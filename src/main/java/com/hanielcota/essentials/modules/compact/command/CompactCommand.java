@@ -1,0 +1,36 @@
+package com.hanielcota.essentials.modules.compact.command;
+
+import com.hanielcota.essentials.command.annotation.EssentialsCommand;
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.compact.config.CompactConfig;
+import com.hanielcota.essentials.modules.compact.service.CompactService;
+import io.github.hanielcota.commandframework.annotation.Command;
+import io.github.hanielcota.commandframework.annotation.Cooldown;
+import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
+import io.github.hanielcota.commandframework.annotation.Description;
+import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.Syntax;
+import io.github.hanielcota.commandframework.core.CommandActor;
+import org.bukkit.entity.Player;
+
+@Command(value = "compactar", aliases = "compact")
+@EssentialsCommand
+@Permission("essentials.compact")
+@Cooldown(duration = "5s")
+@Description("Compacta minérios e barras em blocos no seu inventário.")
+@Syntax("/compactar")
+public record CompactCommand(ConfigHandle<CompactConfig> config, CompactService service) {
+
+  @DefaultSubcommand
+  public void execute(CommandActor actor) {
+    Player sender = actor.unwrap(Player.class);
+    int blocks = service.compact(sender);
+    var snap = config.value();
+
+    if (blocks == 0) {
+      actor.sendError(snap.nothing());
+      return;
+    }
+    actor.sendSuccess(snap.formatSuccess(blocks));
+  }
+}

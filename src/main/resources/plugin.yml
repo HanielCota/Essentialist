@@ -1,0 +1,8 @@
+name: ${name}
+version: ${version}
+main: com.hanielcota.essentials.EssentialsPlugin
+api-version: '${apiVersion}'
+folia-supported: true
+load: STARTUP
+author: HanielCota
+website: https://github.com/HanielCota
