@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.scheduler;
 
 import java.time.Duration;
+import java.util.Objects;
 
 /** Converts {@link Duration} values into Minecraft server ticks. */
 final class Ticks {
@@ -14,6 +15,8 @@ final class Ticks {
    * rejects a delay or period of 0, so any sub-tick duration is rounded up.
    */
   static long fromDuration(Duration duration) {
+    Objects.requireNonNull(duration, "duration");
+
     return Math.max(1L, duration.toMillis() / MILLIS_PER_TICK);
   }
 }

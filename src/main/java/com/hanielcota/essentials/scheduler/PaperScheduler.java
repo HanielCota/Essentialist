@@ -17,12 +17,14 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
   @Override
   public void runSync(Runnable task) {
     Objects.requireNonNull(task, "task");
+
     plugin.getServer().getGlobalRegionScheduler().run(plugin, adapt(task));
   }
 
   @Override
   public void runAsync(Runnable task) {
     Objects.requireNonNull(task, "task");
+
     plugin.getServer().getAsyncScheduler().runNow(plugin, adapt(task));
   }
 
@@ -30,6 +32,7 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
   public void runOnEntity(Entity entity, Runnable task) {
     Objects.requireNonNull(entity, "entity");
     Objects.requireNonNull(task, "task");
+
     entity.getScheduler().run(plugin, adapt(task), null);
   }
 
@@ -37,7 +40,8 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
   public Task runLater(Runnable task, Duration delay) {
     Objects.requireNonNull(task, "task");
     Objects.requireNonNull(delay, "delay");
-    ScheduledTask handle =
+
+    var handle =
         plugin
             .getServer()
             .getGlobalRegionScheduler()
@@ -51,7 +55,7 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
     Objects.requireNonNull(initialDelay, "initialDelay");
     Objects.requireNonNull(period, "period");
 
-    ScheduledTask handle =
+    var handle =
         plugin
             .getServer()
             .getGlobalRegionScheduler()
@@ -64,7 +68,8 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
   public Task runAsyncLater(Runnable task, Duration delay) {
     Objects.requireNonNull(task, "task");
     Objects.requireNonNull(delay, "delay");
-    ScheduledTask handle =
+
+    var handle =
         plugin
             .getServer()
             .getAsyncScheduler()
@@ -78,7 +83,7 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
     Objects.requireNonNull(initialDelay, "initialDelay");
     Objects.requireNonNull(period, "period");
 
-    ScheduledTask handle =
+    var handle =
         plugin
             .getServer()
             .getAsyncScheduler()
