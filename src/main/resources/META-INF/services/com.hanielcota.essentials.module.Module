@@ -7,4 +7,5 @@ com.hanielcota.essentials.modules.compact.CompactModule
 com.hanielcota.essentials.modules.clear.ClearModule
 com.hanielcota.essentials.modules.feed.FeedModule
 com.hanielcota.essentials.modules.hat.HatModule
+com.hanielcota.essentials.modules.repair.RepairModule
 com.hanielcota.essentials.modules.essentials.EssentialsModule

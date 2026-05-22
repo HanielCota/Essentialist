@@ -6,6 +6,7 @@ import com.hanielcota.essentials.module.ModuleMetadata;
 import com.hanielcota.essentials.modules.back.command.BackCommand;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.back.listener.PlayerDeathListener;
+import com.hanielcota.essentials.modules.back.listener.PlayerTeleportListener;
 import com.hanielcota.essentials.modules.back.menu.BackClickHandler;
 import com.hanielcota.essentials.modules.back.menu.BackEntryRenderer;
 import com.hanielcota.essentials.modules.back.menu.BackMenu;
@@ -31,5 +32,6 @@ public final class BackModule extends AbstractModule {
     registerMenu(new BackMenu(config, history, renderer, clickHandler));
     registerCommand(new BackCommand(config, history, menus));
     registerListener(new PlayerDeathListener(history));
+    registerListener(new PlayerTeleportListener(history));
   }
 }
