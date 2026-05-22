@@ -5,6 +5,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.config.MessagePair;
 import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
 import com.hanielcota.essentials.modules.speed.service.SpeedService;
+import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -24,7 +25,7 @@ import org.bukkit.entity.Player;
 @Permission("essentials.speed")
 @Cooldown(duration = "3s")
 @Description("Ajusta a velocidade de andar ou voar do jogador.")
-@Syntax("/speed walk <valor> [jogador] | /speed fly <valor> [jogador]")
+@Syntax("/speed walk <valor> [jogador] | /speed fly <valor> [jogador] | /speed reset [jogador]")
 public record SpeedCommand(
     ConfigHandle<SpeedConfig> config, SpeedService service, PaperCommandFramework framework) {
 
@@ -41,7 +42,7 @@ public record SpeedCommand(
       return;
     }
 
-    announce(sender, subject, valor, config.value().whenWalkSet());
+    announce(sender, subject, config.value().whenWalkSet(valor));
   }
 
   @Subcommand("fly")
@@ -52,18 +53,22 @@ public record SpeedCommand(
       return;
     }
 
-    announce(sender, subject, valor, config.value().whenFlySet());
+    announce(sender, subject, config.value().whenFlySet(valor));
   }
 
-  private void announce(CommandActor sender, Player subject, int valor, MessagePair pair) {
+  @Subcommand("reset")
+  @Alias("resetar")
+  @PermissionForOther("essentials.speed.others")
+  public void reset(CommandActor sender, @TargetOrSelf Player subject) {
+    service.reset(subject);
+    announce(sender, subject, config.value().whenReset());
+  }
+
+  private void announce(CommandActor sender, Player subject, MessagePair pair) {
     var name = subject.getName();
     var isSelf = sender.uniqueId().equals(subject.getUniqueId().toString());
     var target = framework.actorOf(subject);
 
-    var valueStr = Integer.toString(valor);
-    var selfMessage = pair.forSender(isSelf, name).replace("{valor}", valueStr);
-    var targetMessage = pair.forTarget(name).replace("{valor}", valueStr);
-
-    sender.sendDualMessage(target, selfMessage, targetMessage);
+    sender.sendDualMessage(target, pair.forSender(isSelf, name), pair.forTarget(name));
   }
 }
