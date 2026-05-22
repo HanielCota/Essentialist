@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.title.config;
 
-import java.util.Objects;
+import com.hanielcota.essentials.config.MessagePair;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -32,9 +32,8 @@ public record TitleConfig(
         """);
   }
 
-  public String formatSentOther(String player) {
-    Objects.requireNonNull(player, "player");
-    return sentOther.replace("{player}", player);
+  public MessagePair whenSent() {
+    return new MessagePair(sent, sentOther);
   }
 
   public String formatBroadcasted(int count) {

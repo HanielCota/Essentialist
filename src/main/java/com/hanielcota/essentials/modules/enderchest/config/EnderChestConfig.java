@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.enderchest.config;
 
-import java.util.Objects;
+import com.hanielcota.essentials.config.MessagePair;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -19,8 +19,7 @@ public record EnderChestConfig(
         "<red>Você não pode abrir o Ender Chest de outros jogadores.");
   }
 
-  public String formatOpenedOther(String player) {
-    Objects.requireNonNull(player, "player");
-    return openedOther.replace("{player}", player);
+  public MessagePair whenOpened() {
+    return new MessagePair(opened, openedOther);
   }
 }

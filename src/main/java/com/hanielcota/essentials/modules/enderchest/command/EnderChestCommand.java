@@ -31,6 +31,6 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config, EnderChes
     boolean self = target.equals(viewer);
 
     service.open(viewer, target);
-    sender.sendSuccess(self ? snap.opened() : snap.formatOpenedOther(target.getName()));
+    sender.sendSuccess(snap.whenOpened().forSender(self, target.getName()));
   }
 }

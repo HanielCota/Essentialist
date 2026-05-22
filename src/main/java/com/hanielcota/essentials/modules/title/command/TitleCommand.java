@@ -36,8 +36,7 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
 
     service.send(target, request.message());
 
-    var successMessage = toSelf ? snap.sent() : snap.formatSentOther(target.getName());
-    sender.sendSuccess(successMessage);
+    sender.sendSuccess(snap.whenSent().forSender(toSelf, target.getName()));
   }
 
   @Subcommand("broadcast")
