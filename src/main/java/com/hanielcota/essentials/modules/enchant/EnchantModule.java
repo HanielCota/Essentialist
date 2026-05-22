@@ -1,0 +1,19 @@
+package com.hanielcota.essentials.modules.enchant;
+
+import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.modules.enchant.command.EnchantCommand;
+import com.hanielcota.essentials.modules.enchant.config.EnchantConfig;
+import com.hanielcota.essentials.modules.enchant.service.EnchantService;
+
+public final class EnchantModule extends AbstractModule {
+
+  public EnchantModule() {
+    super("enchant");
+  }
+
+  @Override
+  protected void onEnable() {
+    var config = config("enchant", EnchantConfig.class, EnchantConfig::defaults);
+    registerCommand(new EnchantCommand(config, new EnchantService()));
+  }
+}
