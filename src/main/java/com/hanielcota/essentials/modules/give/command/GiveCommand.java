@@ -1,5 +1,9 @@
 package com.hanielcota.essentials.modules.give.command;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.give.config.GiveConfig;
+import com.hanielcota.essentials.modules.give.service.GiveService;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -17,11 +21,6 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Locale;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.give.config.GiveConfig;
-import com.hanielcota.essentials.modules.give.service.GiveService;
-import com.hanielcota.essentials.paper.PlayerProvider;
 
 @Command("give")
 @Permission("essentials.give")

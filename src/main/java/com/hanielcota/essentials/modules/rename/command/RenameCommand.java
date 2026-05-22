@@ -28,12 +28,14 @@ import org.bukkit.entity.Player;
 public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor sender, @DefaultValue("") @GreedyString @Arg("nome") String nome) {
+  public void execute(
+      CommandActor sender, @DefaultValue("") @GreedyString @Arg("nome") String nome) {
     var snap = config.value();
     var player = sender.unwrap(Player.class);
     var trimmed = nome.strip();
 
-    var nameComponent = Optional.of(trimmed)
+    var nameComponent =
+        Optional.of(trimmed)
             .filter(str -> !str.isEmpty())
             .map(ComponentUtils::mini)
             .map(component -> component.decoration(TextDecoration.ITALIC, false))

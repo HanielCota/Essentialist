@@ -18,10 +18,6 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
-import com.hanielcota.essentials.modules.teleport.service.TeleportService;
-
 @Command("tp")
 @Permission("essentials.tp")
 @Cooldown(duration = "3s")

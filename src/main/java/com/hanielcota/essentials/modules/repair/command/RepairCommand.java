@@ -1,5 +1,8 @@
 package com.hanielcota.essentials.modules.repair.command;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.repair.config.RepairConfig;
+import com.hanielcota.essentials.modules.repair.service.RepairService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -12,10 +15,6 @@ import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
-
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.repair.config.RepairConfig;
-import com.hanielcota.essentials.modules.repair.service.RepairService;
 
 @Command(value = "reparar", aliases = "repair")
 @Permission("essentials.repair")

@@ -1,5 +1,9 @@
 package com.hanielcota.essentials.modules.speed.command;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.config.MessagePair;
+import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
+import com.hanielcota.essentials.modules.speed.service.SpeedService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -14,11 +18,6 @@ import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
-
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.config.MessagePair;
-import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
-import com.hanielcota.essentials.modules.speed.service.SpeedService;
 
 @Command("speed")
 @Permission("essentials.speed")
@@ -35,7 +34,10 @@ public record SpeedCommand(
 
   @Subcommand("walk")
   @PermissionForOther(".others")
-  public void walk(CommandActor sender, @Range(min = 1, max = 10) @Arg("valor") int valor, @TargetOrSelf Player subject) {
+  public void walk(
+      CommandActor sender,
+      @Range(min = 1, max = 10) @Arg("valor") int valor,
+      @TargetOrSelf Player subject) {
     if (!service.setWalkSpeed(subject, valor)) {
       sender.sendError(config.value().invalid());
       return;
@@ -46,7 +48,10 @@ public record SpeedCommand(
 
   @Subcommand("fly")
   @PermissionForOther(".others")
-  public void fly(CommandActor sender, @Range(min = 1, max = 10) @Arg("valor") int valor, @TargetOrSelf Player subject) {
+  public void fly(
+      CommandActor sender,
+      @Range(min = 1, max = 10) @Arg("valor") int valor,
+      @TargetOrSelf Player subject) {
     if (!service.setFlySpeed(subject, valor)) {
       sender.sendError(config.value().invalid());
       return;
