@@ -19,11 +19,14 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "3s")
 @Description("Abre o painel de informações.")
 @Syntax("/informacoes")
-public record InfoCommand(MenuService menus) {
+public record InfoCommand(InfoMenu menu, MenuService menus) {
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
     Objects.requireNonNull(actor, "actor");
-    menus.open(actor.unwrap(Player.class), InfoMenu.ID);
+
+    Player player = actor.unwrap(Player.class);
+    menu.reset(player.getUniqueId());
+    menus.open(player, InfoMenu.ID);
   }
 }
