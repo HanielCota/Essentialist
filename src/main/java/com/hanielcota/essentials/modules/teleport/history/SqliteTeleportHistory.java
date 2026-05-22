@@ -49,7 +49,7 @@ public final class SqliteTeleportHistory implements TeleportHistory {
       """;
 
   private static final String LIST =
-      "SELECT id, world, x, y, z, yaw, pitch FROM teleport_history "
+      "SELECT id, world, x, y, z, yaw, pitch, created_at FROM teleport_history "
           + "WHERE player_id = ? ORDER BY created_at DESC LIMIT ?";
 
   private static final String DELETE_BY_ID = "DELETE FROM teleport_history WHERE id = ?";
@@ -81,7 +81,8 @@ public final class SqliteTeleportHistory implements TeleportHistory {
     float yaw = (float) rs.getDouble("yaw");
     float pitch = (float) rs.getDouble("pitch");
     var loc = new Location(world, x, y, z, yaw, pitch);
-    return new HistoryEntry(id, loc);
+    long createdAt = rs.getLong("created_at");
+    return new HistoryEntry(id, loc, createdAt);
   }
 
   @Override

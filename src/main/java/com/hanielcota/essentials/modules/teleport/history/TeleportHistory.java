@@ -14,5 +14,5 @@ public interface TeleportHistory {
 
   void remove(UUID player, long entryId);
 
-  record HistoryEntry(long id, Location location) {}
+  record HistoryEntry(long id, Location location, long createdAt) {}
 }

@@ -18,16 +18,14 @@ public final class PlayerTeleportListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onTeleport(PlayerTeleportEvent event) {
-    if (isTrivial(event.getCause())) {
+    var cause = event.getCause();
+
+    if (cause == TeleportCause.UNKNOWN
+        || cause == TeleportCause.DISMOUNT
+        || cause == TeleportCause.EXIT_BED) {
       return;
     }
 
     history.push(event.getPlayer().getUniqueId(), event.getFrom());
-  }
-
-  private static boolean isTrivial(TeleportCause cause) {
-    return cause == TeleportCause.UNKNOWN
-        || cause == TeleportCause.DISMOUNT
-        || cause == TeleportCause.EXIT_BED;
   }
 }
