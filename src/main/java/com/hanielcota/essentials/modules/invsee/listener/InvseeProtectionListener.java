@@ -18,16 +18,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
  */
 public final class InvseeProtectionListener implements Listener {
 
-  @EventHandler
-  public void onTargetQuit(PlayerQuitEvent event) {
-    closeViewsTargeting(event.getPlayer().getUniqueId());
-  }
-
-  @EventHandler
-  public void onTargetDeath(PlayerDeathEvent event) {
-    closeViewsTargeting(event.getEntity().getUniqueId());
-  }
-
   /** Closes every open /invsee GUI that mirrors the player with {@code targetId}. */
   private static void closeViewsTargeting(UUID targetId) {
     for (Player viewer : Bukkit.getOnlinePlayers()) {
@@ -36,5 +26,15 @@ public final class InvseeProtectionListener implements Listener {
         viewer.closeInventory();
       }
     }
+  }
+
+  @EventHandler
+  public void onTargetQuit(PlayerQuitEvent event) {
+    closeViewsTargeting(event.getPlayer().getUniqueId());
+  }
+
+  @EventHandler
+  public void onTargetDeath(PlayerDeathEvent event) {
+    closeViewsTargeting(event.getEntity().getUniqueId());
   }
 }

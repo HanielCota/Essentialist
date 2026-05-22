@@ -23,6 +23,14 @@ public final class InvseeService {
 
   private static final ItemStack FILLER = filler();
 
+  private static ItemStack filler() {
+    var item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+    var meta = item.getItemMeta();
+    meta.displayName(Component.empty());
+    item.setItemMeta(meta);
+    return item;
+  }
+
   /** Builds the 45-slot invsee GUI populated with {@code target}'s inventory. */
   public Inventory createView(Player target, String title) {
     Objects.requireNonNull(target, "target");
@@ -64,13 +72,5 @@ public final class InvseeService {
     inv.setLeggings(view.getItem(LEGGINGS_SLOT));
     inv.setBoots(view.getItem(BOOTS_SLOT));
     inv.setItemInOffHand(view.getItem(OFFHAND_SLOT));
-  }
-
-  private static ItemStack filler() {
-    var item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-    var meta = item.getItemMeta();
-    meta.displayName(Component.empty());
-    item.setItemMeta(meta);
-    return item;
   }
 }

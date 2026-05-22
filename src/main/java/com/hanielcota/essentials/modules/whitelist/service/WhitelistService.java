@@ -8,6 +8,19 @@ import org.bukkit.OfflinePlayer;
 
 public final class WhitelistService {
 
+  public enum AddResult {
+    ADDED,
+    ALREADY_WHITELISTED,
+    UNKNOWN_PLAYER
+  }
+
+  /** A player's name, falling back to the UUID string when the name is unknown. */
+  public static String nameOf(OfflinePlayer player) {
+    Objects.requireNonNull(player, "player");
+    String name = player.getName();
+    return name != null ? name : player.getUniqueId().toString();
+  }
+
   /** Whitelisted players, sorted by name (case-insensitive). */
   public List<OfflinePlayer> list() {
     return Bukkit.getWhitelistedPlayers().stream()
@@ -15,29 +28,33 @@ public final class WhitelistService {
         .toList();
   }
 
-  /** Whitelists {@code name}; returns {@code false} if it was already whitelisted. */
-  @SuppressWarnings(
-      "deprecation") // getOfflinePlayer(String): whitelisting is name-based by design.
-  public boolean add(String name) {
+  /**
+   * Whitelists a player by name. Resolves only players the server already knows — online or in the
+   * user cache; a name the server has never seen yields {@link AddResult#UNKNOWN_PLAYER}.
+   */
+  public AddResult add(String name) {
     Objects.requireNonNull(name, "name");
-    OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+
+    OfflinePlayer player = resolveKnown(name);
+    if (player == null) {
+      return AddResult.UNKNOWN_PLAYER;
+    }
     if (player.isWhitelisted()) {
-      return false;
+      return AddResult.ALREADY_WHITELISTED;
     }
     player.setWhitelisted(true);
-    return true;
+    return AddResult.ADDED;
   }
 
-  /** Removes {@code name} from the whitelist; returns {@code false} if it was not whitelisted. */
-  @SuppressWarnings(
-      "deprecation") // getOfflinePlayer(String): whitelisting is name-based by design.
+  /** Removes a player from the whitelist by name; returns {@code false} if not whitelisted. */
   public boolean remove(String name) {
     Objects.requireNonNull(name, "name");
-    OfflinePlayer player = Bukkit.getOfflinePlayer(name);
-    if (!player.isWhitelisted()) {
+
+    OfflinePlayer match = findWhitelisted(name);
+    if (match == null) {
       return false;
     }
-    player.setWhitelisted(false);
+    match.setWhitelisted(false);
     return true;
   }
 
@@ -47,10 +64,19 @@ public final class WhitelistService {
     player.setWhitelisted(false);
   }
 
-  /** A player's name, falling back to the UUID string when the name is unknown. */
-  public static String nameOf(OfflinePlayer player) {
-    Objects.requireNonNull(player, "player");
-    String name = player.getName();
-    return name != null ? name : player.getUniqueId().toString();
+  /**
+   * An online or cached player for {@code name}, or {@code null} if the server has never seen it.
+   */
+  private static OfflinePlayer resolveKnown(String name) {
+    OfflinePlayer online = Bukkit.getPlayerExact(name);
+    return online != null ? online : Bukkit.getOfflinePlayerIfCached(name);
+  }
+
+  /** A whitelisted player matching {@code name}, or {@code null} when none matches. */
+  private static OfflinePlayer findWhitelisted(String name) {
+    return Bukkit.getWhitelistedPlayers().stream()
+        .filter(player -> name.equalsIgnoreCase(player.getName()))
+        .findFirst()
+        .orElse(null);
   }
 }

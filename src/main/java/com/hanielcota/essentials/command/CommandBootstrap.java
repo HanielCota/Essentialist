@@ -32,6 +32,21 @@ public final class CommandBootstrap {
     this.customizers = List.copyOf(Objects.requireNonNull(customizers, "customizers"));
   }
 
+  /** Tab-completes enchantment names (without the {@code minecraft:} namespace) by prefix. */
+  private static SuggestionProvider<Enchantment> enchantmentSuggestions() {
+    return context -> {
+      String input = context.currentInput().toLowerCase(Locale.ROOT);
+      List<String> names = new ArrayList<>();
+      for (Enchantment enchantment : Registry.ENCHANTMENT) {
+        String name = enchantment.getKey().getKey();
+        if (name.startsWith(input)) {
+          names.add(name);
+        }
+      }
+      return names;
+    };
+  }
+
   public PaperCommandFramework createFramework() {
     var builder =
         PaperCommandFramework.builder(plugin)
@@ -74,20 +89,5 @@ public final class CommandBootstrap {
         });
 
     return builder.build();
-  }
-
-  /** Tab-completes enchantment names (without the {@code minecraft:} namespace) by prefix. */
-  private static SuggestionProvider<Enchantment> enchantmentSuggestions() {
-    return context -> {
-      String input = context.currentInput().toLowerCase(Locale.ROOT);
-      List<String> names = new ArrayList<>();
-      for (Enchantment enchantment : Registry.ENCHANTMENT) {
-        String name = enchantment.getKey().getKey();
-        if (name.startsWith(input)) {
-          names.add(name);
-        }
-      }
-      return names;
-    };
   }
 }

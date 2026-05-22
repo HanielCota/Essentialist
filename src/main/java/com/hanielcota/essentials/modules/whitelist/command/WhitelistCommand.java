@@ -41,11 +41,12 @@ public record WhitelistCommand(
     Objects.requireNonNull(name, "name");
 
     var snap = config.value();
-    if (service.add(name)) {
-      sender.sendSuccess(snap.formatAdded(name));
-      return;
+    switch (service.add(name)) {
+      case ADDED -> sender.sendSuccess(snap.formatAdded(name));
+      case ALREADY_WHITELISTED -> sender.sendError(snap.formatAlreadyAdded(name));
+      case UNKNOWN_PLAYER -> sender.sendError(snap.formatUnknownPlayer(name));
+      default -> throw new IllegalStateException("Unexpected add result");
     }
-    sender.sendError(snap.formatAlreadyAdded(name));
   }
 
   @Subcommand("remove")

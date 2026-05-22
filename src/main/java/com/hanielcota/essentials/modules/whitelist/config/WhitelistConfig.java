@@ -16,7 +16,9 @@ public record WhitelistConfig(
         String alreadyAdded,
     @Comment("Shown after a player is removed. Placeholder: {player}.") String removed,
     @Comment("Shown when the player is not whitelisted. Placeholder: {player}.")
-        String notWhitelisted) {
+        String notWhitelisted,
+    @Comment("Shown when /whitelist add gets a name the server has never seen. {player}.")
+        String unknownPlayer) {
 
   public static WhitelistConfig defaults() {
     return new WhitelistConfig(
@@ -27,7 +29,13 @@ public record WhitelistConfig(
         "<green><gold>{player}</gold> foi adicionado à whitelist.",
         "<red><gold>{player}</gold> já está na whitelist.",
         "<green><gold>{player}</gold> foi removido da whitelist.",
-        "<red><gold>{player}</gold> não está na whitelist.");
+        "<red><gold>{player}</gold> não está na whitelist.",
+        "<red><gold>{player}</gold> nunca entrou no servidor.");
+  }
+
+  private static String withPlayer(String template, String player) {
+    Objects.requireNonNull(player, "player");
+    return template.replace("{player}", player);
   }
 
   public String formatItemName(String player) {
@@ -50,8 +58,7 @@ public record WhitelistConfig(
     return withPlayer(notWhitelisted, player);
   }
 
-  private static String withPlayer(String template, String player) {
-    Objects.requireNonNull(player, "player");
-    return template.replace("{player}", player);
+  public String formatUnknownPlayer(String player) {
+    return withPlayer(unknownPlayer, player);
   }
 }

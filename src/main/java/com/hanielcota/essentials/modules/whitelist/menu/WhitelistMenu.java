@@ -41,6 +41,12 @@ public final class WhitelistMenu implements Menu {
     this.clickHandler = Objects.requireNonNull(clickHandler, "clickHandler");
   }
 
+  /** Content slots cover every row but the last, which is left for pagination controls. */
+  private static List<Integer> contentSlots(int rows) {
+    int count = rows > MIN_ROWS ? (rows - 1) * SLOTS_PER_ROW : SLOTS_PER_ROW;
+    return IntStream.range(0, count).boxed().toList();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -70,11 +76,5 @@ public final class WhitelistMenu implements Menu {
       slots.add(SlotDefinition.of(-1, template, click -> clickHandler.handle(click, entry)));
     }
     return slots;
-  }
-
-  /** Content slots cover every row but the last, which is left for pagination controls. */
-  private static List<Integer> contentSlots(int rows) {
-    int count = rows > MIN_ROWS ? (rows - 1) * SLOTS_PER_ROW : SLOTS_PER_ROW;
-    return IntStream.range(0, count).boxed().toList();
   }
 }
