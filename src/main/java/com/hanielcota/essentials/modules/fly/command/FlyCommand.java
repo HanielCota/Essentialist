@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PermissionForOther;
+import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -22,13 +23,26 @@ import org.bukkit.entity.Player;
 @PermissionForOther("essentials.fly.others")
 @Cooldown(duration = "5s")
 @Description("Ativa ou desativa o modo voo do jogador.")
-@Syntax("/fly [jogador]")
+@Syntax("/fly [jogador] | /fly on [jogador] | /fly off [jogador]")
 public record FlyCommand(
     ConfigHandle<FlyConfig> config, FlyService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    var result = service.toggle(subject);
+    announce(sender, subject, service.toggle(subject));
+  }
+
+  @Subcommand("on")
+  public void on(CommandActor sender, @TargetOrSelf Player subject) {
+    announce(sender, subject, service.set(subject, true));
+  }
+
+  @Subcommand("off")
+  public void off(CommandActor sender, @TargetOrSelf Player subject) {
+    announce(sender, subject, service.set(subject, false));
+  }
+
+  private void announce(CommandActor sender, Player subject, FlyService.Result result) {
     var snap = config.value();
     String name = subject.getName();
     boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
@@ -40,8 +54,6 @@ public record FlyCommand(
 
     var pair = snap.toggle(result == FlyService.Result.ENABLED);
     var target = framework.actorOf(subject);
-    String selfMessage = pair.forSender(self, name);
-
-    sender.sendDualMessage(target, selfMessage, pair.forTarget(name));
+    sender.sendDualMessage(target, pair.forSender(self, name), pair.forTarget(name));
   }
 }

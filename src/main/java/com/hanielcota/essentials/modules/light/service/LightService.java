@@ -27,18 +27,21 @@ public final class LightService {
    * @return {@code true} when night vision was enabled, {@code false} when disabled
    */
   public boolean toggle(Player player) {
+    boolean enabled = !player.getPersistentDataContainer().has(key, PersistentDataType.BYTE);
+    set(player, enabled);
+    return enabled;
+  }
+
+  /** Enables or disables command-managed night vision explicitly. */
+  public void set(Player player, boolean enabled) {
     var pdc = player.getPersistentDataContainer();
-    boolean active = pdc.has(key, PersistentDataType.BYTE);
-
     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-    if (active) {
+    if (enabled) {
+      pdc.set(key, PersistentDataType.BYTE, (byte) 1);
+      player.addPotionEffect(
+          new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0));
+    } else {
       pdc.remove(key);
-      return false;
     }
-
-    pdc.set(key, PersistentDataType.BYTE, (byte) 1);
-    player.addPotionEffect(
-        new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0));
-    return true;
   }
 }
