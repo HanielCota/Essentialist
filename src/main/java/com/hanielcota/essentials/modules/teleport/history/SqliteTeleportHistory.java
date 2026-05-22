@@ -1,24 +1,18 @@
 package com.hanielcota.essentials.modules.teleport.history;
 
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.database.Sql;
-import com.hanielcota.essentials.util.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseable {
-
-  private static final Log LOG = Log.of(SqliteTeleportHistory.class);
 
   private static final String CREATE_TABLE =
       """
@@ -65,21 +59,15 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
   private final DatabaseProvider database;
 
   /**
-   * Single-threaded executor for history writes. Teleport events fire on the server thread; running
-   * the SQLite INSERT/DELETE there would block the main thread on disk I/O. Reads ({@link #list})
-   * stay synchronous — they only happen on the rare {@code /back} command, not on every teleport.
+   * Single-threaded writer for history mutations. Teleport events fire on the server thread; the
+   * SQLite INSERT/DELETE must not block it on disk I/O. Reads ({@link #list}) stay synchronous —
+   * they only run on the rare {@code /back} command, not on every teleport.
    */
-  private final ExecutorService writeExecutor;
+  private final AsyncDatabaseWriter writer;
 
   public SqliteTeleportHistory(DatabaseProvider database) {
     this.database = Objects.requireNonNull(database, "database");
-    this.writeExecutor =
-        Executors.newSingleThreadExecutor(
-            runnable -> {
-              var thread = new Thread(runnable, "Essentialist-TeleportHistory");
-              thread.setDaemon(true);
-              return thread;
-            });
+    this.writer = new AsyncDatabaseWriter("Essentialist-TeleportHistory");
     Sql.ddl(database, CREATE_TABLE, CREATE_INDEX);
   }
 
@@ -125,7 +113,7 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     float pitch = location.getPitch();
     long createdAt = System.currentTimeMillis();
 
-    submit(
+    writer.submit(
         "push",
         () ->
             Sql.tx(
@@ -171,7 +159,7 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
       return;
     }
     String playerId = player.toString();
-    submit(
+    writer.submit(
         "remove",
         () ->
             Sql.update(
@@ -183,33 +171,8 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
                 }));
   }
 
-  /** Hands a write off to the background executor, logging (never rethrowing) any failure. */
-  private void submit(String operation, Runnable work) {
-    try {
-      writeExecutor.execute(
-          () -> {
-            try {
-              work.run();
-            } catch (RuntimeException e) {
-              LOG.warn(e, "Async teleport-history {} failed", operation);
-            }
-          });
-    } catch (RejectedExecutionException e) {
-      LOG.warn("Teleport-history executor rejected {} (plugin shutting down?)", operation);
-    }
-  }
-
   @Override
   public void close() {
-    writeExecutor.shutdown();
-    try {
-      if (!writeExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
-        int dropped = writeExecutor.shutdownNow().size();
-        LOG.warn("Teleport-history writer did not drain within 5s; {} write(s) dropped", dropped);
-      }
-    } catch (InterruptedException e) {
-      writeExecutor.shutdownNow();
-      Thread.currentThread().interrupt();
-    }
+    writer.close();
   }
 }
