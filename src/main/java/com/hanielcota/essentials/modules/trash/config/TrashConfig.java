@@ -9,7 +9,7 @@ public record TrashConfig(
     @Comment("Trash menu title.") String title) {
 
   public static TrashConfig defaults() {
-    return new TrashConfig(4, "<dark_gray>Lixeira");
+    return new TrashConfig(4, "Lixeira");
   }
 
   /** Inventory slot count: rows (clamped to 1-6) times nine. */
