@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.teleport.command;
 
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.teleport.config.TeleportMessages;
+import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -24,9 +24,7 @@ import org.bukkit.entity.Player;
 @Description("Teleporta o jogador para outro jogador ou coordenadas.")
 @Syntax("/tp <jogador> | /tp move <de> <para> | /tp pos <x> <y> <z>")
 public record TeleportCommand(
-    ConfigHandle<TeleportMessages> config,
-    TeleportService service,
-    PaperCommandFramework framework) {
+    ConfigHandle<TeleportConfig> config, TeleportService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
   @Description("Teleporta você até outro jogador.")

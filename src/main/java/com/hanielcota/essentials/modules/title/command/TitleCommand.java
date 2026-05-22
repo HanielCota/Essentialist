@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.title.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.title.config.TitleConfig;
+import com.hanielcota.essentials.modules.title.service.TitleRequest;
 import com.hanielcota.essentials.modules.title.service.TitleService;
 import io.github.hanielcota.commandframework.annotation.*;
 import io.github.hanielcota.commandframework.core.CommandActor;

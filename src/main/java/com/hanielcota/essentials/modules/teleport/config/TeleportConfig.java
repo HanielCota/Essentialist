@@ -5,7 +5,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 @ConfigSerializable
-public record TeleportMessages(
+public record TeleportConfig(
     @Comment("/tp <player> sender message. Placeholders: {player}.") String toPlayer,
     @Comment("/tp <player> destination notification. Placeholders: {player}.") String teleportedTo,
     @Comment("Self-target error.") String selfTarget,
@@ -20,8 +20,8 @@ public record TeleportMessages(
     @Comment("Shown by /tp pos when coordinates are outside the world limits.")
         String invalidPosition) {
 
-  public static TeleportMessages defaults() {
-    return new TeleportMessages(
+  public static TeleportConfig defaults() {
+    return new TeleportConfig(
         "<green>Teleported to <gold>{player}</gold>.",
         "<yellow><gold>{player}</gold> teleported to you.",
         "<red>You are already there.",

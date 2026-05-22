@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.title.command;
+package com.hanielcota.essentials.modules.title.service;
 
 import java.util.Objects;
 import org.bukkit.Bukkit;

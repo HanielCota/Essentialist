@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.kick.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kick.config.KickConfig;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.modules.kick.service.KickService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "3s")
 @Description("Expulsa um jogador do servidor.")
 @Syntax("/kick <jogador> [motivo]")
-public record KickCommand(ConfigHandle<KickConfig> config) {
+public record KickCommand(ConfigHandle<KickConfig> config, KickService service) {
 
   @DefaultSubcommand
   public void execute(
@@ -36,7 +36,7 @@ public record KickCommand(ConfigHandle<KickConfig> config) {
     var snap = config.value();
     String reason = snap.reasonOr(motivo.strip());
 
-    target.kick(ComponentUtils.mini(snap.formatScreen(reason)));
+    service.kick(target, snap.formatScreen(reason));
     sender.sendSuccess(snap.formatKicked(target.getName(), reason));
   }
 }
