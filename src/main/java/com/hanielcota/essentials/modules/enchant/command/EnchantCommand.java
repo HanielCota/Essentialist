@@ -55,6 +55,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
 
     var snap = config.value();
     String label = enchantName(enchantment);
+
     switch (service.remove(sender.unwrap(Player.class), enchantment)) {
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
       case NOT_ENCHANTED -> sender.sendError(snap.formatNotEnchanted(label));
@@ -73,6 +74,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       sender.sendError(snap.emptyHand());
       return;
     }
+
     if (removed == 0) {
       sender.sendError(snap.nothingToClear());
       return;

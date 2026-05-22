@@ -39,10 +39,11 @@ public final class EnchantService {
     if (held.getType().isAir()) {
       return Result.EMPTY_HAND;
     }
-    if (held.removeEnchantment(enchantment) == 0) {
+    if (!held.containsEnchantment(enchantment)) {
       return Result.NOT_ENCHANTED;
     }
 
+    held.removeEnchantment(enchantment);
     inventory.setItemInMainHand(held);
     return Result.REMOVED;
   }
