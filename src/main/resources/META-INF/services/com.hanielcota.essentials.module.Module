@@ -24,4 +24,5 @@ com.hanielcota.essentials.modules.kick.KickModule
 com.hanielcota.essentials.modules.invsee.InvseeModule
 com.hanielcota.essentials.modules.whitelist.WhitelistModule
 com.hanielcota.essentials.modules.info.InfoModule
+com.hanielcota.essentials.modules.rename.RenameModule
 com.hanielcota.essentials.modules.essentials.EssentialsModule
