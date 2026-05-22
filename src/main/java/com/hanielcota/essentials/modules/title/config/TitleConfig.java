@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.title.config;
 
+import java.util.Objects;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -26,15 +27,18 @@ public record TitleConfig(
         "<green>Título enviado para <gold>{player}</gold>.",
         "<green>Título enviado para <gold>{count}</gold> jogador(es).",
         "<red>Você não tem permissão para enviar títulos a outros jogadores.",
-        "<yellow>Uso: <gray>/title [jogador] mensagem</gray>. Separe título e subtítulo com"
-            + " <gray>|</gray>.");
+        """
+        <yellow>Uso: <gray>/title [jogador] "título" "subtítulo"</gray> — o subtítulo é opcional.\
+        """);
   }
 
   public String formatSentOther(String player) {
+    Objects.requireNonNull(player, "player");
     return sentOther.replace("{player}", player);
   }
 
   public String formatBroadcasted(int count) {
-    return broadcasted.replace("{count}", Integer.toString(count));
+    var countStr = Integer.toString(count);
+    return broadcasted.replace("{count}", countStr);
   }
 }
