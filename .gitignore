@@ -1,11 +1,62 @@
+# ===== Gradle =====
 .gradle/
 build/
+gradle-app.setting
+.gradletasknamecache
+
+# ===== Build / compiled output =====
 out/
 bin/
+*.class
+
+# ===== IntelliJ IDEA =====
 .idea/
 *.iml
-.vscode/
+*.ipr
+*.iws
+
+# ===== Eclipse =====
 .settings/
 .classpath
 .project
+.factorypath
+
+# ===== VS Code =====
+.vscode/
+
+# ===== NetBeans =====
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# ===== Java / JVM crash logs =====
+hs_err_pid*
+replay_pid*
+*.hprof
+
+# ===== Logs =====
 *.log
+logs/
+
+# ===== Paper test server =====
+run/
+
+# ===== OS files =====
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# ===== Editor temp / backup files =====
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# ===== Local / secret config =====
+.env
+*.local
