@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.invsee.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.invsee.config.InvseeConfig;
+import com.hanielcota.essentials.modules.invsee.service.InvseeService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -18,9 +19,9 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.invsee")
 @Cooldown(duration = "3s")
-@Description("Abre o inventário de outro jogador.")
+@Description("Abre o inventário, a armadura e a off-hand de outro jogador.")
 @Syntax("/invsee <jogador>")
-public record InvseeCommand(ConfigHandle<InvseeConfig> config) {
+public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService service) {
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @OnlinePlayer Player target) {
@@ -34,8 +35,7 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config) {
       return;
     }
 
-    // Opens the target's live inventory — edits affect the real inventory.
-    viewer.openInventory(target.getInventory());
+    viewer.openInventory(service.createView(target, snap.formatTitle(target.getName())));
     sender.sendSuccess(snap.formatOpened(target.getName()));
   }
 }
