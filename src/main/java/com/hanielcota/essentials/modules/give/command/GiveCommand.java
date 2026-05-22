@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.give.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.give.config.GiveConfig;
 import com.hanielcota.essentials.modules.give.service.GiveService;
@@ -47,7 +48,7 @@ public record GiveCommand(
       @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     if (!item.isItem()) {
       sender.sendError(snap.invalidItem());

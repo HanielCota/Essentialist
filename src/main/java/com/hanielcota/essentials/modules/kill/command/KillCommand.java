@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.kill.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kill.config.KillConfig;
 import com.hanielcota.essentials.modules.kill.service.KillService;
@@ -30,7 +31,7 @@ public record KillCommand(
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     if (!service.kill(subject)) {
       sender.sendError(snap.whenAlreadyDead().forSender(self, name));

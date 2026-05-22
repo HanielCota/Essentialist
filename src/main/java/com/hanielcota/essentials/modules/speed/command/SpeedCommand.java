@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.speed.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.config.MessagePair;
 import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
@@ -69,7 +70,7 @@ public record SpeedCommand(
 
   private void announce(CommandActor sender, Player subject, MessagePair pair) {
     var name = subject.getName();
-    var isSelf = sender.uniqueId().equals(subject.getUniqueId().toString());
+    var isSelf = Senders.isSelf(sender, subject);
     var target = framework.actorOf(subject);
 
     sender.sendDualMessage(target, pair.forSender(isSelf, name), pair.forTarget(name));

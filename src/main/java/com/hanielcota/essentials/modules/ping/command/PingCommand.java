@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.ping.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.ping.config.PingConfig;
 import com.hanielcota.essentials.modules.ping.service.PingService;
@@ -25,7 +26,7 @@ public record PingCommand(ConfigHandle<PingConfig> config, PingService service) 
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     String coloredPing = service.format(subject.getPing());
     String message = config.value().message().forSender(self, name).replace("{ping}", coloredPing);

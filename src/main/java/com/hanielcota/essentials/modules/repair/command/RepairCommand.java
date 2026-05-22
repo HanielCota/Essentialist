@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.repair.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
 import com.hanielcota.essentials.modules.repair.service.RepairService;
@@ -29,7 +30,7 @@ public record RepairCommand(
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     var result = service.repairHand(subject);
     switch (result) {
@@ -49,7 +50,7 @@ public record RepairCommand(
   public void all(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     int repaired = service.repairAll(subject);
     if (repaired == 0) {

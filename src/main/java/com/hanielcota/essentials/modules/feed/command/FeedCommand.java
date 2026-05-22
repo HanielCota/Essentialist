@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.feed.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.feed.config.FeedConfig;
 import com.hanielcota.essentials.modules.feed.service.FeedService;
@@ -33,7 +34,7 @@ public record FeedCommand(
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     if (!service.feed(subject)) {
       sender.sendError(snap.whenAlreadyFull().forSender(self, name));

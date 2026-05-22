@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.gamemode.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.gamemode.config.GamemodeConfig;
 import com.hanielcota.essentials.modules.gamemode.service.GamemodeService;
@@ -33,7 +34,7 @@ public record GamemodeCommand(
       CommandActor sender, @Arg("modo") GameMode mode, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     if (service.apply(subject, mode) == GamemodeService.Result.ALREADY_IN_MODE) {
       sender.sendError(snap.whenAlreadyInMode(mode).forSender(self, name));

@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.heal.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.heal.config.HealConfig;
 import com.hanielcota.essentials.modules.heal.service.HealService;
@@ -33,7 +34,7 @@ public record HealCommand(
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     if (subject.getHealth() <= 0) {
       sender.sendError(snap.whenDead().forSender(self, name));

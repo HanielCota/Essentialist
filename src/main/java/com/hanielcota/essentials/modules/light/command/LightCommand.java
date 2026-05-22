@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.light.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.light.config.LightConfig;
 import com.hanielcota.essentials.modules.light.service.LightService;
@@ -45,7 +46,7 @@ public record LightCommand(
   private void announce(CommandActor sender, Player subject, boolean enabled) {
     var pair = config.value().toggle(enabled);
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
     var target = framework.actorOf(subject);
     sender.sendDualMessage(target, pair.forSender(self, name), pair.forTarget(name));
   }

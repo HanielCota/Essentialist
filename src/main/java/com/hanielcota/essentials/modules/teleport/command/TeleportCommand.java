@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.teleport.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
@@ -69,7 +70,7 @@ public record TeleportCommand(
 
     sender.sendSuccess(snap.formatMoveSender(from.getName(), to.getName()));
 
-    if (!sender.uniqueId().equals(from.getUniqueId().toString())) {
+    if (!Senders.isSelf(sender, from)) {
       framework.actorOf(from).sendSuccess(snap.formatMoveNotify(sender.name()));
     }
   }

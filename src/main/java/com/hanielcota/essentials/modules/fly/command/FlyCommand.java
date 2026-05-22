@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.fly.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.fly.config.FlyConfig;
 import com.hanielcota.essentials.modules.fly.service.FlyService;
@@ -43,7 +44,7 @@ public record FlyCommand(
   private void announce(CommandActor sender, Player subject, FlyService.Result result) {
     var snap = config.value();
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     if (result == FlyService.Result.UNSUPPORTED) {
       sender.sendError(snap.unsupportedGamemode().forSender(self, name));

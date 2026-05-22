@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.clear.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.clear.config.ClearConfig;
 import com.hanielcota.essentials.modules.clear.service.ClearService;
@@ -31,7 +32,7 @@ public record ClearCommand(
     var snap = config.value();
     int removed = service.clear(subject, snap.clearArmor());
     String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    boolean self = Senders.isSelf(sender, subject);
 
     if (removed == 0) {
       sender.sendError(snap.whenEmpty().forSender(self, name));
