@@ -15,8 +15,7 @@ import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
-import net.kyori.adventure.text.Component;
+import java.util.Optional;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
@@ -31,24 +30,29 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
   @DefaultSubcommand
   public void execute(
       CommandActor sender, @DefaultValue("") @GreedyString @Arg("nome") String nome) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(nome, "nome");
+    if (!sender.isPlayer()) {
+      sender.sendError("<red>Este comando só pode ser executado por jogadores.");
+      return;
+    }
 
     var snap = config.value();
-    Player player = sender.unwrap(Player.class);
-    String trimmed = nome.strip();
+    var player = sender.unwrap(Player.class);
+    var trimmed = nome.strip();
 
-    // No name resets the item; a name is shown without the default italic styling.
-    Component name =
-        trimmed.isEmpty()
-            ? null
-            : ComponentUtils.mini(trimmed).decoration(TextDecoration.ITALIC, false);
+    var nameComponent =
+        Optional.of(trimmed)
+            .filter(str -> !str.isEmpty())
+            .map(ComponentUtils::mini)
+            .map(component -> component.decoration(TextDecoration.ITALIC, false))
+            .orElse(null);
 
-    switch (service.rename(player, name)) {
+    var result = service.rename(player, nameComponent);
+
+    switch (result) {
       case RENAMED -> sender.sendSuccess(snap.formatRenamed(trimmed));
       case CLEARED -> sender.sendSuccess(snap.cleared());
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
-      default -> throw new IllegalStateException("Unexpected rename result");
+      default -> throw new IllegalStateException("Unexpected rename result: " + result);
     }
   }
 }

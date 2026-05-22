@@ -13,9 +13,6 @@ public final class RenameService {
     EMPTY_HAND
   }
 
-  /**
-   * Sets the held item's display name, or clears it back to the default when {@code name} is null.
-   */
   public Result rename(Player player, @Nullable Component name) {
     Objects.requireNonNull(player, "player");
 
@@ -27,6 +24,7 @@ public final class RenameService {
     var meta = held.getItemMeta();
     meta.displayName(name);
     held.setItemMeta(meta);
+
     return name != null ? Result.RENAMED : Result.CLEARED;
   }
 }
