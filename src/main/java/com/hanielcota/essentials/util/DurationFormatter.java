@@ -16,7 +16,7 @@ public final class DurationFormatter {
     long minutes = (totalSeconds % 3_600L) / 60L;
     long seconds = totalSeconds % 60L;
 
-    StringBuilder sb = new StringBuilder();
+    var sb = new StringBuilder();
     if (days > 0) sb.append(days).append("d ");
     if (hours > 0) sb.append(hours).append("h ");
     if (minutes > 0) sb.append(minutes).append("m ");

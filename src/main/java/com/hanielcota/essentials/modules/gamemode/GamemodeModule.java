@@ -1,10 +1,10 @@
 package com.hanielcota.essentials.modules.gamemode;
 
-import com.hanielcota.essentials.command.ActorMessages;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.gamemode.command.GamemodeCommand;
 import com.hanielcota.essentials.modules.gamemode.config.GamemodeConfig;
 import com.hanielcota.essentials.modules.gamemode.service.GamemodeService;
+import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 
 public final class GamemodeModule extends AbstractModule {
 
@@ -18,6 +18,7 @@ public final class GamemodeModule extends AbstractModule {
         configure(
             "gamemode", GamemodeConfig.class, GamemodeConfig::defaults, new GamemodeService());
     registerCommand(
-        new GamemodeCommand(config, service(GamemodeService.class), service(ActorMessages.class)));
+        new GamemodeCommand(
+            config, service(GamemodeService.class), service(PaperCommandFramework.class)));
   }
 }

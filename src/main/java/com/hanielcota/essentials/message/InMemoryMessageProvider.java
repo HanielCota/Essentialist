@@ -32,7 +32,7 @@ public final class InMemoryMessageProvider implements MutableMessageProvider {
   public Optional<String> get(Locale locale, MessageKey key) {
     Objects.requireNonNull(locale, "locale");
     Objects.requireNonNull(key, "key");
-    Map<MessageKey, String> bucket = messages.get(locale);
+    var bucket = messages.get(locale);
     if (bucket == null) {
       return Optional.empty();
     }

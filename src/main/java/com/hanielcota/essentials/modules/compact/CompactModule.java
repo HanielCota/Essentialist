@@ -14,7 +14,7 @@ public final class CompactModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("compact", CompactConfig.class, CompactConfig::defaults);
-    CompactService service = new CompactService(config);
+    var service = new CompactService(config);
     registerService(CompactService.class, service);
     registerCommand(new CompactCommand(config, service));
   }

@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.config;
 
 import com.hanielcota.essentials.exception.ConfigurationException;
+import com.hanielcota.essentials.util.Log;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,8 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 public final class YamlConfigService implements ConfigService {
 
+  private static final Log LOG = Log.of(YamlConfigService.class);
+
   private final Path baseDir;
   private final Map<String, Handle<?>> handles = new ConcurrentHashMap<>();
   private final CopyOnWriteArrayList<Runnable> reloadCallbacks = new CopyOnWriteArrayList<>();
@@ -33,7 +36,7 @@ public final class YamlConfigService implements ConfigService {
     Objects.requireNonNull(type, "type");
     Objects.requireNonNull(defaults, "defaults");
 
-    Handle<?> existing = handles.get(name);
+    var existing = handles.get(name);
     if (existing != null) {
       if (!existing.type.equals(type)) {
         throw new IllegalStateException(
@@ -46,7 +49,7 @@ public final class YamlConfigService implements ConfigService {
       }
       return (ConfigHandle<T>) existing;
     }
-    Handle<T> handle = new Handle<>(name, type, defaults);
+    var handle = new Handle<>(name, type, defaults);
     handle.refresh();
     handles.put(name, handle);
     return handle;
@@ -54,7 +57,7 @@ public final class YamlConfigService implements ConfigService {
 
   @Override
   public ReloadReport reloadAll() {
-    Map<String, String> failures = new LinkedHashMap<>();
+    var failures = new LinkedHashMap<String, String>();
     for (Handle<?> handle : handles.values()) {
       try {
         handle.refresh();
@@ -66,7 +69,7 @@ public final class YamlConfigService implements ConfigService {
       try {
         callback.run();
       } catch (RuntimeException e) {
-        failures.put("reload-callback", e.getMessage() != null ? e.getMessage() : e.toString());
+        LOG.warn(e, "Reload callback failed");
       }
     }
     return new ReloadReport(handles.size(), failures);
@@ -80,16 +83,16 @@ public final class YamlConfigService implements ConfigService {
   }
 
   private <T> T readFromDisk(String name, Class<T> type, Supplier<T> defaults) {
-    Path file = baseDir.resolve(name + ".yml");
+    var file = baseDir.resolve(name + ".yml");
     ensureParent(file);
 
-    YamlConfigurationLoader loader =
+    var loader =
         YamlConfigurationLoader.builder().path(file).nodeStyle(NodeStyle.BLOCK).indent(2).build();
 
     try {
-      CommentedConfigurationNode node = loader.load();
+      var node = loader.load();
 
-      CommentedConfigurationNode defaultsNode = CommentedConfigurationNode.root(node.options());
+      var defaultsNode = CommentedConfigurationNode.root(node.options());
       defaultsNode.set(type, defaults.get());
 
       int sizeBefore = node.childrenMap().size();
@@ -111,7 +114,7 @@ public final class YamlConfigService implements ConfigService {
   }
 
   private void ensureParent(Path file) {
-    Path parent = file.getParent();
+    var parent = file.getParent();
     if (parent == null) {
       return;
     }

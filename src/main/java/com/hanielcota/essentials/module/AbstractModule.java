@@ -3,7 +3,6 @@ package com.hanielcota.essentials.module;
 import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.EssentialsPlugin;
-import com.hanielcota.essentials.command.CommandRegistrar;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.config.ConfigService;
 import com.hanielcota.essentials.message.MessageKey;
@@ -97,23 +96,7 @@ public abstract class AbstractModule implements Module {
     return service(ConfigService.class).load(name, type, defaults);
   }
 
-  /**
-   * Loads a config, registers the service, and returns the config handle in one call.
-   *
-   * <p>Eliminates the repetitive three-line pattern in player command modules:
-   *
-   * <pre>
-   * var config = config("fly", FlyConfig.class, FlyConfig::defaults);
-   * FlyService service = new FlyService();
-   * registerService(FlyService.class, service);
-   * </pre>
-   *
-   * <p>Becomes:
-   *
-   * <pre>
-   * var config = configure("fly", FlyConfig.class, FlyConfig::defaults, new FlyService());
-   * </pre>
-   */
+  /** Loads a config, registers the service, and returns the config handle in one call. */
   protected final <C, S> ConfigHandle<C> configure(
       String name, Class<C> configType, Supplier<C> defaults, S service) {
     var handle = config(name, configType, defaults);
@@ -135,24 +118,8 @@ public abstract class AbstractModule implements Module {
     return messages().resolve(key, placeholders);
   }
 
-  protected final void registerCommand(Class<?> handlerClass) {
-    service(CommandRegistrar.class).register(handlerClass);
-  }
-
   protected final void registerCommand(Object handler) {
-    service(CommandRegistrar.class).register(handler);
-  }
-
-  /**
-   * Scans the {@code command} sub-package of the caller's package for {@code @Command} annotated
-   * classes and registers them automatically.
-   *
-   * <p>Dependencies must be satisfied by the framework's {@link DependencyRegistry} (via {@link
-   * #registerService}).
-   */
-  protected final void registerCommandsInPackage() {
-    String pkg = getClass().getPackageName() + ".command";
-    service(CommandRegistrar.class).framework().registerPackage(pkg);
+    service(PaperCommandFramework.class).registerAnnotated(handler);
   }
 
   protected final void registerMenu(Menu menu) {

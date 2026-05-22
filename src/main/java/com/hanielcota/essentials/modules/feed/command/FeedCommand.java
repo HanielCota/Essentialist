@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.feed.command;
 
-import com.hanielcota.essentials.command.ActorMessages;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.feed.config.FeedConfig;
@@ -14,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
 @Command(value = "alimentar", aliases = "feed")
@@ -24,19 +24,23 @@ import org.bukkit.entity.Player;
 @Description("Alimenta o jogador restaurando fome e saturação.")
 @Syntax("/alimentar [jogador]")
 public record FeedCommand(
-    ConfigHandle<FeedConfig> config, FeedService service, ActorMessages messages) {
+    ConfigHandle<FeedConfig> config, FeedService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    boolean fed = service.feed(subject);
     var snap = config.value();
     String name = subject.getName();
+    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
 
-    if (!fed) {
-      sender.sendError(snap.whenAlreadyFull().format(true, name));
+    if (!service.feed(subject)) {
+      sender.sendError(snap.whenAlreadyFull().forSender(self, name));
       return;
     }
 
-    messages.notifyTarget(sender, subject, snap.whenFed(), name);
+    var pair = snap.whenFed();
+    var target = framework.actorOf(subject);
+    String selfMessage = pair.forSender(self, name);
+
+    sender.sendDualMessage(target, selfMessage, pair.forTarget(name));
   }
 }

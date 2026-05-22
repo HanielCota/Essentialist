@@ -4,7 +4,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.smelt.config.SmeltConfig;
 import com.hanielcota.essentials.util.ItemStacks;
 import java.util.Objects;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,7 +23,7 @@ public record SmeltService(ConfigHandle<SmeltConfig> config) {
       if (item == null || !ItemStacks.isPlain(item)) {
         continue;
       }
-      Material result = mappings.get(item.getType());
+      var result = mappings.get(item.getType());
       if (result != null) {
         inv.setItem(slot, new ItemStack(result, item.getAmount()));
         count += item.getAmount();

@@ -15,7 +15,10 @@ public record TeleportMessages(
     @Comment("/tp pos <x> <y> <z> sender message. Placeholders: {x}, {y}, {z}.") String toPos,
     @Comment("/tphere <player> sender message. Placeholders: {player}.") String broughtPlayer,
     @Comment("/tphere <player> notification to the moved player. Placeholders: {sender}.")
-        String broughtBy) {
+        String broughtBy,
+    @Comment("Shown when a teleport could not be completed.") String teleportFailed,
+    @Comment("Shown by /tp pos when coordinates are outside the world limits.")
+        String invalidPosition) {
 
   public static TeleportMessages defaults() {
     return new TeleportMessages(
@@ -26,7 +29,9 @@ public record TeleportMessages(
         "<yellow>You were teleported by <gold>{sender}</gold>.",
         "<green>Teleported to <gold>{x}, {y}, {z}</gold>.",
         "<green>Brought <gold>{player}</gold> to you.",
-        "<yellow>Teleported to <gold>{sender}</gold>.");
+        "<yellow>Teleported to <gold>{sender}</gold>.",
+        "<red>The teleport could not be completed.",
+        "<red>Those coordinates are outside the world limits.");
   }
 
   public String formatToPlayer(String player) {

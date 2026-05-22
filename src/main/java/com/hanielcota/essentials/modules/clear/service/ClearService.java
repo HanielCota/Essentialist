@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.clear.service;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 public final class ClearService {
 
@@ -18,8 +17,8 @@ public final class ClearService {
   }
 
   public int clear(Player player) {
-    PlayerInventory inv = player.getInventory();
-    int removed = countItems(inv.getContents()) + countItems(inv.getArmorContents());
+    var inv = player.getInventory();
+    int removed = countItems(inv.getContents());
     if (removed == 0) {
       return 0;
     }

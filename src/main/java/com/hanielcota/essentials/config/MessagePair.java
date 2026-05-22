@@ -3,15 +3,14 @@ package com.hanielcota.essentials.config;
 import java.util.Objects;
 
 /**
- * Immutable pair of self / other message templates.
- *
- * <p>Eliminates repetitive {@code xxxFor(boolean selfTarget, String player)} methods in config
- * records. Placeholders supported:
+ * Immutable pair of self / other message templates. Placeholders:
  *
  * <ul>
- *   <li>{@code {player}} — replaced by the target player's name
- *   <li>{@code {gamemode}} — replaced by the gamemode display name
+ *   <li>{@code {player}} — replaced by the target player's name.
  * </ul>
+ *
+ * <p>Other placeholders (e.g. {@code {gamemode}}) are expected to be pre-substituted by the config
+ * record before producing the pair.
  */
 public record MessagePair(String self, String other) {
 
@@ -20,29 +19,21 @@ public record MessagePair(String self, String other) {
     Objects.requireNonNull(other, "other");
   }
 
-  /** Returns {@code self} when {@code selfTarget} is true, otherwise {@code other}. */
-  public String select(boolean selfTarget) {
-    return selfTarget ? self : other;
+  /**
+   * Message from the sender's perspective.
+   *
+   * <p>Returns {@code self} when the sender is also the target, otherwise {@code other}. {@code
+   * {player}} is replaced with {@code player}.
+   */
+  public String forSender(boolean selfTarget, String player) {
+    return (selfTarget ? self : other).replace("{player}", player);
   }
 
   /**
-   * Formats the appropriate template replacing {@code {player}}.
-   *
-   * @param selfTarget whether the target is the actor themselves
-   * @param player the target player's name
+   * Message from the target's perspective — always the {@code self} template with {@code {player}}
+   * replaced.
    */
-  public String format(boolean selfTarget, String player) {
-    return select(selfTarget).replace("{player}", player);
-  }
-
-  /**
-   * Formats the appropriate template replacing {@code {player}} and {@code {gamemode}}.
-   *
-   * @param selfTarget whether the target is the actor themselves
-   * @param player the target player's name
-   * @param gamemode the gamemode display name
-   */
-  public String format(boolean selfTarget, String player, String gamemode) {
-    return select(selfTarget).replace("{player}", player).replace("{gamemode}", gamemode);
+  public String forTarget(String player) {
+    return self.replace("{player}", player);
   }
 }

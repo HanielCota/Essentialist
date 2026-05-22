@@ -2,6 +2,8 @@ package com.hanielcota.essentials.modules.teleport;
 
 import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.modules.teleport.command.TeleportCommand;
+import com.hanielcota.essentials.modules.teleport.command.TeleportHereCommand;
 import com.hanielcota.essentials.modules.teleport.config.TeleportMessages;
 import com.hanielcota.essentials.modules.teleport.history.SqliteTeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
@@ -17,15 +19,14 @@ public final class TeleportModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("teleport", TeleportMessages.class, TeleportMessages::defaults);
-    TeleportHistory history = new SqliteTeleportHistory(service(DatabaseProvider.class));
+    var history = new SqliteTeleportHistory(service(DatabaseProvider.class));
     registerService(TeleportHistory.class, history);
 
-    TeleportService teleportService = new TeleportService(history);
+    var teleportService = new TeleportService();
     registerService(TeleportService.class, teleportService);
 
-    var ctx = new TeleportContext(config, service(PaperCommandFramework.class));
-    registerService(TeleportContext.class, ctx);
-
-    registerCommandsInPackage();
+    var framework = service(PaperCommandFramework.class);
+    registerCommand(new TeleportCommand(config, teleportService, framework));
+    registerCommand(new TeleportHereCommand(config, teleportService, framework));
   }
 }

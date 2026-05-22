@@ -34,7 +34,7 @@ public final class InMemoryUserRepository implements UserRepository {
   @Override
   public User save(User user) {
     Objects.requireNonNull(user, "user");
-    User previous = byId.put(user.id(), user);
+    var previous = byId.put(user.id(), user);
     if (previous != null && !previous.name().equalsIgnoreCase(user.name())) {
       byName.remove(previous.name().toLowerCase(Locale.ROOT));
     }

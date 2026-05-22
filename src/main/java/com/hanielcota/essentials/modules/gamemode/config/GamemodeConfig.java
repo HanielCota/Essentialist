@@ -28,20 +28,22 @@ public record GamemodeConfig(
             GameMode.SPECTATOR, "Spectator"));
   }
 
+  private static String capitalize(String raw) {
+    return raw.charAt(0) + raw.substring(1).toLowerCase(Locale.ROOT);
+  }
+
   public MessagePair whenUpdated(GameMode mode) {
+    String displayName = nameOf(mode);
     return new MessagePair(
-        updated.replace("{gamemode}", nameOf(mode)),
-        updatedOther.replace("{gamemode}", nameOf(mode)));
+        updated.replace("{gamemode}", displayName),
+        updatedOther.replace("{gamemode}", displayName));
   }
 
   public MessagePair whenAlreadyInMode(GameMode mode) {
+    String displayName = nameOf(mode);
     return new MessagePair(
-        alreadyInMode.replace("{gamemode}", nameOf(mode)),
-        alreadyInModeOther.replace("{gamemode}", nameOf(mode)));
-  }
-
-  private static String capitalize(String raw) {
-    return raw.charAt(0) + raw.substring(1).toLowerCase(Locale.ROOT);
+        alreadyInMode.replace("{gamemode}", displayName),
+        alreadyInModeOther.replace("{gamemode}", displayName));
   }
 
   private String nameOf(GameMode mode) {

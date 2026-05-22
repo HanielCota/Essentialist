@@ -21,7 +21,7 @@ public final class Log {
     if (args.length == 0) {
       return pattern;
     }
-    StringBuilder sb = new StringBuilder(pattern.length() + args.length * 16);
+    var sb = new StringBuilder(pattern.length() + args.length * 16);
     int argIdx = 0;
     int pos = 0;
     while (pos < pattern.length()) {

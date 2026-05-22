@@ -7,19 +7,16 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.List;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
 public final class BackMenu extends ListMenu<HistoryEntry> {
 
   public static final String ID = "essentials.back";
-
-  private static final Log LOG = Log.of(BackMenu.class);
 
   private final ConfigHandle<BackConfig> config;
   private final TeleportHistory history;
@@ -49,18 +46,12 @@ public final class BackMenu extends ListMenu<HistoryEntry> {
 
   @Override
   protected @NonNull Component title() {
-    return MiniMessage.miniMessage().deserialize(config.value().menuTitle());
+    return ComponentUtils.mini(config.value().menuTitle());
   }
 
   @Override
   protected @NonNull List<HistoryEntry> items(@NonNull Player player) {
-    var list = history.list(player.getUniqueId());
-    LOG.info(
-        "[back DEBUG] menu items() for {} ({}): {} entries",
-        player.getName(),
-        player.getUniqueId(),
-        list.size());
-    return list;
+    return history.list(player.getUniqueId());
   }
 
   @Override

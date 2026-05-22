@@ -14,7 +14,7 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
   public <T> void register(Class<T> type, T instance) {
     Objects.requireNonNull(type, "type");
     Objects.requireNonNull(instance, "instance");
-    Object previous = services.putIfAbsent(type, instance);
+    var previous = services.putIfAbsent(type, instance);
     if (previous != null) {
       throw new IllegalStateException("Service already registered: " + type.getName());
     }
@@ -22,7 +22,7 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
 
   @Override
   public <T> Optional<T> find(Class<T> type) {
-    Object value = services.get(Objects.requireNonNull(type, "type"));
+    var value = services.get(Objects.requireNonNull(type, "type"));
     return Optional.ofNullable(type.cast(value));
   }
 

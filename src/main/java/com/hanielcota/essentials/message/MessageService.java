@@ -15,7 +15,7 @@ public record MessageService(MessageProvider provider) {
       return template;
     }
     String out = template;
-    for (Map.Entry<String, String> entry : values.entrySet()) {
+    for (var entry : values.entrySet()) {
       out = out.replace("{" + entry.getKey() + "}", entry.getValue());
     }
     return out;

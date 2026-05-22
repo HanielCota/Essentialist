@@ -8,6 +8,7 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import org.bukkit.GameMode;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,7 +28,7 @@ public final class CommandBootstrap {
   }
 
   public PaperCommandFramework createFramework() {
-    PaperCommandFramework.Builder builder =
+    var builder =
         PaperCommandFramework.builder(plugin)
             .messageProvider(CommandMessages.portugueseBrazil())
             .interceptor(new AuditInterceptor(plugin.getLogger()))
@@ -45,7 +46,12 @@ public final class CommandBootstrap {
                 RuntimeException.class,
                 (ctx, ex) -> {
                   ctx.actor().sendError("<red>Ocorreu um erro inesperado.");
-                  plugin.getLogger().warning("Unhandled command exception: " + ex.getMessage());
+                  plugin
+                      .getLogger()
+                      .log(
+                          Level.WARNING,
+                          ex,
+                          () -> "Unhandled command exception: " + ex.getMessage());
                   return CommandResult.failure(CommandStatus.ERROR, "unexpected");
                 });
 
@@ -53,9 +59,5 @@ public final class CommandBootstrap {
       customizer.accept(builder);
     }
     return builder.build();
-  }
-
-  public CommandRegistrar createRegistrar(PaperCommandFramework framework) {
-    return new CommandRegistrar(Objects.requireNonNull(framework, "framework"));
   }
 }

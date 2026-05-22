@@ -16,15 +16,16 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config)
   }
 
   @Override
-  public @NonNull ItemTemplate render(HistoryEntry entry, int humanIndex) {
+  public @NonNull ItemTemplate render(@NonNull HistoryEntry entry, int humanIndex) {
     var snap = config.value();
     var loc = entry.location();
-    var world = loc.getWorld() != null ? loc.getWorld().getName() : "?";
+    var entryWorld = loc.getWorld();
+    var worldName = entryWorld != null ? entryWorld.getName() : "?";
 
     return ItemTemplate.builder(snap.itemMaterial())
         .name(snap.formatItemName(humanIndex))
         .lore(
-            snap.formatItemLoreLocation(world, loc.getX(), loc.getY(), loc.getZ()),
+            snap.formatItemLoreLocation(worldName, loc.getX(), loc.getY(), loc.getZ()),
             snap.itemLoreClick())
         .glow(snap.itemGlow())
         .build();

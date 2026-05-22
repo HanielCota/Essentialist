@@ -4,7 +4,6 @@ import com.hanielcota.essentials.EssentialsPlugin;
 import java.util.Objects;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
-import org.bukkit.entity.Player;
 
 public record PaperAudienceProvider(EssentialsPlugin plugin) implements AudienceProvider {
 
@@ -25,7 +24,7 @@ public record PaperAudienceProvider(EssentialsPlugin plugin) implements Audience
   @Override
   public Audience player(UUID id) {
     Objects.requireNonNull(id, "id");
-    Player player = plugin.getServer().getPlayer(id);
+    var player = plugin.getServer().getPlayer(id);
     return player == null ? Audience.empty() : player;
   }
 }

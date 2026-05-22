@@ -38,7 +38,7 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
   @Override
   public Task runLater(Runnable task, Duration delay) {
     long ticks = Math.max(1L, delay.toMillis() / 50L);
-    ScheduledTask handle =
+    var handle =
         plugin.getServer().getGlobalRegionScheduler().runDelayed(plugin, t -> task.run(), ticks);
     return wrap(handle);
   }

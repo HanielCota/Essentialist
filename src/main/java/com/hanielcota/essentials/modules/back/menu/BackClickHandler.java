@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.Histor
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import java.util.Objects;
 import org.bukkit.Bukkit;
+import org.jspecify.annotations.NonNull;
 
 public record BackClickHandler(
     ConfigHandle<BackConfig> config, TeleportHistory history, TeleportService teleport)
@@ -21,23 +22,26 @@ public record BackClickHandler(
   }
 
   @Override
-  public void handle(ClickContext click, HistoryEntry entry) {
+  public void handle(@NonNull ClickContext click, @NonNull HistoryEntry entry) {
     var snap = config.value();
     var target = entry.location();
     var world = target.getWorld();
+    var playerId = click.player().getUniqueId();
 
     click.close();
-    history.remove(click.player().getUniqueId(), entry.id());
 
     if (world == null || Bukkit.getWorld(world.getName()) == null) {
+      history.remove(playerId, entry.id());
       click.reply(snap.noBack());
       return;
     }
 
-    if (teleport.teleportTo(click.player(), target)) {
-      click.reply(snap.formatBack(world.getName(), target.getX(), target.getY(), target.getZ()));
-    } else {
+    if (!teleport.teleportTo(click.player(), target)) {
       click.reply(snap.noBack());
+      return;
     }
+
+    history.remove(playerId, entry.id());
+    click.reply(snap.formatBack(world.getName(), target.getX(), target.getY(), target.getZ()));
   }
 }

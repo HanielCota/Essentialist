@@ -58,6 +58,9 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       var ingredient = entry.getKey();
       int total = entry.getValue();
       Recipe recipe = recipes.get(ingredient);
+      if (recipe.amount() <= 0) {
+        continue;
+      }
       int blocks = total / recipe.amount();
       if (blocks == 0) {
         continue;

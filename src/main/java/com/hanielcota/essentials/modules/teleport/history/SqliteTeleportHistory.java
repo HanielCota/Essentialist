@@ -10,7 +10,6 @@ import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 public final class SqliteTeleportHistory implements TeleportHistory {
 
@@ -72,7 +71,7 @@ public final class SqliteTeleportHistory implements TeleportHistory {
   private static HistoryEntry readEntry(ResultSet rs) throws SQLException {
     long id = rs.getLong("id");
     String worldName = rs.getString("world");
-    World world = Bukkit.getWorld(worldName);
+    var world = Bukkit.getWorld(worldName);
     if (world == null) {
       return null;
     }
@@ -81,7 +80,7 @@ public final class SqliteTeleportHistory implements TeleportHistory {
     double z = rs.getDouble("z");
     float yaw = (float) rs.getDouble("yaw");
     float pitch = (float) rs.getDouble("pitch");
-    Location loc = new Location(world, x, y, z, yaw, pitch);
+    var loc = new Location(world, x, y, z, yaw, pitch);
     return new HistoryEntry(id, loc);
   }
 
@@ -89,7 +88,7 @@ public final class SqliteTeleportHistory implements TeleportHistory {
   public void push(UUID player, Location location) {
     Objects.requireNonNull(player, "player");
     Objects.requireNonNull(location, "location");
-    World world = location.getWorld();
+    var world = location.getWorld();
     if (world == null) {
       return;
     }

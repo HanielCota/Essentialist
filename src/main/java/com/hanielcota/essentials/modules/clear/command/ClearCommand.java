@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.clear.command;
 
-import com.hanielcota.essentials.command.ActorMessages;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.clear.config.ClearConfig;
@@ -15,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
 @Command(value = "limpar", aliases = "clear")
@@ -26,24 +26,26 @@ import org.bukkit.entity.Player;
 @Description("Limpa o inventário do jogador.")
 @Syntax("/limpar [jogador]")
 public record ClearCommand(
-    ConfigHandle<ClearConfig> config, ClearService service, ActorMessages messages) {
+    ConfigHandle<ClearConfig> config, ClearService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     int removed = service.clear(subject);
     var snap = config.value();
     String name = subject.getName();
+    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
 
     if (removed == 0) {
-      sender.sendError(snap.whenEmpty().format(true, name));
+      sender.sendError(snap.whenEmpty().forSender(self, name));
       return;
     }
 
     var pair = snap.whenCleared();
-    messages.notifyTarget(
-        sender,
-        subject,
-        pair.format(true, name).replace("{count}", Integer.toString(removed)),
-        pair.self().replace("{count}", Integer.toString(removed)));
+    String count = Integer.toString(removed);
+    var target = framework.actorOf(subject);
+    String selfMessage = pair.forSender(self, name).replace("{count}", count);
+    String targetMessage = pair.forTarget(name).replace("{count}", count);
+
+    sender.sendDualMessage(target, selfMessage, targetMessage);
   }
 }

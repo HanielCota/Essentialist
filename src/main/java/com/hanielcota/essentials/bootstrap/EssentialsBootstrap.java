@@ -4,9 +4,7 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.api.EssentialsApi;
-import com.hanielcota.essentials.command.ActorMessages;
 import com.hanielcota.essentials.command.CommandBootstrap;
-import com.hanielcota.essentials.command.CommandRegistrar;
 import com.hanielcota.essentials.config.ConfigService;
 import com.hanielcota.essentials.config.YamlConfigService;
 import com.hanielcota.essentials.core.EssentialsCore;
@@ -56,7 +54,7 @@ public final class EssentialsBootstrap {
   private static void mirrorServicesAsCommandDependencies(
       PaperCommandFramework framework, ServiceRegistry services) {
     for (Class<?> type : services.registered()) {
-      if (type != PaperCommandFramework.class && type != CommandRegistrar.class) {
+      if (type != PaperCommandFramework.class) {
         mirrorOne(framework, services, type);
       }
     }
@@ -70,15 +68,15 @@ public final class EssentialsBootstrap {
   }
 
   public EssentialsCore start() {
-    ServiceRegistry services = new DefaultServiceRegistry();
+    var services = new DefaultServiceRegistry();
 
-    Scheduler scheduler = registerScheduler(services);
+    var scheduler = registerScheduler(services);
     registerPaperAdapters(services, scheduler);
     registerConfigs(services);
     registerMessages(services);
     registerDatabase(services);
-    ModuleManager modules = createModules();
-    CommandRegistrar commands = registerCommands(services, modules);
+    var modules = createModules();
+    var framework = registerCommands(services, modules);
     registerMenus(services);
     registerEventBus(services);
     registerUserStack(services);
@@ -89,14 +87,14 @@ public final class EssentialsBootstrap {
     var core = new EssentialsCore(plugin, services);
     services.register(EssentialsApi.class, core);
 
-    mirrorServicesAsCommandDependencies(commands.framework(), services);
+    mirrorServicesAsCommandDependencies(framework, services);
 
     core.advance(LifecyclePhase.ENABLED);
     return core;
   }
 
   private Scheduler registerScheduler(ServiceRegistry services) {
-    Scheduler scheduler = new PaperScheduler(plugin);
+    var scheduler = new PaperScheduler(plugin);
     services.register(Scheduler.class, scheduler);
     return scheduler;
   }
@@ -108,7 +106,7 @@ public final class EssentialsBootstrap {
   }
 
   private ConfigService registerConfigs(ServiceRegistry services) {
-    ConfigService configs = new YamlConfigService(plugin.getDataFolder().toPath());
+    var configs = new YamlConfigService(plugin.getDataFolder().toPath());
     services.register(ConfigService.class, configs);
     return configs;
   }
@@ -122,22 +120,18 @@ public final class EssentialsBootstrap {
     return messages;
   }
 
-  private CommandRegistrar registerCommands(ServiceRegistry services, ModuleManager modules) {
+  private PaperCommandFramework registerCommands(ServiceRegistry services, ModuleManager modules) {
     var customizers =
         modules.all().stream()
             .<Consumer<PaperCommandFramework.Builder>>map(module -> module::customizeCommands)
             .toList();
-    var commandBootstrap = new CommandBootstrap(plugin, customizers);
-    PaperCommandFramework framework = commandBootstrap.createFramework();
-    CommandRegistrar registrar = commandBootstrap.createRegistrar(framework);
+    var framework = new CommandBootstrap(plugin, customizers).createFramework();
     services.register(PaperCommandFramework.class, framework);
-    services.register(ActorMessages.class, new ActorMessages(framework));
-    services.register(CommandRegistrar.class, registrar);
-    return registrar;
+    return framework;
   }
 
   private MenuService registerMenus(ServiceRegistry services) {
-    MenuService menus = MenuFramework.create(plugin);
+    var menus = MenuFramework.create(plugin);
     services.register(MenuService.class, menus);
     return menus;
   }
@@ -153,12 +147,16 @@ public final class EssentialsBootstrap {
   }
 
   private void registerUserStack(ServiceRegistry services) {
-    UserRepository repository = new InMemoryUserRepository();
-    UserSessionService sessions = new UserSessionService();
+    var repository = new InMemoryUserRepository();
+    var users = new UserService(repository);
+    var sessions = new UserSessionService();
     services.register(UserRepository.class, repository);
-    services.register(UserService.class, new UserService(repository));
+    services.register(UserService.class, users);
     services.register(UserSessionService.class, sessions);
-    plugin.getServer().getPluginManager().registerEvents(new UserSessionListener(sessions), plugin);
+    plugin
+        .getServer()
+        .getPluginManager()
+        .registerEvents(new UserSessionListener(users, sessions), plugin);
   }
 
   private void registerSerializers(ServiceRegistry services) {

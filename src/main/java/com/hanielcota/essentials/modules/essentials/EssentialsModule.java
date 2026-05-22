@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.essentials;
 
-import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.config.ConfigService;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.essentials.command.EssentialsCommand;
@@ -14,8 +13,7 @@ public final class EssentialsModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
-    ConfigHandle<EssentialsConfig> config =
-        config("essentials", EssentialsConfig.class, EssentialsConfig::defaults);
+    var config = config("essentials", EssentialsConfig.class, EssentialsConfig::defaults);
     registerCommand(new EssentialsCommand(config, service(ConfigService.class)));
   }
 }

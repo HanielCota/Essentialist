@@ -5,7 +5,6 @@ import com.hanielcota.essentials.util.Log;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +31,7 @@ public final class ModuleManager {
     Objects.requireNonNull(context, "context");
     enableOrder = resolveLoadOrder();
 
-    List<Module> succeeded = new ArrayList<>(enableOrder.size());
+    var succeeded = new ArrayList<Module>(enableOrder.size());
     for (Module module : enableOrder) {
       try {
         module.enable(context);
@@ -47,7 +46,7 @@ public final class ModuleManager {
   }
 
   public void disableAll() {
-    List<Module> reversed = new ArrayList<>(enableOrder);
+    var reversed = new ArrayList<Module>(enableOrder);
     for (Module module : reversed.reversed()) {
       if (states.get(module.id()) != ModuleState.ENABLED) {
         continue;
@@ -80,7 +79,7 @@ public final class ModuleManager {
 
   private void rollback(List<Module> succeeded) {
     for (int i = succeeded.size() - 1; i >= 0; i--) {
-      Module module = succeeded.get(i);
+      var module = succeeded.get(i);
       try {
         module.disable();
         states.put(module.id(), ModuleState.DISABLED);
@@ -92,8 +91,8 @@ public final class ModuleManager {
   }
 
   private List<Module> resolveLoadOrder() {
-    Map<String, Integer> inDegree = new LinkedHashMap<>();
-    Map<String, List<String>> dependents = new HashMap<>();
+    var inDegree = new LinkedHashMap<String, Integer>();
+    var dependents = new HashMap<String, List<String>>();
 
     for (Module module : registered.values()) {
       inDegree.put(module.id(), 0);
@@ -110,14 +109,14 @@ public final class ModuleManager {
       }
     }
 
-    Deque<String> ready = new ArrayDeque<>();
-    for (Map.Entry<String, Integer> entry : inDegree.entrySet()) {
+    var ready = new ArrayDeque<String>();
+    for (var entry : inDegree.entrySet()) {
       if (entry.getValue() == 0) {
         ready.add(entry.getKey());
       }
     }
 
-    List<Module> ordered = new ArrayList<>(registered.size());
+    var ordered = new ArrayList<Module>(registered.size());
     while (!ready.isEmpty()) {
       String id = ready.poll();
       ordered.add(registered.get(id));
@@ -130,7 +129,7 @@ public final class ModuleManager {
     }
 
     if (ordered.size() != registered.size()) {
-      List<String> stuck =
+      var stuck =
           inDegree.entrySet().stream()
               .filter(e -> e.getValue() > 0)
               .map(Map.Entry::getKey)

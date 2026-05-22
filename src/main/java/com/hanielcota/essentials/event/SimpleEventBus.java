@@ -20,7 +20,7 @@ public final class SimpleEventBus implements EventBus {
     Objects.requireNonNull(type, "type");
     Objects.requireNonNull(subscriber, "subscriber");
 
-    Registration<T> registration = new Registration<>(subscriber);
+    var registration = new Registration<>(subscriber);
     subscribers.computeIfAbsent(type, k -> new CopyOnWriteArrayList<>()).add(registration);
 
     return new Subscription() {
@@ -32,7 +32,7 @@ public final class SimpleEventBus implements EventBus {
       @Override
       public void unsubscribe() {
         if (registration.active.compareAndSet(true, false)) {
-          List<Registration<?>> list = subscribers.get(type);
+          var list = subscribers.get(type);
           if (list != null) {
             list.remove(registration);
           }
@@ -45,7 +45,7 @@ public final class SimpleEventBus implements EventBus {
   @SuppressWarnings("unchecked")
   public <T extends BasePluginEvent> void publish(T event) {
     Objects.requireNonNull(event, "event");
-    List<Registration<?>> list = subscribers.get(event.getClass());
+    var list = subscribers.get(event.getClass());
     if (list == null || list.isEmpty()) {
       return;
     }

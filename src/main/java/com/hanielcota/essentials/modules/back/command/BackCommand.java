@@ -31,6 +31,7 @@ public record BackCommand(
       actor.sendError(config.value().noBack());
       return;
     }
+
     menus.open(sender, BackMenu.ID);
   }
 }
