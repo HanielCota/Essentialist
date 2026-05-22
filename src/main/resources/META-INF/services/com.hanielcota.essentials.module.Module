@@ -19,4 +19,5 @@ com.hanielcota.essentials.modules.online.OnlineModule
 com.hanielcota.essentials.modules.near.NearModule
 com.hanielcota.essentials.modules.enchant.EnchantModule
 com.hanielcota.essentials.modules.clearchat.ClearChatModule
+com.hanielcota.essentials.modules.trash.TrashModule
 com.hanielcota.essentials.modules.essentials.EssentialsModule
