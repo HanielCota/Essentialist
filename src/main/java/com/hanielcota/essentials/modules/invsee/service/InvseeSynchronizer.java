@@ -27,7 +27,9 @@ public final class InvseeSynchronizer {
             plugin,
             () -> {
               Player target = Bukkit.getPlayer(holder.targetId());
-              if (target != null) {
+              // Skip when the target is offline or dead: writing a stale view onto an
+              // inventory already emptied by death drops would duplicate items.
+              if (target != null && !target.isDead()) {
                 service.sync(target, view);
               }
             });
