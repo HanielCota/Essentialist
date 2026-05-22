@@ -6,6 +6,11 @@ com.hanielcota.essentials.modules.smelt.SmeltModule
 com.hanielcota.essentials.modules.compact.CompactModule
 com.hanielcota.essentials.modules.clear.ClearModule
 com.hanielcota.essentials.modules.feed.FeedModule
+com.hanielcota.essentials.modules.heal.HealModule
+com.hanielcota.essentials.modules.kill.KillModule
+com.hanielcota.essentials.modules.light.LightModule
+com.hanielcota.essentials.modules.ping.PingModule
+com.hanielcota.essentials.modules.speed.SpeedModule
 com.hanielcota.essentials.modules.hat.HatModule
 com.hanielcota.essentials.modules.repair.RepairModule
 com.hanielcota.essentials.modules.give.GiveModule
