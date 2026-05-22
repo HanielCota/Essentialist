@@ -29,7 +29,7 @@ public record WhitelistCommand(
   public void open(CommandActor actor) {
     Objects.requireNonNull(actor, "actor");
     if (!actor.isPlayer()) {
-      actor.sendError("<red>O menu da whitelist só pode ser aberto por jogadores.");
+      actor.sendError(config.value().menuPlayerOnly());
       return;
     }
     menus.open(actor.unwrap(Player.class), WhitelistMenu.ID);

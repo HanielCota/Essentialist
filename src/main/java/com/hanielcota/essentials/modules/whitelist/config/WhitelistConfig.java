@@ -18,7 +18,9 @@ public record WhitelistConfig(
     @Comment("Shown when the player is not whitelisted. Placeholder: {player}.")
         String notWhitelisted,
     @Comment("Shown when /whitelist add gets an unknown name. Placeholder: {player}.")
-        String unknownPlayer) {
+        String unknownPlayer,
+    @Comment("Shown when the console runs /whitelist, since the menu needs a player.")
+        String menuPlayerOnly) {
 
   private static final int MIN_ROWS = 1;
   private static final int MAX_ROWS = 6;
@@ -33,7 +35,8 @@ public record WhitelistConfig(
         "<red><gold>{player}</gold> já está na whitelist.",
         "<green><gold>{player}</gold> foi removido da whitelist.",
         "<red><gold>{player}</gold> não está na whitelist.",
-        "<red><gold>{player}</gold> nunca entrou no servidor.");
+        "<red><gold>{player}</gold> nunca entrou no servidor.",
+        "<red>O menu da whitelist só pode ser aberto por jogadores.");
   }
 
   /** Configured menu rows clamped to the supported 1-6 range. */
