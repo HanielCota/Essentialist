@@ -19,10 +19,4 @@ public interface Scheduler {
   Task runLater(Runnable task, Duration delay);
 
   Task runTimer(Runnable task, Duration initialDelay, Duration period);
-
-  interface Task {
-    void cancel();
-
-    boolean isCancelled();
-  }
 }
