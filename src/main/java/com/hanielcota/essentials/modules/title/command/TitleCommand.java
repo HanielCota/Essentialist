@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.title.service.TitleRequest;
 import com.hanielcota.essentials.modules.title.service.TitleService;
 import io.github.hanielcota.commandframework.annotation.*;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 
 @Command("title")
@@ -18,9 +17,6 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
   @DefaultSubcommand
   @Cooldown(duration = "3s")
   public void execute(CommandActor sender, @GreedyString @Arg("texto") String texto) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(texto, "texto");
-
     var snap = config.value();
     var self = sender.isPlayer() ? sender.unwrap(Player.class) : null;
     var request = TitleRequest.from(self, texto.strip());
@@ -50,9 +46,6 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
   @Description("Envia um título para todos os jogadores online.")
   @Syntax("/title broadcast \"título\" [\"subtítulo\"]")
   public void broadcast(CommandActor sender, @GreedyString @Arg("texto") String texto) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(texto, "texto");
-
     var snap = config.value();
     var message = texto.strip();
 

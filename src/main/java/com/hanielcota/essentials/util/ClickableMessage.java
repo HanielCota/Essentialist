@@ -48,7 +48,7 @@ public final class ClickableMessage implements ComponentLike {
 
   /** Appends a plain MiniMessage segment with no interactive actions. */
   public ClickableMessage append(String mini) {
-    parts.add(ComponentUtils.mini(Objects.requireNonNull(mini, "mini")));
+    parts.add(ComponentUtils.mini(mini));
     return this;
   }
 
@@ -151,7 +151,7 @@ public final class ClickableMessage implements ComponentLike {
 
     /** Shows a MiniMessage tooltip when the segment is hovered. */
     public Segment hover(String mini) {
-      return hover(ComponentUtils.mini(Objects.requireNonNull(mini, "mini")));
+      return hover(ComponentUtils.mini(mini));
     }
 
     /** Shows a component tooltip when the segment is hovered. */

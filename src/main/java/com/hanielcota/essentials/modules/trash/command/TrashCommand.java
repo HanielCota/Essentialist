@@ -11,7 +11,6 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 
 @Command(value = "lixo", aliases = "trash")
@@ -24,8 +23,6 @@ public record TrashCommand(ConfigHandle<TrashConfig> config, TrashService servic
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
-    Objects.requireNonNull(actor, "actor");
-
     Player player = actor.unwrap(Player.class);
     var snap = config.value();
     service.openTrash(player, snap.size(), snap.title());

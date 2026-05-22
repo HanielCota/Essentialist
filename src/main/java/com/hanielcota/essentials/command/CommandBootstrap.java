@@ -22,10 +22,6 @@ public final class CommandBootstrap {
   private final JavaPlugin plugin;
   private final List<Consumer<PaperCommandFramework.Builder>> customizers;
 
-  public CommandBootstrap(JavaPlugin plugin) {
-    this(plugin, List.of());
-  }
-
   public CommandBootstrap(
       JavaPlugin plugin, List<Consumer<PaperCommandFramework.Builder>> customizers) {
     this.plugin = Objects.requireNonNull(plugin, "plugin");
@@ -65,28 +61,18 @@ public final class CommandBootstrap {
         .onException(
             IllegalArgumentException.class,
             (ctx, ex) -> {
-              Objects.requireNonNull(ctx, "context");
-              Objects.requireNonNull(ex, "exception");
-
               ctx.actor().sendError("<red>Erro: " + ex.getMessage());
               return CommandResult.failure(CommandStatus.INVALID_USAGE, ex.getMessage());
             })
         .onException(
             RuntimeException.class,
             (ctx, ex) -> {
-              Objects.requireNonNull(ctx, "context");
-              Objects.requireNonNull(ex, "exception");
-
               ctx.actor().sendError("<red>Ocorreu um erro inesperado.");
               plugin.getLogger().log(Level.WARNING, ex, () -> "Unhandled command exception");
               return CommandResult.failure(CommandStatus.ERROR, "unexpected");
             });
 
-    customizers.forEach(
-        customizer -> {
-          Objects.requireNonNull(customizer, "customizer");
-          customizer.accept(builder);
-        });
+    customizers.forEach(customizer -> customizer.accept(builder));
 
     return builder.build();
   }
