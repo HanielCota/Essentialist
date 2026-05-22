@@ -22,7 +22,6 @@ public final class WhitelistMenu implements Menu {
   public static final String ID = "essentials.whitelist";
 
   private static final int MIN_ROWS = 1;
-  private static final int MAX_ROWS = 6;
   private static final int SLOTS_PER_ROW = 9;
 
   private final ConfigHandle<WhitelistConfig> config;
@@ -56,7 +55,7 @@ public final class WhitelistMenu implements Menu {
   public void register(@NonNull MenuService menus) {
     Objects.requireNonNull(menus, "menus");
     var snap = config.value();
-    int rows = Math.clamp(snap.menuRows(), MIN_ROWS, MAX_ROWS);
+    int rows = snap.effectiveRows();
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(rows)).build();
 
     MenuFramework.builder(ID, menus)

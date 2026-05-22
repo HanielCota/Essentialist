@@ -22,7 +22,7 @@ public record WhitelistEntryRenderer(ConfigHandle<WhitelistConfig> config) {
     return ItemTemplate.builder(Material.PLAYER_HEAD)
         .head(player.getUniqueId())
         .name(snap.formatItemName(name))
-        .lore(snap.itemLore().toArray(String[]::new))
+        .lore(snap.formatLore(name).toArray(String[]::new))
         .italic(false)
         .build();
   }
