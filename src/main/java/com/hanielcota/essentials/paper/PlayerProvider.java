@@ -14,5 +14,8 @@ public interface PlayerProvider {
 
   OfflinePlayer offline(UUID id);
 
+  /** Resolves {@code name} to an online or previously-seen offline player; empty if unknown. */
+  Optional<OfflinePlayer> offlineByName(String name);
+
   Collection<Player> all();
 }

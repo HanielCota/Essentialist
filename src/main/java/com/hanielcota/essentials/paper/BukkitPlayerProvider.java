@@ -32,6 +32,16 @@ public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerPro
   }
 
   @Override
+  public Optional<OfflinePlayer> offlineByName(String name) {
+    Objects.requireNonNull(name, "name");
+    Player current = plugin.getServer().getPlayerExact(name);
+    if (current != null) {
+      return Optional.of(current);
+    }
+    return Optional.ofNullable(plugin.getServer().getOfflinePlayerIfCached(name));
+  }
+
+  @Override
   public Collection<Player> all() {
     return List.copyOf(plugin.getServer().getOnlinePlayers());
   }

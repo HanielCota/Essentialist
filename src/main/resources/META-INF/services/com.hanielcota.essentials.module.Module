@@ -1,5 +1,6 @@
 com.hanielcota.essentials.modules.teleport.TeleportModule
 com.hanielcota.essentials.modules.back.BackModule
+com.hanielcota.essentials.modules.tpa.TpaModule
 com.hanielcota.essentials.modules.fly.FlyModule
 com.hanielcota.essentials.modules.gamemode.GamemodeModule
 com.hanielcota.essentials.modules.smelt.SmeltModule
