@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
+import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
@@ -64,13 +66,27 @@ public final class WhitelistMenu implements Menu {
     int rows = snap.effectiveRows();
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(rows)).build();
 
-    MenuFramework.builder(ID, menus)
-        .rows(rows)
-        .title(ComponentUtils.mini(snap.menuTitle()))
-        .pagination(pagination)
-        .dynamicContent(this::buildSlots)
-        .build()
-        .register();
+    var builder =
+        MenuFramework.builder(ID, menus)
+            .rows(rows)
+            .title(ComponentUtils.mini(snap.menuTitle()))
+            .pagination(pagination)
+            .dynamicContent(this::buildSlots);
+
+    // Without page buttons a whitelist larger than one page is unreachable. The last
+    // row is free for them only when the menu has more than one row.
+    if (rows > MIN_ROWS) {
+      int lastRow = (rows - 1) * SLOTS_PER_ROW;
+      builder
+          .previousPageButton(lastRow + 3, pageButton("<yellow>« Página anterior"))
+          .nextPageButton(lastRow + 5, pageButton("<yellow>Próxima página »"));
+    }
+
+    builder.build().register();
+  }
+
+  private static ItemTemplate pageButton(String name) {
+    return ItemTemplate.builder(Material.ARROW).name(name).italic(false).build();
   }
 
   private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
