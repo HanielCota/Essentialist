@@ -22,6 +22,7 @@ public record OnlineCommand(ConfigHandle<OnlineConfig> config) {
   public void execute(CommandActor actor) {
     int count = Bukkit.getOnlinePlayers().size();
     int max = Bukkit.getMaxPlayers();
-    actor.sendMessage(config.value().formatMessage(count, max));
+
+    actor.sendMessage(config.value().format(count, max));
   }
 }
