@@ -1,10 +1,5 @@
 package com.hanielcota.essentials.modules.repair.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.repair.config.RepairConfig;
-import com.hanielcota.essentials.modules.repair.service.RepairService;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -18,10 +13,13 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.repair.config.RepairConfig;
+import com.hanielcota.essentials.modules.repair.service.RepairService;
+
 @Command(value = "reparar", aliases = "repair")
-@EssentialsCommand
 @Permission("essentials.repair")
-@PermissionForOther("essentials.repair.others")
+@PermissionForOther(".others")
 @Cooldown(duration = "5s")
 @Description("Repara o item na mão ou o inventário inteiro.")
 @Syntax("/reparar [jogador] | /reparar tudo [jogador]")
@@ -48,8 +46,7 @@ public record RepairCommand(
     }
   }
 
-  @Subcommand("tudo")
-  @Alias("all")
+  @Subcommand({"tudo", "all"})
   public void all(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();

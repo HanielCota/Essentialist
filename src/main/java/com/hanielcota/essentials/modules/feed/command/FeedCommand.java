@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.feed.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.feed.config.FeedConfig;
 import com.hanielcota.essentials.modules.feed.service.FeedService;
@@ -19,7 +18,6 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
 @Command(value = "alimentar", aliases = "feed")
-@EssentialsCommand
 @Permission("essentials.feed")
 @Cooldown(duration = "5s")
 @Description("Alimenta o jogador restaurando fome e saturação.")
@@ -31,7 +29,7 @@ public record FeedCommand(
     PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  @PermissionForOther("essentials.feed.others")
+  @PermissionForOther(".others")
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();

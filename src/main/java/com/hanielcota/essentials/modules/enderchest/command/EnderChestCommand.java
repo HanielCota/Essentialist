@@ -9,6 +9,7 @@ import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Player;
 public record EnderChestCommand(ConfigHandle<EnderChestConfig> config, EnderChestService service) {
 
   @DefaultSubcommand
+  @PermissionForOther(".others")
   public void execute(CommandActor sender, @TargetOrSelf Player target) {
     Objects.requireNonNull(sender, "sender");
     Objects.requireNonNull(target, "target");
@@ -31,11 +33,6 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config, EnderChes
     Player viewer = sender.unwrap(Player.class);
     var snap = config.value();
     boolean self = target.equals(viewer);
-
-    if (!self && !sender.hasPermission("essentials.echest.others")) {
-      sender.sendError(snap.noPermissionOther());
-      return;
-    }
 
     service.open(viewer, target);
     sender.sendSuccess(self ? snap.opened() : snap.formatOpenedOther(target.getName()));

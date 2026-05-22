@@ -30,11 +30,6 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
     Objects.requireNonNull(sender, "sender");
     Objects.requireNonNull(enchantment, "enchantment");
 
-    if (!sender.isPlayer()) {
-      sender.sendError("<red>Este comando só pode ser executado por jogadores.");
-      return;
-    }
-
     var snap = config.value();
     if (level < 1) {
       sender.sendError(snap.invalidLevel());
@@ -59,11 +54,6 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
     Objects.requireNonNull(sender, "sender");
     Objects.requireNonNull(enchantment, "enchantment");
 
-    if (!sender.isPlayer()) {
-      sender.sendError("<red>Este comando só pode ser executado por jogadores.");
-      return;
-    }
-
     var snap = config.value();
     var label = enchantName(enchantment);
 
@@ -81,11 +71,6 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
   @Subcommand("clear")
   public void clear(CommandActor sender) {
     Objects.requireNonNull(sender, "sender");
-
-    if (!sender.isPlayer()) {
-      sender.sendError("<red>Este comando só pode ser executado por jogadores.");
-      return;
-    }
 
     var snap = config.value();
     var player = sender.unwrap(Player.class);

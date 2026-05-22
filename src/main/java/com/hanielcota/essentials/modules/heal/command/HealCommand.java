@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.heal.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.heal.config.HealConfig;
 import com.hanielcota.essentials.modules.heal.service.HealService;
@@ -19,7 +18,6 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
 @Command(value = "curar", aliases = "heal")
-@EssentialsCommand
 @Permission("essentials.heal")
 @Cooldown(duration = "5s")
 @Description("Restaura a vida do jogador.")
@@ -31,7 +29,7 @@ public record HealCommand(
     PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  @PermissionForOther("essentials.heal.others")
+  @PermissionForOther(".others")
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();

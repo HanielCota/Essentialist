@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.gamemode.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.gamemode.config.GamemodeConfig;
 import com.hanielcota.essentials.modules.gamemode.service.GamemodeService;
@@ -20,9 +19,8 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 @Command(value = "gamemode", aliases = "gm")
-@EssentialsCommand
 @Permission("essentials.gamemode")
-@PermissionForOther("essentials.gamemode.others")
+@PermissionForOther(".others")
 @PermissionTemplate("essentials.gamemode.{modo}")
 @Cooldown(duration = "3s")
 @Description("Altera o modo de jogo do jogador.")

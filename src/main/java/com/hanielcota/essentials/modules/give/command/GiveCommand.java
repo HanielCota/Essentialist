@@ -1,17 +1,12 @@
 package com.hanielcota.essentials.modules.give.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.give.config.GiveConfig;
-import com.hanielcota.essentials.modules.give.service.GiveService;
-import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
+import io.github.hanielcota.commandframework.annotation.Min;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
@@ -23,8 +18,12 @@ import java.util.Locale;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.give.config.GiveConfig;
+import com.hanielcota.essentials.modules.give.service.GiveService;
+import com.hanielcota.essentials.paper.PlayerProvider;
+
 @Command("give")
-@EssentialsCommand
 @Permission("essentials.give")
 @Cooldown(duration = "3s")
 @Description("Dá itens a um jogador.")
@@ -43,11 +42,11 @@ public record GiveCommand(
   }
 
   @DefaultSubcommand
-  @PermissionForOther("essentials.give.others")
+  @PermissionForOther(".others")
   public void execute(
       CommandActor sender,
       @Arg("item") Material item,
-      @DefaultValue("1") @Arg("quantidade") int amount,
+      @DefaultValue("1") @Min(1) @Arg("quantidade") int amount,
       @TargetOrSelf Player subject) {
     var snap = config.value();
     String name = subject.getName();
@@ -55,11 +54,6 @@ public record GiveCommand(
 
     if (!item.isItem()) {
       sender.sendError(snap.invalidItem());
-      return;
-    }
-
-    if (amount < 1) {
-      sender.sendError(snap.invalidAmount());
       return;
     }
 
@@ -86,24 +80,18 @@ public record GiveCommand(
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }
 
-  @Subcommand("all")
-  @Alias("todos")
+  @Subcommand({"all", "todos"})
   @Permission("essentials.give.all")
   @Description("Dá um item para todos os jogadores online.")
   @Syntax("/give all <item> [quantidade]")
   public void all(
       CommandActor sender,
       @Arg("item") Material item,
-      @DefaultValue("1") @Arg("quantidade") int amount) {
+      @DefaultValue("1") @Min(1) @Arg("quantidade") int amount) {
     var snap = config.value();
 
     if (!item.isItem()) {
       sender.sendError(snap.invalidItem());
-      return;
-    }
-
-    if (amount < 1) {
-      sender.sendError(snap.invalidAmount());
       return;
     }
 

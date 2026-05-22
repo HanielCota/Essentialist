@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -26,12 +27,9 @@ public record WhitelistCommand(
     ConfigHandle<WhitelistConfig> config, WhitelistService service, MenuService menus) {
 
   @DefaultSubcommand
+  @PlayerOnly
   public void open(CommandActor actor) {
     Objects.requireNonNull(actor, "actor");
-    if (!actor.isPlayer()) {
-      actor.sendError(config.value().menuPlayerOnly());
-      return;
-    }
     menus.open(actor.unwrap(Player.class), WhitelistMenu.ID);
   }
 

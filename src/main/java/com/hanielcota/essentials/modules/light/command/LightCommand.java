@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.light.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.light.config.LightConfig;
 import com.hanielcota.essentials.modules.light.service.LightService;
@@ -18,9 +17,8 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
 @Command(value = "luz", aliases = "light")
-@EssentialsCommand
 @Permission("essentials.light")
-@PermissionForOther("essentials.light.others")
+@PermissionForOther(".others")
 @Cooldown(duration = "5s")
 @Description("Ativa ou desativa a visão noturna do jogador.")
 @Syntax("/luz [jogador] | /luz on [jogador] | /luz off [jogador]")

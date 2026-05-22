@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -24,15 +25,12 @@ import org.bukkit.entity.Player;
 public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarService service) {
 
   @DefaultSubcommand
+  @PlayerOnly
   public void execute(CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
     Objects.requireNonNull(sender, "sender");
     Objects.requireNonNull(mensagem, "mensagem");
 
     var snap = config.value();
-    if (!sender.isPlayer()) {
-      sender.sendError(snap.playerOnly());
-      return;
-    }
 
     String message = mensagem.strip();
     if (message.isBlank()) {

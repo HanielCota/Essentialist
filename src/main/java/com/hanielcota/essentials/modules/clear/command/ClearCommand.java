@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.clear.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.clear.config.ClearConfig;
 import com.hanielcota.essentials.modules.clear.service.ClearService;
@@ -18,9 +17,8 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
 @Command(value = "limpar", aliases = "clear")
-@EssentialsCommand
 @Permission("essentials.clear")
-@PermissionForOther("essentials.clear.others")
+@PermissionForOther(".others")
 @Cooldown(duration = "5s")
 @Confirm(duration = "3s")
 @Description("Limpa o inventário do jogador.")

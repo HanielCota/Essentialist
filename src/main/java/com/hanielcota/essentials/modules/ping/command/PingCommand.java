@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.ping.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.ping.config.PingConfig;
 import com.hanielcota.essentials.modules.ping.service.PingService;
@@ -16,9 +15,8 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 import org.bukkit.entity.Player;
 
 @Command("ping")
-@EssentialsCommand
 @Permission("essentials.ping")
-@PermissionForOther("essentials.ping.others")
+@PermissionForOther(".others")
 @Cooldown(duration = "3s")
 @Description("Mostra o ping do jogador.")
 @Syntax("/ping [jogador]")

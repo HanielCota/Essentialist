@@ -1,11 +1,5 @@
 package com.hanielcota.essentials.modules.speed.command;
 
-import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.config.MessagePair;
-import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
-import com.hanielcota.essentials.modules.speed.service.SpeedService;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -13,6 +7,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PermissionForOther;
+import io.github.hanielcota.commandframework.annotation.Range;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
@@ -20,8 +15,12 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.entity.Player;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.config.MessagePair;
+import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
+import com.hanielcota.essentials.modules.speed.service.SpeedService;
+
 @Command("speed")
-@EssentialsCommand
 @Permission("essentials.speed")
 @Cooldown(duration = "3s")
 @Description("Ajusta a velocidade de andar ou voar do jogador.")
@@ -35,8 +34,8 @@ public record SpeedCommand(
   }
 
   @Subcommand("walk")
-  @PermissionForOther("essentials.speed.others")
-  public void walk(CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
+  @PermissionForOther(".others")
+  public void walk(CommandActor sender, @Range(min = 1, max = 10) @Arg("valor") int valor, @TargetOrSelf Player subject) {
     if (!service.setWalkSpeed(subject, valor)) {
       sender.sendError(config.value().invalid());
       return;
@@ -46,8 +45,8 @@ public record SpeedCommand(
   }
 
   @Subcommand("fly")
-  @PermissionForOther("essentials.speed.others")
-  public void fly(CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
+  @PermissionForOther(".others")
+  public void fly(CommandActor sender, @Range(min = 1, max = 10) @Arg("valor") int valor, @TargetOrSelf Player subject) {
     if (!service.setFlySpeed(subject, valor)) {
       sender.sendError(config.value().invalid());
       return;
@@ -56,9 +55,8 @@ public record SpeedCommand(
     announce(sender, subject, config.value().whenFlySet(valor));
   }
 
-  @Subcommand("reset")
-  @Alias("resetar")
-  @PermissionForOther("essentials.speed.others")
+  @Subcommand({"reset", "resetar"})
+  @PermissionForOther(".others")
   public void reset(CommandActor sender, @TargetOrSelf Player subject) {
     service.reset(subject);
     announce(sender, subject, config.value().whenReset());
