@@ -32,6 +32,17 @@ public final class Sql {
     }
   }
 
+  /**
+   * Positional-parameter variant of {@link #query(DatabaseProvider, String, StatementBinder,
+   * ResultMapper)} — each {@code param} is bound via {@code setObject(i+1, value)}, which the JDBC
+   * driver maps for standard types (String, Integer, Long, Double, Boolean, byte[], etc.). Use the
+   * binder overload when the values need custom typing or null handling.
+   */
+  public static <T> List<T> query(
+      DatabaseProvider db, String sql, ResultMapper<T> mapper, Object... params) {
+    return query(db, sql, stmt -> bindAll(stmt, params), mapper);
+  }
+
   public static int update(DatabaseProvider db, String sql, StatementBinder binder) {
     try (var conn = db.getConnection();
         var stmt = conn.prepareStatement(sql)) {
@@ -39,6 +50,32 @@ public final class Sql {
       return stmt.executeUpdate();
     } catch (SQLException e) {
       throw new PluginException("SQL update failed: " + sql, e);
+    }
+  }
+
+  /**
+   * Positional-parameter variant of {@link #update(DatabaseProvider, String, StatementBinder)}; see
+   * {@link #query(DatabaseProvider, String, ResultMapper, Object...)} for the binding semantics.
+   */
+  public static int update(DatabaseProvider db, String sql, Object... params) {
+    return update(db, sql, stmt -> bindAll(stmt, params));
+  }
+
+  /**
+   * Executes one statement on an existing connection — typically inside a {@link
+   * #tx(DatabaseProvider, TxBlock)} lambda so several writes share the same transaction. Binds via
+   * the same {@code setObject} rules as the varargs overloads.
+   */
+  public static int execute(Connection conn, String sql, Object... params) throws SQLException {
+    try (var stmt = conn.prepareStatement(sql)) {
+      bindAll(stmt, params);
+      return stmt.executeUpdate();
+    }
+  }
+
+  private static void bindAll(PreparedStatement stmt, Object[] params) throws SQLException {
+    for (int i = 0; i < params.length; i++) {
+      stmt.setObject(i + 1, params[i]);
     }
   }
 

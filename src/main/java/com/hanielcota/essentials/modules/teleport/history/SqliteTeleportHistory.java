@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.teleport.history;
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.database.Sql;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -119,37 +118,15 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
             Sql.tx(
                 database,
                 conn -> {
-                  try (PreparedStatement insert = conn.prepareStatement(INSERT)) {
-                    insert.setString(1, playerId);
-                    insert.setString(2, worldName);
-                    insert.setDouble(3, x);
-                    insert.setDouble(4, y);
-                    insert.setDouble(5, z);
-                    insert.setDouble(6, yaw);
-                    insert.setDouble(7, pitch);
-                    insert.setLong(8, createdAt);
-                    insert.executeUpdate();
-                  }
-                  try (PreparedStatement trim = conn.prepareStatement(TRIM)) {
-                    trim.setString(1, playerId);
-                    trim.setString(2, playerId);
-                    trim.setInt(3, CAPACITY);
-                    trim.executeUpdate();
-                  }
+                  Sql.execute(conn, INSERT, playerId, worldName, x, y, z, yaw, pitch, createdAt);
+                  Sql.execute(conn, TRIM, playerId, playerId, CAPACITY);
                 }));
   }
 
   @Override
   public List<HistoryEntry> list(UUID player) {
     Objects.requireNonNull(player, "player");
-    return Sql.query(
-        database,
-        LIST,
-        stmt -> {
-          stmt.setString(1, player.toString());
-          stmt.setInt(2, CAPACITY);
-        },
-        SqliteTeleportHistory::readEntry);
+    return Sql.query(database, LIST, SqliteTeleportHistory::readEntry, player.toString(), CAPACITY);
   }
 
   @Override
@@ -159,16 +136,7 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
       return;
     }
     String playerId = player.toString();
-    writer.submit(
-        "remove",
-        () ->
-            Sql.update(
-                database,
-                DELETE_BY_ID,
-                stmt -> {
-                  stmt.setLong(1, entryId);
-                  stmt.setString(2, playerId);
-                }));
+    writer.submit("remove", () -> Sql.update(database, DELETE_BY_ID, entryId, playerId));
   }
 
   @Override

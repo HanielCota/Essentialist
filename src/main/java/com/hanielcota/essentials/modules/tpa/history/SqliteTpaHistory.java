@@ -48,11 +48,6 @@ public final class SqliteTpaHistory implements TpaHistory {
     TpaHistorySchema.create(database);
   }
 
-  private static void bindList(PreparedStatement statement, UUID requester) throws SQLException {
-    statement.setString(1, requester.toString());
-    statement.setInt(2, CAPACITY);
-  }
-
   @Override
   public void push(TpaHistoryEntry entry) {
     Objects.requireNonNull(entry, "entry");
@@ -67,7 +62,7 @@ public final class SqliteTpaHistory implements TpaHistory {
   @Override
   public List<TpaHistoryEntry> list(UUID requester) {
     Objects.requireNonNull(requester, "requester");
-    return Sql.query(database, LIST, stmt -> bindList(stmt, requester), mapper::map);
+    return Sql.query(database, LIST, mapper::map, requester.toString(), CAPACITY);
   }
 
   /** Inserts the entry as a new history row. */
@@ -80,12 +75,7 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   /** Drops every row of {@code requester} beyond the {@link TpaHistory#CAPACITY} most recent. */
   private void trim(Connection conn, UUID requester) throws SQLException {
-    try (PreparedStatement statement = conn.prepareStatement(TRIM)) {
-      String requesterId = requester.toString();
-      statement.setString(1, requesterId);
-      statement.setString(2, requesterId);
-      statement.setInt(3, CAPACITY);
-      statement.executeUpdate();
-    }
+    String requesterId = requester.toString();
+    Sql.execute(conn, TRIM, requesterId, requesterId, CAPACITY);
   }
 }
