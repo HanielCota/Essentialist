@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.feed.config.FeedConfig;
 import com.hanielcota.essentials.modules.feed.service.FeedService;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -49,7 +48,6 @@ public record FeedCommand(
   }
 
   @Subcommand("todos")
-  @Alias("all")
   @Permission("essentials.feed.all")
   @Description("Alimenta todos os jogadores online.")
   @Syntax("/alimentar todos")
