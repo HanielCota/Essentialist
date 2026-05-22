@@ -33,6 +33,12 @@ public final class InfoMenu implements Menu {
     this.config = Objects.requireNonNull(config, "config");
   }
 
+  private static SlotDefinition category(
+      Material icon, String name, String lore, String targetMenu) {
+    var template = ItemTemplate.builder(icon).name(name).lore(lore).italic(false).build();
+    return SlotDefinition.of(-1, template, click -> click.open(targetMenu));
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -59,11 +65,5 @@ public final class InfoMenu implements Menu {
         category(Material.PLAYER_HEAD, "<yellow>Jogador", "<gray>Suas informações.", PLAYER_ID),
         category(
             Material.ENCHANTED_BOOK, "<yellow>Essentialist", "<gray>Sobre o plugin.", ABOUT_ID));
-  }
-
-  private static SlotDefinition category(
-      Material icon, String name, String lore, String targetMenu) {
-    var template = ItemTemplate.builder(icon).name(name).lore(lore).italic(false).build();
-    return SlotDefinition.of(-1, template, click -> click.open(targetMenu));
   }
 }

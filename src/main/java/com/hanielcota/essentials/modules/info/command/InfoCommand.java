@@ -13,12 +13,12 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.Objects;
 import org.bukkit.entity.Player;
 
-@Command("info")
+@Command("informacoes")
 @EssentialsCommand
 @Permission("essentials.info")
 @Cooldown(duration = "3s")
 @Description("Abre o painel de informações.")
-@Syntax("/info")
+@Syntax("/informacoes")
 public record InfoCommand(MenuService menus) {
 
   @DefaultSubcommand

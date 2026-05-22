@@ -22,6 +22,38 @@ public final class InfoService {
     this.plugin = Objects.requireNonNull(plugin, "plugin");
   }
 
+  private static String formattedTps() {
+    double tps = Math.min(20.0, Bukkit.getTPS()[0]);
+    return String.format(Locale.US, "%.2f", tps);
+  }
+
+  private static String formattedUptime() {
+    var uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime());
+    long hours = uptime.toHours();
+    long minutes = uptime.toMinutesPart();
+    return hours > 0 ? hours + "h " + minutes + "m" : minutes + "m";
+  }
+
+  private static String formattedMemory() {
+    var runtime = Runtime.getRuntime();
+    long usedMb = (runtime.totalMemory() - runtime.freeMemory()) / BYTES_PER_MB;
+    long maxMb = runtime.maxMemory() / BYTES_PER_MB;
+    return usedMb + " MB <dark_gray>/ <gray>" + maxMb + " MB";
+  }
+
+  private static String authors(List<String> authors) {
+    return authors.isEmpty() ? "Desconhecido" : String.join(", ", authors);
+  }
+
+  private static String gameModeName(GameMode mode) {
+    return switch (mode) {
+      case SURVIVAL -> "Sobrevivência";
+      case CREATIVE -> "Criativo";
+      case ADVENTURE -> "Aventura";
+      case SPECTATOR -> "Espectador";
+    };
+  }
+
   /** Server status: TPS, players, version, uptime, memory and worlds. */
   public List<InfoEntry> serverEntries() {
     return List.of(
@@ -85,37 +117,5 @@ public final class InfoService {
             Material.WRITABLE_BOOK, "<yellow>Autor", "<gray>" + authors(meta.getAuthors())),
         InfoEntry.of(
             Material.GRASS_BLOCK, "<yellow>Minecraft", "<gray>" + Bukkit.getMinecraftVersion()));
-  }
-
-  private static String formattedTps() {
-    double tps = Math.min(20.0, Bukkit.getTPS()[0]);
-    return String.format(Locale.US, "%.2f", tps);
-  }
-
-  private static String formattedUptime() {
-    var uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime());
-    long hours = uptime.toHours();
-    long minutes = uptime.toMinutesPart();
-    return hours > 0 ? hours + "h " + minutes + "m" : minutes + "m";
-  }
-
-  private static String formattedMemory() {
-    var runtime = Runtime.getRuntime();
-    long usedMb = (runtime.totalMemory() - runtime.freeMemory()) / BYTES_PER_MB;
-    long maxMb = runtime.maxMemory() / BYTES_PER_MB;
-    return usedMb + " MB <dark_gray>/ <gray>" + maxMb + " MB";
-  }
-
-  private static String authors(List<String> authors) {
-    return authors.isEmpty() ? "Desconhecido" : String.join(", ", authors);
-  }
-
-  private static String gameModeName(GameMode mode) {
-    return switch (mode) {
-      case SURVIVAL -> "Sobrevivência";
-      case CREATIVE -> "Criativo";
-      case ADVENTURE -> "Aventura";
-      case SPECTATOR -> "Espectador";
-    };
   }
 }

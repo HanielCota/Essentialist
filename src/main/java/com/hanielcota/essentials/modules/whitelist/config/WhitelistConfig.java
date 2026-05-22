@@ -54,6 +54,11 @@ public record WhitelistConfig(
         "<red>O menu da whitelist só pode ser aberto por jogadores.");
   }
 
+  private static String withPlayer(String template, String player) {
+    Objects.requireNonNull(player, "player");
+    return template.replace("{player}", player);
+  }
+
   /** Configured menu rows clamped to the supported 1-6 range. */
   public int effectiveRows() {
     return Math.clamp(menuRows, MIN_ROWS, MAX_ROWS);
@@ -87,10 +92,5 @@ public record WhitelistConfig(
 
   public String formatUnknownPlayer(String player) {
     return withPlayer(unknownPlayer, player);
-  }
-
-  private static String withPlayer(String template, String player) {
-    Objects.requireNonNull(player, "player");
-    return template.replace("{player}", player);
   }
 }

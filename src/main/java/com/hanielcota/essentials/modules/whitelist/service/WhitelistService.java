@@ -8,17 +8,27 @@ import org.bukkit.OfflinePlayer;
 
 public final class WhitelistService {
 
-  public enum AddResult {
-    ADDED,
-    ALREADY_WHITELISTED,
-    UNKNOWN_PLAYER
-  }
-
   /** A player's name, falling back to the UUID string when the name is unknown. */
   public static String nameOf(OfflinePlayer player) {
     Objects.requireNonNull(player, "player");
     String name = player.getName();
     return name != null ? name : player.getUniqueId().toString();
+  }
+
+  /**
+   * An online or cached player for {@code name}, or {@code null} if the server has never seen it.
+   */
+  private static OfflinePlayer resolveKnown(String name) {
+    OfflinePlayer online = Bukkit.getPlayerExact(name);
+    return online != null ? online : Bukkit.getOfflinePlayerIfCached(name);
+  }
+
+  /** A whitelisted player matching {@code name}, or {@code null} when none matches. */
+  private static OfflinePlayer findWhitelisted(String name) {
+    return Bukkit.getWhitelistedPlayers().stream()
+        .filter(player -> name.equalsIgnoreCase(player.getName()))
+        .findFirst()
+        .orElse(null);
   }
 
   /** Whitelisted players, sorted by name (case-insensitive). */
@@ -64,19 +74,9 @@ public final class WhitelistService {
     player.setWhitelisted(false);
   }
 
-  /**
-   * An online or cached player for {@code name}, or {@code null} if the server has never seen it.
-   */
-  private static OfflinePlayer resolveKnown(String name) {
-    OfflinePlayer online = Bukkit.getPlayerExact(name);
-    return online != null ? online : Bukkit.getOfflinePlayerIfCached(name);
-  }
-
-  /** A whitelisted player matching {@code name}, or {@code null} when none matches. */
-  private static OfflinePlayer findWhitelisted(String name) {
-    return Bukkit.getWhitelistedPlayers().stream()
-        .filter(player -> name.equalsIgnoreCase(player.getName()))
-        .findFirst()
-        .orElse(null);
+  public enum AddResult {
+    ADDED,
+    ALREADY_WHITELISTED,
+    UNKNOWN_PLAYER
   }
 }
