@@ -5,6 +5,7 @@ import com.hanielcota.essentials.modules.invsee.command.InvseeCommand;
 import com.hanielcota.essentials.modules.invsee.config.InvseeConfig;
 import com.hanielcota.essentials.modules.invsee.listener.InvseeListener;
 import com.hanielcota.essentials.modules.invsee.service.InvseeService;
+import com.hanielcota.essentials.modules.invsee.service.InvseeSynchronizer;
 
 public final class InvseeModule extends AbstractModule {
 
@@ -16,7 +17,8 @@ public final class InvseeModule extends AbstractModule {
   protected void onEnable() {
     var config = config("invsee", InvseeConfig.class, InvseeConfig::defaults);
     var service = new InvseeService();
-    registerListener(new InvseeListener(plugin(), service));
+    var synchronizer = new InvseeSynchronizer(plugin(), service);
+    registerListener(new InvseeListener(synchronizer));
     registerCommand(new InvseeCommand(config, service));
   }
 }

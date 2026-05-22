@@ -2,24 +2,20 @@ package com.hanielcota.essentials.modules.invsee.listener;
 
 import com.hanielcota.essentials.modules.invsee.service.InvseeHolder;
 import com.hanielcota.essentials.modules.invsee.service.InvseeService;
+import com.hanielcota.essentials.modules.invsee.service.InvseeSynchronizer;
 import java.util.Objects;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.Plugin;
 
 public final class InvseeListener implements Listener {
 
-  private final Plugin plugin;
-  private final InvseeService service;
+  private final InvseeSynchronizer synchronizer;
 
-  public InvseeListener(Plugin plugin, InvseeService service) {
-    this.plugin = Objects.requireNonNull(plugin, "plugin");
-    this.service = Objects.requireNonNull(service, "service");
+  public InvseeListener(InvseeSynchronizer synchronizer) {
+    this.synchronizer = Objects.requireNonNull(synchronizer, "synchronizer");
   }
 
   @EventHandler
@@ -32,7 +28,7 @@ public final class InvseeListener implements Listener {
       event.setCancelled(true);
       return;
     }
-    scheduleSync(holder, top);
+    synchronizer.scheduleSync(holder, top);
   }
 
   @EventHandler
@@ -47,19 +43,6 @@ public final class InvseeListener implements Listener {
         return;
       }
     }
-    scheduleSync(holder, top);
-  }
-
-  /** Syncs the GUI back to the target next tick, once the click/drag has been applied. */
-  private void scheduleSync(InvseeHolder holder, Inventory view) {
-    Bukkit.getScheduler()
-        .runTask(
-            plugin,
-            () -> {
-              Player target = Bukkit.getPlayer(holder.targetId());
-              if (target != null) {
-                service.sync(target, view);
-              }
-            });
+    synchronizer.scheduleSync(holder, top);
   }
 }
