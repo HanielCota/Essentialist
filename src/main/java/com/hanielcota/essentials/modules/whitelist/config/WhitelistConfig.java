@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.whitelist.config;
 
 import java.util.List;
 import java.util.Objects;
+import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -11,6 +12,10 @@ public record WhitelistConfig(
     @Comment("Rows in the whitelist menu (clamped to 1-6).") int menuRows,
     @Comment("Item name for each whitelisted player. Placeholder: {player}.") String itemName,
     @Comment("Item lore for each whitelisted player. Placeholder: {player}.") List<String> itemLore,
+    @Comment("Material of the placeholder shown when the whitelist is empty.")
+        Material emptyMaterial,
+    @Comment("Name of the placeholder shown when the whitelist is empty.") String emptyName,
+    @Comment("Lore of the placeholder shown when the whitelist is empty.") List<String> emptyLore,
     @Comment("Shown after /whitelist add. Placeholder: {player}.") String added,
     @Comment("Shown when the player is already whitelisted. Placeholder: {player}.")
         String alreadyAdded,
@@ -31,6 +36,16 @@ public record WhitelistConfig(
         6,
         "<yellow>{player}",
         List.of("<gray>Clique para <red>remover</red> da whitelist."),
+        Material.BARRIER,
+        "<red>A whitelist está vazia",
+        List.of(
+            "<gray>Nenhum jogador foi adicionado ainda.",
+            "",
+            "<yellow>/whitelist add [jogador]",
+            "<dark_gray>» <gray>adiciona um jogador à whitelist",
+            "",
+            "<yellow>/whitelist remove [jogador]",
+            "<dark_gray>» <gray>remove um jogador da whitelist"),
         "<green><gold>{player}</gold> foi adicionado à whitelist.",
         "<red><gold>{player}</gold> já está na whitelist.",
         "<green><gold>{player}</gold> foi removido da whitelist.",

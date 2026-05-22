@@ -24,6 +24,12 @@ public final class WhitelistMenu implements Menu {
   private static final int MIN_ROWS = 1;
   private static final int SLOTS_PER_ROW = 9;
 
+  /**
+   * A handler-less dynamic slot. The framework skips it when rendering but still advances the slot
+   * index, which lets {@link #emptyState()} push its single item into a centred slot.
+   */
+  private static final SlotDefinition SKIP = SlotDefinition.withHandler(-1, null);
+
   private final ConfigHandle<WhitelistConfig> config;
   private final WhitelistService service;
   private final WhitelistEntryRenderer renderer;
@@ -69,11 +75,31 @@ public final class WhitelistMenu implements Menu {
 
   private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
     var whitelisted = service.list();
+    if (whitelisted.isEmpty()) {
+      return emptyState();
+    }
     var slots = new ArrayList<SlotDefinition>(whitelisted.size());
     for (var entry : whitelisted) {
       var template = renderer.render(entry);
       slots.add(SlotDefinition.of(-1, template, click -> clickHandler.handle(click, entry)));
     }
+    return slots;
+  }
+
+  /**
+   * A single placeholder item centred in the content area, shown when the whitelist is empty. The
+   * framework maps the n-th dynamic item to content slot n, so the item is preceded by {@link
+   * #SKIP} entries that consume the leading indices without rendering anything.
+   */
+  private List<SlotDefinition> emptyState() {
+    int contentRows = contentSlots(config.value().effectiveRows()).size() / SLOTS_PER_ROW;
+    int centerSlot = (contentRows / 2) * SLOTS_PER_ROW + SLOTS_PER_ROW / 2;
+
+    var slots = new ArrayList<SlotDefinition>(centerSlot + 1);
+    for (int i = 0; i < centerSlot; i++) {
+      slots.add(SKIP);
+    }
+    slots.add(SlotDefinition.of(-1, renderer.renderEmpty(), click -> {}));
     return slots;
   }
 }

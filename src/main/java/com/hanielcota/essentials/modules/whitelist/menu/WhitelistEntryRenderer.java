@@ -8,13 +8,14 @@ import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 
-/** Renders a whitelisted player as a head item. */
+/** Renders the items shown in the whitelist menu. */
 public record WhitelistEntryRenderer(ConfigHandle<WhitelistConfig> config) {
 
   public WhitelistEntryRenderer {
     Objects.requireNonNull(config, "config");
   }
 
+  /** A whitelisted player as a head item. */
   public ItemTemplate render(OfflinePlayer player) {
     Objects.requireNonNull(player, "player");
     var snap = config.value();
@@ -23,6 +24,16 @@ public record WhitelistEntryRenderer(ConfigHandle<WhitelistConfig> config) {
         .head(player.getUniqueId())
         .name(snap.formatItemName(name))
         .lore(snap.formatLore(name).toArray(String[]::new))
+        .italic(false)
+        .build();
+  }
+
+  /** The placeholder item shown when the whitelist has no players. */
+  public ItemTemplate renderEmpty() {
+    var snap = config.value();
+    return ItemTemplate.builder(snap.emptyMaterial())
+        .name(snap.emptyName())
+        .lore(snap.emptyLore().toArray(String[]::new))
         .italic(false)
         .build();
   }
