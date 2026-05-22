@@ -2,183 +2,193 @@
 
 # Essentialist
 
-### Plugin de comandos essenciais para servidores Paper — modular, moderno e pronto para Folia.
+**A modular essentials plugin for Paper &amp; Folia servers.**
 
+Teleportation, item repair, flight, gamemode control and inventory utilities —
+every feature shipped as an independent, hot-reloadable module.
+
+[![CI](https://github.com/HanielCota/Essentialist/actions/workflows/ci.yml/badge.svg)](https://github.com/HanielCota/Essentialist/actions/workflows/ci.yml)
 ![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)
 ![Paper](https://img.shields.io/badge/Paper-1.21.11-005C99)
-![Gradle](https://img.shields.io/badge/Gradle-Kotlin%20DSL-02303A?logo=gradle&logoColor=white)
 ![Folia](https://img.shields.io/badge/Folia-supported-2EA043)
-![License](https://img.shields.io/badge/license-MIT-3DA639)
-![Version](https://img.shields.io/badge/version-0.1.0--SNAPSHOT-DBAB09)
+![License](https://img.shields.io/badge/License-MIT-3DA639)
+
+[Overview](#overview) · [Features](#features) · [Commands](#commands) · [Permissions](#permissions) · [Configuration](#configuration) · [Architecture](#architecture) · [Building](#building-from-source)
 
 </div>
 
 ---
 
-## Sobre
+## Overview
 
-**Essentialist** é um plugin de comandos essenciais para servidores Minecraft baseados em
-[Paper](https://papermc.io/). Em vez de um monólito, cada funcionalidade é um **módulo
-independente**: o que você não usa, não carrega. A arquitetura é centrada em injeção de
-dependências, ciclo de vida explícito e resolução de dependências entre módulos por ordenação
-topológica.
+**Essentialist** is a command plugin for Minecraft servers running [Paper](https://papermc.io/).
+Rather than a monolith, every feature is an **independent module** — what you don't use is never
+loaded. The codebase is built around dependency injection, an explicit lifecycle, and topological
+resolution of inter-module dependencies.
 
-Todos os comandos são **recarregáveis em tempo real**, suportam **alvo em outro jogador** com
-permissões dedicadas e usam mensagens formatadas com MiniMessage.
+Every command is **hot-reloadable**, supports **targeting another player** through dedicated
+permissions, and renders messages with MiniMessage formatting.
 
-## Características
+## Features
 
-- **Arquitetura modular** — cada feature é um `Module` descoberto via `ServiceLoader`; falha de
-  um módulo não derruba os demais (com rollback automático).
-- **Pronto para Folia** — `folia-supported: true`, agendamento por região.
-- **Comandos self/other** — aplique em si mesmo ou em outro jogador com `essentials.<comando>.others`.
-- **Configuração viva** — YAML por módulo, recarregável via `/essentials reload` sem reiniciar.
-- **Histórico de teleporte** — `/back` registra mortes e teleportes (ender pearl, portais,
-  comandos) persistidos em SQLite.
-- **Cooldowns e confirmação** — proteção contra spam; comandos destrutivos pedem confirmação.
-- **Internacionalizável** — todas as mensagens vivem no config, com placeholders.
+- **Modular architecture** — each feature is a `Module` discovered via `ServiceLoader`; a failing
+  module never takes the others down, thanks to automatic rollback.
+- **Folia-ready** — `folia-supported: true`, with region-based scheduling.
+- **Self / other commands** — apply an action to yourself or to another player with the
+  `essentials.<command>.others` permission.
+- **Live configuration** — per-module YAML, reloadable via `/essentials reload` with no restart.
+- **Teleport history** — `/back` records deaths and teleports (ender pearls, portals, commands),
+  persisted in SQLite.
+- **Cooldowns &amp; confirmation** — built-in spam protection; destructive commands ask for
+  confirmation before running.
+- **Fully configurable messages** — every string lives in the config, with placeholders.
 
-## Requisitos
+## Requirements
 
-| Componente | Versão |
-|------------|--------|
-| Servidor   | Paper 1.21.11+ (ou Folia) |
-| Java       | 25+ |
-
-## Instalação
-
-1. Baixe o `Essentialist-<versão>.jar` mais recente.
-2. Coloque o arquivo na pasta `plugins/` do seu servidor.
-3. Reinicie o servidor — os arquivos de configuração são gerados em `plugins/Essentialist/`.
-
-## Comandos
-
-| Comando | Aliases | Descrição | Permissão |
-|---------|---------|-----------|-----------|
-| `/tp <jogador>` | — | Teleporta você até outro jogador | `essentials.tp` |
-| `/tp move <de> <para>` | — | Teleporta um jogador até outro | `essentials.tp.others` |
-| `/tp pos <x> <y> <z>` | — | Teleporta para coordenadas específicas | `essentials.tp` |
-| `/tphere <jogador>` | — | Traz um jogador até você | `essentials.tphere` |
-| `/back` | — | Volta ao local anterior pelo menu de histórico | `essentials.back` |
-| `/fly [jogador]` | — | Ativa ou desativa o modo voo | `essentials.fly` |
-| `/gamemode <modo> [jogador]` | `/gm` | Altera o modo de jogo | `essentials.gamemode` |
-| `/reparar [jogador]` | `/repair` | Repara o item na mão | `essentials.repair` |
-| `/reparar tudo [jogador]` | `all` | Repara o inventário inteiro | `essentials.repair` |
-| `/limpar [jogador]` | `/clear` | Limpa o inventário (pede confirmação) | `essentials.clear` |
-| `/alimentar [jogador]` | `/feed` | Restaura fome e saturação | `essentials.feed` |
-| `/chapeu` | `/hat` | Equipa o item da mão como capacete | `essentials.hat` |
-| `/compactar` | `/compact` | Compacta minérios e barras em blocos | `essentials.compact` |
-| `/derreter` | `/smelt` | Derrete minérios no inventário | `essentials.smelt` |
-| `/essentials reload` | — | Recarrega todas as configurações | `essentials.admin.reload` |
-
-> Os comandos têm cooldown de 3 a 5 segundos. O `/limpar` exige confirmação antes de executar.
-
-## Permissões
-
-O modelo de permissões é declarativo e segue um padrão consistente:
-
-| Permissão | Concede |
+| Component | Version |
 |-----------|---------|
-| `essentials.<comando>` | Usar o comando em si mesmo |
-| `essentials.<comando>.others` | Usar o comando em outro jogador (`fly`, `gamemode`, `clear`, `feed`, `repair`, `tp move`) |
-| `essentials.gamemode.<modo>` | Acesso a um modo de jogo específico (`survival`, `creative`, ...) |
-| `essentials.admin.reload` | Recarregar configurações |
+| Server    | Paper 1.21.11 or newer (Folia supported) |
+| Java      | 25 or newer |
 
-## Configuração
+## Installation
 
-Cada módulo gera o próprio arquivo YAML em `plugins/Essentialist/` (`clear.yml`, `repair.yml`,
-`teleport.yml`, ...). Todas as mensagens são editáveis e aceitam tags do MiniMessage e
-placeholders como `{player}` e `{count}`.
+1. Download the latest `Essentialist-<version>.jar`.
+2. Drop it into your server's `plugins/` folder.
+3. Restart the server — configuration files are generated under `plugins/Essentialist/`.
+
+## Commands
+
+| Command | Aliases | Description | Permission |
+|---------|---------|-------------|------------|
+| `/tp <player>` | — | Teleport yourself to another player | `essentials.tp` |
+| `/tp move <from> <to>` | — | Teleport one player to another | `essentials.tp.others` |
+| `/tp pos <x> <y> <z>` | — | Teleport to specific coordinates | `essentials.tp` |
+| `/tphere <player>` | — | Bring a player to you | `essentials.tphere` |
+| `/back` | — | Return to a previous location via the history menu | `essentials.back` |
+| `/fly [player]` | — | Toggle flight mode | `essentials.fly` |
+| `/gamemode <mode> [player]` | `/gm` | Change game mode | `essentials.gamemode` |
+| `/reparar [player]` | `/repair` | Repair the item in hand | `essentials.repair` |
+| `/reparar tudo [player]` | `all` | Repair the entire inventory | `essentials.repair` |
+| `/limpar [player]` | `/clear` | Clear the inventory (asks for confirmation) | `essentials.clear` |
+| `/alimentar [player]` | `/feed` | Restore hunger and saturation | `essentials.feed` |
+| `/chapeu` | `/hat` | Wear the held item as a helmet | `essentials.hat` |
+| `/compactar` | `/compact` | Compact ores and ingots into blocks | `essentials.compact` |
+| `/derreter` | `/smelt` | Smelt ores in the inventory | `essentials.smelt` |
+| `/essentials reload` | — | Reload every configuration file | `essentials.admin.reload` |
+
+> [!NOTE]
+> Commands have a 3–5 second cooldown. `/limpar` requires confirmation before it runs.
+
+## Permissions
+
+The permission model is declarative and follows a consistent pattern:
+
+| Permission | Grants |
+|------------|--------|
+| `essentials.<command>` | Use the command on yourself |
+| `essentials.<command>.others` | Use the command on another player (`fly`, `gamemode`, `clear`, `feed`, `repair`, `tp move`) |
+| `essentials.gamemode.<mode>` | Access to a specific game mode (`survival`, `creative`, ...) |
+| `essentials.admin.reload` | Reload configurations |
+
+## Configuration
+
+Each module generates its own YAML file under `plugins/Essentialist/` (`clear.yml`, `repair.yml`,
+`teleport.yml`, ...). Every message is editable and accepts MiniMessage tags and placeholders such
+as `{player}` and `{count}`.
 
 ```yaml
 # repair.yml
-repaired-hand: "<green>Item reparado."
-repaired-hand-other: "<green>Reparou o item de <gold>{player}</gold>."
-blacklist: []          # materiais que nunca podem ser reparados
-repair-all-limit: 41   # teto de itens por /reparar tudo
+repaired-hand: "<green>Item repaired."
+repaired-hand-other: "<green>Repaired <gold>{player}</gold>'s item."
+blacklist: []          # materials that can never be repaired
+repair-all-limit: 41   # cap of items processed per /reparar tudo
 ```
 
-Após editar qualquer arquivo, aplique as mudanças com `/essentials reload` — não é preciso
-reiniciar o servidor.
+> [!TIP]
+> After editing any file, apply the changes with `/essentials reload` — no server restart needed.
 
-## Arquitetura
+## Architecture
 
 ```
 com.hanielcota.essentials
 ├── EssentialsPlugin       Entry point (JavaPlugin)
-├── bootstrap/             Montagem do grafo de serviços
-├── core/                  Ciclo de vida (BOOTING → ENABLED → DISABLING)
-├── module/                Sistema de módulos e ordenação por dependências
-├── modules/               Módulos de funcionalidade (clear, feed, repair, ...)
-├── command/               Infraestrutura de comandos e interceptors
-├── config/                Serviço de configuração YAML recarregável
+├── bootstrap/             Service graph assembly
+├── core/                  Lifecycle (BOOTING → ENABLED → DISABLING)
+├── module/                Module system and dependency ordering
+├── modules/               Feature modules (clear, feed, repair, ...)
+├── command/               Command infrastructure and interceptors
+├── config/                Reloadable YAML configuration service
 ├── database/              SQLite + HikariCP
-├── event/                 Event bus interno
-├── message/               Mensagens e internacionalização
-├── service/               Service registry (injeção de dependências)
-├── user/                  Usuários e sessões
-├── paper/                 Adapters da API do Paper
-├── scheduler/             Agendamento de tarefas
+├── event/                 Internal event bus
+├── message/               Messages and internationalization
+├── service/               Service registry (dependency injection)
+├── user/                  Users and sessions
+├── paper/                 Paper API adapters
+├── scheduler/             Task scheduling
 ├── serialization/         Serializers
-└── util/                  Utilitários
+└── util/                  Utilities
 ```
 
-**Como funciona:**
+**How it works:**
 
-- Cada módulo implementa `Module` (via `AbstractModule`) e é descoberto pelo `ServiceLoader`.
-- O `ModuleManager` resolve a ordem de habilitação por **ordenação topológica** das dependências
-  declaradas (ex.: `back` depende de `teleport`); se um módulo falha, faz rollback dos já ativos.
-- O `EssentialsBootstrap` monta o grafo de serviços e o `ServiceRegistry` atua como container de DI.
-- Comandos são declarados por anotações ([CommandFramework](https://github.com/HanielCota)) e
-  menus pelo [MenuFramework](https://github.com/HanielCota).
-- A persistência (histórico do `/back`) usa SQLite acessado via HikariCP.
+- Each module implements `Module` (through `AbstractModule`) and is discovered by `ServiceLoader`.
+- `ModuleManager` resolves the enable order via **topological sort** of the declared dependencies
+  (e.g. `back` depends on `teleport`); if a module fails, the already-enabled ones are rolled back.
+- `EssentialsBootstrap` assembles the service graph; `ServiceRegistry` acts as the DI container.
+- Commands are declared with annotations
+  ([CommandFramework](https://github.com/HanielCota)) and menus with
+  [MenuFramework](https://github.com/HanielCota).
+- Persistence (the `/back` history) uses SQLite accessed through HikariCP.
 
-## Compilando do código-fonte
+## Building from Source
 
-Requer **JDK 25**. O projeto usa Gradle (Kotlin DSL) com o plugin Shadow.
+Requires **JDK 25**. The project uses Gradle (Kotlin DSL) with the Shadow plugin.
 
 ```bash
-# Clone o repositório
-git clone <url-do-repositorio>
+# Clone the repository
+git clone https://github.com/HanielCota/Essentialist.git
 cd Essentialist
 
-# Gere o artefato final (fat jar com dependências relocadas)
+# Produce the final artifact (fat jar with relocated dependencies)
 ./gradlew build
 ```
 
-O `.jar` final é escrito em `build/libs/`. A formatação é garantida pelo
+The final `.jar` is written to `build/libs/`. Formatting is enforced by
 [Spotless](https://github.com/diffplug/spotless) (`google-java-format`):
 
 ```bash
-./gradlew spotlessApply   # formata o código
-./gradlew spotlessCheck   # verifica a formatação
+./gradlew spotlessApply   # format the code
+./gradlew spotlessCheck   # verify formatting
 ```
 
-## Tecnologias
+## Tech Stack
 
-| Camada | Tecnologia |
-|--------|------------|
-| Linguagem | Java 25 |
+| Layer | Technology |
+|-------|------------|
+| Language | Java 25 |
 | Build | Gradle (Kotlin DSL) + Shadow |
-| Servidor | Paper API |
-| Comandos | CommandFramework |
+| Server | Paper API |
+| Commands | CommandFramework |
 | Menus | MenuFramework |
-| Configuração | Configurate (YAML) |
-| Banco de dados | SQLite + HikariCP |
-| Formatação | Spotless / google-java-format |
+| Configuration | Configurate (YAML) |
+| Database | SQLite + HikariCP |
+| Formatting | Spotless / google-java-format |
+| CI | GitHub Actions |
 
-## Contribuindo
+## Contributing
 
-Contribuições são bem-vindas. Antes de abrir um pull request:
+Contributions are welcome. Before opening a pull request:
 
-1. Garanta que o código compila — `./gradlew build`.
-2. Aplique a formatação — `./gradlew spotlessApply`.
-3. Mantenha o padrão modular: novas features entram como módulos próprios em `modules/`.
+1. Make sure the project builds — `./gradlew build`.
+2. Apply formatting — `./gradlew spotlessApply`.
+3. Keep the modular pattern: new features go in as their own module under `modules/`.
 
-## Licença
+Every push and pull request is automatically validated by the CI pipeline (build, tests, lint).
 
-Distribuído sob a licença MIT. Veja o arquivo [`LICENSE`](LICENSE) para mais detalhes.
+## License
 
-## Autor
+Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
 
-Desenvolvido por **HanielCota** — [github.com/HanielCota](https://github.com/HanielCota).
+## Author
+
+Built by **HanielCota** — [github.com/HanielCota](https://github.com/HanielCota).
