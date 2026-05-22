@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.invsee.menu;
+package com.hanielcota.essentials.modules.invsee.service;
 
 import java.util.Objects;
 import java.util.UUID;

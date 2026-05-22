@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
-import com.hanielcota.essentials.modules.invsee.menu.InvseeHolder;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.Objects;
 import net.kyori.adventure.text.Component;
