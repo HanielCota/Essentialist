@@ -10,6 +10,8 @@ public record SpeedConfig(
     @Comment("Placeholders: {player}, {valor}.") String walkSetOther,
     @Comment("Shown when fly speed is set. Placeholder: {valor}.") String flySet,
     @Comment("Placeholders: {player}, {valor}.") String flySetOther,
+    @Comment("Shown when walk and fly speed are restored to the defaults.") String reset,
+    @Comment("Placeholders: {player}.") String resetOther,
     @Comment("Shown when the speed value is outside the 1-10 range.") String invalid,
     @Comment("Shown when /speed is used without a subcommand.") String usage) {
 
@@ -20,16 +22,27 @@ public record SpeedConfig(
             + " <gold>{valor}</gold>.",
         "<green>Velocidade de voo definida para <gold>{valor}</gold>.",
         "<green>Velocidade de voo de <gold>{player}</gold> definida para <gold>{valor}</gold>.",
+        "<green>Velocidades de caminhada e voo restauradas para o padrão.",
+        "<green>Velocidades de <gold>{player}</gold> restauradas para o padrão.",
         "<red>A velocidade precisa estar entre 1 e 10.",
-        "<yellow>Use <gray>/speed walk</gray> ou <gray>/speed fly</gray> seguido de um valor de 1 a"
-            + " 10.</yellow>");
+        "<yellow>Use <gray>/speed walk</gray> ou <gray>/speed fly</gray> com um valor de 1 a 10,"
+            + " ou <gray>/speed reset</gray> para restaurar o padrão.</yellow>");
   }
 
-  public MessagePair whenWalkSet() {
-    return new MessagePair(walkSet, walkSetOther);
+  public MessagePair whenWalkSet(int valor) {
+    return resolve(walkSet, walkSetOther, valor);
   }
 
-  public MessagePair whenFlySet() {
-    return new MessagePair(flySet, flySetOther);
+  public MessagePair whenFlySet(int valor) {
+    return resolve(flySet, flySetOther, valor);
+  }
+
+  public MessagePair whenReset() {
+    return new MessagePair(reset, resetOther);
+  }
+
+  private static MessagePair resolve(String self, String other, int valor) {
+    String value = Integer.toString(valor);
+    return new MessagePair(self.replace("{valor}", value), other.replace("{valor}", value));
   }
 }
