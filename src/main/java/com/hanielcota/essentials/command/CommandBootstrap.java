@@ -3,13 +3,18 @@ package com.hanielcota.essentials.command;
 import com.hanielcota.essentials.command.interceptor.AuditInterceptor;
 import io.github.hanielcota.commandframework.core.CommandResult;
 import io.github.hanielcota.commandframework.core.CommandStatus;
+import io.github.hanielcota.commandframework.core.SuggestionProvider;
 import io.github.hanielcota.commandframework.core.message.CommandMessages;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.bukkit.GameMode;
+import org.bukkit.Registry;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CommandBootstrap {
@@ -39,6 +44,8 @@ public final class CommandBootstrap {
         .enumAlias(GameMode.ADVENTURE, "aventura", "a", "2")
         .enumAlias(GameMode.SPECTATOR, "espectador", "sp", "3");
 
+    builder.suggestionProvider("enchantments", enchantmentSuggestions());
+
     builder
         .onException(
             IllegalArgumentException.class,
@@ -67,5 +74,20 @@ public final class CommandBootstrap {
         });
 
     return builder.build();
+  }
+
+  /** Tab-completes enchantment names (without the {@code minecraft:} namespace) by prefix. */
+  private static SuggestionProvider<Enchantment> enchantmentSuggestions() {
+    return context -> {
+      String input = context.currentInput().toLowerCase(Locale.ROOT);
+      List<String> names = new ArrayList<>();
+      for (Enchantment enchantment : Registry.ENCHANTMENT) {
+        String name = enchantment.getKey().getKey();
+        if (name.startsWith(input)) {
+          names.add(name);
+        }
+      }
+      return names;
+    };
   }
 }

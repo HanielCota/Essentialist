@@ -8,13 +8,6 @@ import org.bukkit.entity.Player;
 
 public final class NearService {
 
-  /** A nearby player and the rounded block distance from the search center. */
-  public record Nearby(Player player, int distance) {
-    public Nearby {
-      Objects.requireNonNull(player, "player");
-    }
-  }
-
   /**
    * Returns the players within {@code radius} blocks of {@code center} (same world only), ordered
    * nearest first. The center player is never included.
@@ -38,5 +31,12 @@ public final class NearService {
 
     result.sort(Comparator.comparingInt(Nearby::distance));
     return result;
+  }
+
+  /** A nearby player and the rounded block distance from the search center. */
+  public record Nearby(Player player, int distance) {
+    public Nearby {
+      Objects.requireNonNull(player, "player");
+    }
   }
 }

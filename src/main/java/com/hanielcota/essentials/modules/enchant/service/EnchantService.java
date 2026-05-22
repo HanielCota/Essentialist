@@ -6,26 +6,17 @@ import org.bukkit.entity.Player;
 
 public final class EnchantService {
 
-  public enum Result {
-    APPLIED,
-    REMOVED,
-    NOT_ENCHANTED,
-    EMPTY_HAND
-  }
-
   /** Adds an enchantment to the held item at any level — unsafe, no vanilla checks. */
   public Result apply(Player player, Enchantment enchantment, int level) {
     Objects.requireNonNull(player, "player");
     Objects.requireNonNull(enchantment, "enchantment");
 
-    var inventory = player.getInventory();
-    var held = inventory.getItemInMainHand();
+    var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
       return Result.EMPTY_HAND;
     }
 
     held.addUnsafeEnchantment(enchantment, level);
-    inventory.setItemInMainHand(held);
     return Result.APPLIED;
   }
 
@@ -34,17 +25,16 @@ public final class EnchantService {
     Objects.requireNonNull(player, "player");
     Objects.requireNonNull(enchantment, "enchantment");
 
-    var inventory = player.getInventory();
-    var held = inventory.getItemInMainHand();
+    var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
       return Result.EMPTY_HAND;
     }
+
     if (!held.containsEnchantment(enchantment)) {
       return Result.NOT_ENCHANTED;
     }
 
     held.removeEnchantment(enchantment);
-    inventory.setItemInMainHand(held);
     return Result.REMOVED;
   }
 
@@ -56,15 +46,24 @@ public final class EnchantService {
   public int clearAll(Player player) {
     Objects.requireNonNull(player, "player");
 
-    var inventory = player.getInventory();
-    var held = inventory.getItemInMainHand();
+    var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
       return -1;
     }
 
     var enchantments = held.getEnchantments();
+    if (enchantments.isEmpty()) {
+      return 0;
+    }
+
     enchantments.keySet().forEach(held::removeEnchantment);
-    inventory.setItemInMainHand(held);
     return enchantments.size();
+  }
+
+  public enum Result {
+    APPLIED,
+    REMOVED,
+    NOT_ENCHANTED,
+    EMPTY_HAND
   }
 }

@@ -4,15 +4,7 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.enchant.config.EnchantConfig;
 import com.hanielcota.essentials.modules.enchant.service.EnchantService;
-import io.github.hanielcota.commandframework.annotation.Arg;
-import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
-import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
-import io.github.hanielcota.commandframework.annotation.Description;
-import io.github.hanielcota.commandframework.annotation.Permission;
-import io.github.hanielcota.commandframework.annotation.Subcommand;
-import io.github.hanielcota.commandframework.annotation.Syntax;
+import io.github.hanielcota.commandframework.annotation.*;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.Objects;
 import org.bukkit.enchantments.Enchantment;
@@ -26,13 +18,22 @@ import org.bukkit.entity.Player;
 @Syntax("/enchant <encantamento> [nível] | /enchant remove <encantamento> | /enchant clear")
 public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService service) {
 
+  private static String enchantName(Enchantment enchantment) {
+    return enchantment.getKey().getKey();
+  }
+
   @DefaultSubcommand
   public void apply(
       CommandActor sender,
-      @Arg("encantamento") Enchantment enchantment,
+      @Suggestions("enchantments") @Arg("encantamento") Enchantment enchantment,
       @DefaultValue("1") @Arg("nivel") int level) {
     Objects.requireNonNull(sender, "sender");
     Objects.requireNonNull(enchantment, "enchantment");
+
+    if (!sender.isPlayer()) {
+      sender.sendError("<red>Este comando só pode ser executado por jogadores.");
+      return;
+    }
 
     var snap = config.value();
     if (level < 1) {
@@ -40,27 +41,40 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       return;
     }
 
-    var result = service.apply(sender.unwrap(Player.class), enchantment, level);
+    var player = sender.unwrap(Player.class);
+    var result = service.apply(player, enchantment, level);
+
     if (result == EnchantService.Result.EMPTY_HAND) {
       sender.sendError(snap.emptyHand());
       return;
     }
+
     sender.sendSuccess(snap.formatApplied(enchantName(enchantment), level));
   }
 
   @Subcommand("remove")
-  public void remove(CommandActor sender, @Arg("encantamento") Enchantment enchantment) {
+  public void remove(
+      CommandActor sender,
+      @Suggestions("enchantments") @Arg("encantamento") Enchantment enchantment) {
     Objects.requireNonNull(sender, "sender");
     Objects.requireNonNull(enchantment, "enchantment");
 
-    var snap = config.value();
-    String label = enchantName(enchantment);
+    if (!sender.isPlayer()) {
+      sender.sendError("<red>Este comando só pode ser executado por jogadores.");
+      return;
+    }
 
-    switch (service.remove(sender.unwrap(Player.class), enchantment)) {
+    var snap = config.value();
+    var label = enchantName(enchantment);
+
+    var player = sender.unwrap(Player.class);
+    var result = service.remove(player, enchantment);
+
+    switch (result) {
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
       case NOT_ENCHANTED -> sender.sendError(snap.formatNotEnchanted(label));
       case REMOVED -> sender.sendSuccess(snap.formatRemoved(label));
-      default -> throw new IllegalStateException("Unexpected enchant result");
+      default -> throw new IllegalStateException("Unexpected enchant result: " + result);
     }
   }
 
@@ -68,8 +82,15 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
   public void clear(CommandActor sender) {
     Objects.requireNonNull(sender, "sender");
 
+    if (!sender.isPlayer()) {
+      sender.sendError("<red>Este comando só pode ser executado por jogadores.");
+      return;
+    }
+
     var snap = config.value();
-    int removed = service.clearAll(sender.unwrap(Player.class));
+    var player = sender.unwrap(Player.class);
+    var removed = service.clearAll(player);
+
     if (removed < 0) {
       sender.sendError(snap.emptyHand());
       return;
@@ -79,10 +100,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       sender.sendError(snap.nothingToClear());
       return;
     }
-    sender.sendSuccess(snap.formatCleared(removed));
-  }
 
-  private static String enchantName(Enchantment enchantment) {
-    return enchantment.getKey().getKey();
+    sender.sendSuccess(snap.formatCleared(removed));
   }
 }

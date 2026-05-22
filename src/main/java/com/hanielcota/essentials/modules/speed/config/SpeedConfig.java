@@ -29,6 +29,11 @@ public record SpeedConfig(
             + " ou <gray>/speed reset</gray> para restaurar o padrão.</yellow>");
   }
 
+  private static MessagePair resolve(String self, String other, int valor) {
+    String value = Integer.toString(valor);
+    return new MessagePair(self.replace("{valor}", value), other.replace("{valor}", value));
+  }
+
   public MessagePair whenWalkSet(int valor) {
     return resolve(walkSet, walkSetOther, valor);
   }
@@ -39,10 +44,5 @@ public record SpeedConfig(
 
   public MessagePair whenReset() {
     return new MessagePair(reset, resetOther);
-  }
-
-  private static MessagePair resolve(String self, String other, int valor) {
-    String value = Integer.toString(valor);
-    return new MessagePair(self.replace("{valor}", value), other.replace("{valor}", value));
   }
 }

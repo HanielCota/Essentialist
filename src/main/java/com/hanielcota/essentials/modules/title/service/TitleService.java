@@ -20,6 +20,18 @@ public final class TitleService {
     this.config = Objects.requireNonNull(config, "config");
   }
 
+  private static Component render(String raw) {
+    try {
+      return ComponentUtils.mini(raw);
+    } catch (RuntimeException _) {
+      return Component.text(raw);
+    }
+  }
+
+  private static Duration ticksToDuration(int ticks) {
+    return Duration.ofMillis(Math.max(0, ticks) * 50L);
+  }
+
   public void send(Player target, String message) {
     Objects.requireNonNull(target, "target");
     Objects.requireNonNull(message, "message");
@@ -51,18 +63,6 @@ public final class TitleService {
             ticksToDuration(snap.fadeOutTicks()));
 
     return Title.title(render(lines.title()), render(lines.subtitle()), times);
-  }
-
-  private static Component render(String raw) {
-    try {
-      return ComponentUtils.mini(raw);
-    } catch (RuntimeException _) {
-      return Component.text(raw);
-    }
-  }
-
-  private static Duration ticksToDuration(int ticks) {
-    return Duration.ofMillis(Math.max(0, ticks) * 50L);
   }
 
   /** A title message split into its title and subtitle lines. */
