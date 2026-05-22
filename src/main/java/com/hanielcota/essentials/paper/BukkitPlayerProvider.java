@@ -2,6 +2,7 @@ package com.hanielcota.essentials.paper;
 
 import com.hanielcota.essentials.EssentialsPlugin;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,7 +32,7 @@ public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerPro
   }
 
   @Override
-  public Collection<? extends Player> all() {
-    return plugin.getServer().getOnlinePlayers();
+  public Collection<Player> all() {
+    return List.copyOf(plugin.getServer().getOnlinePlayers());
   }
 }

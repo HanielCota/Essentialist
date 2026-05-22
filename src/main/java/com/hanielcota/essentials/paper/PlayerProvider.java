@@ -14,5 +14,5 @@ public interface PlayerProvider {
 
   OfflinePlayer offline(UUID id);
 
-  Collection<? extends Player> all();
+  Collection<Player> all();
 }
