@@ -9,6 +9,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
+import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.Objects;
 import org.bukkit.entity.Player;
@@ -17,16 +18,17 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.info")
 @Cooldown(duration = "3s")
-@Description("Abre o painel de informações.")
-@Syntax("/informacoes")
+@Description("Abre o painel de informações suas ou de outro jogador.")
+@Syntax("/informacoes [jogador]")
 public record InfoCommand(InfoMenu menu, MenuService menus) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(CommandActor actor, @TargetOrSelf Player target) {
     Objects.requireNonNull(actor, "actor");
+    Objects.requireNonNull(target, "target");
 
-    Player player = actor.unwrap(Player.class);
-    menu.reset(player.getUniqueId());
-    menus.open(player, InfoMenu.ID);
+    Player viewer = actor.unwrap(Player.class);
+    menu.prepare(viewer.getUniqueId(), target.getUniqueId());
+    menus.open(viewer, InfoMenu.ID);
   }
 }

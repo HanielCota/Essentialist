@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
@@ -33,8 +34,8 @@ public final class InfoMenu implements Menu {
   public static final String ID = "essentials.info";
 
   private static final int ROWS = 4;
-  private static final List<Integer> CONTENT_SLOTS = List.of(10, 11, 12, 13, 14, 15, 16, 31);
-  private static final int BACK_INDEX = 7;
+  private static final List<Integer> CONTENT_SLOTS = List.of(9, 10, 11, 12, 13, 14, 15, 16, 17, 31);
+  private static final int BACK_INDEX = 9;
 
   /** A handler-less slot the renderer skips while still advancing the slot index. */
   private static final SlotDefinition SKIP = SlotDefinition.withHandler(-1, null);
@@ -42,16 +43,22 @@ public final class InfoMenu implements Menu {
   private final ConfigHandle<InfoConfig> config;
   private final InfoService service;
   private final Map<UUID, Tab> openTab = new ConcurrentHashMap<>();
+  private final Map<UUID, UUID> playerTarget = new ConcurrentHashMap<>();
 
   public InfoMenu(ConfigHandle<InfoConfig> config, InfoService service) {
     this.config = Objects.requireNonNull(config, "config");
     this.service = Objects.requireNonNull(service, "service");
   }
 
-  /** Resets the viewer to the category tab; call before opening the menu. */
-  public void reset(UUID viewer) {
+  /**
+   * Prepares the menu for {@code viewer} before it is opened: the player tab will show {@code
+   * target}, and the menu starts on the player tab whenever a different player was requested.
+   */
+  public void prepare(UUID viewer, UUID target) {
     Objects.requireNonNull(viewer, "viewer");
-    openTab.remove(viewer);
+    Objects.requireNonNull(target, "target");
+    playerTarget.put(viewer, target);
+    openTab.put(viewer, viewer.equals(target) ? Tab.CATEGORIES : Tab.PLAYER);
   }
 
   @Override
@@ -78,18 +85,30 @@ public final class InfoMenu implements Menu {
     return switch (tab) {
       case CATEGORIES -> categorySlots();
       case SERVER -> detailSlots(service.serverEntries());
-      case PLAYER -> detailSlots(service.playerEntries(player));
+      case PLAYER -> detailSlots(service.playerEntries(resolveTarget(player)));
       case ABOUT -> detailSlots(service.aboutEntries());
     };
+  }
+
+  /** The player whose info {@code viewer} is looking at — the /info argument, or {@code viewer}. */
+  private Player resolveTarget(Player viewer) {
+    UUID targetId = playerTarget.getOrDefault(viewer.getUniqueId(), viewer.getUniqueId());
+    Player target = Bukkit.getPlayer(targetId);
+    return target != null ? target : viewer;
   }
 
   private List<SlotDefinition> categorySlots() {
     return List.of(
         SKIP,
+        SKIP,
         category(
             Material.COMMAND_BLOCK, "<yellow>Servidor", "<gray>Status do servidor.", Tab.SERVER),
         SKIP,
-        category(Material.PLAYER_HEAD, "<yellow>Jogador", "<gray>Suas informações.", Tab.PLAYER),
+        category(
+            Material.PLAYER_HEAD,
+            "<yellow>Jogador",
+            "<gray>Informações de um jogador.",
+            Tab.PLAYER),
         SKIP,
         category(
             Material.ENCHANTED_BOOK, "<yellow>Essentialist", "<gray>Sobre o plugin.", Tab.ABOUT));
@@ -98,13 +117,7 @@ public final class InfoMenu implements Menu {
   private List<SlotDefinition> detailSlots(List<InfoEntry> entries) {
     var slots = new ArrayList<SlotDefinition>(BACK_INDEX + 1);
     for (var entry : entries) {
-      var template =
-          ItemTemplate.builder(entry.icon())
-              .name(entry.name())
-              .lore(entry.lore().toArray(String[]::new))
-              .italic(false)
-              .build();
-      slots.add(SlotDefinition.of(-1, template, click -> {}));
+      slots.add(entryItem(entry));
     }
     while (slots.size() < BACK_INDEX) {
       slots.add(SKIP);
@@ -112,6 +125,18 @@ public final class InfoMenu implements Menu {
     var back = ItemTemplate.builder(Material.ARROW).name("<yellow>Voltar").italic(false).build();
     slots.add(SlotDefinition.of(-1, back, click -> switchTab(click, Tab.CATEGORIES)));
     return slots;
+  }
+
+  private static SlotDefinition entryItem(InfoEntry entry) {
+    var builder =
+        ItemTemplate.builder(entry.icon())
+            .name(entry.name())
+            .lore(entry.lore().toArray(String[]::new))
+            .italic(false);
+    if (entry.headOwner() != null) {
+      builder.head(entry.headOwner());
+    }
+    return SlotDefinition.of(-1, builder.build(), click -> {});
   }
 
   private SlotDefinition category(Material icon, String name, String lore, Tab target) {

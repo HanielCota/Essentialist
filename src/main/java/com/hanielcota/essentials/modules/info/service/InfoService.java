@@ -79,6 +79,8 @@ public final class InfoService {
     Objects.requireNonNull(player, "player");
     var location = player.getLocation();
     return List.of(
+        InfoEntry.head(
+            player.getUniqueId(), "<yellow>" + player.getName(), "<gray>Informações do jogador."),
         InfoEntry.of(
             Material.GOLDEN_APPLE,
             "<yellow>Vida",
