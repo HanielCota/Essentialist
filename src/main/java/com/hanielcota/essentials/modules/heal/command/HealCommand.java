@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.heal.config.HealConfig;
 import com.hanielcota.essentials.modules.heal.service.HealService;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -54,7 +53,6 @@ public record HealCommand(
   }
 
   @Subcommand("todos")
-  @Alias("all")
   @Permission("essentials.heal.all")
   @Description("Restaura a vida de todos os jogadores online.")
   @Syntax("/curar todos")
