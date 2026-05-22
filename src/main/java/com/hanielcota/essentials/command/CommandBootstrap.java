@@ -6,6 +6,8 @@ import io.github.hanielcota.commandframework.core.CommandStatus;
 import io.github.hanielcota.commandframework.core.SuggestionProvider;
 import io.github.hanielcota.commandframework.core.message.CommandMessages;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -13,7 +15,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.bukkit.GameMode;
-import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,7 +34,8 @@ public final class CommandBootstrap {
     return context -> {
       String input = context.currentInput().toLowerCase(Locale.ROOT);
       List<String> names = new ArrayList<>();
-      for (Enchantment enchantment : Registry.ENCHANTMENT) {
+      for (Enchantment enchantment :
+          RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)) {
         String name = enchantment.getKey().getKey();
         if (name.startsWith(input)) {
           names.add(name);
