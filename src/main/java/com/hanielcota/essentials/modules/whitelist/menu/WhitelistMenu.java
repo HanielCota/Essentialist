@@ -54,6 +54,10 @@ public final class WhitelistMenu implements Menu {
     return IntStream.range(0, count).boxed().toList();
   }
 
+  private static ItemTemplate pageButton(String name) {
+    return ItemTemplate.builder(Material.ARROW).name(name).italic(false).build();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -83,10 +87,6 @@ public final class WhitelistMenu implements Menu {
     }
 
     builder.build().register();
-  }
-
-  private static ItemTemplate pageButton(String name) {
-    return ItemTemplate.builder(Material.ARROW).name(name).italic(false).build();
   }
 
   private List<SlotDefinition> buildSlots(Player player, MenuSession session) {

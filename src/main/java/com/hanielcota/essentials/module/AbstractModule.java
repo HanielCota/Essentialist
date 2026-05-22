@@ -5,13 +5,10 @@ import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.config.ConfigService;
-import com.hanielcota.essentials.message.MessageKey;
-import com.hanielcota.essentials.message.MessageService;
 import com.hanielcota.essentials.util.Log;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.bukkit.event.HandlerList;
@@ -23,7 +20,7 @@ public abstract class AbstractModule implements Module {
 
   private final ModuleMetadata metadata;
   private final List<Listener> listeners = new ArrayList<>();
-  private final List<AutoCloseable> closeables = new ArrayList<>();
+  private final List<AutoCloseable> closeable = new ArrayList<>();
   private final List<Class<?>> ownedServices = new ArrayList<>();
   private ModuleContext context;
 
@@ -55,14 +52,14 @@ public abstract class AbstractModule implements Module {
         HandlerList.unregisterAll(listener);
       }
       listeners.clear();
-      for (AutoCloseable closeable : closeables) {
+      for (AutoCloseable closeable : closeable) {
         try {
           closeable.close();
         } catch (Exception e) {
           LOG.warn(e, "Closeable threw during disable of {}", id());
         }
       }
-      closeables.clear();
+      closeable.clear();
       if (context != null) {
         for (Class<?> type : ownedServices) {
           context.services().unregister(type);
@@ -106,18 +103,6 @@ public abstract class AbstractModule implements Module {
     return handle;
   }
 
-  protected final MessageService messages() {
-    return service(MessageService.class);
-  }
-
-  protected final String message(MessageKey key) {
-    return messages().resolve(key);
-  }
-
-  protected final String message(MessageKey key, Map<String, String> placeholders) {
-    return messages().resolve(key, placeholders);
-  }
-
   protected final void registerCommand(Object handler) {
     service(PaperCommandFramework.class).registerAnnotated(handler);
   }
@@ -137,7 +122,7 @@ public abstract class AbstractModule implements Module {
 
   protected final void registerCloseable(AutoCloseable closeable) {
     Objects.requireNonNull(closeable, "closeable");
-    closeables.add(closeable);
+    this.closeable.add(closeable);
   }
 
   protected final <T> void registerService(Class<T> type, T instance) {
@@ -150,11 +135,5 @@ public abstract class AbstractModule implements Module {
     services
         .find(PaperCommandFramework.class)
         .ifPresent(framework -> framework.registerDependency(type, instance));
-  }
-
-  protected final <T> void unregisterService(Class<T> type) {
-    Objects.requireNonNull(type, "type");
-    context().services().unregister(type);
-    ownedServices.remove(type);
   }
 }

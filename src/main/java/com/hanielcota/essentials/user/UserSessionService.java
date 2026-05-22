@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.user;
 
 import java.time.Instant;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,11 +15,10 @@ public final class UserSessionService {
     return Optional.ofNullable(sessions.get(Objects.requireNonNull(id, "id")));
   }
 
-  public UserSession openSession(User user, Locale locale) {
-    Objects.requireNonNull(user, "user");
-    Objects.requireNonNull(locale, "locale");
-    UserSession session = new UserSession(user, Instant.now(), locale);
-    sessions.put(user.id(), session);
+  public UserSession openSession(UUID playerId) {
+    Objects.requireNonNull(playerId, "playerId");
+    UserSession session = new UserSession(playerId, Instant.now());
+    sessions.put(playerId, session);
     return session;
   }
 

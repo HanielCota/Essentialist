@@ -15,7 +15,6 @@ public final class SmeltModule extends AbstractModule {
   protected void onEnable() {
     var config = config("smelt", SmeltConfig.class, SmeltConfig::defaults);
     var service = new SmeltService(config);
-    registerService(SmeltService.class, service);
     registerCommand(new SmeltCommand(config, service));
   }
 }

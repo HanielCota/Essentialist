@@ -15,7 +15,6 @@ public final class TitleModule extends AbstractModule {
   protected void onEnable() {
     var config = config("title", TitleConfig.class, TitleConfig::defaults);
     var service = new TitleService(config);
-    registerService(TitleService.class, service);
     registerCommand(new TitleCommand(config, service));
   }
 }

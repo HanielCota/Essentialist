@@ -7,12 +7,6 @@ import org.jspecify.annotations.Nullable;
 
 public final class RenameService {
 
-  public enum Result {
-    RENAMED,
-    CLEARED,
-    EMPTY_HAND
-  }
-
   public Result rename(Player player, @Nullable Component name) {
     Objects.requireNonNull(player, "player");
 
@@ -26,5 +20,11 @@ public final class RenameService {
     held.setItemMeta(meta);
 
     return name != null ? Result.RENAMED : Result.CLEARED;
+  }
+
+  public enum Result {
+    RENAMED,
+    CLEARED,
+    EMPTY_HAND
   }
 }

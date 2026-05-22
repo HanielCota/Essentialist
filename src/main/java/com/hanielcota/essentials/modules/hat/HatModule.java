@@ -15,7 +15,6 @@ public final class HatModule extends AbstractModule {
   protected void onEnable() {
     var config = config("hat", HatConfig.class, HatConfig::defaults);
     var service = new HatService();
-    registerService(HatService.class, service);
     registerCommand(new HatCommand(config, service));
   }
 }

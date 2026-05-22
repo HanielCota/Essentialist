@@ -9,7 +9,5 @@ public interface DatabaseProvider {
 
   void close();
 
-  boolean isConnected();
-
   Connection getConnection() throws SQLException;
 }

@@ -1,19 +1,19 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
+import com.hanielcota.essentials.scheduler.Scheduler;
 import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.Plugin;
 
 /** Schedules the write-back of an /invsee GUI to its target player. */
 public final class InvseeSynchronizer {
 
-  private final Plugin plugin;
+  private final Scheduler scheduler;
   private final InvseeService service;
 
-  public InvseeSynchronizer(Plugin plugin, InvseeService service) {
-    this.plugin = Objects.requireNonNull(plugin, "plugin");
+  public InvseeSynchronizer(Scheduler scheduler, InvseeService service) {
+    this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
     this.service = Objects.requireNonNull(service, "service");
   }
 
@@ -22,16 +22,19 @@ public final class InvseeSynchronizer {
     Objects.requireNonNull(holder, "holder");
     Objects.requireNonNull(view, "view");
 
-    Bukkit.getScheduler()
-        .runTask(
-            plugin,
-            () -> {
-              Player target = Bukkit.getPlayer(holder.targetId());
-              // Skip when the target is offline or dead: writing a stale view onto an
-              // inventory already emptied by death drops would duplicate items.
-              if (target != null && !target.isDead()) {
-                service.sync(target, view);
-              }
-            });
+    Player target = Bukkit.getPlayer(holder.targetId());
+    if (target == null) {
+      return;
+    }
+    // Routed through the target's region: on Folia its inventory may only be touched there.
+    scheduler.runOnEntity(
+        target,
+        () -> {
+          // Skip when the target died meanwhile: writing a stale view onto an inventory
+          // already emptied by death drops would duplicate items.
+          if (!target.isDead()) {
+            service.sync(target, view);
+          }
+        });
   }
 }

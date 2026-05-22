@@ -6,6 +6,7 @@ import com.hanielcota.essentials.modules.info.command.InfoCommand;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.modules.info.menu.InfoMenu;
 import com.hanielcota.essentials.modules.info.service.InfoService;
+import com.hanielcota.essentials.user.UserSessionService;
 
 public final class InfoModule extends AbstractModule {
 
@@ -16,7 +17,7 @@ public final class InfoModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("info", InfoConfig.class, InfoConfig::defaults);
-    var service = new InfoService(plugin());
+    var service = new InfoService(plugin(), service(UserSessionService.class));
     var menus = service(MenuService.class);
 
     var menu = new InfoMenu(config, service);

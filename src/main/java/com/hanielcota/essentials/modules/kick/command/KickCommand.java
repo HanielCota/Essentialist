@@ -14,7 +14,6 @@ import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 
 @Command("kick")
@@ -29,10 +28,6 @@ public record KickCommand(ConfigHandle<KickConfig> config, KickService service) 
       CommandActor sender,
       @OnlinePlayer Player target,
       @DefaultValue("") @GreedyString @Arg("motivo") String motivo) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(motivo, "motivo");
-
     var snap = config.value();
     String reason = snap.reasonOr(motivo.strip());
 

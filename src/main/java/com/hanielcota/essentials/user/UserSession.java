@@ -1,14 +1,14 @@
 package com.hanielcota.essentials.user;
 
 import java.time.Instant;
-import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
-public record UserSession(User user, Instant connectedAt, Locale locale) {
+/** Tracks when a player connected, so features like /info can show session uptime. */
+public record UserSession(UUID playerId, Instant connectedAt) {
 
   public UserSession {
-    Objects.requireNonNull(user, "user");
+    Objects.requireNonNull(playerId, "playerId");
     Objects.requireNonNull(connectedAt, "connectedAt");
-    Objects.requireNonNull(locale, "locale");
   }
 }

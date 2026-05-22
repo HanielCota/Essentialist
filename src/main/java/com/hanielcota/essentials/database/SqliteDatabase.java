@@ -47,12 +47,6 @@ public final class SqliteDatabase implements DatabaseProvider {
   }
 
   @Override
-  public boolean isConnected() {
-    var current = source;
-    return current != null && !current.isClosed();
-  }
-
-  @Override
   public Connection getConnection() throws SQLException {
     var current = source;
     if (current == null || current.isClosed()) {

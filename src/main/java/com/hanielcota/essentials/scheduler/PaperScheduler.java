@@ -3,6 +3,7 @@ package com.hanielcota.essentials.scheduler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.time.Duration;
 import java.util.Objects;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
@@ -33,6 +34,11 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
   @Override
   public void runAsync(Runnable task) {
     plugin.getServer().getAsyncScheduler().runNow(plugin, t -> task.run());
+  }
+
+  @Override
+  public void runOnEntity(Entity entity, Runnable task) {
+    entity.getScheduler().run(plugin, t -> task.run(), null);
   }
 
   @Override

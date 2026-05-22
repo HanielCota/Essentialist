@@ -1,8 +1,11 @@
 package com.hanielcota.essentials.modules.info.service;
 
+import com.hanielcota.essentials.user.UserSessionService;
+import com.hanielcota.essentials.util.DurationFormatter;
 import com.hanielcota.essentials.util.Numbers;
 import java.lang.management.ManagementFactory;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -17,9 +20,11 @@ public final class InfoService {
   private static final long BYTES_PER_MB = 1024L * 1024L;
 
   private final Plugin plugin;
+  private final UserSessionService sessions;
 
-  public InfoService(Plugin plugin) {
+  public InfoService(Plugin plugin, UserSessionService sessions) {
     this.plugin = Objects.requireNonNull(plugin, "plugin");
+    this.sessions = Objects.requireNonNull(sessions, "sessions");
   }
 
   private static String formattedTps() {
@@ -29,9 +34,7 @@ public final class InfoService {
 
   private static String formattedUptime() {
     var uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime());
-    long hours = uptime.toHours();
-    long minutes = uptime.toMinutesPart();
-    return hours > 0 ? hours + "h " + minutes + "m" : minutes + "m";
+    return DurationFormatter.format(uptime);
   }
 
   private static String formattedMemory() {
@@ -74,6 +77,16 @@ public final class InfoService {
             "<gray>" + Bukkit.getWorlds().size() + " carregado(s)"));
   }
 
+  /** How long the player has been connected this session, or a fallback for a fresh join. */
+  private String sessionDuration(Player player) {
+    return sessions
+        .sessionOf(player.getUniqueId())
+        .map(
+            session ->
+                DurationFormatter.format(Duration.between(session.connectedAt(), Instant.now())))
+        .orElse("agora mesmo");
+  }
+
   /** Live information about a single player. */
   public List<InfoEntry> playerEntries(Player player) {
     Objects.requireNonNull(player, "player");
@@ -104,7 +117,9 @@ public final class InfoService {
                 + Numbers.compact(location.getY())
                 + ", "
                 + Numbers.compact(location.getZ())),
-        InfoEntry.of(Material.FEATHER, "<yellow>Ping", "<gray>" + player.getPing() + " ms"));
+        InfoEntry.of(Material.FEATHER, "<yellow>Ping", "<gray>" + player.getPing() + " ms"),
+        InfoEntry.of(
+            Material.CLOCK, "<yellow>Tempo de sessão", "<gray>" + sessionDuration(player)));
   }
 
   /** Information about the Essentialist plugin itself. */

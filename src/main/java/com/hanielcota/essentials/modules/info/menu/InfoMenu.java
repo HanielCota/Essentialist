@@ -50,6 +50,18 @@ public final class InfoMenu implements Menu {
     this.service = Objects.requireNonNull(service, "service");
   }
 
+  private static SlotDefinition entryItem(InfoEntry entry) {
+    var builder =
+        ItemTemplate.builder(entry.icon())
+            .name(entry.name())
+            .lore(entry.lore().toArray(String[]::new))
+            .italic(false);
+    if (entry.headOwner() != null) {
+      builder.head(entry.headOwner());
+    }
+    return SlotDefinition.of(-1, builder.build(), click -> {});
+  }
+
   /**
    * Prepares the menu for {@code viewer} before it is opened: the player tab will show {@code
    * target}, and the menu starts on the player tab whenever a different player was requested.
@@ -125,18 +137,6 @@ public final class InfoMenu implements Menu {
     var back = ItemTemplate.builder(Material.ARROW).name("<yellow>Voltar").italic(false).build();
     slots.add(SlotDefinition.of(-1, back, click -> switchTab(click, Tab.CATEGORIES)));
     return slots;
-  }
-
-  private static SlotDefinition entryItem(InfoEntry entry) {
-    var builder =
-        ItemTemplate.builder(entry.icon())
-            .name(entry.name())
-            .lore(entry.lore().toArray(String[]::new))
-            .italic(false);
-    if (entry.headOwner() != null) {
-      builder.head(entry.headOwner());
-    }
-    return SlotDefinition.of(-1, builder.build(), click -> {});
   }
 
   private SlotDefinition category(Material icon, String name, String lore, Tab target) {

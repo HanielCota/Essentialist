@@ -5,7 +5,6 @@ import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.api.EssentialsApi;
 import com.hanielcota.essentials.core.lifecycle.LifecyclePhase;
 import com.hanielcota.essentials.database.DatabaseProvider;
-import com.hanielcota.essentials.integrations.IntegrationRegistry;
 import com.hanielcota.essentials.module.ModuleContext;
 import com.hanielcota.essentials.module.ModuleManager;
 import com.hanielcota.essentials.service.ServiceRegistry;
@@ -35,7 +34,6 @@ public final class EssentialsCore implements EssentialsApi {
     try {
       services.resolve(ModuleManager.class).disableAll();
     } finally {
-      services.resolve(IntegrationRegistry.class).disableAll();
       services.find(DatabaseProvider.class).ifPresent(DatabaseProvider::close);
       services.find(MenuService.class).ifPresent(MenuService::shutdown);
       phase = LifecyclePhase.DISABLED;

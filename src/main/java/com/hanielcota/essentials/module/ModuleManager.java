@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public final class ModuleManager {
 
@@ -61,20 +60,8 @@ public final class ModuleManager {
     }
   }
 
-  public Optional<Module> get(String id) {
-    return Optional.ofNullable(registered.get(Objects.requireNonNull(id, "id")));
-  }
-
-  public ModuleState stateOf(String id) {
-    return states.getOrDefault(Objects.requireNonNull(id, "id"), ModuleState.DISABLED);
-  }
-
   public Collection<Module> all() {
     return List.copyOf(registered.values());
-  }
-
-  public Map<String, ModuleState> snapshot() {
-    return Map.copyOf(states);
   }
 
   private void rollback(List<Module> succeeded) {
