@@ -31,33 +31,41 @@ public final class CommandBootstrap {
     var builder =
         PaperCommandFramework.builder(plugin)
             .messageProvider(CommandMessages.portugueseBrazil())
-            .interceptor(new AuditInterceptor(plugin.getLogger()))
-            .enumAlias(GameMode.SURVIVAL, "sobrevivência", "s", "0")
-            .enumAlias(GameMode.CREATIVE, "criativo", "c", "1")
-            .enumAlias(GameMode.ADVENTURE, "aventura", "a", "2")
-            .enumAlias(GameMode.SPECTATOR, "espectador", "sp", "3")
-            .onException(
-                IllegalArgumentException.class,
-                (ctx, ex) -> {
-                  ctx.actor().sendError("<red>Erro: " + ex.getMessage());
-                  return CommandResult.failure(CommandStatus.INVALID_USAGE, ex.getMessage());
-                })
-            .onException(
-                RuntimeException.class,
-                (ctx, ex) -> {
-                  ctx.actor().sendError("<red>Ocorreu um erro inesperado.");
-                  plugin
-                      .getLogger()
-                      .log(
-                          Level.WARNING,
-                          ex,
-                          () -> "Unhandled command exception: " + ex.getMessage());
-                  return CommandResult.failure(CommandStatus.ERROR, "unexpected");
-                });
+            .interceptor(new AuditInterceptor(plugin.getLogger()));
 
-    for (Consumer<PaperCommandFramework.Builder> customizer : customizers) {
-      customizer.accept(builder);
-    }
+    builder
+        .enumAlias(GameMode.SURVIVAL, "sobrevivência", "s", "0")
+        .enumAlias(GameMode.CREATIVE, "criativo", "c", "1")
+        .enumAlias(GameMode.ADVENTURE, "aventura", "a", "2")
+        .enumAlias(GameMode.SPECTATOR, "espectador", "sp", "3");
+
+    builder
+        .onException(
+            IllegalArgumentException.class,
+            (ctx, ex) -> {
+              Objects.requireNonNull(ctx, "context");
+              Objects.requireNonNull(ex, "exception");
+
+              ctx.actor().sendError("<red>Erro: " + ex.getMessage());
+              return CommandResult.failure(CommandStatus.INVALID_USAGE, ex.getMessage());
+            })
+        .onException(
+            RuntimeException.class,
+            (ctx, ex) -> {
+              Objects.requireNonNull(ctx, "context");
+              Objects.requireNonNull(ex, "exception");
+
+              ctx.actor().sendError("<red>Ocorreu um erro inesperado.");
+              plugin.getLogger().log(Level.WARNING, ex, () -> "Unhandled command exception");
+              return CommandResult.failure(CommandStatus.ERROR, "unexpected");
+            });
+
+    customizers.forEach(
+        customizer -> {
+          Objects.requireNonNull(customizer, "customizer");
+          customizer.accept(builder);
+        });
+
     return builder.build();
   }
 }

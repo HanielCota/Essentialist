@@ -20,23 +20,14 @@ import com.hanielcota.essentials.message.MessageService;
 import com.hanielcota.essentials.message.MutableMessageProvider;
 import com.hanielcota.essentials.module.Module;
 import com.hanielcota.essentials.module.ModuleManager;
-import com.hanielcota.essentials.paper.AudienceProvider;
-import com.hanielcota.essentials.paper.BukkitPlayerProvider;
-import com.hanielcota.essentials.paper.DefaultTaskDispatcher;
-import com.hanielcota.essentials.paper.PaperAudienceProvider;
-import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.paper.TaskDispatcher;
+import com.hanielcota.essentials.paper.*;
 import com.hanielcota.essentials.scheduler.PaperScheduler;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.serialization.LocationSerializer;
 import com.hanielcota.essentials.serialization.SerializerRegistry;
 import com.hanielcota.essentials.service.DefaultServiceRegistry;
 import com.hanielcota.essentials.service.ServiceRegistry;
-import com.hanielcota.essentials.user.InMemoryUserRepository;
-import com.hanielcota.essentials.user.UserRepository;
-import com.hanielcota.essentials.user.UserService;
-import com.hanielcota.essentials.user.UserSessionListener;
-import com.hanielcota.essentials.user.UserSessionService;
+import com.hanielcota.essentials.user.*;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Locale;
 import java.util.Objects;
@@ -51,22 +42,6 @@ public final class EssentialsBootstrap {
     this.plugin = Objects.requireNonNull(plugin, "plugin");
   }
 
-  private static void mirrorServicesAsCommandDependencies(
-      PaperCommandFramework framework, ServiceRegistry services) {
-    for (Class<?> type : services.registered()) {
-      if (type != PaperCommandFramework.class) {
-        mirrorOne(framework, services, type);
-      }
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <T> void mirrorOne(
-      PaperCommandFramework framework, ServiceRegistry services, Class<?> rawType) {
-    Class<T> type = (Class<T>) rawType;
-    framework.registerDependency(type, services.resolve(type));
-  }
-
   public EssentialsCore start() {
     var services = new DefaultServiceRegistry();
 
@@ -75,19 +50,21 @@ public final class EssentialsBootstrap {
     registerConfigs(services);
     registerMessages(services);
     registerDatabase(services);
+
     var modules = createModules();
+    services.register(ModuleManager.class, modules);
+
     var framework = registerCommands(services, modules);
     registerMenus(services);
     registerEventBus(services);
     registerUserStack(services);
     registerSerializers(services);
     registerIntegrations(services);
-    services.register(ModuleManager.class, modules);
 
     var core = new EssentialsCore(plugin, services);
     services.register(EssentialsApi.class, core);
 
-    mirrorServicesAsCommandDependencies(framework, services);
+    mirrorServicesToCommands(framework, services);
 
     core.advance(LifecyclePhase.ENABLED);
     return core;
@@ -105,35 +82,30 @@ public final class EssentialsBootstrap {
     services.register(TaskDispatcher.class, new DefaultTaskDispatcher(scheduler));
   }
 
-  private ConfigService registerConfigs(ServiceRegistry services) {
-    var configs = new YamlConfigService(plugin.getDataFolder().toPath());
-    services.register(ConfigService.class, configs);
-    return configs;
+  private void registerConfigs(ServiceRegistry services) {
+    services.register(ConfigService.class, new YamlConfigService(plugin.getDataFolder().toPath()));
   }
 
-  private MessageService registerMessages(ServiceRegistry services) {
+  private void registerMessages(ServiceRegistry services) {
     var provider = new InMemoryMessageProvider(Locale.of("en"));
-    var messages = new MessageService(provider);
     services.register(MessageProvider.class, provider);
     services.register(MutableMessageProvider.class, provider);
-    services.register(MessageService.class, messages);
-    return messages;
+    services.register(MessageService.class, new MessageService(provider));
   }
 
   private PaperCommandFramework registerCommands(ServiceRegistry services, ModuleManager modules) {
     var customizers =
         modules.all().stream()
-            .<Consumer<PaperCommandFramework.Builder>>map(module -> module::customizeCommands)
+            .map(module -> (Consumer<PaperCommandFramework.Builder>) module::customizeCommands)
             .toList();
+
     var framework = new CommandBootstrap(plugin, customizers).createFramework();
     services.register(PaperCommandFramework.class, framework);
     return framework;
   }
 
-  private MenuService registerMenus(ServiceRegistry services) {
-    var menus = MenuFramework.create(plugin);
-    services.register(MenuService.class, menus);
-    return menus;
+  private void registerMenus(ServiceRegistry services) {
+    services.register(MenuService.class, MenuFramework.create(plugin));
   }
 
   private void registerDatabase(ServiceRegistry services) {
@@ -150,9 +122,11 @@ public final class EssentialsBootstrap {
     var repository = new InMemoryUserRepository();
     var users = new UserService(repository);
     var sessions = new UserSessionService();
+
     services.register(UserRepository.class, repository);
     services.register(UserService.class, users);
     services.register(UserSessionService.class, sessions);
+
     plugin
         .getServer()
         .getPluginManager()
@@ -173,5 +147,14 @@ public final class EssentialsBootstrap {
     var modules = new ModuleManager();
     ServiceLoader.load(Module.class, getClass().getClassLoader()).forEach(modules::register);
     return modules;
+  }
+
+  @SuppressWarnings("unchecked")
+  private void mirrorServicesToCommands(PaperCommandFramework framework, ServiceRegistry services) {
+    for (Class<?> type : services.registered()) {
+      if (type != PaperCommandFramework.class) {
+        framework.registerDependency((Class<Object>) type, services.resolve((Class<Object>) type));
+      }
+    }
   }
 }

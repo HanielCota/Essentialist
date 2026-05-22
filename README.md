@@ -43,10 +43,10 @@ permissions, and renders messages with MiniMessage formatting.
 
 ## 📋 Requirements
 
-| Component | Version |
-|-----------|---------|
+| Component | Version                                  |
+|-----------|------------------------------------------|
 | Server    | Paper 1.21.11 or newer (Folia supported) |
-| Java      | 25 or newer |
+| Java      | 25 or newer                              |
 
 ## 📦 Installation
 
@@ -56,23 +56,23 @@ permissions, and renders messages with MiniMessage formatting.
 
 ## ⌨️ Commands
 
-| Command | Aliases | Description | Permission |
-|---------|---------|-------------|------------|
-| `/tp <player>` | — | Teleport yourself to another player | `essentials.tp` |
-| `/tp move <from> <to>` | — | Teleport one player to another | `essentials.tp.others` |
-| `/tp pos <x> <y> <z>` | — | Teleport to specific coordinates | `essentials.tp` |
-| `/tphere <player>` | — | Bring a player to you | `essentials.tphere` |
-| `/back` | — | Return to a previous location via the history menu | `essentials.back` |
-| `/fly [player]` | — | Toggle flight mode | `essentials.fly` |
-| `/gamemode <mode> [player]` | `/gm` | Change game mode | `essentials.gamemode` |
-| `/reparar [player]` | `/repair` | Repair the item in hand | `essentials.repair` |
-| `/reparar tudo [player]` | `all` | Repair the entire inventory | `essentials.repair` |
-| `/limpar [player]` | `/clear` | Clear the inventory (asks for confirmation) | `essentials.clear` |
-| `/alimentar [player]` | `/feed` | Restore hunger and saturation | `essentials.feed` |
-| `/chapeu` | `/hat` | Wear the held item as a helmet | `essentials.hat` |
-| `/compactar` | `/compact` | Compact ores and ingots into blocks | `essentials.compact` |
-| `/derreter` | `/smelt` | Smelt ores in the inventory | `essentials.smelt` |
-| `/essentials reload` | — | Reload every configuration file | `essentials.admin.reload` |
+| Command                     | Aliases    | Description                                        | Permission                |
+|-----------------------------|------------|----------------------------------------------------|---------------------------|
+| `/tp <player>`              | —          | Teleport yourself to another player                | `essentials.tp`           |
+| `/tp move <from> <to>`      | —          | Teleport one player to another                     | `essentials.tp.others`    |
+| `/tp pos <x> <y> <z>`       | —          | Teleport to specific coordinates                   | `essentials.tp`           |
+| `/tphere <player>`          | —          | Bring a player to you                              | `essentials.tphere`       |
+| `/back`                     | —          | Return to a previous location via the history menu | `essentials.back`         |
+| `/fly [player]`             | —          | Toggle flight mode                                 | `essentials.fly`          |
+| `/gamemode <mode> [player]` | `/gm`      | Change game mode                                   | `essentials.gamemode`     |
+| `/reparar [player]`         | `/repair`  | Repair the item in hand                            | `essentials.repair`       |
+| `/reparar tudo [player]`    | `all`      | Repair the entire inventory                        | `essentials.repair`       |
+| `/limpar [player]`          | `/clear`   | Clear the inventory (asks for confirmation)        | `essentials.clear`        |
+| `/alimentar [player]`       | `/feed`    | Restore hunger and saturation                      | `essentials.feed`         |
+| `/chapeu`                   | `/hat`     | Wear the held item as a helmet                     | `essentials.hat`          |
+| `/compactar`                | `/compact` | Compact ores and ingots into blocks                | `essentials.compact`      |
+| `/derreter`                 | `/smelt`   | Smelt ores in the inventory                        | `essentials.smelt`        |
+| `/essentials reload`        | —          | Reload every configuration file                    | `essentials.admin.reload` |
 
 > [!NOTE]
 > Commands have a 3–5 second cooldown. `/limpar` requires confirmation before it runs.
@@ -81,12 +81,12 @@ permissions, and renders messages with MiniMessage formatting.
 
 The permission model is declarative and follows a consistent pattern:
 
-| Permission | Grants |
-|------------|--------|
-| `essentials.<command>` | Use the command on yourself |
+| Permission                    | Grants                                                                                      |
+|-------------------------------|---------------------------------------------------------------------------------------------|
+| `essentials.<command>`        | Use the command on yourself                                                                 |
 | `essentials.<command>.others` | Use the command on another player (`fly`, `gamemode`, `clear`, `feed`, `repair`, `tp move`) |
-| `essentials.gamemode.<mode>` | Access to a specific game mode (`survival`, `creative`, ...) |
-| `essentials.admin.reload` | Reload configurations |
+| `essentials.gamemode.<mode>`  | Access to a specific game mode (`survival`, `creative`, ...)                                |
+| `essentials.admin.reload`     | Reload configurations                                                                       |
 
 ## ⚙️ Configuration
 
@@ -161,17 +161,17 @@ The final `.jar` is written to `build/libs/`. Formatting is enforced by
 
 ## 🧰 Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Language | Java 25 |
-| Build | Gradle (Kotlin DSL) + Shadow |
-| Server | Paper API |
-| Commands | CommandFramework |
-| Menus | MenuFramework |
-| Configuration | Configurate (YAML) |
-| Database | SQLite + HikariCP |
-| Formatting | Spotless / google-java-format |
-| CI | GitHub Actions |
+| Layer         | Technology                    |
+|---------------|-------------------------------|
+| Language      | Java 25                       |
+| Build         | Gradle (Kotlin DSL) + Shadow  |
+| Server        | Paper API                     |
+| Commands      | CommandFramework              |
+| Menus         | MenuFramework                 |
+| Configuration | Configurate (YAML)            |
+| Database      | SQLite + HikariCP             |
+| Formatting    | Spotless / google-java-format |
+| CI            | GitHub Actions                |
 
 ## 🤝 Contributing
 
