@@ -39,12 +39,13 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       }
       int take = Math.min(remaining, item.getAmount());
       int left = item.getAmount() - take;
+      remaining -= take;
+
       if (left == 0) {
         inv.setItem(slot, null);
-      } else {
-        item.setAmount(left);
+        continue;
       }
-      remaining -= take;
+      item.setAmount(left);
     }
   }
 

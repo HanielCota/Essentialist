@@ -27,6 +27,7 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
         || !damageable.hasDamage()) {
       return false;
     }
+
     damageable.setDamage(0);
     item.setItemMeta(damageable);
     return true;
@@ -35,12 +36,14 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
   public HandResult repairHand(Player player) {
     var inv = player.getInventory();
     var held = inv.getItemInMainHand();
+
     if (held.getType().isAir()) {
       return HandResult.EMPTY_HAND;
     }
     if (!repair(held, config.value().blacklist())) {
       return HandResult.NOTHING_TO_REPAIR;
     }
+
     inv.setItemInMainHand(held);
     return HandResult.REPAIRED;
   }
@@ -51,6 +54,7 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
     int limit = snap.repairAllLimit();
     var inv = player.getInventory();
     int count = 0;
+
     for (int slot = 0; slot < inv.getSize() && count < limit; slot++) {
       var item = inv.getItem(slot);
       if (repair(item, blacklist)) {
@@ -58,6 +62,7 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
         count++;
       }
     }
+
     return count;
   }
 
