@@ -21,4 +21,5 @@ com.hanielcota.essentials.modules.enchant.EnchantModule
 com.hanielcota.essentials.modules.clearchat.ClearChatModule
 com.hanielcota.essentials.modules.trash.TrashModule
 com.hanielcota.essentials.modules.kick.KickModule
+com.hanielcota.essentials.modules.invsee.InvseeModule
 com.hanielcota.essentials.modules.essentials.EssentialsModule
