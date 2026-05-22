@@ -10,7 +10,6 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 
 @Command("clearchat")
 @Permission("essentials.clearchat")
@@ -21,8 +20,6 @@ public record ClearChatCommand(ConfigHandle<ClearChatConfig> config, ClearChatSe
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
-    Objects.requireNonNull(actor, "actor");
-
     var snap = config.value();
     String announcement = snap.formatAnnouncement(actor.name());
     service.clearChat(snap.effectiveLines(), announcement);

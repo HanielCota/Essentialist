@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.enchant.config.EnchantConfig;
 import com.hanielcota.essentials.modules.enchant.service.EnchantService;
 import io.github.hanielcota.commandframework.annotation.*;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
@@ -27,9 +26,6 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       CommandActor sender,
       @Suggestions("enchantments") @Arg("encantamento") Enchantment enchantment,
       @DefaultValue("1") @Arg("nivel") int level) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(enchantment, "enchantment");
-
     var snap = config.value();
     if (level < 1) {
       sender.sendError(snap.invalidLevel());
@@ -51,9 +47,6 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
   public void remove(
       CommandActor sender,
       @Suggestions("enchantments") @Arg("encantamento") Enchantment enchantment) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(enchantment, "enchantment");
-
     var snap = config.value();
     var label = enchantName(enchantment);
 
@@ -70,8 +63,6 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
 
   @Subcommand("clear")
   public void clear(CommandActor sender) {
-    Objects.requireNonNull(sender, "sender");
-
     var snap = config.value();
     var player = sender.unwrap(Player.class);
     var removed = service.clearAll(player);

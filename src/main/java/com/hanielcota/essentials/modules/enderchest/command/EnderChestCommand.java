@@ -13,7 +13,6 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 
 @Command(value = "echest", aliases = "enderchest")
@@ -27,9 +26,6 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config, EnderChes
   @DefaultSubcommand
   @PermissionForOther(".others")
   public void execute(CommandActor sender, @TargetOrSelf Player target) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(target, "target");
-
     Player viewer = sender.unwrap(Player.class);
     var snap = config.value();
     boolean self = target.equals(viewer);

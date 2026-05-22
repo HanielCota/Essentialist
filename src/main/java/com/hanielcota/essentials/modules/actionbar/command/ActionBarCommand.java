@@ -14,7 +14,6 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 
 @Command("actionbar")
@@ -27,9 +26,6 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
   @DefaultSubcommand
   @PlayerOnly
   public void execute(CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(mensagem, "mensagem");
-
     var snap = config.value();
 
     String message = mensagem.strip();
@@ -47,9 +43,6 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
   @Description("Envia uma action bar para todos os jogadores online.")
   @Syntax("/actionbar broadcast <mensagem>")
   public void broadcast(CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(mensagem, "mensagem");
-
     var snap = config.value();
     String message = mensagem.strip();
     if (message.isBlank()) {

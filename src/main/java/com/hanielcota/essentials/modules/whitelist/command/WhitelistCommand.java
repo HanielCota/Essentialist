@@ -15,7 +15,6 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 
 @Command("whitelist")
@@ -29,15 +28,11 @@ public record WhitelistCommand(
   @DefaultSubcommand
   @PlayerOnly
   public void open(CommandActor actor) {
-    Objects.requireNonNull(actor, "actor");
     menus.open(actor.unwrap(Player.class), WhitelistMenu.ID);
   }
 
   @Subcommand("add")
   public void add(CommandActor sender, @Arg("jogador") String name) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(name, "name");
-
     var snap = config.value();
     switch (service.add(name)) {
       case ADDED -> sender.sendSuccess(snap.formatAdded(name));
@@ -49,9 +44,6 @@ public record WhitelistCommand(
 
   @Subcommand("remove")
   public void remove(CommandActor sender, @Arg("jogador") String name) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(name, "name");
-
     var snap = config.value();
     if (service.remove(name)) {
       sender.sendSuccess(snap.formatRemoved(name));

@@ -13,7 +13,6 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.bukkit.entity.Player;
 
@@ -27,8 +26,6 @@ public record NearCommand(ConfigHandle<NearConfig> config, NearService service) 
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("-1") @Arg("raio") int raio) {
-    Objects.requireNonNull(actor, "actor");
-
     Player player = actor.unwrap(Player.class);
     var snap = config.value();
 

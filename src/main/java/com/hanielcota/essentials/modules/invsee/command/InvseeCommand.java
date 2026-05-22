@@ -12,7 +12,6 @@ import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 
 @Command("invsee")
@@ -25,9 +24,6 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @OnlinePlayer Player target) {
-    Objects.requireNonNull(sender, "sender");
-    Objects.requireNonNull(target, "target");
-
     Player viewer = sender.unwrap(Player.class);
     var snap = config.value();
     if (target.equals(viewer)) {
