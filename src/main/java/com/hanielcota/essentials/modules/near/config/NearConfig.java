@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.near.config;
 
+import com.hanielcota.essentials.util.Placeholders;
 import java.util.Objects;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -29,15 +30,12 @@ public record NearConfig(
 
   public String formatEntry(String player, int distance) {
     Objects.requireNonNull(player, "player");
-    return entry.replace("{player}", player).replace("{distance}", Integer.toString(distance));
+    return Placeholders.format(entry, "player", player, "distance", distance);
   }
 
   public String formatFound(int radius, int count, String players) {
     Objects.requireNonNull(players, "players");
-    return found
-        .replace("{radius}", Integer.toString(radius))
-        .replace("{count}", Integer.toString(count))
-        .replace("{players}", players);
+    return Placeholders.format(found, "radius", radius, "count", count, "players", players);
   }
 
   public String formatNone(int radius) {

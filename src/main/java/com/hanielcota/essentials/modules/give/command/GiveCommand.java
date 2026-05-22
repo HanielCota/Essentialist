@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.give.config.GiveConfig;
 import com.hanielcota.essentials.modules.give.service.GiveService;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -34,10 +35,7 @@ public record GiveCommand(
     PaperCommandFramework framework) {
 
   private static String fill(String template, String item, int amount, int leftover) {
-    return template
-        .replace("{item}", item)
-        .replace("{amount}", Integer.toString(amount))
-        .replace("{leftover}", Integer.toString(leftover));
+    return Placeholders.format(template, "item", item, "amount", amount, "leftover", leftover);
   }
 
   @DefaultSubcommand
@@ -118,11 +116,7 @@ public record GiveCommand(
       recipient.sendSuccess(fill(pair.forTarget(player.getName()), itemName, given, leftover));
     }
 
-    String summary =
-        snap.givenAll()
-            .replace("{amount}", Integer.toString(amount))
-            .replace("{item}", itemName)
-            .replace("{count}", Integer.toString(count));
-    sender.sendSuccess(summary);
+    sender.sendSuccess(
+        Placeholders.format(snap.givenAll(), "amount", amount, "item", itemName, "count", count));
   }
 }

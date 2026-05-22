@@ -6,11 +6,12 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.util.Placeholders;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.bukkit.Material;
 import org.jspecify.annotations.NonNull;
@@ -74,19 +75,16 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
       String z,
       String time) {
 
-    List<String> list = new ArrayList<>();
-    for (String line : template) {
-      String replace =
-          line.replace("{target}", targetName)
-              .replace("{type}", type)
-              .replace("{status}", status)
-              .replace("{world}", world)
-              .replace("{x}", x)
-              .replace("{y}", y)
-              .replace("{z}", z)
-              .replace("{time}", time);
-      list.add(replace);
-    }
-    return list.toArray(new String[0]);
+    var values =
+        Map.<String, Object>of(
+            "target", targetName,
+            "type", type,
+            "status", status,
+            "world", world,
+            "x", x,
+            "y", y,
+            "z", z,
+            "time", time);
+    return template.stream().map(line -> Placeholders.format(line, values)).toArray(String[]::new);
   }
 }

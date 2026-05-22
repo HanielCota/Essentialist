@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.teleport.config;
 
 import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.util.Placeholders;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -43,7 +44,7 @@ public record TeleportConfig(
   }
 
   public String formatMoveSender(String from, String to) {
-    return moveSender.replace("{from}", from).replace("{to}", to);
+    return Placeholders.format(moveSender, "from", from, "to", to);
   }
 
   public String formatMoveNotify(String sender) {
@@ -51,10 +52,8 @@ public record TeleportConfig(
   }
 
   public String formatToPos(double x, double y, double z) {
-    return toPos
-        .replace("{x}", Numbers.compact(x))
-        .replace("{y}", Numbers.compact(y))
-        .replace("{z}", Numbers.compact(z));
+    return Placeholders.format(
+        toPos, "x", Numbers.compact(x), "y", Numbers.compact(y), "z", Numbers.compact(z));
   }
 
   public String formatBroughtPlayer(String player) {
