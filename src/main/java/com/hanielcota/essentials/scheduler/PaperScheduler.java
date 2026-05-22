@@ -3,6 +3,7 @@ package com.hanielcota.essentials.scheduler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.time.Duration;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -56,6 +57,37 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
             .getGlobalRegionScheduler()
             .runAtFixedRate(
                 plugin, adapt(task), Ticks.fromDuration(initialDelay), Ticks.fromDuration(period));
+    return new ScheduledTaskHandle(handle);
+  }
+
+  @Override
+  public Task runAsyncLater(Runnable task, Duration delay) {
+    Objects.requireNonNull(task, "task");
+    Objects.requireNonNull(delay, "delay");
+    ScheduledTask handle =
+        plugin
+            .getServer()
+            .getAsyncScheduler()
+            .runDelayed(plugin, adapt(task), Math.max(0L, delay.toMillis()), TimeUnit.MILLISECONDS);
+    return new ScheduledTaskHandle(handle);
+  }
+
+  @Override
+  public Task runAsyncTimer(Runnable task, Duration initialDelay, Duration period) {
+    Objects.requireNonNull(task, "task");
+    Objects.requireNonNull(initialDelay, "initialDelay");
+    Objects.requireNonNull(period, "period");
+
+    ScheduledTask handle =
+        plugin
+            .getServer()
+            .getAsyncScheduler()
+            .runAtFixedRate(
+                plugin,
+                adapt(task),
+                Math.max(0L, initialDelay.toMillis()),
+                Math.max(1L, period.toMillis()),
+                TimeUnit.MILLISECONDS);
     return new ScheduledTaskHandle(handle);
   }
 

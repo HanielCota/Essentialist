@@ -19,4 +19,17 @@ public interface Scheduler {
   Task runLater(Runnable task, Duration delay);
 
   Task runTimer(Runnable task, Duration initialDelay, Duration period);
+
+  /**
+   * Runs {@code task} asynchronously after {@code delay}. Unlike {@link #runLater}, the delay is
+   * wall-clock, not tick-bound — appropriate for I/O work (DB, HTTP) that must not touch a region
+   * thread.
+   */
+  Task runAsyncLater(Runnable task, Duration delay);
+
+  /**
+   * Runs {@code task} asynchronously every {@code period} after {@code initialDelay}. Wall-clock
+   * scheduling, like {@link #runAsyncLater}.
+   */
+  Task runAsyncTimer(Runnable task, Duration initialDelay, Duration period);
 }
