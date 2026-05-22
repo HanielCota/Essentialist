@@ -7,11 +7,11 @@
 Teleportation, item repair, flight, gamemode control and inventory utilities —
 every feature shipped as an independent, hot-reloadable module.
 
-[![CI](https://github.com/HanielCota/Essentialist/actions/workflows/ci.yml/badge.svg)](https://github.com/HanielCota/Essentialist/actions/workflows/ci.yml)
-![Java](https://img.shields.io/badge/Java-25-ED8B00?logo=openjdk&logoColor=white)
-![Paper](https://img.shields.io/badge/Paper-1.21.11-005C99)
-![Folia](https://img.shields.io/badge/Folia-supported-2EA043)
-![License](https://img.shields.io/badge/License-MIT-3DA639)
+[![Build](https://img.shields.io/github/actions/workflow/status/HanielCota/Essentialist/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=build)](https://github.com/HanielCota/Essentialist/actions/workflows/ci.yml)
+![Java](https://img.shields.io/badge/Java-25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Paper](https://img.shields.io/badge/Paper-1.21.11-00ADD8?style=for-the-badge)
+![Folia](https://img.shields.io/badge/Folia-supported-7E57C2?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-43A047?style=for-the-badge)
 
 </div>
 
