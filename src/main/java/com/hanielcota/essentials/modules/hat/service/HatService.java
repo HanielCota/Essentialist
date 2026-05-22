@@ -13,8 +13,28 @@ public final class HatService {
     }
 
     var previousHelmet = inv.getHelmet();
-    inv.setHelmet(held);
-    inv.setItemInMainHand(previousHelmet);
+
+    // Only a single unit goes on the head, even if a whole stack is held.
+    var newHelmet = held.clone();
+    newHelmet.setAmount(1);
+    inv.setHelmet(newHelmet);
+
+    if (held.getAmount() == 1) {
+      // Plain swap: the held slot is freed for the previous helmet.
+      inv.setItemInMainHand(previousHelmet);
+      return Result.EQUIPPED;
+    }
+
+    // The rest of the stack stays in hand; the old helmet returns to the inventory.
+    held.setAmount(held.getAmount() - 1);
+    inv.setItemInMainHand(held);
+
+    if (previousHelmet != null && !previousHelmet.getType().isAir()) {
+      var overflow = inv.addItem(previousHelmet);
+      for (var drop : overflow.values()) {
+        player.getWorld().dropItem(player.getLocation(), drop);
+      }
+    }
     return Result.EQUIPPED;
   }
 

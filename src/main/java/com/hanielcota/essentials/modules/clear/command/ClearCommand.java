@@ -30,8 +30,8 @@ public record ClearCommand(
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    int removed = service.clear(subject);
     var snap = config.value();
+    int removed = service.clear(subject, snap.clearArmor());
     String name = subject.getName();
     boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
 

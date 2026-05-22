@@ -6,12 +6,14 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 @ConfigSerializable
 public record EssentialsConfig(
     @Comment("Placeholders: {count}.") String reloadSuccess,
-    @Comment("Placeholders: {succeeded}, {total}, {failed}.") String reloadFailure) {
+    @Comment("Placeholders: {succeeded}, {total}, {failed}.") String reloadFailure,
+    @Comment("Shown when /essentials is used without a subcommand.") String usage) {
 
   public static EssentialsConfig defaults() {
     return new EssentialsConfig(
         "<green>Reloaded <gold>{count}</gold> config(s).",
-        "<red>Reloaded {succeeded}/{total}. Failed: <gold>{failed}</gold>.");
+        "<red>Reloaded {succeeded}/{total}. Failed: <gold>{failed}</gold>.",
+        "<yellow>Usage: <gray>/essentials reload</gray>.</yellow>");
   }
 
   public String formatSuccess(int count) {

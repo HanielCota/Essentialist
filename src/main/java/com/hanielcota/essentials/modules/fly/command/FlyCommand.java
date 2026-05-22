@@ -28,11 +28,17 @@ public record FlyCommand(
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    boolean enabled = service.toggle(subject);
-    var pair = config.value().toggle(enabled);
+    var result = service.toggle(subject);
+    var snap = config.value();
     String name = subject.getName();
     boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
 
+    if (result == FlyService.Result.UNSUPPORTED) {
+      sender.sendError(snap.unsupportedGamemode().forSender(self, name));
+      return;
+    }
+
+    var pair = snap.toggle(result == FlyService.Result.ENABLED);
     var target = framework.actorOf(subject);
     String selfMessage = pair.forSender(self, name);
 

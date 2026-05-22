@@ -10,7 +10,8 @@ public record SpeedConfig(
     @Comment("Placeholders: {player}, {valor}.") String walkSetOther,
     @Comment("Shown when fly speed is set. Placeholder: {valor}.") String flySet,
     @Comment("Placeholders: {player}, {valor}.") String flySetOther,
-    @Comment("Shown when the speed value is outside the 1-10 range.") String invalid) {
+    @Comment("Shown when the speed value is outside the 1-10 range.") String invalid,
+    @Comment("Shown when /speed is used without a subcommand.") String usage) {
 
   public static SpeedConfig defaults() {
     return new SpeedConfig(
@@ -19,7 +20,9 @@ public record SpeedConfig(
             + " <gold>{valor}</gold>.",
         "<green>Velocidade de voo definida para <gold>{valor}</gold>.",
         "<green>Velocidade de voo de <gold>{player}</gold> definida para <gold>{valor}</gold>.",
-        "<red>A velocidade precisa estar entre 1 e 10.");
+        "<red>A velocidade precisa estar entre 1 e 10.",
+        "<yellow>Use <gray>/speed walk</gray> ou <gray>/speed fly</gray> seguido de um valor de 1 a"
+            + " 10.</yellow>");
   }
 
   public MessagePair whenWalkSet() {

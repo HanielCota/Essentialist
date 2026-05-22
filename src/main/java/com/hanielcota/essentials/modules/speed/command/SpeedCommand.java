@@ -8,6 +8,7 @@ import com.hanielcota.essentials.modules.speed.service.SpeedService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
+import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PermissionForOther;
@@ -21,14 +22,19 @@ import org.bukkit.entity.Player;
 @Command("speed")
 @EssentialsCommand
 @Permission("essentials.speed")
-@PermissionForOther("essentials.speed.others")
 @Cooldown(duration = "3s")
 @Description("Ajusta a velocidade de andar ou voar do jogador.")
 @Syntax("/speed walk <valor> [jogador] | /speed fly <valor> [jogador]")
 public record SpeedCommand(
     ConfigHandle<SpeedConfig> config, SpeedService service, PaperCommandFramework framework) {
 
+  @DefaultSubcommand
+  public void showUsage(CommandActor sender) {
+    sender.sendMessage(config.value().usage());
+  }
+
   @Subcommand("walk")
+  @PermissionForOther("essentials.speed.others")
   public void walk(CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
     if (!service.setWalkSpeed(subject, valor)) {
       sender.sendError(config.value().invalid());
@@ -39,6 +45,7 @@ public record SpeedCommand(
   }
 
   @Subcommand("fly")
+  @PermissionForOther("essentials.speed.others")
   public void fly(CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
     if (!service.setFlySpeed(subject, valor)) {
       sender.sendError(config.value().invalid());
@@ -49,12 +56,13 @@ public record SpeedCommand(
   }
 
   private void announce(CommandActor sender, Player subject, int valor, MessagePair pair) {
-    String name = subject.getName();
-    boolean self = sender.uniqueId().equals(subject.getUniqueId().toString());
+    var name = subject.getName();
+    var isSelf = sender.uniqueId().equals(subject.getUniqueId().toString());
     var target = framework.actorOf(subject);
-    String value = Integer.toString(valor);
-    String selfMessage = pair.forSender(self, name).replace("{valor}", value);
-    String targetMessage = pair.forTarget(name).replace("{valor}", value);
+
+    var valueStr = Integer.toString(valor);
+    var selfMessage = pair.forSender(isSelf, name).replace("{valor}", valueStr);
+    var targetMessage = pair.forTarget(name).replace("{valor}", valueStr);
 
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }
