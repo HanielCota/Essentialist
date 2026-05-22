@@ -14,14 +14,17 @@ public record ClearConfig(
         String clearedOther,
     @Comment("Shown when the player has nothing to clear.") String empty,
     @Comment("Shown to the executor when target has nothing to clear. Placeholders: {player}.")
-        String emptyOther) {
+        String emptyOther,
+    @Comment("When true, /limpar also removes worn armor and the off-hand item.")
+        boolean clearArmor) {
 
   public static ClearConfig defaults() {
     return new ClearConfig(
         "<green>Inventário limpo (<gold>{count}</gold> item(ns) removido(s)).",
         "<green>Limpo o inventário de <gold>{player}</gold> (<gold>{count}</gold> item(ns)).",
         "<red>Seu inventário já está vazio.",
-        "<red>O inventário de <gold>{player}</gold> já está vazio.");
+        "<red>O inventário de <gold>{player}</gold> já está vazio.",
+        false);
   }
 
   public MessagePair whenCleared() {

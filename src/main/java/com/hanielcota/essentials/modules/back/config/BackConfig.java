@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.back.config;
 
 import com.hanielcota.essentials.util.Numbers;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -21,6 +22,9 @@ public record BackConfig(
         List<String> itemLore,
     @Comment("/back success on click. Placeholders: {world}, {x}, {y}, {z}.") String back,
     @Comment("/back failure when there is no previous location.") String noBack) {
+
+  private static final DateTimeFormatter FALLBACK_TIME_FORMAT =
+      DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
   public static BackConfig defaults() {
     return new BackConfig(
@@ -43,6 +47,18 @@ public record BackConfig(
 
   public String formatItemName(int humanIndex) {
     return itemName.replace("{index}", Integer.toString(humanIndex));
+  }
+
+  /**
+   * Returns the configured {@code timeFormat} as a formatter, falling back to a safe default when
+   * the pattern is malformed so a bad config value cannot crash the menu render.
+   */
+  public DateTimeFormatter timeFormatter() {
+    try {
+      return DateTimeFormatter.ofPattern(timeFormat);
+    } catch (IllegalArgumentException e) {
+      return FALLBACK_TIME_FORMAT;
+    }
   }
 
   public String formatBack(String world, double x, double y, double z) {

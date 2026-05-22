@@ -25,8 +25,11 @@ public record SmeltService(ConfigHandle<SmeltConfig> config) {
       }
       var result = mappings.get(item.getType());
       if (result != null) {
-        inv.setItem(slot, new ItemStack(result, item.getAmount()));
-        count += item.getAmount();
+        // Clamp to the result's max stack size: a misconfigured mapping to a low-stack
+        // material would otherwise produce an oversized ItemStack (dupe/visual issues).
+        int amount = Math.min(item.getAmount(), result.getMaxStackSize());
+        inv.setItem(slot, new ItemStack(result, amount));
+        count += amount;
       }
     }
     return count;

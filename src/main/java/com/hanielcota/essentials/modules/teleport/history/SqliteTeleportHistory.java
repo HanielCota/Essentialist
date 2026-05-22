@@ -2,16 +2,23 @@ package com.hanielcota.essentials.modules.teleport.history;
 
 import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.database.Sql;
+import com.hanielcota.essentials.util.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-public final class SqliteTeleportHistory implements TeleportHistory {
+public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseable {
+
+  private static final Log LOG = Log.of(SqliteTeleportHistory.class);
 
   private static final String CREATE_TABLE =
       """
@@ -52,12 +59,27 @@ public final class SqliteTeleportHistory implements TeleportHistory {
       "SELECT id, world, x, y, z, yaw, pitch, created_at FROM teleport_history "
           + "WHERE player_id = ? ORDER BY created_at DESC LIMIT ?";
 
-  private static final String DELETE_BY_ID = "DELETE FROM teleport_history WHERE id = ?";
+  private static final String DELETE_BY_ID =
+      "DELETE FROM teleport_history WHERE id = ? AND player_id = ?";
 
   private final DatabaseProvider database;
 
+  /**
+   * Single-threaded executor for history writes. Teleport events fire on the server thread; running
+   * the SQLite INSERT/DELETE there would block the main thread on disk I/O. Reads ({@link #list})
+   * stay synchronous — they only happen on the rare {@code /back} command, not on every teleport.
+   */
+  private final ExecutorService writeExecutor;
+
   public SqliteTeleportHistory(DatabaseProvider database) {
     this.database = Objects.requireNonNull(database, "database");
+    this.writeExecutor =
+        Executors.newSingleThreadExecutor(
+            runnable -> {
+              var thread = new Thread(runnable, "Essentialist-TeleportHistory");
+              thread.setDaemon(true);
+              return thread;
+            });
     Sql.ddl(database, CREATE_TABLE, CREATE_INDEX);
   }
 
@@ -93,28 +115,40 @@ public final class SqliteTeleportHistory implements TeleportHistory {
     if (world == null) {
       return;
     }
+    // Snapshot the (mutable) Location's values on the calling thread before handing off.
     String playerId = player.toString();
-    Sql.tx(
-        database,
-        conn -> {
-          try (PreparedStatement insert = conn.prepareStatement(INSERT)) {
-            insert.setString(1, playerId);
-            insert.setString(2, world.getName());
-            insert.setDouble(3, location.getX());
-            insert.setDouble(4, location.getY());
-            insert.setDouble(5, location.getZ());
-            insert.setDouble(6, location.getYaw());
-            insert.setDouble(7, location.getPitch());
-            insert.setLong(8, System.currentTimeMillis());
-            insert.executeUpdate();
-          }
-          try (PreparedStatement trim = conn.prepareStatement(TRIM)) {
-            trim.setString(1, playerId);
-            trim.setString(2, playerId);
-            trim.setInt(3, CAPACITY);
-            trim.executeUpdate();
-          }
-        });
+    String worldName = world.getName();
+    double x = location.getX();
+    double y = location.getY();
+    double z = location.getZ();
+    float yaw = location.getYaw();
+    float pitch = location.getPitch();
+    long createdAt = System.currentTimeMillis();
+
+    submit(
+        "push",
+        () ->
+            Sql.tx(
+                database,
+                conn -> {
+                  try (PreparedStatement insert = conn.prepareStatement(INSERT)) {
+                    insert.setString(1, playerId);
+                    insert.setString(2, worldName);
+                    insert.setDouble(3, x);
+                    insert.setDouble(4, y);
+                    insert.setDouble(5, z);
+                    insert.setDouble(6, yaw);
+                    insert.setDouble(7, pitch);
+                    insert.setLong(8, createdAt);
+                    insert.executeUpdate();
+                  }
+                  try (PreparedStatement trim = conn.prepareStatement(TRIM)) {
+                    trim.setString(1, playerId);
+                    trim.setString(2, playerId);
+                    trim.setInt(3, CAPACITY);
+                    trim.executeUpdate();
+                  }
+                }));
   }
 
   @Override
@@ -137,12 +171,45 @@ public final class SqliteTeleportHistory implements TeleportHistory {
       return;
     }
     String playerId = player.toString();
-    Sql.update(
-        database,
-        DELETE_BY_ID + " AND player_id = ?",
-        stmt -> {
-          stmt.setLong(1, entryId);
-          stmt.setString(2, playerId);
-        });
+    submit(
+        "remove",
+        () ->
+            Sql.update(
+                database,
+                DELETE_BY_ID,
+                stmt -> {
+                  stmt.setLong(1, entryId);
+                  stmt.setString(2, playerId);
+                }));
+  }
+
+  /** Hands a write off to the background executor, logging (never rethrowing) any failure. */
+  private void submit(String operation, Runnable work) {
+    try {
+      writeExecutor.execute(
+          () -> {
+            try {
+              work.run();
+            } catch (RuntimeException e) {
+              LOG.warn(e, "Async teleport-history {} failed", operation);
+            }
+          });
+    } catch (RejectedExecutionException e) {
+      LOG.warn("Teleport-history executor rejected {} (plugin shutting down?)", operation);
+    }
+  }
+
+  @Override
+  public void close() {
+    writeExecutor.shutdown();
+    try {
+      if (!writeExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+        int dropped = writeExecutor.shutdownNow().size();
+        LOG.warn("Teleport-history writer did not drain within 5s; {} write(s) dropped", dropped);
+      }
+    } catch (InterruptedException e) {
+      writeExecutor.shutdownNow();
+      Thread.currentThread().interrupt();
+    }
   }
 }

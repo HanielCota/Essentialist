@@ -14,7 +14,8 @@ public final class LightModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
-    var config = configure("light", LightConfig.class, LightConfig::defaults, new LightService());
+    var config =
+        configure("light", LightConfig.class, LightConfig::defaults, new LightService(plugin()));
     registerCommand(
         new LightCommand(
             config, service(LightService.class), service(PaperCommandFramework.class)));

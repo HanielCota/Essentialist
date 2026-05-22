@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.config.ConfigService;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
 import io.github.hanielcota.commandframework.annotation.Command;
+import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
@@ -15,6 +16,11 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 @Description("Comandos administrativos do Essentials.")
 @Syntax("/essentials reload")
 public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigService configs) {
+
+  @DefaultSubcommand
+  public void showUsage(CommandActor actor) {
+    actor.sendMessage(config.value().usage());
+  }
 
   @Subcommand("reload")
   @Description("Recarrega todas as configurações do plugin.")

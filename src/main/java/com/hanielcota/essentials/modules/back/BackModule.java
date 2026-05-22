@@ -29,8 +29,9 @@ public final class BackModule extends AbstractModule {
 
     var renderer = new BackEntryRenderer(config);
     var clickHandler = new BackClickHandler(config, history, teleport);
-    registerMenu(new BackMenu(config, history, renderer, clickHandler));
-    registerCommand(new BackCommand(config, history, menus));
+    var menu = new BackMenu(config, history, renderer, clickHandler);
+    registerMenu(menu);
+    registerCommand(new BackCommand(config, history, menus, menu));
     registerListener(new PlayerDeathListener(history));
     registerListener(new PlayerTeleportListener(history));
   }

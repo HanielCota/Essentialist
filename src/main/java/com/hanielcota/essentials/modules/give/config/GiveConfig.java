@@ -17,6 +17,8 @@ public record GiveConfig(
     @Comment("Placeholders: {item}, {player}.") String inventoryFullOther,
     @Comment("Shown when the material cannot be given as an item.") String invalidItem,
     @Comment("Shown when the amount is not a positive number.") String invalidAmount,
+    @Comment("Shown when the amount exceeds maxAmount. Placeholders: {max}.") String amountTooLarge,
+    @Comment("Largest amount accepted by /give in a single command.") int maxAmount,
     @Comment("Shown to the sender after /give all. Placeholders: {amount}, {item}, {count}.")
         String givenAll) {
 
@@ -31,6 +33,8 @@ public record GiveConfig(
         "<red>O inventário de <gold>{player}</gold> está cheio.",
         "<red>Esse material não pode ser dado como item.",
         "<red>A quantidade precisa ser um número positivo.",
+        "<red>A quantidade máxima por comando é <gold>{max}</gold>.",
+        2304,
         "<green>Você deu <gold>{amount}x {item}</gold> para <gold>{count}</gold> jogador(es).");
   }
 
@@ -44,5 +48,9 @@ public record GiveConfig(
 
   public MessagePair whenInventoryFull() {
     return new MessagePair(inventoryFull, inventoryFullOther);
+  }
+
+  public String formatAmountTooLarge() {
+    return amountTooLarge.replace("{max}", Integer.toString(maxAmount));
   }
 }

@@ -9,7 +9,6 @@ import com.hanielcota.essentials.util.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
@@ -29,7 +28,7 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config)
 
     var moment =
         LocalDateTime.ofInstant(Instant.ofEpochMilli(entry.createdAt()), ZoneId.systemDefault());
-    var time = DateTimeFormatter.ofPattern(snap.timeFormat()).format(moment);
+    var time = snap.timeFormatter().format(moment);
 
     var lore =
         snap.itemLore().stream()

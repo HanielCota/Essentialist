@@ -63,6 +63,11 @@ public record GiveCommand(
       return;
     }
 
+    if (amount > snap.maxAmount()) {
+      sender.sendError(snap.formatAmountTooLarge());
+      return;
+    }
+
     int leftover = service.give(subject, item, amount);
     int given = amount - leftover;
     String itemName = item.name().toLowerCase(Locale.ROOT);
@@ -99,6 +104,11 @@ public record GiveCommand(
 
     if (amount < 1) {
       sender.sendError(snap.invalidAmount());
+      return;
+    }
+
+    if (amount > snap.maxAmount()) {
+      sender.sendError(snap.formatAmountTooLarge());
       return;
     }
 

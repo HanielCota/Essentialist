@@ -87,7 +87,7 @@ public record TeleportCommand(
     var destination = new Location(world, x, y, z, current.getYaw(), current.getPitch());
 
     if (y < world.getMinHeight()
-        || y > world.getMaxHeight()
+        || y >= world.getMaxHeight()
         || !world.getWorldBorder().isInside(destination)) {
       senderActor.sendError(snap.invalidPosition());
       return;

@@ -22,16 +22,18 @@ import org.bukkit.entity.Player;
 @Description("Retorna à localização anterior ou abre o histórico de teleportes.")
 @Syntax("/back")
 public record BackCommand(
-    ConfigHandle<BackConfig> config, TeleportHistory history, MenuService menus) {
+    ConfigHandle<BackConfig> config, TeleportHistory history, MenuService menus, BackMenu menu) {
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
     Player sender = actor.unwrap(Player.class);
-    if (history.list(sender.getUniqueId()).isEmpty()) {
+    var entries = history.list(sender.getUniqueId());
+    if (entries.isEmpty()) {
       actor.sendError(config.value().noBack());
       return;
     }
 
+    menu.prefetch(sender.getUniqueId(), entries);
     menus.open(sender, BackMenu.ID);
   }
 }

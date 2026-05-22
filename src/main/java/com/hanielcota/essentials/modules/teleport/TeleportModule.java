@@ -21,6 +21,7 @@ public final class TeleportModule extends AbstractModule {
     var config = config("teleport", TeleportMessages.class, TeleportMessages::defaults);
     var history = new SqliteTeleportHistory(service(DatabaseProvider.class));
     registerService(TeleportHistory.class, history);
+    registerCloseable(history);
 
     var teleportService = new TeleportService();
     registerService(TeleportService.class, teleportService);
