@@ -1,8 +1,8 @@
 <div align="center">
 
-# Essentialist
+# ⚡ Essentialist
 
-**A modular essentials plugin for Paper &amp; Folia servers.**
+**A modular essentials plugin for Paper and Folia servers.**
 
 Teleportation, item repair, flight, gamemode control and inventory utilities —
 every feature shipped as an independent, hot-reloadable module.
@@ -13,13 +13,11 @@ every feature shipped as an independent, hot-reloadable module.
 ![Folia](https://img.shields.io/badge/Folia-supported-2EA043)
 ![License](https://img.shields.io/badge/License-MIT-3DA639)
 
-[Overview](#overview) · [Features](#features) · [Commands](#commands) · [Permissions](#permissions) · [Configuration](#configuration) · [Architecture](#architecture) · [Building](#building-from-source)
-
 </div>
 
 ---
 
-## Overview
+## 📖 Overview
 
 **Essentialist** is a command plugin for Minecraft servers running [Paper](https://papermc.io/).
 Rather than a monolith, every feature is an **independent module** — what you don't use is never
@@ -29,34 +27,34 @@ resolution of inter-module dependencies.
 Every command is **hot-reloadable**, supports **targeting another player** through dedicated
 permissions, and renders messages with MiniMessage formatting.
 
-## Features
+## ✨ Features
 
-- **Modular architecture** — each feature is a `Module` discovered via `ServiceLoader`; a failing
+- 🧩 **Modular architecture** — each feature is a `Module` discovered via `ServiceLoader`; a failing
   module never takes the others down, thanks to automatic rollback.
-- **Folia-ready** — `folia-supported: true`, with region-based scheduling.
-- **Self / other commands** — apply an action to yourself or to another player with the
+- 🧵 **Folia-ready** — `folia-supported: true`, with region-based scheduling.
+- 🎯 **Self / other commands** — apply an action to yourself or to another player with the
   `essentials.<command>.others` permission.
-- **Live configuration** — per-module YAML, reloadable via `/essentials reload` with no restart.
-- **Teleport history** — `/back` records deaths and teleports (ender pearls, portals, commands),
+- 🔄 **Live configuration** — per-module YAML, reloadable via `/essentials reload` with no restart.
+- 🧭 **Teleport history** — `/back` records deaths and teleports (ender pearls, portals, commands),
   persisted in SQLite.
-- **Cooldowns &amp; confirmation** — built-in spam protection; destructive commands ask for
+- 🛡️ **Cooldowns and confirmation** — built-in spam protection; destructive commands ask for
   confirmation before running.
-- **Fully configurable messages** — every string lives in the config, with placeholders.
+- 💬 **Fully configurable messages** — every string lives in the config, with placeholders.
 
-## Requirements
+## 📋 Requirements
 
 | Component | Version |
 |-----------|---------|
 | Server    | Paper 1.21.11 or newer (Folia supported) |
 | Java      | 25 or newer |
 
-## Installation
+## 📦 Installation
 
 1. Download the latest `Essentialist-<version>.jar`.
 2. Drop it into your server's `plugins/` folder.
 3. Restart the server — configuration files are generated under `plugins/Essentialist/`.
 
-## Commands
+## ⌨️ Commands
 
 | Command | Aliases | Description | Permission |
 |---------|---------|-------------|------------|
@@ -79,7 +77,7 @@ permissions, and renders messages with MiniMessage formatting.
 > [!NOTE]
 > Commands have a 3–5 second cooldown. `/limpar` requires confirmation before it runs.
 
-## Permissions
+## 🔐 Permissions
 
 The permission model is declarative and follows a consistent pattern:
 
@@ -90,7 +88,7 @@ The permission model is declarative and follows a consistent pattern:
 | `essentials.gamemode.<mode>` | Access to a specific game mode (`survival`, `creative`, ...) |
 | `essentials.admin.reload` | Reload configurations |
 
-## Configuration
+## ⚙️ Configuration
 
 Each module generates its own YAML file under `plugins/Essentialist/` (`clear.yml`, `repair.yml`,
 `teleport.yml`, ...). Every message is editable and accepts MiniMessage tags and placeholders such
@@ -107,7 +105,7 @@ repair-all-limit: 41   # cap of items processed per /reparar tudo
 > [!TIP]
 > After editing any file, apply the changes with `/essentials reload` — no server restart needed.
 
-## Architecture
+## 🏗️ Architecture
 
 ```
 com.hanielcota.essentials
@@ -140,7 +138,7 @@ com.hanielcota.essentials
   [MenuFramework](https://github.com/HanielCota).
 - Persistence (the `/back` history) uses SQLite accessed through HikariCP.
 
-## Building from Source
+## 🔨 Building from Source
 
 Requires **JDK 25**. The project uses Gradle (Kotlin DSL) with the Shadow plugin.
 
@@ -161,7 +159,7 @@ The final `.jar` is written to `build/libs/`. Formatting is enforced by
 ./gradlew spotlessCheck   # verify formatting
 ```
 
-## Tech Stack
+## 🧰 Tech Stack
 
 | Layer | Technology |
 |-------|------------|
@@ -175,7 +173,7 @@ The final `.jar` is written to `build/libs/`. Formatting is enforced by
 | Formatting | Spotless / google-java-format |
 | CI | GitHub Actions |
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome. Before opening a pull request:
 
@@ -185,10 +183,10 @@ Contributions are welcome. Before opening a pull request:
 
 Every push and pull request is automatically validated by the CI pipeline (build, tests, lint).
 
-## License
+## 📄 License
 
 Distributed under the MIT License. See [`LICENSE`](LICENSE) for details.
 
-## Author
+## 👤 Author
 
 Built by **HanielCota** — [github.com/HanielCota](https://github.com/HanielCota).
