@@ -28,11 +28,13 @@ public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigSer
   public void reload(CommandActor actor) {
     var report = configs.reloadAll();
     var snap = config.value();
+
     if (report.failures().isEmpty()) {
       actor.sendSuccess(snap.formatSuccess(report.total()));
       return;
     }
-    String failed = String.join(", ", report.failedNames());
+
+    var failed = String.join(", ", report.failedNames());
     actor.sendError(snap.formatFailure(report.succeeded(), report.total(), failed));
   }
 }
