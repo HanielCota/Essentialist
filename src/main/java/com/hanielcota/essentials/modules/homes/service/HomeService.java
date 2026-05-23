@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
@@ -36,33 +37,52 @@ public final class HomeService {
     return limits.resolve(owner);
   }
 
-  /**
-   * Saves the home. Returns the outcome â€” {@link SaveResult#CREATED} for new homes, {@link
-   * SaveResult#UPDATED} when overwriting an existing name, {@link SaveResult#LIMIT_REACHED} when
-   * the player has no free slot for a new home.
-   */
-  public SaveResult save(Player owner, String name, Location location) {
-
+  public SaveResult save(Player owner, String name, Location location, Material material) {
     var ownerId = owner.getUniqueId();
-    if (store.find(ownerId, name).isPresent()) {
-      store.save(Home.of(ownerId, name, location));
+    var existing = store.find(ownerId, name);
+
+    if (existing.isPresent()) {
+      var keepMaterial = material != null ? material : existing.get().material();
+      store.save(Home.of(ownerId, name, location, keepMaterial));
       return SaveResult.UPDATED;
     }
     if (store.count(ownerId) >= limits.resolve(owner)) {
       return SaveResult.LIMIT_REACHED;
     }
-    store.save(Home.of(ownerId, name, location));
+
+    store.save(Home.of(ownerId, name, location, material));
     return SaveResult.CREATED;
   }
 
-  /** Deletes the home. Returns {@code true} when a row was removed. */
   public boolean delete(UUID owner, String name) {
     return store.delete(owner, name);
+  }
+
+  public RenameResult rename(UUID owner, String oldName, String newName) {
+    if (store.find(owner, oldName).isEmpty()) {
+      return RenameResult.NOT_FOUND;
+    }
+    if (store.find(owner, newName).isPresent()) {
+      return RenameResult.NAME_TAKEN;
+    }
+
+    store.rename(owner, oldName, newName);
+    return RenameResult.RENAMED;
+  }
+
+  public boolean setMaterial(UUID owner, String name, Material material) {
+    return store.updateMaterial(owner, name, material);
   }
 
   public enum SaveResult {
     CREATED,
     UPDATED,
     LIMIT_REACHED
+  }
+
+  public enum RenameResult {
+    RENAMED,
+    NOT_FOUND,
+    NAME_TAKEN
   }
 }

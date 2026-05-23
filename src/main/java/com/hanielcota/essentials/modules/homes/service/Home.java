@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 /**
  * One persisted home of a player.
@@ -20,10 +21,10 @@ public record Home(
     double z,
     float yaw,
     float pitch,
+    Material material,
     long createdAt) {
 
-  /** Captures a Bukkit {@link Location} as a fresh home record. */
-  public static Home of(UUID owner, String name, Location location) {
+  public static Home of(UUID owner, String name, Location location, Material material) {
     var world = location.getWorld();
     return new Home(
         owner,
@@ -34,10 +35,18 @@ public record Home(
         location.getZ(),
         location.getYaw(),
         location.getPitch(),
+        material,
         System.currentTimeMillis());
   }
 
-  /** Materialises the home back into a Bukkit location, or empty when the world is unloaded. */
+  public Home withName(String newName) {
+    return new Home(owner, newName, world, x, y, z, yaw, pitch, material, createdAt);
+  }
+
+  public Home withMaterial(Material newMaterial) {
+    return new Home(owner, name, world, x, y, z, yaw, pitch, newMaterial, createdAt);
+  }
+
   public Optional<Location> resolve() {
     var w = Bukkit.getWorld(world);
     if (w == null) {
