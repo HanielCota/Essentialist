@@ -30,9 +30,9 @@ public record ClearCommand(
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
-    int removed = service.clear(subject, snap.clearArmor());
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var removed = service.clear(subject, snap.clearArmor());
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
     if (removed == 0) {
       sender.sendError(snap.whenEmpty().forSender(self, name));
@@ -40,10 +40,10 @@ public record ClearCommand(
     }
 
     var messages = snap.whenCleared();
-    String count = Integer.toString(removed);
+    var count = Integer.toString(removed);
     var target = framework.actorOf(subject);
-    String selfMessage = messages.forSender(self, name).replace("{count}", count);
-    String targetMessage = messages.forTarget(name).replace("{count}", count);
+    var selfMessage = messages.forSender(self, name).replace("{count}", count);
+    var targetMessage = messages.forTarget(name).replace("{count}", count);
 
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }

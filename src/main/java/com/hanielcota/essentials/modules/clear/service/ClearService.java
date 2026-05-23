@@ -6,9 +6,8 @@ import org.bukkit.inventory.ItemStack;
 public final class ClearService {
 
   private static int countItems(ItemStack[] items) {
-    int total = 0;
-    for (ItemStack item : items) {
-
+    var total = 0;
+    for (var item : items) {
       if (item != null && !item.getType().isAir()) {
         total += item.getAmount();
       }
@@ -16,26 +15,20 @@ public final class ClearService {
     return total;
   }
 
-  /**
-   * Clears the player's storage inventory (hotbar + main). Worn armor and the off-hand item are
-   * only touched when {@code includeArmor} is true.
-   *
-   * @return the total number of items removed
-   */
+  // Clears storage (hotbar + main); armor and off-hand only when includeArmor is true.
   public int clear(Player player, boolean includeArmor) {
     var inv = player.getInventory();
-    ItemStack[] storage = inv.getStorageContents();
-    ItemStack[] armor = inv.getArmorContents();
-    ItemStack offhand = inv.getItemInOffHand();
+    var storage = inv.getStorageContents();
+    var armor = inv.getArmorContents();
+    var offhand = inv.getItemInOffHand();
 
-    int removed = countItems(storage);
+    var removed = countItems(storage);
     if (includeArmor) {
       removed += countItems(armor);
       if (!offhand.getType().isAir()) {
         removed += offhand.getAmount();
       }
     }
-
     if (removed == 0) {
       return 0;
     }
