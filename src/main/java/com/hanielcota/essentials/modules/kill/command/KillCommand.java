@@ -30,8 +30,8 @@ public record KillCommand(
   @DefaultSubcommand
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
     if (!service.kill(subject)) {
       sender.sendError(snap.whenAlreadyDead().forSender(self, name));
@@ -40,7 +40,7 @@ public record KillCommand(
 
     var messages = snap.whenKilled();
     var target = framework.actorOf(subject);
-    String selfMessage = messages.forSender(self, name);
+    var selfMessage = messages.forSender(self, name);
 
     sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
   }
