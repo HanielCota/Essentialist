@@ -9,8 +9,10 @@ import com.hanielcota.essentials.modules.homes.menu.DeleteHomeDialog;
 import com.hanielcota.essentials.modules.homes.menu.HomeClickHandler;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
+import com.hanielcota.essentials.modules.homes.menu.MaterialCategoryMenu;
 import com.hanielcota.essentials.modules.homes.menu.MaterialPickerMenu;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialPickerPresentation;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
@@ -37,11 +39,19 @@ public final class HomesMenuFactory {
         new HomeClickHandler(teleporter, framework, actionTarget, rename, scheduler, menus);
     var homesMenu = new HomesMenu(config, homeService, renderer, clickHandler);
 
+    var iconRegistry = new MaterialIconRegistry(config.value().messages());
+    var pickerPresentation = new MaterialPickerPresentation();
+
+    var categoryMenu = new MaterialCategoryMenu(menus, actionTarget);
+    var pickerMenu =
+        new MaterialPickerMenu(
+            config, homeService, menus, actionTarget, pickerPresentation, iconRegistry);
+
     var dialogs =
         List.of(
+            categoryMenu,
             new DeleteHomeDialog(config, homeService, menus, actionTarget),
-            new MaterialPickerMenu(
-                config, homeService, menus, actionTarget, new MaterialPickerPresentation()));
+            pickerMenu);
 
     var cleanupListener = new HomesMenuCleanupListener(homesMenu);
 

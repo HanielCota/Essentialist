@@ -4,15 +4,15 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
+import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialPickerPresentation;
-import com.hanielcota.essentials.modules.homes.menu.presentation.MenuContentSlots;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ComponentUtils;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,23 +20,41 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
- * Material picker submenu. Opened when the player drops (Q) a home in /homes; clicking a material
- * updates that home's icon and reopens /homes. The home being modified is read from {@link
- * HomesActionTarget}, populated by {@link HomeClickHandler} right before this menu opens.
+ * Paginated material picker. Shows every Minecraft item from the category the player chose in
+ * {@link MaterialCategoryMenu}.
+ *
+ * <p>Performance optimisations from MenuFramework:
+ *
+ * <ul>
+ *   <li>{@link PaginationConfig} with a dense content-slot grid — maximises items per page.
+ *   <li>{@link MaterialIconRegistry} pre-builds every {@link SlotDefinition} at plugin startup; the
+ *       dynamic-content provider only copies the cached list, never touches {@link
+ *       Material#values()} or string formatting.
+ *   <li>The pagination engine handles page splitting and nav buttons natively — no manual page-math
+ *       in application code.
+ * </ul>
  */
 @RequiredArgsConstructor
 public final class MaterialPickerMenu implements Menu {
 
   public static final String ID = "essentials.homes.picker";
 
-  private static final int MIN_ROWS = 1;
-  private static final int MAX_ROWS = 6;
+  private static final int ROWS = 6;
+
+  /** Interior content slots: excludes the outer border so nav buttons have room. */
+  private static final List<Integer> CONTENT_SLOTS =
+      List.of(
+          10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37,
+          38, 39, 40, 41, 42, 43);
+
+  private static final int BACK_SLOT = 49;
 
   private final ConfigHandle<HomesConfig> config;
   private final HomeService service;
   private final MenuService menus;
   private final HomesActionTarget target;
   private final MaterialPickerPresentation presentation;
+  private final MaterialIconRegistry registry;
 
   @Override
   public @NonNull String id() {
@@ -46,14 +64,12 @@ public final class MaterialPickerMenu implements Menu {
   @Override
   public void register(@NonNull MenuService menusRef) {
     var menuSpec = this.config.value().menu();
-    var rows = Math.clamp(menuSpec.pickerRows(), MIN_ROWS, MAX_ROWS);
     var menuTitle = ComponentUtils.mini(menuSpec.staticPickerTitle());
-    var contentSlots = MenuContentSlots.allRows(rows);
 
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
+    var pagination = PaginationConfig.builder().contentSlots(CONTENT_SLOTS).build();
 
     MenuFramework.builder(ID, menusRef)
-        .rows(rows)
+        .rows(ROWS)
         .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
@@ -62,16 +78,22 @@ public final class MaterialPickerMenu implements Menu {
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
-    var menuSpec = this.config.value().menu();
-    var palette = menuSpec.palette();
-    var loreTemplate = this.config.value().messages().pickerItemLore();
+    var uuid = player.getUniqueId();
+    var category = this.target.peekCategory(uuid);
 
-    var slots = new ArrayList<SlotDefinition>(palette.size());
-
-    for (var material : palette) {
-      var template = this.presentation.render(material, loreTemplate);
-      slots.add(SlotDefinition.of(-1, template, click -> handlePick(click.player(), material)));
+    if (category == null) {
+      return List.of();
     }
+
+    var icons = this.registry.iconsFor(category);
+    var slots = new java.util.ArrayList<SlotDefinition>(icons.size() + 1);
+
+    for (var icon : icons) {
+      slots.add(
+          SlotDefinition.of(-1, icon.template(), ctx -> handlePick(ctx.player(), icon.material())));
+    }
+
+    slots.add(backButtonSlot(player));
 
     return slots;
   }
@@ -79,6 +101,7 @@ public final class MaterialPickerMenu implements Menu {
   private void handlePick(@NonNull Player player, @NonNull Material material) {
     var uuid = player.getUniqueId();
     var homeName = this.target.consume(uuid);
+    this.target.consumeCategory(uuid);
 
     if (homeName == null) {
       this.menus.open(player, HomesMenu.ID);
@@ -93,5 +116,22 @@ public final class MaterialPickerMenu implements Menu {
     player.sendMessage(replyComponent);
 
     this.menus.open(player, HomesMenu.ID);
+  }
+
+  private @NonNull SlotDefinition backButtonSlot(@NonNull Player player) {
+    var back =
+        ItemTemplate.builder(org.bukkit.Material.BARRIER)
+            .name("<red>Voltar às categorias")
+            .italic(false)
+            .build();
+
+    return SlotDefinition.of(
+        BACK_SLOT,
+        back,
+        ctx -> {
+          var uuid = ctx.player().getUniqueId();
+          this.target.consumeCategory(uuid);
+          this.menus.open(ctx.player(), MaterialCategoryMenu.ID);
+        });
   }
 }

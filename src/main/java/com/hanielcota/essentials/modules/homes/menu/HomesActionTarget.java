@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
@@ -14,6 +15,7 @@ import lombok.NonNull;
 public final class HomesActionTarget {
 
   private final ConcurrentHashMap<UUID, String> targets = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<UUID, MaterialCategory> categories = new ConcurrentHashMap<>();
 
   public void set(@NonNull UUID player, @NonNull String homeName) {
     this.targets.put(player, homeName);
@@ -25,5 +27,18 @@ public final class HomesActionTarget {
 
   public void clear(@NonNull UUID player) {
     this.targets.remove(player);
+    this.categories.remove(player);
+  }
+
+  public void setCategory(@NonNull UUID player, @NonNull MaterialCategory category) {
+    this.categories.put(player, category);
+  }
+
+  public MaterialCategory consumeCategory(@NonNull UUID player) {
+    return this.categories.remove(player);
+  }
+
+  public MaterialCategory peekCategory(@NonNull UUID player) {
+    return this.categories.get(player);
   }
 }

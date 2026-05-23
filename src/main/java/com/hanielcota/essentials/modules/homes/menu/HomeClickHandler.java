@@ -44,7 +44,7 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
     }
 
     if (type == ClickType.DROP || type == ClickType.CONTROL_DROP) {
-      openSubMenuFor(click, homeName, MaterialPickerMenu.ID, true);
+      openCategoryMenuFor(click, homeName);
       return;
     }
 
@@ -57,6 +57,16 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
 
     var actor = this.framework.actorOf(player);
     this.teleporter.teleport(player, home, actor);
+  }
+
+  private void openCategoryMenuFor(@NonNull ClickContext click, @NonNull String homeName) {
+    var player = click.player();
+    var uuid = player.getUniqueId();
+
+    this.target.set(uuid, homeName);
+    click.close();
+    this.scheduler.runOnEntityLater(
+        player, () -> this.menus.open(player, MaterialCategoryMenu.ID), SUBMENU_OPEN_DELAY);
   }
 
   private void openSubMenuFor(
