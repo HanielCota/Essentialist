@@ -92,7 +92,7 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
     }
   }
 
-  private void ensureParent(Path file) {
+  private void ensureParent(@NonNull Path file) {
     var parent = file.getParent();
     if (parent == null) {
       return;

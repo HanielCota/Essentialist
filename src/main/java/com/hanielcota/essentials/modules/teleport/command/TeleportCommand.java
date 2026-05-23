@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -31,21 +32,21 @@ public record TeleportCommand(
   @PlayerOnly
   @Description("Teleporta você até outro jogador.")
   @Syntax("/tp <jogador>")
-  public void toPlayer(Player sender, @OnlinePlayer Player target) {
-    var snap = config.value();
-    var senderActor = framework.actorOf(sender);
+  public void toPlayer(@NonNull Player sender, @OnlinePlayer @NonNull Player target) {
+    var snap = this.config.value();
+    var senderActor = this.framework.actorOf(sender);
 
     if (sender.getUniqueId().equals(target.getUniqueId())) {
       senderActor.sendError(snap.selfTarget());
       return;
     }
 
-    if (!service.teleportTo(sender, target.getLocation())) {
+    if (!this.service.teleportTo(sender, target.getLocation())) {
       senderActor.sendError(snap.teleportFailed());
       return;
     }
 
-    var targetActor = framework.actorOf(target);
+    var targetActor = this.framework.actorOf(target);
     String selfMessage = snap.formatToPlayer(target.getName());
     String otherMessage = snap.formatTeleportedTo(sender.getName());
     senderActor.sendDualMessage(targetActor, selfMessage, otherMessage);
@@ -55,15 +56,18 @@ public record TeleportCommand(
   @Permission("essentials.tp.others")
   @Description("Teleporta um jogador até outro.")
   @Syntax("/tp move <de> <para>")
-  public void movePlayer(CommandActor sender, @OnlinePlayer Player from, @OnlinePlayer Player to) {
-    var snap = config.value();
+  public void movePlayer(
+      @NonNull CommandActor sender,
+      @OnlinePlayer @NonNull Player from,
+      @OnlinePlayer @NonNull Player to) {
+    var snap = this.config.value();
 
     if (from.getUniqueId().equals(to.getUniqueId())) {
       sender.sendError(snap.selfTarget());
       return;
     }
 
-    if (!service.teleportTo(from, to.getLocation())) {
+    if (!this.service.teleportTo(from, to.getLocation())) {
       sender.sendError(snap.teleportFailed());
       return;
     }
@@ -71,7 +75,7 @@ public record TeleportCommand(
     sender.sendSuccess(snap.formatMoveSender(from.getName(), to.getName()));
 
     if (!Senders.isSelf(sender, from)) {
-      framework.actorOf(from).sendSuccess(snap.formatMoveNotify(sender.name()));
+      this.framework.actorOf(from).sendSuccess(snap.formatMoveNotify(sender.name()));
     }
   }
 
@@ -79,9 +83,10 @@ public record TeleportCommand(
   @PlayerOnly
   @Description("Teleporta para coordenadas específicas.")
   @Syntax("/tp pos <x> <y> <z>")
-  public void toPos(Player sender, @Arg("x") double x, @Arg("y") double y, @Arg("z") double z) {
-    var snap = config.value();
-    var senderActor = framework.actorOf(sender);
+  public void toPos(
+      @NonNull Player sender, @Arg("x") double x, @Arg("y") double y, @Arg("z") double z) {
+    var snap = this.config.value();
+    var senderActor = this.framework.actorOf(sender);
     var world = sender.getWorld();
     var current = sender.getLocation();
     var destination = new Location(world, x, y, z, current.getYaw(), current.getPitch());
@@ -93,7 +98,7 @@ public record TeleportCommand(
       return;
     }
 
-    if (!service.teleportTo(sender, destination)) {
+    if (!this.service.teleportTo(sender, destination)) {
       senderActor.sendError(snap.teleportFailed());
       return;
     }

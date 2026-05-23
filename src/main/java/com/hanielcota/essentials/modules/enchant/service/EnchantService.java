@@ -1,12 +1,13 @@
 package com.hanielcota.essentials.modules.enchant.service;
 
+import lombok.NonNull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
 public final class EnchantService {
 
   /** Adds an enchantment to the held item at any level — unsafe, no vanilla checks. */
-  public Result apply(Player player, Enchantment enchantment, int level) {
+  public Result apply(@NonNull Player player, @NonNull Enchantment enchantment, int level) {
 
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
@@ -18,7 +19,7 @@ public final class EnchantService {
   }
 
   /** Removes one enchantment from the held item. */
-  public Result remove(Player player, Enchantment enchantment) {
+  public Result remove(@NonNull Player player, @NonNull Enchantment enchantment) {
 
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
@@ -38,7 +39,7 @@ public final class EnchantService {
    *
    * @return the number of enchantments removed, or {@code -1} when the hand is empty
    */
-  public int clearAll(Player player) {
+  public int clearAll(@NonNull Player player) {
 
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {

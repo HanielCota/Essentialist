@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tphere")
@@ -24,21 +25,21 @@ public record TeleportHereCommand(
     ConfigHandle<TeleportConfig> config, TeleportService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void execute(Player sender, @OnlinePlayer Player target) {
-    var snap = config.value();
-    var senderActor = framework.actorOf(sender);
+  public void execute(@NonNull Player sender, @OnlinePlayer @NonNull Player target) {
+    var snap = this.config.value();
+    var senderActor = this.framework.actorOf(sender);
 
     if (sender.getUniqueId().equals(target.getUniqueId())) {
       senderActor.sendError(snap.selfTarget());
       return;
     }
 
-    if (!service.teleportTo(target, sender.getLocation())) {
+    if (!this.service.teleportTo(target, sender.getLocation())) {
       senderActor.sendError(snap.teleportFailed());
       return;
     }
 
-    var targetActor = framework.actorOf(target);
+    var targetActor = this.framework.actorOf(target);
     String selfMessage = snap.formatBroughtPlayer(target.getName());
     String otherMessage = snap.formatBroughtBy(sender.getName());
     senderActor.sendDualMessage(targetActor, selfMessage, otherMessage);

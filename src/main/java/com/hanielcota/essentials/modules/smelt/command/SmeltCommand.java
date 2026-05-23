@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command(value = "derreter", aliases = "smelt")
@@ -22,10 +23,10 @@ import org.bukkit.entity.Player;
 public record SmeltCommand(ConfigHandle<SmeltConfig> config, SmeltService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(@NonNull CommandActor actor) {
     Player sender = actor.unwrap(Player.class);
-    int count = service.smelt(sender);
-    var snap = config.value();
+    int count = this.service.smelt(sender);
+    var snap = this.config.value();
 
     if (count == 0) {
       actor.sendError(snap.nothing());

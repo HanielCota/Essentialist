@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command(value = "chapeu", aliases = "hat")
@@ -22,10 +23,10 @@ import org.bukkit.entity.Player;
 public record HatCommand(ConfigHandle<HatConfig> config, HatService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(@NonNull CommandActor actor) {
     Player sender = actor.unwrap(Player.class);
-    var result = service.equip(sender);
-    var snap = config.value();
+    var result = this.service.equip(sender);
+    var snap = this.config.value();
 
     if (result == HatService.Result.EMPTY_HAND) {
       actor.sendError(snap.emptyHand());

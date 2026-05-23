@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 
 @Command("essentials")
 @Permission("essentials.admin.reload")
@@ -18,16 +19,16 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigService configs) {
 
   @DefaultSubcommand
-  public void showUsage(CommandActor actor) {
-    actor.sendMessage(config.value().usage());
+  public void showUsage(@NonNull CommandActor actor) {
+    actor.sendMessage(this.config.value().usage());
   }
 
   @Subcommand("reload")
   @Description("Recarrega todas as configurações do plugin.")
   @Syntax("/essentials reload")
-  public void reload(CommandActor actor) {
-    var report = configs.reloadAll();
-    var snap = config.value();
+  public void reload(@NonNull CommandActor actor) {
+    var report = this.configs.reloadAll();
+    var snap = this.config.value();
 
     if (report.failures().isEmpty()) {
       actor.sendSuccess(snap.formatSuccess(report.total()));

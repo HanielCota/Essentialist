@@ -20,6 +20,7 @@ import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Locale;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -34,7 +35,8 @@ public record GiveCommand(
     PlayerProvider players,
     PaperCommandFramework framework) {
 
-  private static String fill(String template, String item, int amount, int leftover) {
+  private static String fill(
+      @NonNull String template, @NonNull String item, int amount, int leftover) {
     return template
         .replace("{item}", item)
         .replace("{amount}", Integer.toString(amount))
@@ -44,11 +46,11 @@ public record GiveCommand(
   @DefaultSubcommand
   @PermissionForOther(".others")
   public void execute(
-      CommandActor sender,
+      @NonNull CommandActor sender,
       @Arg("item") Material item,
       @DefaultValue("1") @Min(1) @Arg("quantidade") int amount,
       @TargetOrSelf Player subject) {
-    var snap = config.value();
+    var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
@@ -62,7 +64,7 @@ public record GiveCommand(
       return;
     }
 
-    var leftover = service.give(subject, item, amount);
+    var leftover = this.service.give(subject, item, amount);
     var given = amount - leftover;
     var itemName = item.name().toLowerCase(Locale.ROOT);
 
@@ -73,7 +75,7 @@ public record GiveCommand(
     }
 
     var messages = leftover > 0 ? snap.whenPartial() : snap.whenGiven();
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
     var selfMessage = fill(messages.forSender(self, name), itemName, given, leftover);
     var targetMessage = fill(messages.forTarget(name), itemName, given, leftover);
 
@@ -85,10 +87,10 @@ public record GiveCommand(
   @Description("Dá um item para todos os jogadores online.")
   @Syntax("/give all <item> [quantidade]")
   public void all(
-      CommandActor sender,
+      @NonNull CommandActor sender,
       @Arg("item") Material item,
       @DefaultValue("1") @Min(1) @Arg("quantidade") int amount) {
-    var snap = config.value();
+    var snap = this.config.value();
 
     if (!item.isItem()) {
       sender.sendError(snap.invalidItem());
@@ -103,10 +105,10 @@ public record GiveCommand(
     var itemName = item.name().toLowerCase(Locale.ROOT);
     var count = 0;
 
-    for (var player : players.all()) {
-      var leftover = service.give(player, item, amount);
+    for (var player : this.players.all()) {
+      var leftover = this.service.give(player, item, amount);
       var given = amount - leftover;
-      var recipient = framework.actorOf(player);
+      var recipient = this.framework.actorOf(player);
 
       if (given == 0) {
         recipient.sendError(

@@ -6,6 +6,7 @@ import com.hanielcota.essentials.util.ComponentUtils;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -17,7 +18,7 @@ public final class TitleService {
 
   private final ConfigHandle<TitleConfig> config;
 
-  private static Component render(String raw) {
+  private static Component render(@NonNull String raw) {
     try {
       return ComponentUtils.mini(raw);
     } catch (RuntimeException _) {
@@ -29,12 +30,12 @@ public final class TitleService {
     return Duration.ofMillis(Math.max(0, ticks) * 50L);
   }
 
-  public void send(Player target, String message) {
+  public void send(@NonNull Player target, @NonNull String message) {
 
     target.showTitle(build(message));
   }
 
-  public int broadcast(String message) {
+  public int broadcast(@NonNull String message) {
 
     var title = build(message);
     var onlinePlayers = Bukkit.getOnlinePlayers();
@@ -46,8 +47,8 @@ public final class TitleService {
     return onlinePlayers.size();
   }
 
-  private Title build(String message) {
-    var snap = config.value();
+  private Title build(@NonNull String message) {
+    var snap = this.config.value();
     var lines = TitleLines.parse(message);
 
     var times =
@@ -62,7 +63,7 @@ public final class TitleService {
   /** A title message split into its title and subtitle lines. */
   private record TitleLines(String title, String subtitle) {
 
-    static TitleLines parse(String message) {
+    static TitleLines parse(@NonNull String message) {
       var trimmed = message.strip();
       if (!trimmed.startsWith("\"")) {
         return new TitleLines(trimmed, "");
@@ -75,7 +76,7 @@ public final class TitleService {
       return new TitleLines(title, subtitle);
     }
 
-    private static List<String> extractQuoted(String input) {
+    private static List<String> extractQuoted(@NonNull String input) {
       var segments = new ArrayList<String>(2);
       var cursor = 0;
 

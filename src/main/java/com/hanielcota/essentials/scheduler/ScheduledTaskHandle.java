@@ -7,11 +7,11 @@ record ScheduledTaskHandle(ScheduledTask handle) implements Task {
 
   @Override
   public void cancel() {
-    handle.cancel();
+    this.handle.cancel();
   }
 
   @Override
   public boolean isCancelled() {
-    return handle.isCancelled();
+    return this.handle.isCancelled();
   }
 }

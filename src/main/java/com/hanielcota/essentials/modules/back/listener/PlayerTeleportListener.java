@@ -32,6 +32,6 @@ public final class PlayerTeleportListener implements Listener {
     var uuid = player.getUniqueId();
     var originLocation = event.getFrom();
 
-    history.push(uuid, originLocation);
+    this.history.push(uuid, originLocation);
   }
 }

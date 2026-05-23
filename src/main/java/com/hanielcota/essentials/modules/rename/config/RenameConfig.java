@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.rename.config;
 
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -16,7 +17,7 @@ public record RenameConfig(
         "<green>O nome do item foi removido.");
   }
 
-  public String formatRenamed(String name) {
+  public String formatRenamed(@NonNull String name) {
     return renamed.replace("{name}", name);
   }
 }

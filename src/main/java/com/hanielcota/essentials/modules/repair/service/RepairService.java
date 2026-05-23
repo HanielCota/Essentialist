@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.repair.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
 import java.util.List;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +11,7 @@ import org.bukkit.inventory.meta.Damageable;
 
 public record RepairService(ConfigHandle<RepairConfig> config) {
 
-  private static boolean repair(ItemStack item, List<Material> blacklist) {
+  private static boolean repair(@NonNull ItemStack item, @NonNull List<Material> blacklist) {
     if (item == null || item.getType().getMaxDurability() <= 0) {
       return false;
     }
@@ -28,14 +29,14 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
     return true;
   }
 
-  public HandResult repairHand(Player player) {
+  public HandResult repairHand(@NonNull Player player) {
     var inv = player.getInventory();
     var held = inv.getItemInMainHand();
 
     if (held.getType().isAir()) {
       return HandResult.EMPTY_HAND;
     }
-    if (!repair(held, config.value().blacklist())) {
+    if (!repair(held, this.config.value().blacklist())) {
       return HandResult.NOTHING_TO_REPAIR;
     }
 
@@ -43,8 +44,8 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
     return HandResult.REPAIRED;
   }
 
-  public int repairAll(Player player) {
-    var snap = config.value();
+  public int repairAll(@NonNull Player player) {
+    var snap = this.config.value();
     var blacklist = snap.blacklist();
     int limit = snap.repairAllLimit();
     var inv = player.getInventory();

@@ -6,6 +6,7 @@ import com.hanielcota.essentials.modules.enchant.config.EnchantConfig;
 import com.hanielcota.essentials.modules.enchant.service.EnchantService;
 import io.github.hanielcota.commandframework.annotation.*;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
@@ -17,23 +18,23 @@ import org.bukkit.entity.Player;
 @Syntax("/enchant <encantamento> [nível] | /enchant remove <encantamento> | /enchant clear")
 public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService service) {
 
-  private static String enchantName(Enchantment enchantment) {
+  private static String enchantName(@NonNull Enchantment enchantment) {
     return enchantment.getKey().getKey();
   }
 
   @DefaultSubcommand
   public void apply(
-      CommandActor sender,
+      @NonNull CommandActor sender,
       @Suggestions("enchantments") @Arg("encantamento") Enchantment enchantment,
       @DefaultValue("1") @Arg("nivel") int level) {
-    var snap = config.value();
+    var snap = this.config.value();
     if (level < 1) {
       sender.sendError(snap.invalidLevel());
       return;
     }
 
     var player = sender.unwrap(Player.class);
-    var result = service.apply(player, enchantment, level);
+    var result = this.service.apply(player, enchantment, level);
 
     if (result == EnchantService.Result.EMPTY_HAND) {
       sender.sendError(snap.emptyHand());
@@ -45,13 +46,13 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
 
   @Subcommand("remove")
   public void remove(
-      CommandActor sender,
+      @NonNull CommandActor sender,
       @Suggestions("enchantments") @Arg("encantamento") Enchantment enchantment) {
-    var snap = config.value();
+    var snap = this.config.value();
     var label = enchantName(enchantment);
 
     var player = sender.unwrap(Player.class);
-    var result = service.remove(player, enchantment);
+    var result = this.service.remove(player, enchantment);
 
     switch (result) {
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
@@ -62,10 +63,10 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
   }
 
   @Subcommand("clear")
-  public void clear(CommandActor sender) {
-    var snap = config.value();
+  public void clear(@NonNull CommandActor sender) {
+    var snap = this.config.value();
     var player = sender.unwrap(Player.class);
-    var removed = service.clearAll(player);
+    var removed = this.service.clearAll(player);
 
     if (removed < 0) {
       sender.sendError(snap.emptyHand());

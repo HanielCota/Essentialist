@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.spawn.listener;
 
 import com.hanielcota.essentials.modules.spawn.service.SpawnLocation;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,14 +17,14 @@ public final class SpawnVoidListener implements Listener {
   private final SpawnService service;
 
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-  public void onVoidDamage(EntityDamageEvent event) {
+  public void onVoidDamage(@NonNull EntityDamageEvent event) {
     if (event.getCause() != DamageCause.VOID) {
       return;
     }
     if (!(event.getEntity() instanceof Player player)) {
       return;
     }
-    var spawn = service.current().flatMap(SpawnLocation::resolve);
+    var spawn = this.service.current().flatMap(SpawnLocation::resolve);
     if (spawn.isEmpty()) {
       return;
     }

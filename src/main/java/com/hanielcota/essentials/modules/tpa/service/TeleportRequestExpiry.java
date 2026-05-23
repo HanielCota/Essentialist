@@ -27,21 +27,21 @@ public final class TeleportRequestExpiry {
 
   /** Starts the periodic sweep. */
   public void start() {
-    task = scheduler.runTimer(this::sweep, INTERVAL, INTERVAL);
+    this.task = this.scheduler.runTimer(this::sweep, INTERVAL, INTERVAL);
   }
 
   /** Stops the periodic sweep. Pending requests are simply dropped on shutdown. */
   public void stop() {
-    if (task != null) {
-      task.cancel();
-      task = null;
+    if (this.task != null) {
+      this.task.cancel();
+      this.task = null;
     }
   }
 
   private void sweep() {
     var now = Instant.now();
-    for (var request : store.expiredAt(now)) {
-      service.expire(request);
+    for (var request : this.store.expiredAt(now)) {
+      this.service.expire(request);
     }
   }
 }

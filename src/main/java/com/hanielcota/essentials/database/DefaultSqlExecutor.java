@@ -20,7 +20,7 @@ public final class DefaultSqlExecutor implements SqlExecutor {
   @Override
   public <T> List<T> query(
       @NonNull String sql, @NonNull StatementBinder binder, @NonNull ResultMapper<T> mapper) {
-    try (var conn = connectionFactory.getConnection();
+    try (var conn = this.connectionFactory.getConnection();
         var stmt = conn.prepareStatement(sql)) {
 
       binder.bind(stmt);
@@ -49,7 +49,7 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   @Override
   public int updateCount(@NonNull String sql, @NonNull StatementBinder binder) {
-    try (var conn = connectionFactory.getConnection();
+    try (var conn = this.connectionFactory.getConnection();
         var stmt = conn.prepareStatement(sql)) {
 
       binder.bind(stmt);
@@ -61,7 +61,7 @@ public final class DefaultSqlExecutor implements SqlExecutor {
   }
 
   @Override
-  public int execute(@NonNull Connection conn, @NonNull String sql, Object... params)
+  public int execute(@NonNull Connection conn, @NonNull String sql, @NonNull Object... params)
       throws SQLException {
     try (var stmt = conn.prepareStatement(sql)) {
       var length = params.length;
@@ -79,7 +79,7 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   @Override
   public void tx(@NonNull TxBlock work) {
-    try (var conn = connectionFactory.getConnection()) {
+    try (var conn = this.connectionFactory.getConnection()) {
       conn.setAutoCommit(false);
       SQLException primary = null;
 
@@ -114,8 +114,8 @@ public final class DefaultSqlExecutor implements SqlExecutor {
   }
 
   @Override
-  public void ddl(String... statements) {
-    try (var conn = connectionFactory.getConnection();
+  public void ddl(@NonNull String... statements) {
+    try (var conn = this.connectionFactory.getConnection();
         var stmt = conn.createStatement()) {
 
       for (var statement : statements) {

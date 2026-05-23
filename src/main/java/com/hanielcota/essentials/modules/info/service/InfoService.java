@@ -81,7 +81,7 @@ public final class InfoService {
   private String sessionDuration(@NonNull Player player) {
     var uuid = player.getUniqueId();
 
-    return sessions
+    return this.sessions
         .sessionOf(uuid)
         .map(
             session -> {
@@ -128,7 +128,7 @@ public final class InfoService {
 
   /** Information about the Essentialist plugin itself. */
   public List<InfoEntry> aboutEntries() {
-    var meta = plugin.getPluginMeta();
+    var meta = this.plugin.getPluginMeta();
     var name = meta.getName();
     var version = meta.getVersion();
     var authorsList = authors(meta.getAuthors());

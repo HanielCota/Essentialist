@@ -13,6 +13,7 @@ import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,9 +39,10 @@ public final class TeleportRequestService {
    * Registers a new request â€” replacing (and recording as cancelled) any request the requester
    * already had outstanding â€” and prompts the target.
    */
-  public TeleportRequest create(Player requester, Player target, TeleportRequestType type) {
+  public TeleportRequest create(
+      @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
 
-    store
+    this.store
         .outgoingOf(requester.getUniqueId())
         .ifPresent(previous -> resolve(previous, TeleportRequestStatus.CANCELLED));
 
@@ -49,41 +51,42 @@ public final class TeleportRequestService {
             Participant.of(requester),
             Participant.of(target),
             type,
-            config.value().requestExpiry());
+            this.config.value().requestExpiry());
 
-    store.add(request);
-    notifier.sendPrompt(target, request);
+    this.store.add(request);
+    this.notifier.sendPrompt(target, request);
     return request;
   }
 
   /** The target's pending requests, newest first. */
-  public List<TeleportRequest> incoming(UUID target) {
-    return store.incomingFor(target);
+  public List<TeleportRequest> incoming(@NonNull UUID target) {
+    return this.store.incomingFor(target);
   }
 
   /** The requester's single outstanding request, if any. */
-  public Optional<TeleportRequest> outgoing(UUID requester) {
-    return store.outgoingOf(requester);
+  public Optional<TeleportRequest> outgoing(@NonNull UUID requester) {
+    return this.store.outgoingOf(requester);
   }
 
   /** A specific pending request to {@code target} from the named requester, case-insensitive. */
-  public Optional<TeleportRequest> incomingFrom(UUID target, String requesterName) {
-    return store.incomingFrom(target, requesterName);
+  public Optional<TeleportRequest> incomingFrom(
+      @NonNull UUID target, @NonNull String requesterName) {
+    return this.store.incomingFrom(target, requesterName);
   }
 
   /** Accepts a request: performs the teleport, then records the outcome. */
-  public AcceptResult accept(TeleportRequest request) {
+  public AcceptResult accept(@NonNull TeleportRequest request) {
 
     var requester = Bukkit.getPlayer(request.requester().id());
     var target = Bukkit.getPlayer(request.target().id());
     if (requester == null || target == null) {
-      if (store.remove(request)) {
-        history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
+      if (this.store.remove(request)) {
+        this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
       }
       return AcceptResult.REQUESTER_OFFLINE;
     }
 
-    if (!store.remove(request)) {
+    if (!this.store.remove(request)) {
       return AcceptResult.NOT_FOUND;
     }
 
@@ -91,31 +94,31 @@ public final class TeleportRequestService {
     Player mover = toTarget ? requester : target;
     Location landing = (toTarget ? target : requester).getLocation();
 
-    if (!teleport.teleportTo(mover, landing)) {
-      history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
+    if (!this.teleport.teleportTo(mover, landing)) {
+      this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
       return AcceptResult.TELEPORT_FAILED;
     }
 
-    history.push(
+    this.history.push(
         TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, Destination.of(landing)));
     return AcceptResult.SUCCESS;
   }
 
   /** Denies a request. */
-  public void deny(TeleportRequest request) {
+  public void deny(@NonNull TeleportRequest request) {
     resolve(request, TeleportRequestStatus.DENIED);
   }
 
   /** Cancels a request (the requester withdrew it). */
-  public void cancel(TeleportRequest request) {
+  public void cancel(@NonNull TeleportRequest request) {
     resolve(request, TeleportRequestStatus.CANCELLED);
   }
 
   /** Expires a request and notifies the requester. Called by {@link TeleportRequestExpiry}. */
-  public void expire(TeleportRequest request) {
-    if (store.remove(request)) {
-      history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.EXPIRED));
-      notifier.notifyExpired(request);
+  public void expire(@NonNull TeleportRequest request) {
+    if (this.store.remove(request)) {
+      this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.EXPIRED));
+      this.notifier.notifyExpired(request);
     }
   }
 
@@ -123,8 +126,8 @@ public final class TeleportRequestService {
    * Cancels every request a player takes part in â€” used when they disconnect â€” and returns them
    * so the caller can notify the other party.
    */
-  public List<TeleportRequest> cancelAllOf(UUID player) {
-    var affected = store.involving(player);
+  public List<TeleportRequest> cancelAllOf(@NonNull UUID player) {
+    var affected = this.store.involving(player);
     for (TeleportRequest request : affected) {
       resolve(request, TeleportRequestStatus.CANCELLED);
     }
@@ -132,9 +135,9 @@ public final class TeleportRequestService {
   }
 
   /** Removes a request and writes its terminal state to history in one step. */
-  private void resolve(TeleportRequest request, TeleportRequestStatus status) {
-    if (store.remove(request)) {
-      history.push(TpaHistoryEntry.of(request, status));
+  private void resolve(@NonNull TeleportRequest request, @NonNull TeleportRequestStatus status) {
+    if (this.store.remove(request)) {
+      this.history.push(TpaHistoryEntry.of(request, status));
     }
   }
 }

@@ -34,27 +34,27 @@ public final class DeleteHomeDialog extends ConfirmDialog {
 
   @Override
   protected @NonNull Component title() {
-    var titleText = config.value().messages().deleteConfirmTitle();
+    var titleText = this.config.value().messages().deleteConfirmTitle();
     return ComponentUtils.mini(titleText);
   }
 
   @Override
   protected @NonNull ItemTemplate promptItem() {
-    var promptName = config.value().messages().deleteConfirmPrompt();
+    var promptName = this.config.value().messages().deleteConfirmPrompt();
 
     return ItemTemplate.builder(Material.PAPER).name(promptName).italic(false).build();
   }
 
   @Override
   protected @NonNull ItemTemplate yesButton() {
-    var yesName = config.value().messages().deleteConfirmYes();
+    var yesName = this.config.value().messages().deleteConfirmYes();
 
     return ItemTemplate.builder(Material.LIME_WOOL).name(yesName).italic(false).build();
   }
 
   @Override
   protected @NonNull ItemTemplate noButton() {
-    var noName = config.value().messages().deleteConfirmNo();
+    var noName = this.config.value().messages().deleteConfirmNo();
 
     return ItemTemplate.builder(Material.RED_WOOL).name(noName).italic(false).build();
   }
@@ -62,31 +62,31 @@ public final class DeleteHomeDialog extends ConfirmDialog {
   @Override
   protected void onConfirm(@NonNull Player player) {
     var uuid = player.getUniqueId();
-    var homeName = target.consume(uuid);
+    var homeName = this.target.consume(uuid);
 
     if (homeName == null) {
       return;
     }
 
-    var messages = config.value().messages();
+    var messages = this.config.value().messages();
 
-    if (!service.delete(uuid, homeName)) {
+    if (!this.service.delete(uuid, homeName)) {
       var unknownMsg = messages.unknownHome().replace("{name}", homeName);
       player.sendMessage(ComponentUtils.mini(unknownMsg));
-      menus.open(player, HomesMenu.ID);
+      this.menus.open(player, HomesMenu.ID);
       return;
     }
 
     var deletedMsg = messages.homeDeleted().replace("{name}", homeName);
     player.sendMessage(ComponentUtils.mini(deletedMsg));
-    menus.open(player, HomesMenu.ID);
+    this.menus.open(player, HomesMenu.ID);
   }
 
   @Override
   protected void onCancel(@NonNull Player player) {
     var uuid = player.getUniqueId();
 
-    target.clear(uuid);
-    menus.open(player, HomesMenu.ID);
+    this.target.clear(uuid);
+    this.menus.open(player, HomesMenu.ID);
   }
 }

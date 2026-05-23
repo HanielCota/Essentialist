@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.back.config;
 import com.hanielcota.essentials.util.Numbers;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -61,7 +62,7 @@ public record BackConfig(
     }
   }
 
-  public String formatBack(String world, double x, double y, double z) {
+  public String formatBack(@NonNull String world, double x, double y, double z) {
     return back.replace("{world}", world)
         .replace("{x}", Numbers.compact(x))
         .replace("{y}", Numbers.compact(y))

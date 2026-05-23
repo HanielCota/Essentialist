@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.near.config;
 
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -26,11 +27,11 @@ public record NearConfig(
         "<red>O raio precisa estar entre <gold>1</gold> e <gold>{max}</gold>.");
   }
 
-  public String formatEntry(String player, int distance) {
+  public String formatEntry(@NonNull String player, int distance) {
     return entry.replace("{player}", player).replace("{distance}", Integer.toString(distance));
   }
 
-  public String formatFound(int radius, int count, String players) {
+  public String formatFound(int radius, int count, @NonNull String players) {
     return found
         .replace("{radius}", Integer.toString(radius))
         .replace("{count}", Integer.toString(count))

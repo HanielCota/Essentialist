@@ -9,14 +9,14 @@ import com.hanielcota.essentials.util.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import org.jspecify.annotations.NonNull;
+import lombok.NonNull;
 
 public record BackEntryRenderer(ConfigHandle<BackConfig> config)
     implements ItemRenderer<HistoryEntry> {
 
   @Override
   public @NonNull ItemTemplate render(@NonNull HistoryEntry entry, int humanIndex) {
-    var snap = config.value();
+    var snap = this.config.value();
     var location = entry.location();
 
     var entryWorld = location.getWorld();
@@ -46,7 +46,13 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config)
         .build();
   }
 
-  private String formatLine(String line, String world, String x, String y, String z, String time) {
+  private String formatLine(
+      @NonNull String line,
+      @NonNull String world,
+      @NonNull String x,
+      @NonNull String y,
+      @NonNull String z,
+      @NonNull String time) {
     return line.replace("{world}", world)
         .replace("{x}", x)
         .replace("{y}", y)

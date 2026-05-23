@@ -6,6 +6,7 @@ import com.hanielcota.essentials.modules.title.service.TitleRequest;
 import com.hanielcota.essentials.modules.title.service.TitleService;
 import io.github.hanielcota.commandframework.annotation.*;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("title")
@@ -16,8 +17,8 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
 
   @DefaultSubcommand
   @Cooldown(duration = "3s")
-  public void execute(CommandActor sender, @GreedyString @Arg("texto") String texto) {
-    var snap = config.value();
+  public void execute(@NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
+    var snap = this.config.value();
     var self = sender.isPlayer() ? sender.unwrap(Player.class) : null;
     var request = TitleRequest.from(self, texto.strip());
 
@@ -34,7 +35,7 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
       return;
     }
 
-    service.send(target, request.message());
+    this.service.send(target, request.message());
 
     sender.sendSuccess(snap.whenSent().forSender(toSelf, target.getName()));
   }
@@ -44,8 +45,8 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
   @Permission("essentials.title.broadcast")
   @Description("Envia um título para todos os jogadores online.")
   @Syntax("/title broadcast \"título\" [\"subtítulo\"]")
-  public void broadcast(CommandActor sender, @GreedyString @Arg("texto") String texto) {
-    var snap = config.value();
+  public void broadcast(@NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
+    var snap = this.config.value();
     var message = texto.strip();
 
     if (message.isBlank()) {
@@ -53,7 +54,7 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
       return;
     }
 
-    var count = service.broadcast(message);
+    var count = this.service.broadcast(message);
     sender.sendSuccess(snap.formatBroadcasted(count));
   }
 }

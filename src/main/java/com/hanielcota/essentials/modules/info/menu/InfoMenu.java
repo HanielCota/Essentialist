@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -25,7 +26,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Single /info menu with category and detail tabs. Switching tabs re-renders this same inventory
@@ -49,7 +49,7 @@ public final class InfoMenu implements Menu, Listener {
   private final Map<UUID, Tab> openTab = new ConcurrentHashMap<>();
   private final Map<UUID, UUID> playerTarget = new ConcurrentHashMap<>();
 
-  private static SlotDefinition entryItem(InfoEntry entry) {
+  private static SlotDefinition entryItem(@NonNull InfoEntry entry) {
     var builder =
         ItemTemplate.builder(entry.icon())
             .name(entry.name())
@@ -65,9 +65,9 @@ public final class InfoMenu implements Menu, Listener {
    * Prepares the menu for {@code viewer} before it is opened: the player tab will show {@code
    * target}, and the menu starts on the player tab whenever a different player was requested.
    */
-  public void prepare(UUID viewer, UUID target) {
-    playerTarget.put(viewer, target);
-    openTab.put(viewer, viewer.equals(target) ? Tab.CATEGORIES : Tab.PLAYER);
+  public void prepare(@NonNull UUID viewer, @NonNull UUID target) {
+    this.playerTarget.put(viewer, target);
+    this.openTab.put(viewer, viewer.equals(target) ? Tab.CATEGORIES : Tab.PLAYER);
   }
 
   @Override
@@ -81,28 +81,28 @@ public final class InfoMenu implements Menu, Listener {
 
     MenuFramework.builder(ID, menus)
         .rows(ROWS)
-        .title(ComponentUtils.mini(config.value().menuTitle()))
+        .title(ComponentUtils.mini(this.config.value().menuTitle()))
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()
         .register();
   }
 
-  private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
-    Tab tab = openTab.getOrDefault(player.getUniqueId(), Tab.CATEGORIES);
+  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
+    Tab tab = this.openTab.getOrDefault(player.getUniqueId(), Tab.CATEGORIES);
     return switch (tab) {
       case CATEGORIES -> categorySlots();
-      case SERVER -> detailSlots(service.serverEntries());
-      case PLAYER -> detailSlots(service.playerEntries(resolveTarget(player)));
-      case ABOUT -> detailSlots(service.aboutEntries());
+      case SERVER -> detailSlots(this.service.serverEntries());
+      case PLAYER -> detailSlots(this.service.playerEntries(resolveTarget(player)));
+      case ABOUT -> detailSlots(this.service.aboutEntries());
     };
   }
 
   /**
    * The player whose info {@code viewer} is looking at â€” the /info argument, or {@code viewer}.
    */
-  private Player resolveTarget(Player viewer) {
-    UUID targetId = playerTarget.getOrDefault(viewer.getUniqueId(), viewer.getUniqueId());
+  private Player resolveTarget(@NonNull Player viewer) {
+    UUID targetId = this.playerTarget.getOrDefault(viewer.getUniqueId(), viewer.getUniqueId());
     Player target = Bukkit.getPlayer(targetId);
     return target != null ? target : viewer;
   }
@@ -124,7 +124,7 @@ public final class InfoMenu implements Menu, Listener {
             Material.ENCHANTED_BOOK, "<yellow>Essentialist", "<gray>Sobre o plugin.", Tab.ABOUT));
   }
 
-  private List<SlotDefinition> detailSlots(List<InfoEntry> entries) {
+  private List<SlotDefinition> detailSlots(@NonNull List<InfoEntry> entries) {
     var slots = new ArrayList<SlotDefinition>(BACK_INDEX + 1);
     for (var entry : entries) {
       slots.add(entryItem(entry));
@@ -137,21 +137,22 @@ public final class InfoMenu implements Menu, Listener {
     return slots;
   }
 
-  private SlotDefinition category(Material icon, String name, String lore, Tab target) {
+  private SlotDefinition category(
+      @NonNull Material icon, @NonNull String name, @NonNull String lore, @NonNull Tab target) {
     var template = ItemTemplate.builder(icon).name(name).lore(lore).italic(false).build();
     return SlotDefinition.of(-1, template, click -> switchTab(click, target));
   }
 
-  private void switchTab(ClickContext click, Tab tab) {
-    openTab.put(click.player().getUniqueId(), tab);
+  private void switchTab(@NonNull ClickContext click, @NonNull Tab tab) {
+    this.openTab.put(click.player().getUniqueId(), tab);
     click.refresh();
   }
 
   @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
+  public void onQuit(@NonNull PlayerQuitEvent event) {
     var id = event.getPlayer().getUniqueId();
-    openTab.remove(id);
-    playerTarget.remove(id);
+    this.openTab.remove(id);
+    this.playerTarget.remove(id);
   }
 
   private enum Tab {

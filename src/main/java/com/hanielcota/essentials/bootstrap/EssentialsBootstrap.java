@@ -122,7 +122,7 @@ public final class EssentialsBootstrap {
     services.register(SqlExecutor.class, sqlExecutor);
   }
 
-  private void createDirectories(Path path) {
+  private void createDirectories(@NonNull Path path) {
     if (path == null) {
       return;
     }

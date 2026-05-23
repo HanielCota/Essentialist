@@ -42,11 +42,11 @@ public final class SpawnStore {
 
   private final @NonNull SqlExecutor sqlExecutor;
 
-  public static void install(SqlExecutor sqlExecutor) {
+  public static void install(@NonNull SqlExecutor sqlExecutor) {
     sqlExecutor.ddl(CREATE_TABLE);
   }
 
-  private static SpawnLocation readRow(ResultSet rs) throws SQLException {
+  private static SpawnLocation readRow(@NonNull ResultSet rs) throws SQLException {
     return new SpawnLocation(
         rs.getString("world"),
         rs.getDouble("x"),
@@ -58,13 +58,13 @@ public final class SpawnStore {
 
   /** Returns the stored spawn, or empty when {@code /setspawn} has not run yet. */
   public Optional<SpawnLocation> load() {
-    var rows = sqlExecutor.query(SELECT, SpawnStore::readRow);
+    var rows = this.sqlExecutor.query(SELECT, SpawnStore::readRow);
     return rows.isEmpty() ? Optional.empty() : Optional.of(rows.getFirst());
   }
 
   /** Overwrites the stored spawn with {@code location}. */
-  public void save(SpawnLocation location) {
-    sqlExecutor.update(
+  public void save(@NonNull SpawnLocation location) {
+    this.sqlExecutor.update(
         UPSERT,
         location.world(),
         location.x(),

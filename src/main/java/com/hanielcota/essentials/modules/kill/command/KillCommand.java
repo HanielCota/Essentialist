@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command(value = "matar", aliases = "kill")
@@ -28,18 +29,18 @@ public record KillCommand(
     ConfigHandle<KillConfig> config, KillService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    var snap = config.value();
+  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
-    if (!service.kill(subject)) {
+    if (!this.service.kill(subject)) {
       sender.sendError(snap.whenAlreadyDead().forSender(self, name));
       return;
     }
 
     var messages = snap.whenKilled();
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
     var selfMessage = messages.forSender(self, name);
 
     sender.sendDualMessage(target, selfMessage, messages.forTarget(name));

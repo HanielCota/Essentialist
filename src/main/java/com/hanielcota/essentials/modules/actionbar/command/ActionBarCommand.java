@@ -14,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("actionbar")
@@ -25,8 +26,9 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
 
   @DefaultSubcommand
   @PlayerOnly
-  public void execute(CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
-    var snap = config.value();
+  public void execute(
+      @NonNull CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
+    var snap = this.config.value();
 
     var message = mensagem.strip();
     if (message.isBlank()) {
@@ -34,7 +36,7 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
       return;
     }
 
-    service.send(sender.unwrap(Player.class), message);
+    this.service.send(sender.unwrap(Player.class), message);
     sender.sendSuccess(snap.sent());
   }
 
@@ -42,8 +44,9 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
   @Permission("essentials.actionbar.broadcast")
   @Description("Envia uma action bar para todos os jogadores online.")
   @Syntax("/actionbar broadcast <mensagem>")
-  public void broadcast(CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
-    var snap = config.value();
+  public void broadcast(
+      @NonNull CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
+    var snap = this.config.value();
 
     var message = mensagem.strip();
     if (message.isBlank()) {
@@ -51,7 +54,7 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
       return;
     }
 
-    var count = service.broadcast(message);
+    var count = this.service.broadcast(message);
     sender.sendSuccess(snap.formatBroadcasted(count));
   }
 }

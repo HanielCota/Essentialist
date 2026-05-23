@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tpdeny")
@@ -27,18 +28,18 @@ public record TpDenyCommand(
     PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @DefaultValue("") String requester) {
-    var messages = config.value().messages();
+  public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
+    var messages = this.config.value().messages();
     var sender = actor.unwrap(Player.class);
 
-    var resolved = TpaRequests.resolveIncoming(service, sender, requester, messages, actor);
+    var resolved = TpaRequests.resolveIncoming(this.service, sender, requester, messages, actor);
     if (resolved.isEmpty()) {
       return;
     }
     var request = resolved.get();
 
-    service.deny(request);
+    this.service.deny(request);
     actor.sendSuccess(messages.deniedSelf().replace("{player}", request.requester().name()));
-    TpaRequests.replyRequester(framework, request, messages.denied(), false);
+    TpaRequests.replyRequester(this.framework, request, messages.denied(), false);
   }
 }

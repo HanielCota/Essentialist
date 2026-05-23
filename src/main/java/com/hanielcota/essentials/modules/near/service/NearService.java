@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.near.service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 public final class NearService {
@@ -11,7 +12,7 @@ public final class NearService {
    * Returns the players within {@code radius} blocks of {@code center} (same world only), ordered
    * nearest first. The center player is never included.
    */
-  public List<Nearby> findNearby(Player center, int radius) {
+  public List<Nearby> findNearby(@NonNull Player center, int radius) {
 
     var origin = center.getLocation();
     double maxDistanceSquared = (double) radius * radius;

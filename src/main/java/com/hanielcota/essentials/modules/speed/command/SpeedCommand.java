@@ -18,6 +18,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("speed")
@@ -29,49 +30,50 @@ public record SpeedCommand(
     ConfigHandle<SpeedConfig> config, SpeedService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void showUsage(CommandActor sender) {
-    sender.sendMessage(config.value().usage());
+  public void showUsage(@NonNull CommandActor sender) {
+    sender.sendMessage(this.config.value().usage());
   }
 
   @Subcommand("walk")
   @PermissionForOther(".others")
   public void walk(
-      CommandActor sender,
+      @NonNull CommandActor sender,
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
-    if (!service.setWalkSpeed(subject, valor)) {
-      sender.sendError(config.value().invalid());
+    if (!this.service.setWalkSpeed(subject, valor)) {
+      sender.sendError(this.config.value().invalid());
       return;
     }
 
-    announce(sender, subject, config.value().whenWalkSet(valor));
+    announce(sender, subject, this.config.value().whenWalkSet(valor));
   }
 
   @Subcommand("fly")
   @PermissionForOther(".others")
   public void fly(
-      CommandActor sender,
+      @NonNull CommandActor sender,
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
-    if (!service.setFlySpeed(subject, valor)) {
-      sender.sendError(config.value().invalid());
+    if (!this.service.setFlySpeed(subject, valor)) {
+      sender.sendError(this.config.value().invalid());
       return;
     }
 
-    announce(sender, subject, config.value().whenFlySet(valor));
+    announce(sender, subject, this.config.value().whenFlySet(valor));
   }
 
   @Subcommand({"reset", "resetar"})
   @PermissionForOther(".others")
-  public void reset(CommandActor sender, @TargetOrSelf Player subject) {
-    service.reset(subject);
-    announce(sender, subject, config.value().whenReset());
+  public void reset(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    this.service.reset(subject);
+    announce(sender, subject, this.config.value().whenReset());
   }
 
-  private void announce(CommandActor sender, Player subject, MessagePair messages) {
+  private void announce(
+      @NonNull CommandActor sender, @NonNull Player subject, @NonNull MessagePair messages) {
     var name = subject.getName();
     var isSelf = Senders.isSelf(sender, subject);
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
 
     sender.sendDualMessage(target, messages.forSender(isSelf, name), messages.forTarget(name));
   }

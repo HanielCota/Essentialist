@@ -11,7 +11,7 @@ public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) implements Ite
 
   @Override
   public @NonNull ItemTemplate render(@NonNull Home home, int humanIndex) {
-    var menu = config.value().menu();
+    var menu = this.config.value().menu();
 
     var world = home.world();
     var x = home.x();

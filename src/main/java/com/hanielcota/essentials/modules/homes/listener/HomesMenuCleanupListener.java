@@ -15,6 +15,6 @@ public final class HomesMenuCleanupListener implements Listener {
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
     var uuid = event.getPlayer().getUniqueId();
-    menu.clearPrefetched(uuid);
+    this.menu.clearPrefetched(uuid);
   }
 }

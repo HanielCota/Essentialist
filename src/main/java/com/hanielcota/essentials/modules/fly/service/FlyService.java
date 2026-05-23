@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.fly.service;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
@@ -17,36 +18,36 @@ public final class FlyService {
    * desync with the client and the message would be misleading — those modes return {@link
    * Result#UNSUPPORTED} instead.
    */
-  public Result toggle(Player player) {
+  public Result toggle(@NonNull Player player) {
     return set(player, !isEnabled(player));
   }
 
   /** Enables or disables flight explicitly. See {@link #toggle} for the Creative/Spectator note. */
-  public Result set(Player player, boolean enable) {
+  public Result set(@NonNull Player player, boolean enable) {
     var mode = player.getGameMode();
     if (mode == GameMode.CREATIVE || mode == GameMode.SPECTATOR) {
       return Result.UNSUPPORTED;
     }
 
     if (enable) {
-      enabled.add(player.getUniqueId());
+      this.enabled.add(player.getUniqueId());
       player.setAllowFlight(true);
       return Result.ENABLED;
     }
-    enabled.remove(player.getUniqueId());
+    this.enabled.remove(player.getUniqueId());
     player.setAllowFlight(false);
     player.setFlying(false);
     return Result.DISABLED;
   }
 
   /** Whether {@code player} has command-managed flight active in this session. */
-  public boolean isEnabled(Player player) {
-    return enabled.contains(player.getUniqueId());
+  public boolean isEnabled(@NonNull Player player) {
+    return this.enabled.contains(player.getUniqueId());
   }
 
   /** Drops the session entry for {@code id} without touching any live player state. */
-  public void forget(UUID id) {
-    enabled.remove(id);
+  public void forget(@NonNull UUID id) {
+    this.enabled.remove(id);
   }
 
   public enum Result {

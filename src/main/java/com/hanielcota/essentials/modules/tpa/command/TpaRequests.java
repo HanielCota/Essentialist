@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Optional;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -20,12 +21,12 @@ final class TpaRequests {
    * to the sender. Used by {@code /tpa} and {@code /tpahere}.
    */
   static void send(
-      TeleportRequestService service,
-      TpaMessages messages,
-      CommandActor actor,
-      Player target,
-      TeleportRequestType type,
-      String confirmationTemplate) {
+      @NonNull TeleportRequestService service,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor,
+      @NonNull Player target,
+      @NonNull TeleportRequestType type,
+      @NonNull String confirmationTemplate) {
     var sender = actor.unwrap(Player.class);
     if (sender.getUniqueId().equals(target.getUniqueId())) {
       actor.sendError(messages.selfTarget());
@@ -47,11 +48,11 @@ final class TpaRequests {
    * </ul>
    */
   static Optional<TeleportRequest> resolveIncoming(
-      TeleportRequestService service,
-      Player viewer,
-      String requesterName,
-      TpaMessages messages,
-      CommandActor actor) {
+      @NonNull TeleportRequestService service,
+      @NonNull Player viewer,
+      @NonNull String requesterName,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor) {
     if (!requesterName.isBlank()) {
       var found = service.incomingFrom(viewer.getUniqueId(), requesterName);
       if (found.isEmpty()) {
@@ -77,9 +78,9 @@ final class TpaRequests {
    * success / error channel. No-ops when the requester has logged out.
    */
   static void replyRequester(
-      PaperCommandFramework framework,
-      TeleportRequest request,
-      String template,
+      @NonNull PaperCommandFramework framework,
+      @NonNull TeleportRequest request,
+      @NonNull String template,
       boolean asSuccess) {
     var requesterPlayer = Bukkit.getPlayer(request.requester().id());
     if (requesterPlayer == null) {

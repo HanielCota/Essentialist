@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.light.service;
 
+import lombok.NonNull;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
@@ -15,7 +16,7 @@ public final class LightService {
     this.key = new NamespacedKey(plugin, "light_night_vision");
   }
 
-  private static void applyEffect(Player player) {
+  private static void applyEffect(@NonNull Player player) {
     player.addPotionEffect(
         new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0));
   }
@@ -29,26 +30,26 @@ public final class LightService {
    *
    * @return {@code true} when night vision was enabled, {@code false} when disabled
    */
-  public boolean toggle(Player player) {
+  public boolean toggle(@NonNull Player player) {
     boolean next = !isEnabled(player);
     set(player, next);
     return next;
   }
 
   /** Whether {@code player} has command-managed night vision active. */
-  public boolean isEnabled(Player player) {
-    return player.getPersistentDataContainer().has(key, PersistentDataType.BYTE);
+  public boolean isEnabled(@NonNull Player player) {
+    return player.getPersistentDataContainer().has(this.key, PersistentDataType.BYTE);
   }
 
   /** Enables or disables command-managed night vision explicitly. */
-  public void set(Player player, boolean enabled) {
+  public void set(@NonNull Player player, boolean enabled) {
     var pdc = player.getPersistentDataContainer();
     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
     if (!enabled) {
-      pdc.remove(key);
+      pdc.remove(this.key);
       return;
     }
-    pdc.set(key, PersistentDataType.BYTE, (byte) 1);
+    pdc.set(this.key, PersistentDataType.BYTE, (byte) 1);
     applyEffect(player);
   }
 
@@ -57,7 +58,7 @@ public final class LightService {
    * external events (death/respawn, milk bucket) that wipe the effect but leave the PDC saying it
    * should still be on.
    */
-  public void reapply(Player player) {
+  public void reapply(@NonNull Player player) {
     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
     applyEffect(player);
   }

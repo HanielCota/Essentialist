@@ -43,8 +43,8 @@ public final class HomeTeleportListener implements Listener {
     }
 
     var uuid = event.getPlayer().getUniqueId();
-    if (delayed.isPending(uuid)) {
-      delayed.cancel(uuid);
+    if (this.delayed.isPending(uuid)) {
+      this.delayed.cancel(uuid);
     }
   }
 
@@ -52,7 +52,7 @@ public final class HomeTeleportListener implements Listener {
   public void onQuit(@NonNull PlayerQuitEvent event) {
     var uuid = event.getPlayer().getUniqueId();
 
-    actionTarget.clear(uuid);
-    renameSessions.cancel(uuid);
+    this.actionTarget.clear(uuid);
+    this.renameSessions.cancel(uuid);
   }
 }

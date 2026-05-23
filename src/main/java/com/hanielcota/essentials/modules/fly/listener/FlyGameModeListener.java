@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.fly.listener;
 
 import com.hanielcota.essentials.modules.fly.service.FlyService;
 import com.hanielcota.essentials.scheduler.Scheduler;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
@@ -22,15 +23,15 @@ public final class FlyGameModeListener implements Listener {
   private final FlyService service;
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onGameModeChange(PlayerGameModeChangeEvent event) {
+  public void onGameModeChange(@NonNull PlayerGameModeChangeEvent event) {
     var next = event.getNewGameMode();
     if (next == GameMode.CREATIVE || next == GameMode.SPECTATOR) {
       return;
     }
     var player = event.getPlayer();
-    if (!service.isEnabled(player)) {
+    if (!this.service.isEnabled(player)) {
       return;
     }
-    scheduler.runOnEntity(player, () -> player.setAllowFlight(true));
+    this.scheduler.runOnEntity(player, () -> player.setAllowFlight(true));
   }
 }

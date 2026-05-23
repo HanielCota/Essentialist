@@ -39,11 +39,11 @@ public final class HomesMenu implements Menu {
   private final Map<UUID, List<Home>> prefetched = new ConcurrentHashMap<>();
 
   public void prefetch(@NonNull UUID viewer, @NonNull List<Home> entries) {
-    prefetched.put(viewer, List.copyOf(entries));
+    this.prefetched.put(viewer, List.copyOf(entries));
   }
 
   public void clearPrefetched(@NonNull UUID viewer) {
-    prefetched.remove(viewer);
+    this.prefetched.remove(viewer);
   }
 
   @Override
@@ -53,7 +53,7 @@ public final class HomesMenu implements Menu {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    var menuSpec = config.value().menu();
+    var menuSpec = this.config.value().menu();
     var rows = Math.clamp(menuSpec.rows(), MIN_ROWS, MAX_ROWS);
     var title = ComponentUtils.mini(menuSpec.title());
     var contentSlots = MenuContentSlots.allRows(rows);
@@ -69,12 +69,12 @@ public final class HomesMenu implements Menu {
         .register();
   }
 
-  private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
+  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var uuid = player.getUniqueId();
-    var entries = prefetched.remove(uuid);
+    var entries = this.prefetched.remove(uuid);
 
     if (entries == null) {
-      entries = service.list(uuid);
+      entries = this.service.list(uuid);
     }
 
     var slots = new ArrayList<SlotDefinition>(entries.size());
@@ -82,9 +82,9 @@ public final class HomesMenu implements Menu {
     for (var i = 0; i < entries.size(); i++) {
       var home = entries.get(i);
       var humanIndex = i + 1;
-      var template = renderer.render(home, humanIndex);
+      var template = this.renderer.render(home, humanIndex);
 
-      slots.add(SlotDefinition.of(-1, template, click -> clickHandler.handle(click, home)));
+      slots.add(SlotDefinition.of(-1, template, click -> this.clickHandler.handle(click, home)));
     }
 
     return slots;

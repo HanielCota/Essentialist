@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("back")
@@ -25,15 +26,15 @@ public record BackCommand(
     ConfigHandle<BackConfig> config, TeleportHistory history, MenuService menus, BackMenu menu) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var entries = history.list(sender.getUniqueId());
+    var entries = this.history.list(sender.getUniqueId());
     if (entries.isEmpty()) {
-      actor.sendError(config.value().noBack());
+      actor.sendError(this.config.value().noBack());
       return;
     }
 
-    menu.prefetch(sender.getUniqueId(), entries);
-    menus.open(sender, BackMenu.ID);
+    this.menu.prefetch(sender.getUniqueId(), entries);
+    this.menus.open(sender, BackMenu.ID);
   }
 }

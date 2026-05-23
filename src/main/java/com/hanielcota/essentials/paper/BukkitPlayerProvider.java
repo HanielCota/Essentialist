@@ -17,7 +17,7 @@ public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerPro
 
   @Override
   public Optional<Player> online(@NonNull UUID id) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var player = server.getPlayer(id);
 
     return Optional.ofNullable(player);
@@ -25,7 +25,7 @@ public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerPro
 
   @Override
   public Optional<Player> online(@NonNull String name) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var player = server.getPlayerExact(name);
 
     return Optional.ofNullable(player);
@@ -33,13 +33,13 @@ public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerPro
 
   @Override
   public OfflinePlayer offline(@NonNull UUID id) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     return server.getOfflinePlayer(id);
   }
 
   @Override
   public Optional<OfflinePlayer> offlineByName(@NonNull String name) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var current = server.getPlayerExact(name);
 
     if (current != null) {
@@ -52,7 +52,7 @@ public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerPro
 
   @Override
   public Collection<Player> all() {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var onlinePlayers = server.getOnlinePlayers();
 
     return List.copyOf(onlinePlayers);

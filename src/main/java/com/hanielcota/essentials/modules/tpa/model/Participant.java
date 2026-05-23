@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.model;
 
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 /**
@@ -12,7 +13,7 @@ import org.bukkit.entity.Player;
 public record Participant(UUID id, String name) {
 
   /** Snapshots an online player as a participant. */
-  public static Participant of(Player player) {
+  public static Participant of(@NonNull Player player) {
     return new Participant(player.getUniqueId(), player.getName());
   }
 }

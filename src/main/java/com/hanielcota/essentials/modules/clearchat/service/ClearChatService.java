@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.clearchat.service;
 
 import com.hanielcota.essentials.util.ComponentUtils;
+import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 
@@ -10,7 +11,7 @@ public final class ClearChatService {
   // rendered as a chat line by the client, which would leave the chat un-flushed.
   private static final Component BLANK_LINE = Component.space();
 
-  public void clearChat(int lines, String announcement) {
+  public void clearChat(int lines, @NonNull String announcement) {
     var message = ComponentUtils.mini(announcement);
 
     for (var player : Bukkit.getOnlinePlayers()) {

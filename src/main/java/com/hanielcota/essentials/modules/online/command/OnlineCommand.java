@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 
 @Command("online")
 @Permission("essentials.online")
@@ -19,7 +20,8 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 public record OnlineCommand(ConfigHandle<OnlineConfig> config, OnlineService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
-    actor.sendMessage(config.value().format(service.onlineCount(), service.maxPlayers()));
+  public void execute(@NonNull CommandActor actor) {
+    actor.sendMessage(
+        this.config.value().format(this.service.onlineCount(), this.service.maxPlayers()));
   }
 }

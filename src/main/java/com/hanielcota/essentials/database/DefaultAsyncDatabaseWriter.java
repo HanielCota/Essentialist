@@ -41,38 +41,39 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   @Override
   public void submit(@NonNull String operation, @NonNull Runnable work) {
     try {
-      executor.execute(
+      this.executor.execute(
           () -> {
             try {
               work.run();
             } catch (RuntimeException e) {
-              LOG.warn(e, "{} async {} failed", threadName, operation);
+              LOG.warn(e, "{} async {} failed", this.threadName, operation);
             }
           });
     } catch (RejectedExecutionException _) {
-      LOG.warn("{} rejected {} (shutting down?)", threadName, operation);
+      LOG.warn("{} rejected {} (shutting down?)", this.threadName, operation);
     }
   }
 
   @Override
   public void close() {
-    executor.shutdown();
+    this.executor.shutdown();
 
     try {
       var timeout = DRAIN_TIMEOUT_SECONDS;
       var unit = TimeUnit.SECONDS;
 
-      if (executor.awaitTermination(timeout, unit)) {
+      if (this.executor.awaitTermination(timeout, unit)) {
         return;
       }
 
-      var droppedTasks = executor.shutdownNow();
+      var droppedTasks = this.executor.shutdownNow();
       var droppedCount = droppedTasks.size();
 
-      LOG.warn("{} did not drain in {}s; {} write(s) dropped", threadName, timeout, droppedCount);
+      LOG.warn(
+          "{} did not drain in {}s; {} write(s) dropped", this.threadName, timeout, droppedCount);
 
     } catch (InterruptedException _) {
-      executor.shutdownNow();
+      this.executor.shutdownNow();
 
       var currentThread = Thread.currentThread();
       currentThread.interrupt();

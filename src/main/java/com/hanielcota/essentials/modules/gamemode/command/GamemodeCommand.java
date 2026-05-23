@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
@@ -31,18 +32,18 @@ public record GamemodeCommand(
 
   @DefaultSubcommand
   public void execute(
-      CommandActor sender, @Arg("modo") GameMode mode, @TargetOrSelf Player subject) {
-    var snap = config.value();
+      @NonNull CommandActor sender, @Arg("modo") GameMode mode, @TargetOrSelf Player subject) {
+    var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
-    if (service.apply(subject, mode) == GamemodeService.Result.ALREADY_IN_MODE) {
+    if (this.service.apply(subject, mode) == GamemodeService.Result.ALREADY_IN_MODE) {
       sender.sendError(snap.whenAlreadyInMode(mode).forSender(self, name));
       return;
     }
 
     var messages = snap.whenUpdated(mode);
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
     var selfMessage = messages.forSender(self, name);
 
     sender.sendDualMessage(target, selfMessage, messages.forTarget(name));

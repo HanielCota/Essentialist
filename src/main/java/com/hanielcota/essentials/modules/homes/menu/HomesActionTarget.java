@@ -16,14 +16,14 @@ public final class HomesActionTarget {
   private final ConcurrentHashMap<UUID, String> targets = new ConcurrentHashMap<>();
 
   public void set(@NonNull UUID player, @NonNull String homeName) {
-    targets.put(player, homeName);
+    this.targets.put(player, homeName);
   }
 
   public String consume(@NonNull UUID player) {
-    return targets.remove(player);
+    return this.targets.remove(player);
   }
 
   public void clear(@NonNull UUID player) {
-    targets.remove(player);
+    this.targets.remove(player);
   }
 }

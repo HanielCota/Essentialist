@@ -6,6 +6,7 @@ import com.hanielcota.essentials.util.ItemStacks;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -13,7 +14,8 @@ import org.bukkit.inventory.ItemStack;
 
 public record CompactService(ConfigHandle<CompactConfig> config) {
 
-  private static Map<Material, Integer> countByMaterial(Inventory inv, Set<Material> wanted) {
+  private static Map<Material, Integer> countByMaterial(
+      @NonNull Inventory inv, @NonNull Set<Material> wanted) {
     Map<Material, Integer> totals = new EnumMap<>(Material.class);
     for (var slot = 0; slot < inv.getSize(); slot++) {
       var item = inv.getItem(slot);
@@ -24,7 +26,8 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
     return totals;
   }
 
-  private static void removeFromInventory(Inventory inv, Material material, int amount) {
+  private static void removeFromInventory(
+      @NonNull Inventory inv, @NonNull Material material, int amount) {
     var remaining = amount;
     for (var slot = 0; slot < inv.getSize() && remaining > 0; slot++) {
       var item = inv.getItem(slot);
@@ -43,8 +46,8 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
     }
   }
 
-  public int compact(Player player) {
-    var recipes = config.value().recipes();
+  public int compact(@NonNull Player player) {
+    var recipes = this.config.value().recipes();
     var inv = player.getInventory();
     var totals = countByMaterial(inv, recipes.keySet());
 

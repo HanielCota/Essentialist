@@ -46,9 +46,9 @@ public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var messages = config.value().messages();
+    var messages = this.config.value().messages();
 
-    var warps = service.listVisibleTo(sender);
+    var warps = this.service.listVisibleTo(sender);
     if (warps.isEmpty()) {
       actor.sendError(messages.noWarps());
       return;

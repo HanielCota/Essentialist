@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.speed.service;
 
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 public final class SpeedService {
@@ -13,7 +14,7 @@ public final class SpeedService {
     return value < MIN_SPEED || value > MAX_SPEED;
   }
 
-  public boolean setWalkSpeed(Player player, int value) {
+  public boolean setWalkSpeed(@NonNull Player player, int value) {
     if (isOutOfRange(value)) {
       return false;
     }
@@ -22,7 +23,7 @@ public final class SpeedService {
     return true;
   }
 
-  public boolean setFlySpeed(Player player, int value) {
+  public boolean setFlySpeed(@NonNull Player player, int value) {
     if (isOutOfRange(value)) {
       return false;
     }
@@ -32,7 +33,7 @@ public final class SpeedService {
   }
 
   /** Restores walk and fly speed to the Minecraft defaults. */
-  public void reset(Player player) {
+  public void reset(@NonNull Player player) {
     player.setWalkSpeed(DEFAULT_WALK_SPEED);
     player.setFlySpeed(DEFAULT_FLY_SPEED);
   }

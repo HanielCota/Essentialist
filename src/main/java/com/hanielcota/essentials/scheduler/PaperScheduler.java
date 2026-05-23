@@ -20,20 +20,20 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
 
   @Override
   public void runSync(@NonNull Runnable task) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var scheduler = server.getGlobalRegionScheduler();
     var adaptedTask = adapt(task);
 
-    scheduler.run(plugin, adaptedTask);
+    scheduler.run(this.plugin, adaptedTask);
   }
 
   @Override
   public void runAsync(@NonNull Runnable task) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var scheduler = server.getAsyncScheduler();
     var adaptedTask = adapt(task);
 
-    scheduler.runNow(plugin, adaptedTask);
+    scheduler.runNow(this.plugin, adaptedTask);
   }
 
   @Override
@@ -41,7 +41,7 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
     var scheduler = entity.getScheduler();
     var adaptedTask = adapt(task);
 
-    scheduler.run(plugin, adaptedTask, null);
+    scheduler.run(this.plugin, adaptedTask, null);
   }
 
   @Override
@@ -51,7 +51,7 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
     var adaptedTask = adapt(task);
     var ticksDelay = Ticks.fromDuration(delay);
 
-    var handle = scheduler.runDelayed(plugin, adaptedTask, null, ticksDelay);
+    var handle = scheduler.runDelayed(this.plugin, adaptedTask, null, ticksDelay);
     if (handle == null) {
       return Task.noop();
     }
@@ -61,46 +61,46 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
 
   @Override
   public Task runLater(@NonNull Runnable task, @NonNull Duration delay) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var scheduler = server.getGlobalRegionScheduler();
     var adaptedTask = adapt(task);
     var ticksDelay = Ticks.fromDuration(delay);
 
-    var handle = scheduler.runDelayed(plugin, adaptedTask, ticksDelay);
+    var handle = scheduler.runDelayed(this.plugin, adaptedTask, ticksDelay);
     return new ScheduledTaskHandle(handle);
   }
 
   @Override
   public Task runTimer(
       @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var scheduler = server.getGlobalRegionScheduler();
     var adaptedTask = adapt(task);
 
     var ticksInitialDelay = Ticks.fromDuration(initialDelay);
     var ticksPeriod = Ticks.fromDuration(period);
 
-    var handle = scheduler.runAtFixedRate(plugin, adaptedTask, ticksInitialDelay, ticksPeriod);
+    var handle = scheduler.runAtFixedRate(this.plugin, adaptedTask, ticksInitialDelay, ticksPeriod);
     return new ScheduledTaskHandle(handle);
   }
 
   @Override
   public Task runAsyncLater(@NonNull Runnable task, @NonNull Duration delay) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var scheduler = server.getAsyncScheduler();
     var adaptedTask = adapt(task);
 
     var millisDelay = Math.max(0L, delay.toMillis());
     var timeUnit = TimeUnit.MILLISECONDS;
 
-    var handle = scheduler.runDelayed(plugin, adaptedTask, millisDelay, timeUnit);
+    var handle = scheduler.runDelayed(this.plugin, adaptedTask, millisDelay, timeUnit);
     return new ScheduledTaskHandle(handle);
   }
 
   @Override
   public Task runAsyncTimer(
       @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var scheduler = server.getAsyncScheduler();
     var adaptedTask = adapt(task);
 
@@ -109,7 +109,8 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
     var timeUnit = TimeUnit.MILLISECONDS;
 
     var handle =
-        scheduler.runAtFixedRate(plugin, adaptedTask, millisInitialDelay, millisPeriod, timeUnit);
+        scheduler.runAtFixedRate(
+            this.plugin, adaptedTask, millisInitialDelay, millisPeriod, timeUnit);
     return new ScheduledTaskHandle(handle);
   }
 }

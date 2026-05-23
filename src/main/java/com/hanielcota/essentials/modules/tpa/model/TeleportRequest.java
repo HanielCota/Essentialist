@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.tpa.model;
 
 import java.time.Duration;
 import java.time.Instant;
+import lombok.NonNull;
 
 /**
  * An active teleport request held in memory while pending.
@@ -19,13 +20,16 @@ public record TeleportRequest(
 
   /** Opens a fresh request between two participants, lasting {@code lifetime}. */
   public static TeleportRequest open(
-      Participant requester, Participant target, TeleportRequestType type, Duration lifetime) {
+      @NonNull Participant requester,
+      @NonNull Participant target,
+      @NonNull TeleportRequestType type,
+      @NonNull Duration lifetime) {
     return new TeleportRequest(
         RequestId.random(), requester, target, type, RequestWindow.startingNow(lifetime));
   }
 
   /** Whether this request has lapsed by {@code now}. */
-  public boolean isExpired(Instant now) {
-    return window.hasExpired(now);
+  public boolean isExpired(@NonNull Instant now) {
+    return this.window.hasExpired(now);
   }
 }

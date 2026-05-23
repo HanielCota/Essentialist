@@ -13,10 +13,10 @@ import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.jspecify.annotations.NonNull;
 
 @RequiredArgsConstructor
 public final class WhitelistMenu implements Menu {
@@ -46,7 +46,7 @@ public final class WhitelistMenu implements Menu {
     return slots;
   }
 
-  private static ItemTemplate pageButton(String name) {
+  private static ItemTemplate pageButton(@NonNull String name) {
     return ItemTemplate.builder(Material.ARROW).name(name).italic(false).build();
   }
 
@@ -57,7 +57,7 @@ public final class WhitelistMenu implements Menu {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    var snap = config.value();
+    var snap = this.config.value();
     var rows = snap.effectiveRows();
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(rows)).build();
 
@@ -80,15 +80,15 @@ public final class WhitelistMenu implements Menu {
     builder.build().register();
   }
 
-  private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
-    var whitelisted = service.list();
+  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
+    var whitelisted = this.service.list();
     if (whitelisted.isEmpty()) {
       return emptyState();
     }
     var slots = new ArrayList<SlotDefinition>(whitelisted.size());
     for (var entry : whitelisted) {
-      var template = renderer.render(entry);
-      slots.add(SlotDefinition.of(-1, template, click -> clickHandler.handle(click, entry)));
+      var template = this.renderer.render(entry);
+      slots.add(SlotDefinition.of(-1, template, click -> this.clickHandler.handle(click, entry)));
     }
     return slots;
   }
@@ -99,14 +99,14 @@ public final class WhitelistMenu implements Menu {
    * #SKIP} entries that consume the leading indices without rendering anything.
    */
   private List<SlotDefinition> emptyState() {
-    var contentRows = contentSlots(config.value().effectiveRows()).size() / SLOTS_PER_ROW;
+    var contentRows = contentSlots(this.config.value().effectiveRows()).size() / SLOTS_PER_ROW;
     var centerSlot = (contentRows / 2) * SLOTS_PER_ROW + SLOTS_PER_ROW / 2;
 
     var slots = new ArrayList<SlotDefinition>(centerSlot + 1);
     for (var i = 0; i < centerSlot; i++) {
       slots.add(SKIP);
     }
-    slots.add(SlotDefinition.of(-1, renderer.renderEmpty(), click -> {}));
+    slots.add(SlotDefinition.of(-1, this.renderer.renderEmpty(), click -> {}));
     return slots;
   }
 }

@@ -32,7 +32,7 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
 
   @Override
   public void prompt(@NonNull Player player, @NonNull String homeName) {
-    var snap = config.value();
+    var snap = this.config.value();
     var timeout = snap.renameTimeout();
     var seconds = timeout.toSeconds();
     var uuid = player.getUniqueId();
@@ -40,16 +40,17 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
     var timeoutTask =
         timeout.isZero() || timeout.isNegative()
             ? Task.noop()
-            : scheduler.runOnEntityLater(player, () -> handleTimeout(player, seconds), timeout);
+            : this.scheduler.runOnEntityLater(
+                player, () -> handleTimeout(player, seconds), timeout);
 
-    sessions.start(uuid, homeName, timeoutTask);
+    this.sessions.start(uuid, homeName, timeoutTask);
 
     var promptMsg = HomeRenameMessages.prompt(snap.messages(), homeName, seconds);
     player.sendMessage(ComponentUtils.mini(promptMsg));
   }
 
   public void handleInput(@NonNull Player player, @NonNull String oldName, @NonNull String input) {
-    var messages = config.value().messages();
+    var messages = this.config.value().messages();
     var uuid = player.getUniqueId();
 
     if (isCancel(input)) {
@@ -57,12 +58,12 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
       return;
     }
 
-    if (!validator.isValid(input)) {
+    if (!this.validator.isValid(input)) {
       player.sendMessage(ComponentUtils.mini(messages.invalidName()));
       return;
     }
 
-    var result = service.rename(uuid, oldName, input);
+    var result = this.service.rename(uuid, oldName, input);
     var resultMsg = HomeRenameMessages.result(messages, oldName, input, result);
 
     player.sendMessage(ComponentUtils.mini(resultMsg));
@@ -70,13 +71,13 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
 
   public void handleTimeout(@NonNull Player player, long seconds) {
     var uuid = player.getUniqueId();
-    var session = sessions.consume(uuid);
+    var session = this.sessions.consume(uuid);
 
     if (session == null || !player.isOnline()) {
       return;
     }
 
-    var line = HomeRenameMessages.timeout(config.value().messages(), seconds);
+    var line = HomeRenameMessages.timeout(this.config.value().messages(), seconds);
     player.sendMessage(ComponentUtils.mini(line));
   }
 }

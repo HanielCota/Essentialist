@@ -14,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.stream.Collectors;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("near")
@@ -25,9 +26,9 @@ import org.bukkit.entity.Player;
 public record NearCommand(ConfigHandle<NearConfig> config, NearService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @DefaultValue("-1") @Arg("raio") int raio) {
+  public void execute(@NonNull CommandActor actor, @DefaultValue("-1") @Arg("raio") int raio) {
     Player player = actor.unwrap(Player.class);
-    var snap = config.value();
+    var snap = this.config.value();
 
     int radius = raio < 0 ? snap.defaultRadius() : raio;
     if (radius < 1 || radius > snap.maxRadius()) {
@@ -35,7 +36,7 @@ public record NearCommand(ConfigHandle<NearConfig> config, NearService service) 
       return;
     }
 
-    var nearby = service.findNearby(player, radius);
+    var nearby = this.service.findNearby(player, radius);
     if (nearby.isEmpty()) {
       actor.sendMessage(snap.formatNone(radius));
       return;

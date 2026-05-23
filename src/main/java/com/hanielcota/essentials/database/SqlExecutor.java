@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import lombok.NonNull;
 
 /**
  * Interface defining common SQL execution patterns.
@@ -23,7 +24,8 @@ public interface SqlExecutor {
    * @param <T> the row type
    * @return a list of mapped results, excluding null values
    */
-  <T> List<T> query(String sql, StatementBinder binder, ResultMapper<T> mapper);
+  <T> List<T> query(
+      @NonNull String sql, @NonNull StatementBinder binder, @NonNull ResultMapper<T> mapper);
 
   /**
    * Positional-parameter variant of query.
@@ -34,7 +36,8 @@ public interface SqlExecutor {
    * @param <T> the row type
    * @return a list of mapped results, excluding null values
    */
-  default <T> List<T> query(String sql, ResultMapper<T> mapper, Object... params) {
+  default <T> List<T> query(
+      @NonNull String sql, @NonNull ResultMapper<T> mapper, @NonNull Object... params) {
     return query(
         sql,
         stmt -> {
@@ -51,7 +54,7 @@ public interface SqlExecutor {
    * @param sql the update SQL
    * @param binder statement parameter binder
    */
-  void update(String sql, StatementBinder binder);
+  void update(@NonNull String sql, @NonNull StatementBinder binder);
 
   /**
    * Executes an update and returns the number of affected rows.
@@ -60,7 +63,7 @@ public interface SqlExecutor {
    * @param binder statement parameter binder
    * @return affected row count
    */
-  int updateCount(String sql, StatementBinder binder);
+  int updateCount(@NonNull String sql, @NonNull StatementBinder binder);
 
   /**
    * Positional-parameter variant of update.
@@ -68,7 +71,7 @@ public interface SqlExecutor {
    * @param sql the update SQL
    * @param params update parameters
    */
-  default void update(String sql, Object... params) {
+  default void update(@NonNull String sql, @NonNull Object... params) {
     updateCount(sql, params);
   }
 
@@ -79,7 +82,7 @@ public interface SqlExecutor {
    * @param params update parameters
    * @return affected row count
    */
-  default int updateCount(String sql, Object... params) {
+  default int updateCount(@NonNull String sql, @NonNull Object... params) {
     return updateCount(
         sql,
         stmt -> {
@@ -99,26 +102,27 @@ public interface SqlExecutor {
    * @return number of affected rows
    * @throws SQLException if a database access error occurs
    */
-  int execute(Connection conn, String sql, Object... params) throws SQLException;
+  int execute(@NonNull Connection conn, @NonNull String sql, @NonNull Object... params)
+      throws SQLException;
 
   /**
    * Runs a block of operations within a transaction.
    *
    * @param work the transactional block to run
    */
-  void tx(TxBlock work);
+  void tx(@NonNull TxBlock work);
 
   /**
    * Executes DDL statements.
    *
    * @param statements the DDL statements to run
    */
-  void ddl(String... statements);
+  void ddl(@NonNull String... statements);
 
   /** Functional interface for binding parameters to a PreparedStatement. */
   @FunctionalInterface
   interface StatementBinder {
-    void bind(PreparedStatement stmt) throws SQLException;
+    void bind(@NonNull PreparedStatement stmt) throws SQLException;
   }
 
   /**
@@ -128,12 +132,12 @@ public interface SqlExecutor {
    */
   @FunctionalInterface
   interface ResultMapper<T> {
-    T map(ResultSet rs) throws SQLException;
+    T map(@NonNull ResultSet rs) throws SQLException;
   }
 
   /** Functional interface representing a block of work to be run in a database transaction. */
   @FunctionalInterface
   interface TxBlock {
-    void run(Connection conn) throws SQLException;
+    void run(@NonNull Connection conn) throws SQLException;
   }
 }

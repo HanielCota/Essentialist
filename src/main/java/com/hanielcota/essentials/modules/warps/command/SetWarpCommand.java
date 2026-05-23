@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("setwarp")
@@ -23,12 +24,12 @@ import org.bukkit.entity.Player;
 public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @Arg("nome") String name) {
+  public void execute(@NonNull CommandActor actor, @Arg("nome") String name) {
     var sender = actor.unwrap(Player.class);
-    var messages = config.value().messages();
-    var existed = service.find(name).isPresent();
+    var messages = this.config.value().messages();
+    var existed = this.service.find(name).isPresent();
 
-    service.save(name, sender);
+    this.service.save(name, sender);
     var template = existed ? messages.warpUpdated() : messages.warpSet();
     actor.sendSuccess(template.replace("{name}", name));
   }

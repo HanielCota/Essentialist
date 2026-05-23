@@ -37,7 +37,7 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
 
     if (type.isShiftClick()) {
       click.close();
-      rename.prompt(player, homeName);
+      this.rename.prompt(player, homeName);
       return;
     }
 
@@ -53,18 +53,22 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
 
     click.close();
 
-    var actor = framework.actorOf(player);
-    teleporter.teleport(player, home, actor);
+    var actor = this.framework.actorOf(player);
+    this.teleporter.teleport(player, home, actor);
   }
 
-  private void openSubMenuFor(ClickContext click, String homeName, String menuId, boolean delay) {
+  private void openSubMenuFor(
+      @NonNull ClickContext click,
+      @NonNull String homeName,
+      @NonNull String menuId,
+      boolean delay) {
     var player = click.player();
     var uuid = player.getUniqueId();
 
-    target.set(uuid, homeName);
+    this.target.set(uuid, homeName);
 
     if (delay) {
-      scheduler.runOnEntityLater(player, () -> click.open(menuId), SUBMENU_OPEN_DELAY);
+      this.scheduler.runOnEntityLater(player, () -> click.open(menuId), SUBMENU_OPEN_DELAY);
       return;
     }
 

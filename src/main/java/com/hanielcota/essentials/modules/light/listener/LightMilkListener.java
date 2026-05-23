@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.light.listener;
 
 import com.hanielcota.essentials.modules.light.service.LightService;
 import com.hanielcota.essentials.scheduler.Scheduler;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -21,14 +22,14 @@ public final class LightMilkListener implements Listener {
   private final LightService service;
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onConsume(PlayerItemConsumeEvent event) {
+  public void onConsume(@NonNull PlayerItemConsumeEvent event) {
     if (event.getItem().getType() != Material.MILK_BUCKET) {
       return;
     }
     var player = event.getPlayer();
-    if (!service.isEnabled(player)) {
+    if (!this.service.isEnabled(player)) {
       return;
     }
-    scheduler.runOnEntity(player, () -> service.reapply(player));
+    this.scheduler.runOnEntity(player, () -> this.service.reapply(player));
   }
 }

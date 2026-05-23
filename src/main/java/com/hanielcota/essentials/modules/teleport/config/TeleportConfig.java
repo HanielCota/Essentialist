@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.teleport.config;
 
 import com.hanielcota.essentials.util.Numbers;
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -34,19 +35,19 @@ public record TeleportConfig(
         "<red>Those coordinates are outside the world limits.");
   }
 
-  public String formatToPlayer(String player) {
+  public String formatToPlayer(@NonNull String player) {
     return toPlayer.replace("{player}", player);
   }
 
-  public String formatTeleportedTo(String player) {
+  public String formatTeleportedTo(@NonNull String player) {
     return teleportedTo.replace("{player}", player);
   }
 
-  public String formatMoveSender(String from, String to) {
+  public String formatMoveSender(@NonNull String from, @NonNull String to) {
     return moveSender.replace("{from}", from).replace("{to}", to);
   }
 
-  public String formatMoveNotify(String sender) {
+  public String formatMoveNotify(@NonNull String sender) {
     return moveNotify.replace("{sender}", sender);
   }
 
@@ -57,11 +58,11 @@ public record TeleportConfig(
         .replace("{z}", Numbers.compact(z));
   }
 
-  public String formatBroughtPlayer(String player) {
+  public String formatBroughtPlayer(@NonNull String player) {
     return broughtPlayer.replace("{player}", player);
   }
 
-  public String formatBroughtBy(String sender) {
+  public String formatBroughtBy(@NonNull String sender) {
     return broughtBy.replace("{sender}", sender);
   }
 }

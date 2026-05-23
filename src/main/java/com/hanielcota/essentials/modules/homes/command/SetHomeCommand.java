@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("sethome")
@@ -32,24 +33,24 @@ public record SetHomeCommand(
 
   @DefaultSubcommand
   public void execute(
-      CommandActor actor,
+      @NonNull CommandActor actor,
       @DefaultValue("") @Arg("nome") String rawName,
       @DefaultValue("") @Arg("material") String rawMaterial) {
     var sender = actor.unwrap(Player.class);
-    var messages = config.value().messages();
-    var name = nameResolver.resolve(rawName);
+    var messages = this.config.value().messages();
+    var name = this.nameResolver.resolve(rawName);
     if (name == null) {
       actor.sendError(messages.invalidName());
       return;
     }
 
-    var material = materialResolver.resolve(rawMaterial);
+    var material = this.materialResolver.resolve(rawMaterial);
     if (material == null) {
       actor.sendError(messages.invalidMaterial().replace("{material}", rawMaterial));
       return;
     }
 
-    var outcome = service.save(sender, name, sender.getLocation(), material);
+    var outcome = this.service.save(sender, name, sender.getLocation(), material);
     switch (outcome) {
       case CREATED -> actor.sendSuccess(messages.homeSet().replace("{name}", name));
       case UPDATED -> actor.sendSuccess(messages.homeUpdated().replace("{name}", name));
@@ -57,10 +58,11 @@ public record SetHomeCommand(
     }
   }
 
-  private String limitReachedMessage(HomesMessages messages, String name, Player sender) {
+  private String limitReachedMessage(
+      @NonNull HomesMessages messages, @NonNull String name, @NonNull Player sender) {
     return messages
         .limitReached()
         .replace("{name}", name)
-        .replace("{limit}", Integer.toString(service.limit(sender)));
+        .replace("{limit}", Integer.toString(this.service.limit(sender)));
   }
 }

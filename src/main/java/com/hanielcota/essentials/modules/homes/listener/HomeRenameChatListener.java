@@ -19,7 +19,7 @@ public final class HomeRenameChatListener implements Listener {
   @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
   public void onChat(@NonNull AsyncChatEvent event) {
     var player = event.getPlayer();
-    var session = sessions.consume(player.getUniqueId());
+    var session = this.sessions.consume(player.getUniqueId());
 
     if (session == null) {
       return;
@@ -31,6 +31,6 @@ public final class HomeRenameChatListener implements Listener {
     var serializer = PlainTextComponentSerializer.plainText();
     var input = serializer.serialize(event.message()).strip();
 
-    rename.handleInput(player, session.homeName(), input);
+    this.rename.handleInput(player, session.homeName(), input);
   }
 }

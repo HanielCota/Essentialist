@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 
 @Command("delwarp")
 @EssentialsCommand
@@ -22,9 +23,9 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 public record DelWarpCommand(ConfigHandle<WarpsConfig> config, WarpService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @Arg("nome") String name) {
-    var messages = config.value().messages();
-    if (!service.delete(name)) {
+  public void execute(@NonNull CommandActor actor, @Arg("nome") String name) {
+    var messages = this.config.value().messages();
+    if (!this.service.delete(name)) {
       actor.sendError(messages.unknownWarp().replace("{name}", name));
       return;
     }

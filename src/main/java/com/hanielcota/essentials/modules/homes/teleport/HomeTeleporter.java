@@ -38,7 +38,7 @@ public final class HomeTeleporter {
   }
 
   public void teleport(@NonNull Player player, @NonNull Home home, @NonNull CommandActor actor) {
-    var snap = config.value();
+    var snap = this.config.value();
     var messages = snap.messages();
     var resolved = home.resolve();
 
@@ -50,11 +50,11 @@ public final class HomeTeleporter {
     var delay = snap.teleportDelay();
     var prompt = buildPrompt(actor, messages, home);
 
-    delayed.schedule(player, resolved, delay, prompt);
+    this.delayed.schedule(player, resolved, delay, prompt);
   }
 
   public void teleport(@NonNull Player player, @NonNull Home home) {
-    var actor = framework.actorOf(player);
+    var actor = this.framework.actorOf(player);
     teleport(player, home, actor);
   }
 }

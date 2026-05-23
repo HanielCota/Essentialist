@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.module;
 
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 
 public interface Module {
 
@@ -10,9 +11,9 @@ public interface Module {
     return metadata().id();
   }
 
-  default void customizeCommands(PaperCommandFramework.Builder builder) {}
+  default void customizeCommands(@NonNull PaperCommandFramework.Builder builder) {}
 
-  void enable(ModuleContext context);
+  void enable(@NonNull ModuleContext context);
 
   void disable();
 }

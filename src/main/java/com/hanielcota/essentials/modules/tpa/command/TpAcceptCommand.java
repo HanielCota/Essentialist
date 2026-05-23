@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tpaccept")
@@ -27,21 +28,21 @@ public record TpAcceptCommand(
     PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @DefaultValue("") String requester) {
-    var messages = config.value().messages();
+  public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
+    var messages = this.config.value().messages();
     var sender = actor.unwrap(Player.class);
 
-    var resolved = TpaRequests.resolveIncoming(service, sender, requester, messages, actor);
+    var resolved = TpaRequests.resolveIncoming(this.service, sender, requester, messages, actor);
     if (resolved.isEmpty()) {
       return;
     }
     var request = resolved.get();
 
-    var result = service.accept(request);
+    var result = this.service.accept(request);
     switch (result) {
       case SUCCESS -> {
         actor.sendSuccess(messages.acceptedSelf().replace("{player}", request.requester().name()));
-        TpaRequests.replyRequester(framework, request, messages.accepted(), true);
+        TpaRequests.replyRequester(this.framework, request, messages.accepted(), true);
       }
       case REQUESTER_OFFLINE ->
           actor.sendError(

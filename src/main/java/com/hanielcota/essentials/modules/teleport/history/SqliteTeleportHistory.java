@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -84,7 +85,7 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
    * com.hanielcota.essentials.database.Sql#query} filters {@code null} mappings out of the result
    * list, so a stale row produces a silently-dropped entry rather than a crash.
    */
-  private static HistoryEntry readEntry(ResultSet rs) throws SQLException {
+  private static HistoryEntry readEntry(@NonNull ResultSet rs) throws SQLException {
     var id = rs.getLong("id");
     var worldName = rs.getString("world");
     var world = Bukkit.getWorld(worldName);
@@ -102,7 +103,7 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
   }
 
   @Override
-  public void push(UUID player, Location location) {
+  public void push(@NonNull UUID player, @NonNull Location location) {
     var world = location.getWorld();
     if (world == null) {
       return;
@@ -117,33 +118,34 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     var pitch = location.getPitch();
     var createdAt = System.currentTimeMillis();
 
-    writer.submit(
+    this.writer.submit(
         "push",
         () ->
-            sqlExecutor.tx(
+            this.sqlExecutor.tx(
                 conn -> {
-                  sqlExecutor.execute(
+                  this.sqlExecutor.execute(
                       conn, INSERT, playerId, worldName, x, y, z, yaw, pitch, createdAt);
-                  sqlExecutor.execute(conn, TRIM, playerId, playerId, CAPACITY);
+                  this.sqlExecutor.execute(conn, TRIM, playerId, playerId, CAPACITY);
                 }));
   }
 
   @Override
-  public List<HistoryEntry> list(UUID player) {
-    return sqlExecutor.query(LIST, SqliteTeleportHistory::readEntry, player.toString(), CAPACITY);
+  public List<HistoryEntry> list(@NonNull UUID player) {
+    return this.sqlExecutor.query(
+        LIST, SqliteTeleportHistory::readEntry, player.toString(), CAPACITY);
   }
 
   @Override
-  public void remove(UUID player, long entryId) {
+  public void remove(@NonNull UUID player, long entryId) {
     if (entryId <= 0) {
       return;
     }
     var playerId = player.toString();
-    writer.submit("remove", () -> sqlExecutor.update(DELETE_BY_ID, entryId, playerId));
+    this.writer.submit("remove", () -> this.sqlExecutor.update(DELETE_BY_ID, entryId, playerId));
   }
 
   @Override
   public void close() {
-    writer.close();
+    this.writer.close();
   }
 }

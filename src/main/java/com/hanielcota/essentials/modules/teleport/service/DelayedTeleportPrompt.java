@@ -18,21 +18,21 @@ public record DelayedTeleportPrompt(
     if (seconds <= 0) {
       return;
     }
-    actor.sendMessage(teleporting.replace("{seconds}", Long.toString(seconds)));
+    this.actor.sendMessage(this.teleporting.replace("{seconds}", Long.toString(seconds)));
   }
 
   @Override
   public void onSuccess() {
-    actor.sendSuccess(teleported);
+    this.actor.sendSuccess(this.teleported);
   }
 
   @Override
   public void onCancelled() {
-    actor.sendError(cancelled);
+    this.actor.sendError(this.cancelled);
   }
 
   @Override
   public void onFailed() {
-    actor.sendError(failed);
+    this.actor.sendError(this.failed);
   }
 }

@@ -22,13 +22,13 @@ public final class SqliteDatabase implements DatabaseProvider {
 
   @Override
   public void connect() {
-    var current = sourceRef.get();
+    var current = this.sourceRef.get();
     if (current != null && !current.isClosed()) {
       return;
     }
 
-    synchronized (sourceRef) {
-      current = sourceRef.get();
+    synchronized (this.sourceRef) {
+      current = this.sourceRef.get();
       if (current != null && !current.isClosed()) {
         return;
       }
@@ -39,7 +39,7 @@ public final class SqliteDatabase implements DatabaseProvider {
       var zaxxerHikariLogger = Logger.getLogger("com.zaxxer.hikari");
       zaxxerHikariLogger.setLevel(Level.WARNING);
 
-      var jdbcUrl = "jdbc:sqlite:" + file;
+      var jdbcUrl = "jdbc:sqlite:" + this.file;
       var config = new HikariConfig();
 
       config.setPoolName("Essentialist-SQLite");
@@ -51,14 +51,14 @@ public final class SqliteDatabase implements DatabaseProvider {
       config.addDataSourceProperty("journal_mode", "WAL");
 
       var dataSource = new HikariDataSource(config);
-      sourceRef.set(dataSource);
+      this.sourceRef.set(dataSource);
     }
   }
 
   @Override
   public void close() {
-    synchronized (sourceRef) {
-      var current = sourceRef.getAndSet(null);
+    synchronized (this.sourceRef) {
+      var current = this.sourceRef.getAndSet(null);
       if (current == null) {
         return;
       }
@@ -69,7 +69,7 @@ public final class SqliteDatabase implements DatabaseProvider {
 
   @Override
   public Connection getConnection() throws SQLException {
-    var current = sourceRef.get();
+    var current = this.sourceRef.get();
 
     if (current == null || current.isClosed()) {
       throw new SQLException("Database is not connected");

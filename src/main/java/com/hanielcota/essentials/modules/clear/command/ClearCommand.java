@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command(value = "limpar", aliases = "clear")
@@ -28,9 +29,9 @@ public record ClearCommand(
     ConfigHandle<ClearConfig> config, ClearService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    var snap = config.value();
-    var removed = service.clear(subject, snap.clearArmor());
+  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    var snap = this.config.value();
+    var removed = this.service.clear(subject, snap.clearArmor());
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
@@ -41,7 +42,7 @@ public record ClearCommand(
 
     var messages = snap.whenCleared();
     var count = Integer.toString(removed);
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
     var selfMessage = messages.forSender(self, name).replace("{count}", count);
     var targetMessage = messages.forTarget(name).replace("{count}", count);
 

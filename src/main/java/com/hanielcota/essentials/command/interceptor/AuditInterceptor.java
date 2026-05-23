@@ -48,7 +48,7 @@ public final class AuditInterceptor implements RichCommandInterceptor {
     return CommandResult.success();
   }
 
-  private String simplifyValue(Object value) {
+  private String simplifyValue(@NonNull Object value) {
     if (value == null) {
       return "null";
     }

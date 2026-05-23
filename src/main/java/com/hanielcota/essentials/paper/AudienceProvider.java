@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.paper;
 
 import java.util.UUID;
+import lombok.NonNull;
 import net.kyori.adventure.audience.Audience;
 
 public interface AudienceProvider {
@@ -9,5 +10,5 @@ public interface AudienceProvider {
 
   Audience broadcast();
 
-  Audience player(UUID id);
+  Audience player(@NonNull UUID id);
 }

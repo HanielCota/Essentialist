@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tpacancel")
@@ -22,18 +23,18 @@ import org.bukkit.entity.Player;
 public record TpCancelCommand(ConfigHandle<TpaConfig> config, TeleportRequestService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
-    var messages = config.value().messages();
+  public void execute(@NonNull CommandActor actor) {
+    var messages = this.config.value().messages();
     var sender = actor.unwrap(Player.class);
 
-    var pending = service.outgoing(sender.getUniqueId());
+    var pending = this.service.outgoing(sender.getUniqueId());
     if (pending.isEmpty()) {
       actor.sendError(messages.noOutgoing());
       return;
     }
 
     var request = pending.get();
-    service.cancel(request);
+    this.service.cancel(request);
     actor.sendSuccess(messages.cancelled().replace("{player}", request.target().name()));
   }
 }

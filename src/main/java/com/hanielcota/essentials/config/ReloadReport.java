@@ -10,10 +10,10 @@ public record ReloadReport(int total, Map<String, String> failures) {
   }
 
   public int succeeded() {
-    return total - failures.size();
+    return this.total - this.failures.size();
   }
 
   public List<String> failedNames() {
-    return List.copyOf(failures.keySet());
+    return List.copyOf(this.failures.keySet());
   }
 }

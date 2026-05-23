@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.essentials.config;
 
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -20,7 +21,7 @@ public record EssentialsConfig(
     return reloadSuccess.replace("{count}", String.valueOf(count));
   }
 
-  public String formatFailure(int succeeded, int total, String failed) {
+  public String formatFailure(int succeeded, int total, @NonNull String failed) {
     return reloadFailure
         .replace("{succeeded}", String.valueOf(succeeded))
         .replace("{total}", String.valueOf(total))

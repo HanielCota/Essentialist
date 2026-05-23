@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tpahere")
@@ -24,9 +25,14 @@ import org.bukkit.entity.Player;
 public record TpaHereCommand(ConfigHandle<TpaConfig> config, TeleportRequestService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @OnlinePlayer Player target) {
-    var messages = config.value().messages();
+  public void execute(@NonNull CommandActor actor, @OnlinePlayer @NonNull Player target) {
+    var messages = this.config.value().messages();
     TpaRequests.send(
-        service, messages, actor, target, TeleportRequestType.TPAHERE, messages.requestSentHere());
+        this.service,
+        messages,
+        actor,
+        target,
+        TeleportRequestType.TPAHERE,
+        messages.requestSentHere());
   }
 }

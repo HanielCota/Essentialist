@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.Optional;
+import lombok.NonNull;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 
@@ -29,8 +30,8 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
 
   @DefaultSubcommand
   public void execute(
-      CommandActor sender, @DefaultValue("") @GreedyString @Arg("nome") String nome) {
-    var snap = config.value();
+      @NonNull CommandActor sender, @DefaultValue("") @GreedyString @Arg("nome") String nome) {
+    var snap = this.config.value();
     var player = sender.unwrap(Player.class);
     var trimmed = nome.strip();
 
@@ -41,7 +42,7 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
             .map(component -> component.decoration(TextDecoration.ITALIC, false))
             .orElse(null);
 
-    var result = service.rename(player, nameComponent);
+    var result = this.service.rename(player, nameComponent);
 
     switch (result) {
       case RENAMED -> sender.sendSuccess(snap.formatRenamed(trimmed));

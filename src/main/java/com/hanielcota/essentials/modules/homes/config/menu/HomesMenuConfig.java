@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.config.menu;
 
 import com.hanielcota.essentials.util.Numbers;
 import java.util.List;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -90,11 +91,11 @@ public record HomesMenuConfig(
             Material.SHIELD));
   }
 
-  public String formatItemName(String name) {
+  public String formatItemName(@NonNull String name) {
     return itemName.replace("{name}", name);
   }
 
-  public String[] renderItemLore(String world, double x, double y, double z) {
+  public String[] renderItemLore(@NonNull String world, double x, double y, double z) {
     var xStr = Numbers.compact(x);
     var yStr = Numbers.compact(y);
     var zStr = Numbers.compact(z);
@@ -112,7 +113,7 @@ public record HomesMenuConfig(
     return rendered;
   }
 
-  public String formatPickerTitle(String homeName) {
+  public String formatPickerTitle(@NonNull String homeName) {
     return pickerTitle.replace("{name}", homeName);
   }
 

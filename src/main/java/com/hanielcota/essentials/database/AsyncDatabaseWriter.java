@@ -1,5 +1,7 @@
 package com.hanielcota.essentials.database;
 
+import lombok.NonNull;
+
 /**
  * Interface for off-thread execution of database mutations.
  *
@@ -14,7 +16,7 @@ public interface AsyncDatabaseWriter extends AutoCloseable {
    * @param operation the name of the operation for logging context
    * @param work the task to run
    */
-  void submit(String operation, Runnable work);
+  void submit(@NonNull String operation, @NonNull Runnable work);
 
   @Override
   void close();

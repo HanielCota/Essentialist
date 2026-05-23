@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("spawn")
@@ -25,11 +26,11 @@ public record SpawnCommand(
     ConfigHandle<SpawnConfig> config, SpawnService service, DelayedTeleport delayed) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
-    var snap = config.value();
+  public void execute(@NonNull CommandActor actor) {
+    var snap = this.config.value();
     var messages = snap.messages();
 
-    var current = service.current();
+    var current = this.service.current();
     if (current.isEmpty()) {
       actor.sendError(messages.noSpawn());
       return;
@@ -42,7 +43,7 @@ public record SpawnCommand(
     }
 
     Player sender = actor.unwrap(Player.class);
-    delayed.schedule(
+    this.delayed.schedule(
         sender,
         resolved.get(),
         snap.teleportDelay(),

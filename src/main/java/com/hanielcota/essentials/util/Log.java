@@ -46,38 +46,38 @@ public final class Log {
     return sb.toString();
   }
 
-  public void info(@NonNull String pattern, Object... args) {
-    if (jul.isLoggable(Level.INFO)) {
+  public void info(@NonNull String pattern, @NonNull Object... args) {
+    if (this.jul.isLoggable(Level.INFO)) {
       var formattedMessage = format(pattern, args);
-      jul.info(formattedMessage);
+      this.jul.info(formattedMessage);
     }
   }
 
-  public void warn(@NonNull String pattern, Object... args) {
-    if (jul.isLoggable(Level.WARNING)) {
+  public void warn(@NonNull String pattern, @NonNull Object... args) {
+    if (this.jul.isLoggable(Level.WARNING)) {
       var formattedMessage = format(pattern, args);
-      jul.warning(formattedMessage);
+      this.jul.warning(formattedMessage);
     }
   }
 
-  public void warn(@NonNull Throwable thrown, @NonNull String pattern, Object... args) {
-    if (jul.isLoggable(Level.WARNING)) {
+  public void warn(@NonNull Throwable thrown, @NonNull String pattern, @NonNull Object... args) {
+    if (this.jul.isLoggable(Level.WARNING)) {
       var formattedMessage = format(pattern, args);
-      jul.log(Level.WARNING, formattedMessage, thrown);
+      this.jul.log(Level.WARNING, formattedMessage, thrown);
     }
   }
 
-  public void error(@NonNull String pattern, Object... args) {
-    if (jul.isLoggable(Level.SEVERE)) {
+  public void error(@NonNull String pattern, @NonNull Object... args) {
+    if (this.jul.isLoggable(Level.SEVERE)) {
       var formattedMessage = format(pattern, args);
-      jul.severe(formattedMessage);
+      this.jul.severe(formattedMessage);
     }
   }
 
-  public void error(@NonNull Throwable thrown, @NonNull String pattern, Object... args) {
-    if (jul.isLoggable(Level.SEVERE)) {
+  public void error(@NonNull Throwable thrown, @NonNull String pattern, @NonNull Object... args) {
+    if (this.jul.isLoggable(Level.SEVERE)) {
       var formattedMessage = format(pattern, args);
-      jul.log(Level.SEVERE, formattedMessage, thrown);
+      this.jul.log(Level.SEVERE, formattedMessage, thrown);
     }
   }
 }

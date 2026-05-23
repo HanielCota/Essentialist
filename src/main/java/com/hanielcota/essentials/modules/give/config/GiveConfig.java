@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.give.config;
 
 import com.hanielcota.essentials.config.MessagePair;
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -54,7 +55,7 @@ public record GiveConfig(
     return amountTooLarge.replace("{max}", Integer.toString(maxAmount));
   }
 
-  public String formatGivenAll(String item, int amount, int count) {
+  public String formatGivenAll(@NonNull String item, int amount, int count) {
     return givenAll
         .replace("{amount}", Integer.toString(amount))
         .replace("{item}", item)

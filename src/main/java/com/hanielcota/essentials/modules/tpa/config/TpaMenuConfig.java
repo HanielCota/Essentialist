@@ -4,6 +4,7 @@ import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -62,11 +63,11 @@ public record TpaMenuConfig(
     }
   }
 
-  public String formatItemName(int humanIndex, String target) {
+  public String formatItemName(int humanIndex, @NonNull String target) {
     return itemName.replace("{index}", Integer.toString(humanIndex)).replace("{target}", target);
   }
 
-  public String statusLabel(TeleportRequestStatus status) {
+  public String statusLabel(@NonNull TeleportRequestStatus status) {
     return switch (status) {
       case ACCEPTED -> statusAccepted;
       case DENIED -> statusDenied;
@@ -75,7 +76,7 @@ public record TpaMenuConfig(
     };
   }
 
-  public String typeLabel(TeleportRequestType type) {
+  public String typeLabel(@NonNull TeleportRequestType type) {
     return switch (type) {
       case TPA -> typeTpa;
       case TPAHERE -> typeTpaHere;

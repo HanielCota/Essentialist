@@ -14,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("kick")
@@ -25,13 +26,13 @@ public record KickCommand(ConfigHandle<KickConfig> config, KickService service) 
 
   @DefaultSubcommand
   public void execute(
-      CommandActor sender,
-      @OnlinePlayer Player target,
+      @NonNull CommandActor sender,
+      @OnlinePlayer @NonNull Player target,
       @DefaultValue("") @GreedyString @Arg("motivo") String motivo) {
-    var snap = config.value();
+    var snap = this.config.value();
     var reason = snap.reasonOr(motivo.strip());
 
-    service.kick(target, snap.formatScreen(reason));
+    this.service.kick(target, snap.formatScreen(reason));
     sender.sendSuccess(snap.formatKicked(target.getName(), reason));
   }
 }

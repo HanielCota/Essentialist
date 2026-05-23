@@ -4,6 +4,7 @@ import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import java.util.List;
 import java.util.UUID;
+import lombok.NonNull;
 
 /**
  * {@link TpaHistory} decorator that moves writes off the calling thread.
@@ -25,17 +26,17 @@ public final class AsyncTpaHistory implements TpaHistory, AutoCloseable {
   }
 
   @Override
-  public void push(TpaHistoryEntry entry) {
-    writer.submit("push", () -> delegate.push(entry));
+  public void push(@NonNull TpaHistoryEntry entry) {
+    this.writer.submit("push", () -> this.delegate.push(entry));
   }
 
   @Override
-  public List<TpaHistoryEntry> list(UUID requester) {
-    return delegate.list(requester);
+  public List<TpaHistoryEntry> list(@NonNull UUID requester) {
+    return this.delegate.list(requester);
   }
 
   @Override
   public void close() {
-    writer.close();
+    this.writer.close();
   }
 }

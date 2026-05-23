@@ -5,8 +5,8 @@ import com.github.hanielcota.menuframework.api.ItemClickHandler;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.whitelist.config.WhitelistConfig;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
+import lombok.NonNull;
 import org.bukkit.OfflinePlayer;
-import org.jspecify.annotations.NonNull;
 
 /** Removes a player from the whitelist when their head is clicked, then refreshes the menu. */
 public record WhitelistClickHandler(ConfigHandle<WhitelistConfig> config, WhitelistService service)
@@ -14,8 +14,8 @@ public record WhitelistClickHandler(ConfigHandle<WhitelistConfig> config, Whitel
 
   @Override
   public void handle(@NonNull ClickContext click, @NonNull OfflinePlayer player) {
-    service.remove(player);
-    click.reply(config.value().formatRemoved(WhitelistService.nameOf(player)));
+    this.service.remove(player);
+    click.reply(this.config.value().formatRemoved(WhitelistService.nameOf(player)));
     click.refresh();
   }
 }

@@ -23,7 +23,7 @@ public final class SqlHomeRepository implements HomeRepository {
   @Override
   public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
     var ownerStr = owner.toString();
-    var rows = sqlExecutor.query(SqlHomeTable.SELECT_ONE, SqlHomeMapper::read, ownerStr, name);
+    var rows = this.sqlExecutor.query(SqlHomeTable.SELECT_ONE, SqlHomeMapper::read, ownerStr, name);
 
     if (rows.isEmpty()) {
       return Optional.empty();
@@ -35,18 +35,18 @@ public final class SqlHomeRepository implements HomeRepository {
   @Override
   public List<Home> list(@NonNull UUID owner) {
     var ownerStr = owner.toString();
-    return sqlExecutor.query(SqlHomeTable.SELECT_ALL, SqlHomeMapper::read, ownerStr);
+    return this.sqlExecutor.query(SqlHomeTable.SELECT_ALL, SqlHomeMapper::read, ownerStr);
   }
 
   @Override
   public List<Home> listAll() {
-    return sqlExecutor.query(SqlHomeTable.SELECT_ALL_HOMES, SqlHomeMapper::read);
+    return this.sqlExecutor.query(SqlHomeTable.SELECT_ALL_HOMES, SqlHomeMapper::read);
   }
 
   @Override
   public int count(@NonNull UUID owner) {
     var ownerStr = owner.toString();
-    var counts = sqlExecutor.query(SqlHomeTable.COUNT, rs -> rs.getInt("total"), ownerStr);
+    var counts = this.sqlExecutor.query(SqlHomeTable.COUNT, rs -> rs.getInt("total"), ownerStr);
 
     if (counts.isEmpty()) {
       return 0;
@@ -60,7 +60,7 @@ public final class SqlHomeRepository implements HomeRepository {
     var ownerStr = home.owner().toString();
     var materialStr = home.material().name();
 
-    sqlExecutor.update(
+    this.sqlExecutor.update(
         SqlHomeTable.UPSERT,
         ownerStr,
         home.name(),
@@ -77,7 +77,7 @@ public final class SqlHomeRepository implements HomeRepository {
   @Override
   public boolean delete(@NonNull UUID owner, @NonNull String name) {
     var ownerStr = owner.toString();
-    var rowsAffected = sqlExecutor.updateCount(SqlHomeTable.DELETE, ownerStr, name);
+    var rowsAffected = this.sqlExecutor.updateCount(SqlHomeTable.DELETE, ownerStr, name);
 
     return rowsAffected > 0;
   }
@@ -89,7 +89,8 @@ public final class SqlHomeRepository implements HomeRepository {
     }
 
     var ownerStr = owner.toString();
-    var rowsAffected = sqlExecutor.updateCount(SqlHomeTable.RENAME, newName, ownerStr, oldName);
+    var rowsAffected =
+        this.sqlExecutor.updateCount(SqlHomeTable.RENAME, newName, ownerStr, oldName);
 
     return rowsAffected > 0;
   }
@@ -101,7 +102,7 @@ public final class SqlHomeRepository implements HomeRepository {
     var materialStr = material.name();
 
     var rowsAffected =
-        sqlExecutor.updateCount(SqlHomeTable.UPDATE_MATERIAL, materialStr, ownerStr, name);
+        this.sqlExecutor.updateCount(SqlHomeTable.UPDATE_MATERIAL, materialStr, ownerStr, name);
 
     return rowsAffected > 0;
   }

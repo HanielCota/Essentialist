@@ -11,7 +11,7 @@ public record PingService(ConfigHandle<PingConfig> config) {
   }
 
   private String colorFor(int ping) {
-    var snap = config.value();
+    var snap = this.config.value();
     if (ping <= snap.goodMaxPing()) {
       return "green";
     }

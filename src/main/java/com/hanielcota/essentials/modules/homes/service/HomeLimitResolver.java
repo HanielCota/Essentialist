@@ -51,7 +51,7 @@ public final class HomeLimitResolver {
   }
 
   private int defaultLimit() {
-    var limit = defaultLimit.getAsInt();
+    var limit = this.defaultLimit.getAsInt();
     return Math.max(0, limit);
   }
 }

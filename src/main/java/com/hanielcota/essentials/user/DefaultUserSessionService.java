@@ -13,7 +13,7 @@ public final class DefaultUserSessionService implements UserSessionService {
 
   @Override
   public Optional<UserSession> sessionOf(@NonNull UUID id) {
-    var session = sessions.get(id);
+    var session = this.sessions.get(id);
     return Optional.ofNullable(session);
   }
 
@@ -22,12 +22,12 @@ public final class DefaultUserSessionService implements UserSessionService {
     var currentTime = Instant.now();
     var session = new UserSession(playerId, currentTime);
 
-    sessions.put(playerId, session);
+    this.sessions.put(playerId, session);
     return session;
   }
 
   @Override
   public void closeSession(@NonNull UUID id) {
-    sessions.remove(id);
+    this.sessions.remove(id);
   }
 }

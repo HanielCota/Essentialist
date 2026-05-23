@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("ping")
@@ -24,12 +25,13 @@ import org.bukkit.entity.Player;
 public record PingCommand(ConfigHandle<PingConfig> config, PingService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor sender, @TargetOrSelf Player subject) {
+  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     String name = subject.getName();
     boolean self = Senders.isSelf(sender, subject);
 
-    String coloredPing = service.format(subject.getPing());
-    String message = config.value().message().forSender(self, name).replace("{ping}", coloredPing);
+    String coloredPing = this.service.format(subject.getPing());
+    String message =
+        this.config.value().message().forSender(self, name).replace("{ping}", coloredPing);
 
     sender.sendMessage(message);
   }

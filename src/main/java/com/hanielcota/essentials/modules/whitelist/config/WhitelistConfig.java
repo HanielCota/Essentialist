@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.whitelist.config;
 
 import java.util.List;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -53,7 +54,7 @@ public record WhitelistConfig(
         "<red>O menu da whitelist só pode ser aberto por jogadores.");
   }
 
-  private static String withPlayer(String template, String player) {
+  private static String withPlayer(@NonNull String template, @NonNull String player) {
     return template.replace("{player}", player);
   }
 
@@ -62,32 +63,32 @@ public record WhitelistConfig(
     return Math.clamp(menuRows, MIN_ROWS, MAX_ROWS);
   }
 
-  public String formatItemName(String player) {
+  public String formatItemName(@NonNull String player) {
     return withPlayer(itemName, player);
   }
 
   /** Item lore with {@code {player}} resolved on every line. */
-  public List<String> formatLore(String player) {
+  public List<String> formatLore(@NonNull String player) {
     return itemLore.stream().map(line -> line.replace("{player}", player)).toList();
   }
 
-  public String formatAdded(String player) {
+  public String formatAdded(@NonNull String player) {
     return withPlayer(added, player);
   }
 
-  public String formatAlreadyAdded(String player) {
+  public String formatAlreadyAdded(@NonNull String player) {
     return withPlayer(alreadyAdded, player);
   }
 
-  public String formatRemoved(String player) {
+  public String formatRemoved(@NonNull String player) {
     return withPlayer(removed, player);
   }
 
-  public String formatNotWhitelisted(String player) {
+  public String formatNotWhitelisted(@NonNull String player) {
     return withPlayer(notWhitelisted, player);
   }
 
-  public String formatUnknownPlayer(String player) {
+  public String formatUnknownPlayer(@NonNull String player) {
     return withPlayer(unknownPlayer, player);
   }
 }

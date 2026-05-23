@@ -62,13 +62,13 @@ public record Warp(
 
   /** Materializes the warp back into a Bukkit location, or empty when the world is unloaded. */
   public Optional<Location> resolve() {
-    var worldInstance = Bukkit.getWorld(world);
+    var worldInstance = Bukkit.getWorld(this.world);
 
     if (worldInstance == null) {
       return Optional.empty();
     }
 
-    var location = new Location(worldInstance, x, y, z, yaw, pitch);
+    var location = new Location(worldInstance, this.x, this.y, this.z, this.yaw, this.pitch);
     return Optional.of(location);
   }
 }

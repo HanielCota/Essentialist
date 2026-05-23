@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.gamemode.config;
 import com.hanielcota.essentials.config.MessagePair;
 import java.util.Locale;
 import java.util.Map;
+import lombok.NonNull;
 import org.bukkit.GameMode;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -28,25 +29,25 @@ public record GamemodeConfig(
             GameMode.SPECTATOR, "Spectator"));
   }
 
-  private static String capitalize(String raw) {
+  private static String capitalize(@NonNull String raw) {
     return raw.charAt(0) + raw.substring(1).toLowerCase(Locale.ROOT);
   }
 
-  public MessagePair whenUpdated(GameMode mode) {
+  public MessagePair whenUpdated(@NonNull GameMode mode) {
     var displayName = nameOf(mode);
     return new MessagePair(
         updated.replace("{gamemode}", displayName),
         updatedOther.replace("{gamemode}", displayName));
   }
 
-  public MessagePair whenAlreadyInMode(GameMode mode) {
+  public MessagePair whenAlreadyInMode(@NonNull GameMode mode) {
     var displayName = nameOf(mode);
     return new MessagePair(
         alreadyInMode.replace("{gamemode}", displayName),
         alreadyInModeOther.replace("{gamemode}", displayName));
   }
 
-  private String nameOf(GameMode mode) {
+  private String nameOf(@NonNull GameMode mode) {
     return names.getOrDefault(mode, capitalize(mode.name()));
   }
 }

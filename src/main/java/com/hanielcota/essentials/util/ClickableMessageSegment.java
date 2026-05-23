@@ -64,16 +64,16 @@ public final class ClickableMessageSegment {
   Component applyTo(@NonNull Component component) {
     var result = component;
 
-    if (click != null) {
-      result = result.clickEvent(click);
+    if (this.click != null) {
+      result = result.clickEvent(this.click);
     }
 
-    if (hover != null) {
-      result = result.hoverEvent(hover);
+    if (this.hover != null) {
+      result = result.hoverEvent(this.hover);
     }
 
-    if (insertion != null) {
-      result = result.insertion(insertion);
+    if (this.insertion != null) {
+      result = result.insertion(this.insertion);
     }
 
     return result;

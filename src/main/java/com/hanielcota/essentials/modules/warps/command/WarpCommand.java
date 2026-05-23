@@ -40,10 +40,10 @@ public record WarpCommand(
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @NonNull @Arg("nome") String name) {
     var sender = actor.unwrap(Player.class);
-    var snap = config.value();
+    var snap = this.config.value();
     var messages = snap.messages();
 
-    var warpOpt = service.find(name);
+    var warpOpt = this.service.find(name);
     if (warpOpt.isEmpty()) {
       var unknownMsg = messages.unknownWarp().replace("{name}", name);
       actor.sendError(unknownMsg);
@@ -53,7 +53,7 @@ public record WarpCommand(
     var warp = warpOpt.get();
     var resolvedName = warp.name();
 
-    if (!service.canUse(sender, resolvedName)) {
+    if (!this.service.canUse(sender, resolvedName)) {
       var noPermMsg = messages.noPermission().replace("{name}", resolvedName);
       actor.sendError(noPermMsg);
       return;
@@ -69,7 +69,7 @@ public record WarpCommand(
     var delay = snap.teleportDelay();
     var teleportPrompt = prompt(actor, messages, warp);
 
-    delayed.schedule(sender, destination, delay, teleportPrompt);
+    this.delayed.schedule(sender, destination, delay, teleportPrompt);
   }
 
   private DelayedTeleportPrompt prompt(

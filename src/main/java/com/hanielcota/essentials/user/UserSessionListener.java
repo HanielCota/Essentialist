@@ -18,7 +18,7 @@ public final class UserSessionListener implements Listener {
     var player = event.getPlayer();
     var playerId = player.getUniqueId();
 
-    sessions.openSession(playerId);
+    this.sessions.openSession(playerId);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -26,6 +26,6 @@ public final class UserSessionListener implements Listener {
     var player = event.getPlayer();
     var playerId = player.getUniqueId();
 
-    sessions.closeSession(playerId);
+    this.sessions.closeSession(playerId);
   }
 }

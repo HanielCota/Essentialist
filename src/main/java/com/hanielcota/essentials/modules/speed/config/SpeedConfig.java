@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.speed.config;
 
 import com.hanielcota.essentials.config.MessagePair;
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -29,7 +30,7 @@ public record SpeedConfig(
             + " ou <gray>/speed reset</gray> para restaurar o padrão.</yellow>");
   }
 
-  private static MessagePair resolve(String self, String other, int valor) {
+  private static MessagePair resolve(@NonNull String self, @NonNull String other, int valor) {
     var formatted = Integer.toString(valor);
     return new MessagePair(self.replace("{valor}", formatted), other.replace("{valor}", formatted));
   }

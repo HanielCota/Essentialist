@@ -13,18 +13,18 @@ public record PaperAudienceProvider(EssentialsPlugin plugin) implements Audience
 
   @Override
   public Audience console() {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     return server.getConsoleSender();
   }
 
   @Override
   public Audience broadcast() {
-    return plugin.getServer();
+    return this.plugin.getServer();
   }
 
   @Override
   public Audience player(@NonNull UUID id) {
-    var server = plugin.getServer();
+    var server = this.plugin.getServer();
     var player = server.getPlayer(id);
 
     if (player == null) {

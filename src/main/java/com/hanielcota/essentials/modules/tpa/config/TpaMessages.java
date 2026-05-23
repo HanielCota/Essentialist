@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.config;
 
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -85,7 +86,8 @@ public record TpaMessages(
   }
 
   /** The request line shown to the target, picked by {@code type}. */
-  public String formatRequestReceived(TeleportRequestType type, String player, long seconds) {
+  public String formatRequestReceived(
+      @NonNull TeleportRequestType type, @NonNull String player, long seconds) {
     var line = type == TeleportRequestType.TPAHERE ? requestReceivedHere : requestReceived;
     return line.replace("{player}", player).replace("{seconds}", Long.toString(seconds));
   }

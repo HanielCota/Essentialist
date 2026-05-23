@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("fly")
@@ -27,22 +28,23 @@ public record FlyCommand(
     ConfigHandle<FlyConfig> config, FlyService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    announce(sender, subject, service.toggle(subject));
+  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    announce(sender, subject, this.service.toggle(subject));
   }
 
   @Subcommand("on")
-  public void on(CommandActor sender, @TargetOrSelf Player subject) {
-    announce(sender, subject, service.set(subject, true));
+  public void on(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    announce(sender, subject, this.service.set(subject, true));
   }
 
   @Subcommand("off")
-  public void off(CommandActor sender, @TargetOrSelf Player subject) {
-    announce(sender, subject, service.set(subject, false));
+  public void off(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    announce(sender, subject, this.service.set(subject, false));
   }
 
-  private void announce(CommandActor sender, Player subject, FlyService.Result result) {
-    var snap = config.value();
+  private void announce(
+      @NonNull CommandActor sender, @NonNull Player subject, @NonNull FlyService.Result result) {
+    var snap = this.config.value();
     String name = subject.getName();
     boolean self = Senders.isSelf(sender, subject);
 
@@ -52,7 +54,7 @@ public record FlyCommand(
     }
 
     var messages = snap.toggle(result == FlyService.Result.ENABLED);
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
     sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
   }
 }

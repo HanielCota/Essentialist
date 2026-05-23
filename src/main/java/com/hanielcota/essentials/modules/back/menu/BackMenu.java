@@ -17,12 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.jspecify.annotations.NonNull;
 
 @RequiredArgsConstructor
 public final class BackMenu implements Menu, Listener {
@@ -49,7 +49,8 @@ public final class BackMenu implements Menu, Listener {
   // Filters configured slot indices to fit inside `capacity`, dropping
   // nulls/out-of-range/duplicates.
   // Falls back to leading slots when nothing usable remains — PaginationConfig rejects empty lists.
-  private static List<Integer> sanitizeContentSlots(List<Integer> configured, int capacity) {
+  private static List<Integer> sanitizeContentSlots(
+      @NonNull List<Integer> configured, int capacity) {
     var valid = new ArrayList<Integer>(configured.size());
     var seen = new HashSet<Integer>(configured.size());
 
@@ -68,7 +69,7 @@ public final class BackMenu implements Menu, Listener {
   }
 
   public void prefetch(@NonNull UUID viewer, @NonNull List<HistoryEntry> entries) {
-    prefetched.put(viewer, List.copyOf(entries));
+    this.prefetched.put(viewer, List.copyOf(entries));
   }
 
   @Override
@@ -78,7 +79,7 @@ public final class BackMenu implements Menu, Listener {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    var snap = config.value();
+    var snap = this.config.value();
     var rows = Math.max(MIN_ROWS, Math.min(MAX_ROWS, snap.menuRows()));
     var slots = sanitizeContentSlots(snap.menuContentSlots(), rows * SLOTS_PER_ROW);
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
@@ -92,24 +93,24 @@ public final class BackMenu implements Menu, Listener {
         .register();
   }
 
-  private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
-    var entries = prefetched.remove(player.getUniqueId());
+  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
+    var entries = this.prefetched.remove(player.getUniqueId());
     if (entries == null) {
-      entries = history.list(player.getUniqueId());
+      entries = this.history.list(player.getUniqueId());
     }
     var slots = new ArrayList<SlotDefinition>(entries.size());
 
     for (var i = 0; i < entries.size(); i++) {
       var entry = entries.get(i);
-      var template = renderer.render(entry, i + 1);
-      slots.add(SlotDefinition.of(-1, template, click -> clickHandler.handle(click, entry)));
+      var template = this.renderer.render(entry, i + 1);
+      slots.add(SlotDefinition.of(-1, template, click -> this.clickHandler.handle(click, entry)));
     }
 
     return slots;
   }
 
   @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
-    prefetched.remove(event.getPlayer().getUniqueId());
+  public void onQuit(@NonNull PlayerQuitEvent event) {
+    this.prefetched.remove(event.getPlayer().getUniqueId());
   }
 }

@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.spawn.service;
 
 import java.util.Optional;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -13,7 +14,7 @@ import org.bukkit.Location;
 public record SpawnLocation(String world, double x, double y, double z, float yaw, float pitch) {
 
   /** Captures a Bukkit {@link Location} as an immutable spawn point. */
-  public static SpawnLocation of(Location location) {
+  public static SpawnLocation of(@NonNull Location location) {
     var world = location.getWorld();
 
     return new SpawnLocation(
@@ -27,10 +28,10 @@ public record SpawnLocation(String world, double x, double y, double z, float ya
 
   /** Materializes the spawn back into a Bukkit location, or empty when the world is unloaded. */
   public Optional<Location> resolve() {
-    var w = Bukkit.getWorld(world);
+    var w = Bukkit.getWorld(this.world);
     if (w == null) {
       return Optional.empty();
     }
-    return Optional.of(new Location(w, x, y, z, yaw, pitch));
+    return Optional.of(new Location(w, this.x, this.y, this.z, this.yaw, this.pitch));
   }
 }

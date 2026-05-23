@@ -17,7 +17,7 @@ public final class HomeRenameSessions {
   private final ConcurrentHashMap<UUID, Pending> pending = new ConcurrentHashMap<>();
 
   public void start(@NonNull UUID player, @NonNull String homeName, @NonNull Task timeoutTask) {
-    var prior = pending.put(player, new Pending(homeName, timeoutTask));
+    var prior = this.pending.put(player, new Pending(homeName, timeoutTask));
 
     if (prior != null) {
       prior.timeoutTask().cancel();
@@ -25,11 +25,11 @@ public final class HomeRenameSessions {
   }
 
   public Pending consume(@NonNull UUID player) {
-    return pending.remove(player);
+    return this.pending.remove(player);
   }
 
   public void cancel(@NonNull UUID player) {
-    var prior = pending.remove(player);
+    var prior = this.pending.remove(player);
 
     if (prior != null) {
       prior.timeoutTask().cancel();

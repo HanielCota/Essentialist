@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("invsee")
@@ -23,15 +24,15 @@ import org.bukkit.entity.Player;
 public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor sender, @OnlinePlayer Player target) {
+  public void execute(@NonNull CommandActor sender, @OnlinePlayer @NonNull Player target) {
     var viewer = sender.unwrap(Player.class);
-    var snap = config.value();
+    var snap = this.config.value();
     if (target.equals(viewer)) {
       sender.sendError(snap.self());
       return;
     }
 
-    viewer.openInventory(service.createView(target, snap.formatTitle(target.getName())));
+    viewer.openInventory(this.service.createView(target, snap.formatTitle(target.getName())));
     sender.sendSuccess(snap.formatOpened(target.getName()));
   }
 }

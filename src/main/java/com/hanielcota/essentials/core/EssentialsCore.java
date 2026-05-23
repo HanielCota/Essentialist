@@ -23,7 +23,7 @@ public final class EssentialsCore implements EssentialsApi {
     this.phase = next;
 
     if (next == LifecyclePhase.ENABLED) {
-      var moduleManager = services.resolve(ModuleManager.class);
+      var moduleManager = this.services.resolve(ModuleManager.class);
       var context = newContext();
 
       moduleManager.enableAll(context);
@@ -34,13 +34,13 @@ public final class EssentialsCore implements EssentialsApi {
     this.phase = LifecyclePhase.DISABLING;
 
     try {
-      var moduleManager = services.resolve(ModuleManager.class);
+      var moduleManager = this.services.resolve(ModuleManager.class);
       moduleManager.disableAll();
     } finally {
-      var databaseProviderOpt = services.find(DatabaseProvider.class);
+      var databaseProviderOpt = this.services.find(DatabaseProvider.class);
       databaseProviderOpt.ifPresent(DatabaseProvider::close);
 
-      var menuServiceOpt = services.find(MenuService.class);
+      var menuServiceOpt = this.services.find(MenuService.class);
       menuServiceOpt.ifPresent(MenuService::shutdown);
 
       this.phase = LifecyclePhase.DISABLED;
@@ -48,20 +48,20 @@ public final class EssentialsCore implements EssentialsApi {
   }
 
   public LifecyclePhase phase() {
-    return phase;
+    return this.phase;
   }
 
   @Override
   public EssentialsPlugin plugin() {
-    return plugin;
+    return this.plugin;
   }
 
   @Override
   public ServiceRegistry services() {
-    return services;
+    return this.services;
   }
 
   private ModuleContext newContext() {
-    return new ModuleContext(plugin, services);
+    return new ModuleContext(this.plugin, this.services);
   }
 }

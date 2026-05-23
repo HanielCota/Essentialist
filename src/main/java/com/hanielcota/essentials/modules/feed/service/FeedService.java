@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.feed.service;
 
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 public final class FeedService {
@@ -7,7 +8,7 @@ public final class FeedService {
   private static final int MAX_FOOD = 20;
   private static final float MAX_SATURATION = 20f;
 
-  public boolean feed(Player player) {
+  public boolean feed(@NonNull Player player) {
     if (player.getFoodLevel() >= MAX_FOOD
         && player.getSaturation() >= MAX_SATURATION
         && player.getExhaustion() <= 0f) {

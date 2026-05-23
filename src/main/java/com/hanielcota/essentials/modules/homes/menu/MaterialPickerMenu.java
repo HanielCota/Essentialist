@@ -45,7 +45,7 @@ public final class MaterialPickerMenu implements Menu {
 
   @Override
   public void register(@NonNull MenuService menusRef) {
-    var menuSpec = config.value().menu();
+    var menuSpec = this.config.value().menu();
     var rows = Math.clamp(menuSpec.pickerRows(), MIN_ROWS, MAX_ROWS);
     var title = ComponentUtils.mini(menuSpec.staticPickerTitle());
     var contentSlots = MenuContentSlots.allRows(rows);
@@ -61,15 +61,15 @@ public final class MaterialPickerMenu implements Menu {
         .register();
   }
 
-  private List<SlotDefinition> buildSlots(@NonNull Player player, MenuSession session) {
-    var menuSpec = config.value().menu();
+  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
+    var menuSpec = this.config.value().menu();
     var palette = menuSpec.palette();
-    var loreTemplate = config.value().messages().pickerItemLore();
+    var loreTemplate = this.config.value().messages().pickerItemLore();
 
     var slots = new ArrayList<SlotDefinition>(palette.size());
 
     for (var material : palette) {
-      var template = presentation.render(material, loreTemplate);
+      var template = this.presentation.render(material, loreTemplate);
       slots.add(SlotDefinition.of(-1, template, click -> handlePick(click.player(), material)));
     }
 
@@ -78,19 +78,19 @@ public final class MaterialPickerMenu implements Menu {
 
   private void handlePick(@NonNull Player player, @NonNull Material material) {
     var uuid = player.getUniqueId();
-    var homeName = target.consume(uuid);
+    var homeName = this.target.consume(uuid);
 
     if (homeName == null) {
-      menus.open(player, HomesMenu.ID);
+      this.menus.open(player, HomesMenu.ID);
       return;
     }
 
-    var messages = config.value().messages();
-    var applied = service.setMaterial(uuid, homeName, material);
+    var messages = this.config.value().messages();
+    var applied = this.service.setMaterial(uuid, homeName, material);
 
-    var replyText = presentation.reply(messages, homeName, material, applied);
+    var replyText = this.presentation.reply(messages, homeName, material, applied);
     player.sendMessage(ComponentUtils.mini(replyText));
 
-    menus.open(player, HomesMenu.ID);
+    this.menus.open(player, HomesMenu.ID);
   }
 }

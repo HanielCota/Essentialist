@@ -3,13 +3,14 @@ package com.hanielcota.essentials.modules.smelt.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.smelt.config.SmeltConfig;
 import com.hanielcota.essentials.util.ItemStacks;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public record SmeltService(ConfigHandle<SmeltConfig> config) {
 
-  public int smelt(Player player) {
-    var mappings = config.value().mappings();
+  public int smelt(@NonNull Player player) {
+    var mappings = this.config.value().mappings();
     var inv = player.getInventory();
     int count = 0;
 

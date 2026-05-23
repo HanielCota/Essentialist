@@ -46,7 +46,7 @@ public final class ClickableMessage implements ComponentLike {
   /** Appends a plain MiniMessage segment with no interactive actions. */
   public ClickableMessage append(@NonNull String mini) {
     var component = ComponentUtils.mini(mini);
-    parts.add(component);
+    this.parts.add(component);
     return this;
   }
 
@@ -59,7 +59,7 @@ public final class ClickableMessage implements ComponentLike {
 
   /** Appends an already-built component. */
   public ClickableMessage append(@NonNull Component component) {
-    parts.add(component);
+    this.parts.add(component);
     return this;
   }
 
@@ -70,29 +70,29 @@ public final class ClickableMessage implements ComponentLike {
     action.accept(segment);
 
     var modifiedComponent = segment.applyTo(component);
-    parts.add(modifiedComponent);
+    this.parts.add(modifiedComponent);
     return this;
   }
 
   /** Appends a single space. */
   public ClickableMessage space() {
-    parts.add(Component.space());
+    this.parts.add(Component.space());
     return this;
   }
 
   /** Appends a line break. */
   public ClickableMessage newline() {
-    parts.add(Component.newline());
+    this.parts.add(Component.newline());
     return this;
   }
 
   /** Builds the final immutable component. */
   public Component build() {
-    if (parts.isEmpty()) {
+    if (this.parts.isEmpty()) {
       return Component.empty();
     }
 
-    var componentArray = parts.toArray(Component[]::new);
+    var componentArray = this.parts.toArray(Component[]::new);
     return Component.textOfChildren(componentArray);
   }
 

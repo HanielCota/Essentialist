@@ -22,25 +22,25 @@ public final class ModuleManager {
   public void register(@NonNull Module module) {
     var moduleId = module.id();
 
-    if (registered.putIfAbsent(moduleId, module) == null) {
-      states.put(moduleId, ModuleState.REGISTERED);
+    if (this.registered.putIfAbsent(moduleId, module) == null) {
+      this.states.put(moduleId, ModuleState.REGISTERED);
     }
   }
 
   public void enableAll(@NonNull ModuleContext context) {
-    enableOrder = resolveLoadOrder();
+    this.enableOrder = resolveLoadOrder();
 
-    var size = enableOrder.size();
+    var size = this.enableOrder.size();
     var succeeded = new ArrayList<Module>(size);
 
-    for (var module : enableOrder) {
+    for (var module : this.enableOrder) {
       var moduleId = module.id();
       try {
         module.enable(context);
-        states.put(moduleId, ModuleState.ENABLED);
+        this.states.put(moduleId, ModuleState.ENABLED);
         succeeded.add(module);
       } catch (RuntimeException e) {
-        states.put(moduleId, ModuleState.FAILED);
+        this.states.put(moduleId, ModuleState.FAILED);
         rollback(succeeded);
         throw new ModuleLoadException(moduleId, "enable() failed", e);
       }
@@ -48,11 +48,11 @@ public final class ModuleManager {
   }
 
   public void disableAll() {
-    var reversed = new ArrayList<Module>(enableOrder);
+    var reversed = new ArrayList<Module>(this.enableOrder);
 
     for (var module : reversed.reversed()) {
       var moduleId = module.id();
-      var currentState = states.get(moduleId);
+      var currentState = this.states.get(moduleId);
 
       if (currentState != ModuleState.ENABLED) {
         continue;
@@ -60,16 +60,16 @@ public final class ModuleManager {
 
       try {
         module.disable();
-        states.put(moduleId, ModuleState.DISABLED);
+        this.states.put(moduleId, ModuleState.DISABLED);
       } catch (RuntimeException e) {
-        states.put(moduleId, ModuleState.FAILED);
+        this.states.put(moduleId, ModuleState.FAILED);
         LOG.error(e, "Module disable failed: {}", moduleId);
       }
     }
   }
 
   public Collection<Module> all() {
-    var values = registered.values();
+    var values = this.registered.values();
     return List.copyOf(values);
   }
 
@@ -82,9 +82,9 @@ public final class ModuleManager {
 
       try {
         module.disable();
-        states.put(moduleId, ModuleState.DISABLED);
+        this.states.put(moduleId, ModuleState.DISABLED);
       } catch (RuntimeException e) {
-        states.put(moduleId, ModuleState.FAILED);
+        this.states.put(moduleId, ModuleState.FAILED);
         LOG.error(e, "Rollback disable failed: {}", moduleId);
       }
     }
@@ -94,19 +94,19 @@ public final class ModuleManager {
     var inDegree = new LinkedHashMap<String, Integer>();
     var dependents = new HashMap<String, List<String>>();
 
-    for (var module : registered.values()) {
+    for (var module : this.registered.values()) {
       var moduleId = module.id();
       inDegree.put(moduleId, 0);
       dependents.put(moduleId, new ArrayList<>());
     }
 
-    for (var module : registered.values()) {
+    for (var module : this.registered.values()) {
       var moduleId = module.id();
       var metadata = module.metadata();
       var dependencies = metadata.dependencies();
 
       for (var dep : dependencies) {
-        if (!registered.containsKey(dep)) {
+        if (!this.registered.containsKey(dep)) {
           throw new ModuleLoadException(moduleId, "missing dependency: " + dep);
         }
 
@@ -123,12 +123,12 @@ public final class ModuleManager {
       }
     }
 
-    var totalRegisteredSize = registered.size();
+    var totalRegisteredSize = this.registered.size();
     var ordered = new ArrayList<Module>(totalRegisteredSize);
 
     while (!ready.isEmpty()) {
       var id = ready.poll();
-      var currentModule = registered.get(id);
+      var currentModule = this.registered.get(id);
       ordered.add(currentModule);
 
       var nextDependents = dependents.get(id);

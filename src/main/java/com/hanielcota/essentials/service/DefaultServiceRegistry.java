@@ -12,7 +12,7 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
 
   @Override
   public <T> void register(@NonNull Class<T> type, @NonNull T instance) {
-    var previous = services.putIfAbsent(type, instance);
+    var previous = this.services.putIfAbsent(type, instance);
 
     if (previous != null) {
       var typeName = type.getName();
@@ -22,7 +22,7 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
 
   @Override
   public <T> Optional<T> find(@NonNull Class<T> type) {
-    var value = services.get(type);
+    var value = this.services.get(type);
     var castedValue = type.cast(value);
 
     return Optional.ofNullable(castedValue);
@@ -41,13 +41,13 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
 
   @Override
   public <T> boolean unregister(@NonNull Class<T> type) {
-    var removedInstance = services.remove(type);
+    var removedInstance = this.services.remove(type);
     return removedInstance != null;
   }
 
   @Override
   public Set<Class<?>> registered() {
-    var keys = services.keySet();
+    var keys = this.services.keySet();
     return Set.copyOf(keys);
   }
 }

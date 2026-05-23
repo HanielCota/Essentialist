@@ -17,6 +17,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("home")
@@ -32,26 +33,27 @@ public record HomeCommand(
     HomeNameResolver nameResolver) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
+  public void execute(@NonNull CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
     var sender = actor.unwrap(Player.class);
-    var messages = config.value().messages();
-    var name = nameResolver.resolve(rawName);
+    var messages = this.config.value().messages();
+    var name = this.nameResolver.resolve(rawName);
     if (name == null) {
       actor.sendError(messages.invalidName());
       return;
     }
 
-    var home = service.find(sender.getUniqueId(), name);
+    var home = this.service.find(sender.getUniqueId(), name);
     if (home.isEmpty()) {
       actor.sendError(missingMessage(messages, sender.getUniqueId(), name));
       return;
     }
 
-    teleporter.teleport(sender, home.get(), actor);
+    this.teleporter.teleport(sender, home.get(), actor);
   }
 
-  private String missingMessage(HomesMessages messages, UUID owner, String name) {
-    if (service.count(owner) == 0) {
+  private String missingMessage(
+      @NonNull HomesMessages messages, @NonNull UUID owner, @NonNull String name) {
+    if (this.service.count(owner) == 0) {
       return messages.noHomes();
     }
     return messages.unknownHome().replace("{name}", name);

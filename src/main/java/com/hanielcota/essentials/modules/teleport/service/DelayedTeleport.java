@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -34,29 +35,34 @@ public final class DelayedTeleport implements Listener {
    * zero or negative delay} teleports immediately. Any previous pending teleport for the same
    * player is cancelled silently first.
    */
-  public void schedule(Player player, Location destination, Duration delay, Callback callback) {
+  public void schedule(
+      @NonNull Player player,
+      @NonNull Location destination,
+      @NonNull Duration delay,
+      @NonNull Callback callback) {
 
     var uuid = player.getUniqueId();
     cancel(uuid);
 
     if (delay.isZero() || delay.isNegative()) {
       callback.onScheduled(0);
-      scheduler.runOnEntity(player, () -> complete(player, destination, callback));
+      this.scheduler.runOnEntity(player, () -> complete(player, destination, callback));
       return;
     }
 
     callback.onScheduled(Math.max(1, delay.toSeconds()));
     var task =
-        scheduler.runLater(
+        this.scheduler.runLater(
             () ->
-                scheduler.runOnEntity(player, () -> completePending(player, destination, callback)),
+                this.scheduler.runOnEntity(
+                    player, () -> completePending(player, destination, callback)),
             delay);
-    pending.put(uuid, new Pending(task, callback));
+    this.pending.put(uuid, new Pending(task, callback));
   }
 
   /** Whether {@code player} has a pending delayed teleport. */
-  public boolean isPending(UUID player) {
-    return pending.containsKey(player);
+  public boolean isPending(@NonNull UUID player) {
+    return this.pending.containsKey(player);
   }
 
   /**
@@ -64,27 +70,29 @@ public final class DelayedTeleport implements Listener {
    * per-module listeners (e.g. {@code HomeTeleportListener}) can own their own cancel rules in
    * addition to the shared move/damage/quit handling done here.
    */
-  public void cancel(UUID player) {
-    var p = pending.remove(player);
+  public void cancel(@NonNull UUID player) {
+    var p = this.pending.remove(player);
     if (p != null) {
       p.task.cancel();
     }
   }
 
-  private void complete(Player player, Location destination, Callback callback) {
+  private void complete(
+      @NonNull Player player, @NonNull Location destination, @NonNull Callback callback) {
     if (!player.isOnline()) {
       callback.onCancelled();
       return;
     }
-    if (!teleport.teleportTo(player, destination)) {
+    if (!this.teleport.teleportTo(player, destination)) {
       callback.onFailed();
       return;
     }
     callback.onSuccess();
   }
 
-  private void completePending(Player player, Location destination, Callback callback) {
-    var removed = pending.remove(player.getUniqueId());
+  private void completePending(
+      @NonNull Player player, @NonNull Location destination, @NonNull Callback callback) {
+    var removed = this.pending.remove(player.getUniqueId());
     if (removed == null || removed.callback != callback) {
       return;
     }
@@ -92,9 +100,9 @@ public final class DelayedTeleport implements Listener {
   }
 
   @EventHandler
-  public void onMove(PlayerMoveEvent event) {
+  public void onMove(@NonNull PlayerMoveEvent event) {
     var uuid = event.getPlayer().getUniqueId();
-    var p = pending.get(uuid);
+    var p = this.pending.get(uuid);
     if (p == null) {
       return;
     }
@@ -109,19 +117,19 @@ public final class DelayedTeleport implements Listener {
   }
 
   @EventHandler
-  public void onDamage(EntityDamageEvent event) {
+  public void onDamage(@NonNull EntityDamageEvent event) {
     if (event.getEntity() instanceof Player player) {
       fireCancelled(player.getUniqueId());
     }
   }
 
   @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
+  public void onQuit(@NonNull PlayerQuitEvent event) {
     cancel(event.getPlayer().getUniqueId());
   }
 
-  private void fireCancelled(UUID player) {
-    var p = pending.remove(player);
+  private void fireCancelled(@NonNull UUID player) {
+    var p = this.pending.remove(player);
     if (p != null) {
       p.task.cancel();
       p.callback.onCancelled();

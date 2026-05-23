@@ -19,7 +19,7 @@ public final class HomeCache {
   }
 
   Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
-    var bucket = homes.get(owner);
+    var bucket = this.homes.get(owner);
     if (bucket == null) {
       return Optional.empty();
     }
@@ -28,7 +28,7 @@ public final class HomeCache {
   }
 
   List<Home> list(@NonNull UUID owner) {
-    var bucket = homes.get(owner);
+    var bucket = this.homes.get(owner);
     if (bucket == null) {
       return List.of();
     }
@@ -39,14 +39,14 @@ public final class HomeCache {
   List<Home> listAll() {
     var homeComparator = Comparator.comparing(Home::name);
 
-    return homes.values().stream()
+    return this.homes.values().stream()
         .flatMap(bucket -> bucket.list().stream())
         .sorted(homeComparator)
         .toList();
   }
 
   int count(@NonNull UUID owner) {
-    var bucket = homes.get(owner);
+    var bucket = this.homes.get(owner);
     if (bucket == null) {
       return 0;
     }
@@ -60,7 +60,7 @@ public final class HomeCache {
   }
 
   Optional<Home> delete(@NonNull UUID owner, @NonNull String name) {
-    var bucket = homes.get(owner);
+    var bucket = this.homes.get(owner);
     if (bucket == null) {
       return Optional.empty();
     }
@@ -69,7 +69,7 @@ public final class HomeCache {
   }
 
   Optional<Home> rename(@NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
-    var bucket = homes.get(owner);
+    var bucket = this.homes.get(owner);
     if (bucket == null) {
       return Optional.empty();
     }
@@ -79,7 +79,7 @@ public final class HomeCache {
 
   Optional<Home> updateMaterial(
       @NonNull UUID owner, @NonNull String name, @NonNull Material material) {
-    var bucket = homes.get(owner);
+    var bucket = this.homes.get(owner);
     if (bucket == null) {
       return Optional.empty();
     }
@@ -88,6 +88,6 @@ public final class HomeCache {
   }
 
   private HomeBucket bucket(@NonNull UUID owner) {
-    return homes.computeIfAbsent(owner, ignored -> new HomeBucket());
+    return this.homes.computeIfAbsent(owner, ignored -> new HomeBucket());
   }
 }

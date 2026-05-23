@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.invsee.config;
 
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -16,11 +17,11 @@ public record InvseeConfig(
         "<red>Você não pode ver o próprio inventário.");
   }
 
-  public String formatTitle(String player) {
+  public String formatTitle(@NonNull String player) {
     return menuTitle.replace("{player}", player);
   }
 
-  public String formatOpened(String player) {
+  public String formatOpened(@NonNull String player) {
     return opened.replace("{player}", player);
   }
 }

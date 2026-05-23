@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.spawn.listener;
 import com.hanielcota.essentials.modules.spawn.service.SpawnLocation;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,7 +15,7 @@ public final class SpawnJoinListener implements Listener {
   private final SpawnService service;
 
   @EventHandler(priority = EventPriority.HIGH)
-  public void onSpawnLocation(AsyncPlayerSpawnLocationEvent event) {
-    service.current().flatMap(SpawnLocation::resolve).ifPresent(event::setSpawnLocation);
+  public void onSpawnLocation(@NonNull AsyncPlayerSpawnLocationEvent event) {
+    this.service.current().flatMap(SpawnLocation::resolve).ifPresent(event::setSpawnLocation);
   }
 }

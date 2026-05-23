@@ -1,16 +1,17 @@
 package com.hanielcota.essentials.modules.actionbar.service;
 
 import com.hanielcota.essentials.util.ComponentUtils;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public final class ActionBarService {
 
-  public void send(Player player, String message) {
+  public void send(@NonNull Player player, @NonNull String message) {
     player.sendActionBar(ComponentUtils.mini(message));
   }
 
-  public int broadcast(String message) {
+  public int broadcast(@NonNull String message) {
     var bar = ComponentUtils.mini(message);
     var players = Bukkit.getOnlinePlayers();
 

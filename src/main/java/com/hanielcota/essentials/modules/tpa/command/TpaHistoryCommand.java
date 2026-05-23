@@ -18,6 +18,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tpahistory")
@@ -36,9 +37,10 @@ public record TpaHistoryCommand(
   private static final String OTHERS_PERMISSION = "essentials.tpa.history.others";
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @DefaultValue("") @Arg("jogador") String targetName) {
+  public void execute(
+      @NonNull CommandActor actor, @DefaultValue("") @Arg("jogador") String targetName) {
     var sender = actor.unwrap(Player.class);
-    var snap = config.value();
+    var snap = this.config.value();
 
     if (targetName.isEmpty()) {
       openFor(actor, sender, sender.getUniqueId(), /* self */ true, sender.getName());
@@ -50,7 +52,7 @@ public record TpaHistoryCommand(
       return;
     }
 
-    var resolved = players.offlineByName(targetName);
+    var resolved = this.players.offlineByName(targetName);
     if (resolved.isEmpty()) {
       actor.sendError(snap.messages().playerNotFound().replace("{player}", targetName));
       return;
@@ -62,9 +64,13 @@ public record TpaHistoryCommand(
   }
 
   private void openFor(
-      CommandActor actor, Player viewer, UUID subject, boolean self, String subjectName) {
-    var snap = config.value();
-    var entries = history.list(subject);
+      @NonNull CommandActor actor,
+      @NonNull Player viewer,
+      @NonNull UUID subject,
+      boolean self,
+      @NonNull String subjectName) {
+    var snap = this.config.value();
+    var entries = this.history.list(subject);
 
     if (entries.isEmpty()) {
       actor.sendError(
@@ -79,7 +85,7 @@ public record TpaHistoryCommand(
           ComponentUtils.mini(snap.messages().viewingOther().replace("{player}", subjectName)));
     }
 
-    menu.prefetch(viewer.getUniqueId(), entries);
-    menus.open(viewer, TpaHistoryMenu.ID);
+    this.menu.prefetch(viewer.getUniqueId(), entries);
+    this.menus.open(viewer, TpaHistoryMenu.ID);
   }
 }

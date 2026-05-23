@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.kick.config;
 
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -17,15 +18,15 @@ public record KickConfig(
   }
 
   /** Returns {@code provided} when it has content, otherwise the configured default reason. */
-  public String reasonOr(String provided) {
+  public String reasonOr(@NonNull String provided) {
     return provided.isBlank() ? defaultReason : provided;
   }
 
-  public String formatScreen(String reason) {
+  public String formatScreen(@NonNull String reason) {
     return screen.replace("{reason}", reason);
   }
 
-  public String formatKicked(String player, String reason) {
+  public String formatKicked(@NonNull String player, @NonNull String reason) {
     return kicked.replace("{player}", player).replace("{reason}", reason);
   }
 }

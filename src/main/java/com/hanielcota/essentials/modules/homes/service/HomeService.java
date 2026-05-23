@@ -1,10 +1,12 @@
 package com.hanielcota.essentials.modules.homes.service;
 
 import com.hanielcota.essentials.modules.homes.domain.Home;
+import com.hanielcota.essentials.modules.homes.material.HomeMaterials;
 import com.hanielcota.essentials.modules.homes.repository.HomeRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,57 +25,72 @@ public final class HomeService {
   private final HomeRepository repository;
   private final HomeLimitResolver limits;
 
-  public Optional<Home> find(UUID owner, String name) {
-    return repository.find(owner, name);
+  public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
+    return this.repository.find(owner, name);
   }
 
-  public List<Home> list(UUID owner) {
-    return repository.list(owner);
+  public List<Home> list(@NonNull UUID owner) {
+    return this.repository.list(owner);
   }
 
-  public int count(UUID owner) {
-    return repository.count(owner);
+  public int count(@NonNull UUID owner) {
+    return this.repository.count(owner);
   }
 
-  public int limit(Player owner) {
-    return limits.resolve(owner);
+  public int limit(@NonNull Player owner) {
+    return this.limits.resolve(owner);
   }
 
-  public SaveResult save(Player owner, String name, Location location, Material material) {
+  public SaveResult save(
+      @NonNull Player owner,
+      @NonNull String name,
+      @NonNull Location location,
+      @org.jspecify.annotations.Nullable Material material) {
     var ownerId = owner.getUniqueId();
-    var existing = repository.find(ownerId, name);
+    var existing = this.repository.find(ownerId, name);
+    var sanitizedMaterial = HomeMaterials.sanitizeIcon(material);
 
     if (existing.isPresent()) {
-      var keepMaterial = material != null ? material : existing.get().material();
-      repository.save(Home.of(ownerId, name, location, keepMaterial));
+      var keepMaterial = material != null ? sanitizedMaterial : existing.get().material();
+      this.repository.save(Home.of(ownerId, name, location, keepMaterial));
       return SaveResult.UPDATED;
     }
-    if (repository.count(ownerId) >= limits.resolve(owner)) {
+    if (this.repository.count(ownerId) >= this.limits.resolve(owner)) {
       return SaveResult.LIMIT_REACHED;
     }
 
-    repository.save(Home.of(ownerId, name, location, material));
+    this.repository.save(Home.of(ownerId, name, location, sanitizedMaterial));
     return SaveResult.CREATED;
   }
 
-  public boolean delete(UUID owner, String name) {
-    return repository.delete(owner, name);
+  public boolean delete(@NonNull UUID owner, @NonNull String name) {
+    return this.repository.delete(owner, name);
   }
 
-  public RenameResult rename(UUID owner, String oldName, String newName) {
-    if (repository.find(owner, oldName).isEmpty()) {
+  public RenameResult rename(
+      @NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
+    if (this.repository.find(owner, oldName).isEmpty()) {
       return RenameResult.NOT_FOUND;
     }
-    if (repository.find(owner, newName).isPresent()) {
+    if (this.repository.find(owner, newName).isPresent()) {
       return RenameResult.NAME_TAKEN;
     }
 
-    repository.rename(owner, oldName, newName);
+    boolean renamed = this.repository.rename(owner, oldName, newName);
+    if (!renamed) {
+      return RenameResult.NOT_FOUND;
+    }
     return RenameResult.RENAMED;
   }
 
-  public boolean setMaterial(UUID owner, String name, Material material) {
-    return repository.updateMaterial(owner, name, material);
+  public boolean setMaterial(
+      @NonNull UUID owner,
+      @NonNull String name,
+      @org.jspecify.annotations.Nullable Material material) {
+    if (!HomeMaterials.isUsableIcon(material)) {
+      return false;
+    }
+    return this.repository.updateMaterial(owner, name, material);
   }
 
   public enum SaveResult {

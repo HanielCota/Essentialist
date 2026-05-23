@@ -24,15 +24,15 @@ public final class WarpService {
   private final WarpStore store;
 
   public Optional<Warp> find(@NonNull String name) {
-    return store.find(name);
+    return this.store.find(name);
   }
 
   public List<Warp> list() {
-    return store.list();
+    return this.store.list();
   }
 
   public List<Warp> listVisibleTo(@NonNull Permissible permissible) {
-    return store.list().stream().filter(warp -> canUse(permissible, warp.name())).toList();
+    return this.store.list().stream().filter(warp -> canUse(permissible, warp.name())).toList();
   }
 
   public void save(@NonNull String name, @NonNull Player creator) {
@@ -40,11 +40,11 @@ public final class WarpService {
     var uniqueId = creator.getUniqueId();
     var warp = Warp.of(name, location, uniqueId);
 
-    store.save(warp);
+    this.store.save(warp);
   }
 
   public boolean delete(@NonNull String name) {
-    return store.delete(name);
+    return this.store.delete(name);
   }
 
   /** Whether {@code permissible} may use the warp named {@code name}. */

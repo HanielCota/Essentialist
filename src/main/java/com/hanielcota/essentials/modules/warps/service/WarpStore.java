@@ -81,7 +81,7 @@ public final class WarpStore {
   }
 
   public Optional<Warp> find(@NonNull String name) {
-    var rows = sqlExecutor.query(SELECT_ONE, WarpStore::readRow, name);
+    var rows = this.sqlExecutor.query(SELECT_ONE, WarpStore::readRow, name);
 
     if (rows.isEmpty()) {
       return Optional.empty();
@@ -91,13 +91,13 @@ public final class WarpStore {
   }
 
   public List<Warp> list() {
-    return sqlExecutor.query(SELECT_ALL, WarpStore::readRow);
+    return this.sqlExecutor.query(SELECT_ALL, WarpStore::readRow);
   }
 
   public void save(@NonNull Warp warp) {
     var creatorIdStr = warp.createdBy().toString();
 
-    sqlExecutor.update(
+    this.sqlExecutor.update(
         UPSERT,
         warp.name(),
         warp.world(),
@@ -117,7 +117,7 @@ public final class WarpStore {
       return false;
     }
 
-    sqlExecutor.update(DELETE, name);
+    this.sqlExecutor.update(DELETE, name);
     return true;
   }
 }

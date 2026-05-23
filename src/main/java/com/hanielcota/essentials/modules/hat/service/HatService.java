@@ -1,10 +1,11 @@
 package com.hanielcota.essentials.modules.hat.service;
 
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 public final class HatService {
 
-  public Result equip(Player player) {
+  public Result equip(@NonNull Player player) {
     var inv = player.getInventory();
     var held = inv.getItemInMainHand();
 

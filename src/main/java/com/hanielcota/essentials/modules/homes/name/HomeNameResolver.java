@@ -12,12 +12,12 @@ public record HomeNameResolver(ConfigHandle<HomesConfig> config, HomeNameValidat
     this.validator = validator;
   }
 
-  public String resolve(String rawName) {
+  public String resolve(@NonNull String rawName) {
     if (rawName == null || rawName.isBlank()) {
-      return config.value().defaultHomeName();
+      return this.config.value().defaultHomeName();
     }
 
-    if (validator.isValid(rawName)) {
+    if (this.validator.isValid(rawName)) {
       return rawName;
     }
 

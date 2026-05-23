@@ -29,31 +29,31 @@ public record BackClickHandler(
     var playerId = player.getUniqueId();
     var entryId = entry.id();
 
-    var snap = config.value();
+    var snap = this.config.value();
     var target = entry.location();
     var world = target.getWorld();
 
     click.close();
 
     if (world == null) {
-      history.remove(playerId, entryId);
+      this.history.remove(playerId, entryId);
       click.reply(snap.noBack());
       return;
     }
 
     var worldName = world.getName();
     if (Bukkit.getWorld(worldName) == null) {
-      history.remove(playerId, entryId);
+      this.history.remove(playerId, entryId);
       click.reply(snap.noBack());
       return;
     }
 
-    if (!teleport.teleportTo(player, target)) {
+    if (!this.teleport.teleportTo(player, target)) {
       click.reply(snap.noBack());
       return;
     }
 
-    history.remove(playerId, entryId);
+    this.history.remove(playerId, entryId);
 
     var x = target.getX();
     var y = target.getY();

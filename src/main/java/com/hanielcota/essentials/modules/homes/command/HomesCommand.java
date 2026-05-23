@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("homes")
@@ -25,16 +26,16 @@ public record HomesCommand(
     ConfigHandle<HomesConfig> config, HomeService service, MenuService menus, HomesMenu menu) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var homes = service.list(sender.getUniqueId());
+    var homes = this.service.list(sender.getUniqueId());
 
     if (homes.isEmpty()) {
-      actor.sendError(config.value().messages().noHomes());
+      actor.sendError(this.config.value().messages().noHomes());
       return;
     }
 
-    menu.prefetch(sender.getUniqueId(), homes);
-    menus.open(sender, HomesMenu.ID);
+    this.menu.prefetch(sender.getUniqueId(), homes);
+    this.menus.open(sender, HomesMenu.ID);
   }
 }

@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command(value = "compactar", aliases = "compact")
@@ -22,10 +23,10 @@ import org.bukkit.entity.Player;
 public record CompactCommand(ConfigHandle<CompactConfig> config, CompactService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var blocks = service.compact(sender);
-    var snap = config.value();
+    var blocks = this.service.compact(sender);
+    var snap = this.config.value();
 
     if (blocks == 0) {
       actor.sendError(snap.nothing());

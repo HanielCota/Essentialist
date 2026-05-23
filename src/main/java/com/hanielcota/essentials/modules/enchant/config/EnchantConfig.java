@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.enchant.config;
 
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -25,17 +26,17 @@ public record EnchantConfig(
         "<red>O nível precisa ser no mínimo 1.");
   }
 
-  public String formatApplied(String enchantment, int level) {
+  public String formatApplied(@NonNull String enchantment, int level) {
     return applied
         .replace("{enchantment}", enchantment)
         .replace("{level}", Integer.toString(level));
   }
 
-  public String formatRemoved(String enchantment) {
+  public String formatRemoved(@NonNull String enchantment) {
     return removed.replace("{enchantment}", enchantment);
   }
 
-  public String formatNotEnchanted(String enchantment) {
+  public String formatNotEnchanted(@NonNull String enchantment) {
     return notEnchanted.replace("{enchantment}", enchantment);
   }
 

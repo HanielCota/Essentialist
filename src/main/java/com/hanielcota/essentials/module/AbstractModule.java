@@ -34,7 +34,7 @@ public abstract class AbstractModule implements Module {
 
   @Override
   public final ModuleMetadata metadata() {
-    return metadata;
+    return this.metadata;
   }
 
   @Override
@@ -48,13 +48,13 @@ public abstract class AbstractModule implements Module {
     try {
       onDisable();
     } finally {
-      for (var listener : listeners) {
+      for (var listener : this.listeners) {
         if (listener == null) {
           continue;
         }
         HandlerList.unregisterAll(listener);
       }
-      listeners.clear();
+      this.listeners.clear();
 
       var moduleId = id();
       for (var closeable : closeable) {
@@ -69,16 +69,16 @@ public abstract class AbstractModule implements Module {
       }
       closeable.clear();
 
-      if (context != null) {
-        var services = context.services();
-        for (var type : ownedServices) {
+      if (this.context != null) {
+        var services = this.context.services();
+        for (var type : this.ownedServices) {
           if (type == null) {
             continue;
           }
           services.unregister(type);
         }
       }
-      ownedServices.clear();
+      this.ownedServices.clear();
       this.context = null;
     }
   }
@@ -88,11 +88,11 @@ public abstract class AbstractModule implements Module {
   protected void onDisable() {}
 
   protected final ModuleContext context() {
-    if (context == null) {
+    if (this.context == null) {
       var moduleId = id();
       throw new IllegalStateException("Module not enabled: " + moduleId);
     }
-    return context;
+    return this.context;
   }
 
   protected final EssentialsPlugin plugin() {
@@ -147,7 +147,7 @@ public abstract class AbstractModule implements Module {
     var pluginManager = server.getPluginManager();
 
     pluginManager.registerEvents(listener, currentPlugin);
-    listeners.add(listener);
+    this.listeners.add(listener);
   }
 
   protected final void registerCloseable(@NonNull AutoCloseable closeable) {
@@ -160,7 +160,7 @@ public abstract class AbstractModule implements Module {
 
     services.unregister(type);
     services.register(type, instance);
-    ownedServices.add(type);
+    this.ownedServices.add(type);
 
     var commandFrameworkOpt = services.find(PaperCommandFramework.class);
     commandFrameworkOpt.ifPresent(framework -> framework.registerDependency(type, instance));

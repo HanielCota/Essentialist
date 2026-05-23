@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.homes.rename;
 
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 /**
@@ -9,5 +10,5 @@ import org.bukkit.entity.Player;
 @FunctionalInterface
 public interface HomeRenamePrompter {
 
-  void prompt(Player player, String homeName);
+  void prompt(@NonNull Player player, @NonNull String homeName);
 }

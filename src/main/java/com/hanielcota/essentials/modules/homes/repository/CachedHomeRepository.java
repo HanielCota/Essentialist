@@ -24,53 +24,53 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
 
   @Override
   public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
-    return cache.find(owner, name);
+    return this.cache.find(owner, name);
   }
 
   @Override
   public List<Home> list(@NonNull UUID owner) {
-    return cache.list(owner);
+    return this.cache.list(owner);
   }
 
   @Override
   public List<Home> listAll() {
-    return cache.listAll();
+    return this.cache.listAll();
   }
 
   @Override
   public int count(@NonNull UUID owner) {
-    return cache.count(owner);
+    return this.cache.count(owner);
   }
 
   @Override
   public void save(@NonNull Home home) {
-    cache.save(home);
-    writer.submit("save home", () -> delegate.save(home));
+    this.cache.save(home);
+    this.writer.submit("save home", () -> this.delegate.save(home));
   }
 
   @Override
   public boolean delete(@NonNull UUID owner, @NonNull String name) {
-    var removed = cache.delete(owner, name);
+    var removed = this.cache.delete(owner, name);
 
     if (removed.isEmpty()) {
       return false;
     }
 
     var actualHome = removed.get();
-    writer.submit("delete home", () -> delegate.delete(owner, actualHome.name()));
+    this.writer.submit("delete home", () -> this.delegate.delete(owner, actualHome.name()));
 
     return true;
   }
 
   @Override
   public boolean rename(@NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
-    var renamed = cache.rename(owner, oldName, newName);
+    var renamed = this.cache.rename(owner, oldName, newName);
 
     if (renamed.isEmpty()) {
       return false;
     }
 
-    writer.submit("rename home", () -> delegate.rename(owner, oldName, newName));
+    this.writer.submit("rename home", () -> this.delegate.rename(owner, oldName, newName));
 
     return true;
   }
@@ -78,19 +78,20 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   @Override
   public boolean updateMaterial(
       @NonNull UUID owner, @NonNull String name, @NonNull Material material) {
-    var updated = cache.updateMaterial(owner, name, material);
+    var updated = this.cache.updateMaterial(owner, name, material);
 
     if (updated.isEmpty()) {
       return false;
     }
 
-    writer.submit("update home material", () -> delegate.updateMaterial(owner, name, material));
+    this.writer.submit(
+        "update home material", () -> this.delegate.updateMaterial(owner, name, material));
 
     return true;
   }
 
   @Override
   public void close() {
-    writer.close();
+    this.writer.close();
   }
 }

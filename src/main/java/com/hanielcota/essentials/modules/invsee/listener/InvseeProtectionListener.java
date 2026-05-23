@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.invsee.listener;
 
 import com.hanielcota.essentials.modules.invsee.service.InvseeHolder;
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public final class InvseeProtectionListener implements Listener {
 
   /** Closes every open /invsee GUI that mirrors the player with {@code targetId}. */
-  private static void closeViewsTargeting(UUID targetId) {
+  private static void closeViewsTargeting(@NonNull UUID targetId) {
     for (var viewer : Bukkit.getOnlinePlayers()) {
       if (viewer.getOpenInventory().getTopInventory().getHolder() instanceof InvseeHolder holder
           && holder.targetId().equals(targetId)) {
@@ -28,12 +29,12 @@ public final class InvseeProtectionListener implements Listener {
   }
 
   @EventHandler
-  public void onTargetQuit(PlayerQuitEvent event) {
+  public void onTargetQuit(@NonNull PlayerQuitEvent event) {
     closeViewsTargeting(event.getPlayer().getUniqueId());
   }
 
   @EventHandler
-  public void onTargetDeath(PlayerDeathEvent event) {
+  public void onTargetDeath(@NonNull PlayerDeathEvent event) {
     closeViewsTargeting(event.getEntity().getUniqueId());
   }
 }

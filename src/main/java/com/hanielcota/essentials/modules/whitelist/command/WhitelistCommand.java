@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("whitelist")
@@ -27,14 +28,14 @@ public record WhitelistCommand(
 
   @DefaultSubcommand
   @PlayerOnly
-  public void open(CommandActor actor) {
-    menus.open(actor.unwrap(Player.class), WhitelistMenu.ID);
+  public void open(@NonNull CommandActor actor) {
+    this.menus.open(actor.unwrap(Player.class), WhitelistMenu.ID);
   }
 
   @Subcommand("add")
-  public void add(CommandActor sender, @Arg("jogador") String name) {
-    var snap = config.value();
-    switch (service.add(name)) {
+  public void add(@NonNull CommandActor sender, @Arg("jogador") String name) {
+    var snap = this.config.value();
+    switch (this.service.add(name)) {
       case ADDED -> sender.sendSuccess(snap.formatAdded(name));
       case ALREADY_WHITELISTED -> sender.sendError(snap.formatAlreadyAdded(name));
       case UNKNOWN_PLAYER -> sender.sendError(snap.formatUnknownPlayer(name));
@@ -42,9 +43,9 @@ public record WhitelistCommand(
   }
 
   @Subcommand("remove")
-  public void remove(CommandActor sender, @Arg("jogador") String name) {
-    var snap = config.value();
-    if (service.remove(name)) {
+  public void remove(@NonNull CommandActor sender, @Arg("jogador") String name) {
+    var snap = this.config.value();
+    if (this.service.remove(name)) {
       sender.sendSuccess(snap.formatRemoved(name));
       return;
     }

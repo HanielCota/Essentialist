@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command(value = "curar", aliases = "heal")
@@ -31,8 +32,8 @@ public record HealCommand(
 
   @DefaultSubcommand
   @PermissionForOther(".others")
-  public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    var snap = config.value();
+  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    var snap = this.config.value();
     String name = subject.getName();
     boolean self = Senders.isSelf(sender, subject);
 
@@ -41,13 +42,13 @@ public record HealCommand(
       return;
     }
 
-    if (!service.heal(subject)) {
+    if (!this.service.heal(subject)) {
       sender.sendError(snap.whenAlreadyFull().forSender(self, name));
       return;
     }
 
     var messages = snap.whenHealed();
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
     sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
   }
 
@@ -55,14 +56,14 @@ public record HealCommand(
   @Permission("essentials.heal.all")
   @Description("Restaura a vida de todos os jogadores online.")
   @Syntax("/curar todos")
-  public void healAll(CommandActor sender) {
+  public void healAll(@NonNull CommandActor sender) {
     int healed = 0;
-    for (Player player : players.all()) {
+    for (Player player : this.players.all()) {
 
-      if (player.getHealth() > 0 && service.heal(player)) {
+      if (player.getHealth() > 0 && this.service.heal(player)) {
         healed++;
       }
     }
-    sender.sendSuccess(config.value().formatHealedAll(healed));
+    sender.sendSuccess(this.config.value().formatHealedAll(healed));
   }
 }

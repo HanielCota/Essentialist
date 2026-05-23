@@ -19,6 +19,6 @@ public final class PlayerDeathListener implements Listener {
     var location = player.getLocation();
     var uuid = player.getUniqueId();
 
-    history.push(uuid, location);
+    this.history.push(uuid, location);
   }
 }

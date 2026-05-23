@@ -22,22 +22,22 @@ public final class EssentialsPlugin extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    if (core == null) {
+    if (this.core == null) {
       return;
     }
     try {
-      core.shutdown();
+      this.core.shutdown();
     } catch (RuntimeException e) {
       getLogger().log(Level.SEVERE, "Error during Essentials shutdown", e);
     } finally {
-      core = null;
+      this.core = null;
     }
   }
 
   public EssentialsApi api() {
-    if (core == null) {
+    if (this.core == null) {
       throw new IllegalStateException("Essentials is not enabled");
     }
-    return core;
+    return this.core;
   }
 }

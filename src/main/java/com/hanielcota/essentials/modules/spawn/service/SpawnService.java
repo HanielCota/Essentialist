@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.spawn.service;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import lombok.NonNull;
 
 /**
  * Reads and writes the server spawn, with the latest value cached in memory so {@code /spawn} never
@@ -23,12 +24,12 @@ public final class SpawnService {
 
   /** The configured spawn, or empty when {@code /setspawn} has not run yet. */
   public Optional<SpawnLocation> current() {
-    return Optional.ofNullable(cached.get());
+    return Optional.ofNullable(this.cached.get());
   }
 
   /** Persists {@code location} as the spawn point and refreshes the cache. */
-  public void set(SpawnLocation location) {
-    store.save(location);
-    cached.set(location);
+  public void set(@NonNull SpawnLocation location) {
+    this.store.save(location);
+    this.cached.set(location);
   }
 }

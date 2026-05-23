@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("setspawn")
@@ -23,9 +24,9 @@ import org.bukkit.entity.Player;
 public record SetSpawnCommand(ConfigHandle<SpawnConfig> config, SpawnService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(@NonNull CommandActor actor) {
     Player sender = actor.unwrap(Player.class);
-    service.set(SpawnLocation.of(sender.getLocation()));
-    actor.sendSuccess(config.value().messages().spawnSet());
+    this.service.set(SpawnLocation.of(sender.getLocation()));
+    actor.sendSuccess(this.config.value().messages().spawnSet());
   }
 }

@@ -71,12 +71,13 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   private final @NonNull SqlExecutor sqlExecutor;
 
-  public static void install(SqlExecutor sqlExecutor) {
+  public static void install(@NonNull SqlExecutor sqlExecutor) {
     sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
   }
 
   private static void setNullable(
-      PreparedStatement stmt, int index, @Nullable Object value, int sqlType) throws SQLException {
+      @NonNull PreparedStatement stmt, int index, @Nullable Object value, int sqlType)
+      throws SQLException {
     if (value == null) {
       stmt.setNull(index, sqlType);
       return;
@@ -87,7 +88,7 @@ public final class SqliteTpaHistory implements TpaHistory {
   /**
    * Reads one row, or {@code null} when a persisted enum no longer exists — dropped from output.
    */
-  private static @Nullable TpaHistoryEntry mapRow(ResultSet rs) throws SQLException {
+  private static @Nullable TpaHistoryEntry mapRow(@NonNull ResultSet rs) throws SQLException {
     var type = parseEnum(TeleportRequestType.class, rs.getString("type"));
     var status = parseEnum(TeleportRequestStatus.class, rs.getString("status"));
     if (type == null || status == null) {
@@ -103,7 +104,7 @@ public final class SqliteTpaHistory implements TpaHistory {
         readDestination(rs));
   }
 
-  private static @Nullable Destination readDestination(ResultSet rs) throws SQLException {
+  private static @Nullable Destination readDestination(@NonNull ResultSet rs) throws SQLException {
     var world = rs.getString("world");
     if (world == null) {
       return null;
@@ -111,7 +112,8 @@ public final class SqliteTpaHistory implements TpaHistory {
     return new Destination(world, rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"));
   }
 
-  private static <E extends Enum<E>> @Nullable E parseEnum(Class<E> type, String value) {
+  private static <E extends Enum<E>> @Nullable E parseEnum(
+      @NonNull Class<E> type, @NonNull String value) {
     try {
       return Enum.valueOf(type, value);
     } catch (IllegalArgumentException | NullPointerException _) {
@@ -120,8 +122,8 @@ public final class SqliteTpaHistory implements TpaHistory {
   }
 
   @Override
-  public void push(TpaHistoryEntry entry) {
-    sqlExecutor.tx(
+  public void push(@NonNull TpaHistoryEntry entry) {
+    this.sqlExecutor.tx(
         conn -> {
           insert(conn, entry);
           trim(conn, entry.requester());
@@ -129,11 +131,12 @@ public final class SqliteTpaHistory implements TpaHistory {
   }
 
   @Override
-  public List<TpaHistoryEntry> list(UUID requester) {
-    return sqlExecutor.query(LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
+  public List<TpaHistoryEntry> list(@NonNull UUID requester) {
+    return this.sqlExecutor.query(LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
   }
 
-  private void insert(Connection conn, TpaHistoryEntry entry) throws SQLException {
+  private void insert(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
+      throws SQLException {
     try (var statement = conn.prepareStatement(INSERT)) {
       var destination = entry.destination();
       statement.setString(1, entry.requester().toString());
@@ -151,8 +154,8 @@ public final class SqliteTpaHistory implements TpaHistory {
     }
   }
 
-  private void trim(Connection conn, UUID requester) throws SQLException {
+  private void trim(@NonNull Connection conn, @NonNull UUID requester) throws SQLException {
     var requesterId = requester.toString();
-    sqlExecutor.execute(conn, TRIM, requesterId, requesterId, CAPACITY);
+    this.sqlExecutor.execute(conn, TRIM, requesterId, requesterId, CAPACITY);
   }
 }

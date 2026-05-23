@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command(value = "reparar", aliases = "repair")
@@ -27,18 +28,18 @@ public record RepairCommand(
     ConfigHandle<RepairConfig> config, RepairService service, PaperCommandFramework framework) {
 
   @DefaultSubcommand
-  public void execute(CommandActor sender, @TargetOrSelf Player subject) {
-    var snap = config.value();
+  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    var snap = this.config.value();
     String name = subject.getName();
     boolean self = Senders.isSelf(sender, subject);
 
-    var result = service.repairHand(subject);
+    var result = this.service.repairHand(subject);
     switch (result) {
       case EMPTY_HAND -> sender.sendError(snap.whenEmptyHand().forSender(self, name));
       case NOTHING_TO_REPAIR -> sender.sendError(snap.whenNothingHand().forSender(self, name));
       case REPAIRED -> {
         var messages = snap.whenHandRepaired();
-        var target = framework.actorOf(subject);
+        var target = this.framework.actorOf(subject);
         String selfMessage = messages.forSender(self, name);
         sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
       }
@@ -46,12 +47,12 @@ public record RepairCommand(
   }
 
   @Subcommand({"tudo", "all"})
-  public void all(CommandActor sender, @TargetOrSelf Player subject) {
-    var snap = config.value();
+  public void all(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    var snap = this.config.value();
     String name = subject.getName();
     boolean self = Senders.isSelf(sender, subject);
 
-    int repaired = service.repairAll(subject);
+    int repaired = this.service.repairAll(subject);
     if (repaired == 0) {
       sender.sendError(snap.whenNothingAll().forSender(self, name));
       return;
@@ -59,7 +60,7 @@ public record RepairCommand(
 
     var messages = snap.whenAllRepaired();
     String count = Integer.toString(repaired);
-    var target = framework.actorOf(subject);
+    var target = this.framework.actorOf(subject);
     String selfMessage = messages.forSender(self, name).replace("{count}", count);
     String targetMessage = messages.forTarget(name).replace("{count}", count);
 

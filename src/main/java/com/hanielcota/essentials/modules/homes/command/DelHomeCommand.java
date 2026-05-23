@@ -14,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("delhome")
@@ -26,17 +27,17 @@ public record DelHomeCommand(
     ConfigHandle<HomesConfig> config, HomeService service, HomeNameResolver nameResolver) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
+  public void execute(@NonNull CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
     var sender = actor.unwrap(Player.class);
-    var messages = config.value().messages();
-    var name = nameResolver.resolve(rawName);
+    var messages = this.config.value().messages();
+    var name = this.nameResolver.resolve(rawName);
 
     if (name == null) {
       actor.sendError(messages.invalidName());
       return;
     }
 
-    if (!service.delete(sender.getUniqueId(), name)) {
+    if (!this.service.delete(sender.getUniqueId(), name)) {
       actor.sendError(messages.unknownHome().replace("{name}", name));
       return;
     }

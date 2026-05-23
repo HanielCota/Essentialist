@@ -6,12 +6,11 @@
 
 # ⚡ Essentialist
 
-**Um plugin de essentials modular, moderno e altamente otimizado para servidores Paper e Folia.**
+**Um plugin de essentials modular, moderno e altamente otimizado para servidores Paper.**
 
 [![Build](https://img.shields.io/github/actions/workflow/status/HanielCota/Essentialist/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=build)](https://github.com/HanielCota/Essentialist/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/technologies/downloads/)
 [![Paper](https://img.shields.io/badge/Paper-1.21.11+-00ADD8?style=for-the-badge&logo=minecraft&logoColor=white)](https://papermc.io/)
-[![Folia](https://img.shields.io/badge/Folia-Supported-7E57C2?style=for-the-badge)](https://papermc.io/software/folia)
 [![License](https://img.shields.io/badge/License-MIT-43A047?style=for-the-badge)](LICENSE)
 
 ---
@@ -31,8 +30,8 @@ a estabilidade do servidor.
 
 * 🧩 **Arquitetura Modular**: Cada recurso é um `Module` isolado com ciclo de vida explícito (`BOOTING` ➔ `ENABLED` ➔
   `DISABLING`).
-* 🧵 **Pronto para Folia**: Suporte nativo a servidores multi-threaded [Folia](https://papermc.io/software/folia),
-  utilizando agendamentos baseados em região (Region-based Scheduling).
+* 🧵 **Preparado para agendamento moderno**: Fluxos críticos usam schedulers compatíveis com Paper moderno, sem declarar
+  suporte completo a Folia enquanto todos os módulos globais não forem isolados por região.
 * 🔄 **Recarregamento Dinâmico (Hot-Reload)**: Modifique as configurações e aplique-as instantaneamente com
   `/essentials reload` sem reiniciar o servidor.
 * 💾 **Persistência Robusta**: Histórico de teletransporte (`/back`) e sistemas complexos salvos localmente via **SQLite
@@ -50,7 +49,7 @@ a estabilidade do servidor.
 
 | Requisito                       | Versão Suportada                                                         |
 |:--------------------------------|:-------------------------------------------------------------------------|
-| **Plataforma de Servidor**      | [Paper](https://papermc.io/) `1.21.11` ou mais recente (Folia suportado) |
+| **Plataforma de Servidor**      | [Paper](https://papermc.io/) `1.21.11` ou mais recente                  |
 | **Ambiente de Execução (Java)** | OpenJDK `25` ou superior                                                 |
 | **Banco de Dados**              | SQLite (embarcado automaticamente)                                       |
 

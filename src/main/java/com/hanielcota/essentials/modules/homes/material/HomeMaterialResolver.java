@@ -20,13 +20,13 @@ public record HomeMaterialResolver(
     this(config, Material::isItem);
   }
 
-  public Material resolve(String rawMaterial) {
+  public Material resolve(@NonNull String rawMaterial) {
     if (rawMaterial == null || rawMaterial.isBlank()) {
-      return config.value().defaultMaterial();
+      return this.config.value().defaultMaterial();
     }
 
     var material = Material.matchMaterial(rawMaterial);
-    if (material != null && itemMaterial.test(material)) {
+    if (material != null && this.itemMaterial.test(material)) {
       return material;
     }
 

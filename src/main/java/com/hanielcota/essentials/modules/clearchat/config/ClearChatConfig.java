@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.clearchat.config;
 
+import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -17,7 +18,7 @@ public record ClearChatConfig(
     return Math.clamp(lines, 0, 300);
   }
 
-  public String formatAnnouncement(String player) {
+  public String formatAnnouncement(@NonNull String player) {
     return announcement.replace("{player}", player);
   }
 }

@@ -4,6 +4,7 @@ import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.Material;
 
 /**
@@ -14,19 +15,19 @@ import org.bukkit.Material;
  */
 public interface HomeRepository {
 
-  Optional<Home> find(UUID owner, String name);
+  Optional<Home> find(@NonNull UUID owner, @NonNull String name);
 
-  List<Home> list(UUID owner);
+  List<Home> list(@NonNull UUID owner);
 
   List<Home> listAll();
 
-  int count(UUID owner);
+  int count(@NonNull UUID owner);
 
-  void save(Home home);
+  void save(@NonNull Home home);
 
-  boolean delete(UUID owner, String name);
+  boolean delete(@NonNull UUID owner, @NonNull String name);
 
-  boolean rename(UUID owner, String oldName, String newName);
+  boolean rename(@NonNull UUID owner, @NonNull String oldName, @NonNull String newName);
 
-  boolean updateMaterial(UUID owner, String name, Material material);
+  boolean updateMaterial(@NonNull UUID owner, @NonNull String name, @NonNull Material material);
 }

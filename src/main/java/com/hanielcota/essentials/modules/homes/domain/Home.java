@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.domain;
 
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -23,7 +24,11 @@ public record Home(
     Material material,
     long createdAt) {
 
-  public static Home of(UUID owner, String name, Location location, Material material) {
+  public static Home of(
+      @NonNull UUID owner,
+      @NonNull String name,
+      @NonNull Location location,
+      @NonNull Material material) {
     var world = location.getWorld();
     return new Home(
         owner,
@@ -38,16 +43,36 @@ public record Home(
         System.currentTimeMillis());
   }
 
-  public Home withName(String newName) {
-    return new Home(owner, newName, world, x, y, z, yaw, pitch, material, createdAt);
+  public Home withName(@NonNull String newName) {
+    return new Home(
+        this.owner,
+        newName,
+        this.world,
+        this.x,
+        this.y,
+        this.z,
+        this.yaw,
+        this.pitch,
+        this.material,
+        this.createdAt);
   }
 
-  public Home withMaterial(Material newMaterial) {
-    return new Home(owner, name, world, x, y, z, yaw, pitch, newMaterial, createdAt);
+  public Home withMaterial(@NonNull Material newMaterial) {
+    return new Home(
+        this.owner,
+        this.name,
+        this.world,
+        this.x,
+        this.y,
+        this.z,
+        this.yaw,
+        this.pitch,
+        newMaterial,
+        this.createdAt);
   }
 
   public Location resolve() {
-    var w = Bukkit.getWorld(world);
-    return w != null ? new Location(w, x, y, z, yaw, pitch) : null;
+    var w = Bukkit.getWorld(this.world);
+    return w != null ? new Location(w, this.x, this.y, this.z, this.yaw, this.pitch) : null;
   }
 }

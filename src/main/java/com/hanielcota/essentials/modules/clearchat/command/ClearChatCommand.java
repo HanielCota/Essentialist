@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 
 @Command("clearchat")
 @Permission("essentials.clearchat")
@@ -19,10 +20,10 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 public record ClearChatCommand(ConfigHandle<ClearChatConfig> config, ClearChatService service) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
-    var snap = config.value();
+  public void execute(@NonNull CommandActor actor) {
+    var snap = this.config.value();
     var announcement = snap.formatAnnouncement(actor.name());
-    service.clearChat(snap.effectiveLines(), announcement);
+    this.service.clearChat(snap.effectiveLines(), announcement);
 
     // Players see the broadcast above; the console does not, so echo it there.
     if (!actor.isPlayer()) {

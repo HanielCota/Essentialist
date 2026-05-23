@@ -18,12 +18,12 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Read-only menu of a player's last {@link TpaHistory#CAPACITY} sent teleport requests. Items are
@@ -54,7 +54,8 @@ public final class TpaHistoryMenu implements Menu, Listener {
    * dropping nulls, out-of-range and duplicate values. Falls back to the leading slots when nothing
    * usable remains, since {@link PaginationConfig} rejects an empty content-slot list.
    */
-  private static List<Integer> sanitizeContentSlots(List<Integer> configured, int capacity) {
+  private static List<Integer> sanitizeContentSlots(
+      @NonNull List<Integer> configured, int capacity) {
     var valid =
         configured.stream()
             .filter(Objects::nonNull)
@@ -70,7 +71,7 @@ public final class TpaHistoryMenu implements Menu, Listener {
 
   /** Stores a history snapshot to be consumed by this viewer's next menu render. */
   public void prefetch(@NonNull UUID viewer, @NonNull List<TpaHistoryEntry> entries) {
-    prefetched.put(viewer, List.copyOf(entries));
+    this.prefetched.put(viewer, List.copyOf(entries));
   }
 
   @Override
@@ -80,7 +81,7 @@ public final class TpaHistoryMenu implements Menu, Listener {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    var settings = config.value().menu();
+    var settings = this.config.value().menu();
     int rows = Math.clamp(settings.rows(), MIN_ROWS, MAX_ROWS);
     var slots = sanitizeContentSlots(settings.contentSlots(), rows * SLOTS_PER_ROW);
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
@@ -94,21 +95,21 @@ public final class TpaHistoryMenu implements Menu, Listener {
         .register();
   }
 
-  private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
-    var entries = prefetched.remove(player.getUniqueId());
+  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
+    var entries = this.prefetched.remove(player.getUniqueId());
     if (entries == null) {
-      entries = history.list(player.getUniqueId());
+      entries = this.history.list(player.getUniqueId());
     }
     var slots = new ArrayList<SlotDefinition>(entries.size());
     for (int i = 0; i < entries.size(); i++) {
-      var template = renderer.render(entries.get(i), i + 1);
+      var template = this.renderer.render(entries.get(i), i + 1);
       slots.add(SlotDefinition.of(-1, template, click -> {}));
     }
     return slots;
   }
 
   @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
-    prefetched.remove(event.getPlayer().getUniqueId());
+  public void onQuit(@NonNull PlayerQuitEvent event) {
+    this.prefetched.remove(event.getPlayer().getUniqueId());
   }
 }

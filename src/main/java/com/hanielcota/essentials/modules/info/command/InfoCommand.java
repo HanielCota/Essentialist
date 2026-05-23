@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("informacoes")
@@ -22,9 +23,9 @@ import org.bukkit.entity.Player;
 public record InfoCommand(InfoMenu menu, MenuService menus) {
 
   @DefaultSubcommand
-  public void execute(CommandActor actor, @TargetOrSelf Player target) {
+  public void execute(@NonNull CommandActor actor, @TargetOrSelf @NonNull Player target) {
     Player viewer = actor.unwrap(Player.class);
-    menu.prepare(viewer.getUniqueId(), target.getUniqueId());
-    menus.open(viewer, InfoMenu.ID);
+    this.menu.prepare(viewer.getUniqueId(), target.getUniqueId());
+    this.menus.open(viewer, InfoMenu.ID);
   }
 }

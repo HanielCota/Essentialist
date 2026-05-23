@@ -1,11 +1,12 @@
 package com.hanielcota.essentials.modules.clear.service;
 
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public final class ClearService {
 
-  private static int countItems(ItemStack[] items) {
+  private static int countItems(@NonNull ItemStack[] items) {
     var total = 0;
     for (var item : items) {
       if (item != null && !item.getType().isAir()) {
@@ -16,7 +17,7 @@ public final class ClearService {
   }
 
   // Clears storage (hotbar + main); armor and off-hand only when includeArmor is true.
-  public int clear(Player player, boolean includeArmor) {
+  public int clear(@NonNull Player player, boolean includeArmor) {
     var inv = player.getInventory();
     var storage = inv.getStorageContents();
     var armor = inv.getArmorContents();

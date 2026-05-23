@@ -10,8 +10,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import lombok.NonNull;
 import org.bukkit.Material;
-import org.jspecify.annotations.NonNull;
 
 /** Renders one {@link TpaHistoryEntry} as the target player's head in the history menu. */
 public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
@@ -20,15 +20,15 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
   private static final String UNKNOWN = "—";
 
   private static String formatLine(
-      String line,
-      String targetName,
-      String type,
-      String status,
-      String world,
-      String x,
-      String y,
-      String z,
-      String time) {
+      @NonNull String line,
+      @NonNull String targetName,
+      @NonNull String type,
+      @NonNull String status,
+      @NonNull String world,
+      @NonNull String x,
+      @NonNull String y,
+      @NonNull String z,
+      @NonNull String time) {
     return line.replace("{target}", targetName)
         .replace("{type}", type)
         .replace("{status}", status)
@@ -41,7 +41,7 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
 
   @Override
   public @NonNull ItemTemplate render(@NonNull TpaHistoryEntry entry, int humanIndex) {
-    var settings = config.value().menu();
+    var settings = this.config.value().menu();
     var target = entry.target();
     var destination = entry.destination();
 
@@ -76,15 +76,15 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
   }
 
   private String[] buildLore(
-      List<String> template,
-      String targetName,
-      String type,
-      String status,
-      String world,
-      String x,
-      String y,
-      String z,
-      String time) {
+      @NonNull List<String> template,
+      @NonNull String targetName,
+      @NonNull String type,
+      @NonNull String status,
+      @NonNull String world,
+      @NonNull String x,
+      @NonNull String y,
+      @NonNull String z,
+      @NonNull String time) {
     var lore = new String[template.size()];
     for (var i = 0; i < template.size(); i++) {
       lore[i] = formatLine(template.get(i), targetName, type, status, world, x, y, z, time);
