@@ -33,8 +33,8 @@ public record FeedCommand(
   @PermissionForOther(".others")
   public void execute(CommandActor sender, @TargetOrSelf Player subject) {
     var snap = config.value();
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
     if (!service.feed(subject)) {
       sender.sendError(snap.whenAlreadyFull().forSender(self, name));
@@ -51,8 +51,8 @@ public record FeedCommand(
   @Description("Alimenta todos os jogadores online.")
   @Syntax("/alimentar todos")
   public void feedAll(CommandActor sender) {
-    int fed = 0;
-    for (Player player : players.all()) {
+    var fed = 0;
+    for (var player : players.all()) {
       if (service.feed(player)) {
         fed++;
       }
