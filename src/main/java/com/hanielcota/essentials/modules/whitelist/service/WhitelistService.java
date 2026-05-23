@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.whitelist.service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -7,64 +8,57 @@ import org.bukkit.OfflinePlayer;
 
 public final class WhitelistService {
 
-  /** A player's name, falling back to the UUID string when the name is unknown. */
+  // Player name; falls back to UUID when the server has never resolved the name.
   public static String nameOf(OfflinePlayer player) {
-    String name = player.getName();
+    var name = player.getName();
     return name != null ? name : player.getUniqueId().toString();
   }
 
-  /**
-   * An online or cached player for {@code name}, or {@code null} if the server has never seen it.
-   */
+  // Online or cached player for `name`; null when the server has never seen it.
   private static OfflinePlayer resolveKnown(String name) {
-    OfflinePlayer online = Bukkit.getPlayerExact(name);
+    var online = Bukkit.getPlayerExact(name);
     return online != null ? online : Bukkit.getOfflinePlayerIfCached(name);
   }
 
-  /** A whitelisted player matching {@code name}, or {@code null} when none matches. */
   private static OfflinePlayer findWhitelisted(String name) {
-    return Bukkit.getWhitelistedPlayers().stream()
-        .filter(player -> name.equalsIgnoreCase(player.getName()))
-        .findFirst()
-        .orElse(null);
+    for (var player : Bukkit.getWhitelistedPlayers()) {
+      if (name.equalsIgnoreCase(player.getName())) return player;
+    }
+    return null;
   }
 
-  /** Whitelisted players, sorted by name (case-insensitive). */
+  // Whitelisted players, sorted by name (case-insensitive).
   public List<OfflinePlayer> list() {
-    return Bukkit.getWhitelistedPlayers().stream()
-        .sorted(Comparator.comparing(WhitelistService::nameOf, String.CASE_INSENSITIVE_ORDER))
-        .toList();
+    var whitelisted = Bukkit.getWhitelistedPlayers();
+    var sorted = new ArrayList<OfflinePlayer>(whitelisted);
+    sorted.sort(Comparator.comparing(WhitelistService::nameOf, String.CASE_INSENSITIVE_ORDER));
+    return sorted;
   }
 
-  /**
-   * Whitelists a player by name. Resolves only players the server already knows — online or in the
-   * user cache; a name the server has never seen yields {@link AddResult#UNKNOWN_PLAYER}.
-   */
+  // Resolves only players the server already knows (online or in the user cache).
   public AddResult add(String name) {
-
-    OfflinePlayer player = resolveKnown(name);
+    var player = resolveKnown(name);
     if (player == null) {
       return AddResult.UNKNOWN_PLAYER;
     }
     if (player.isWhitelisted()) {
       return AddResult.ALREADY_WHITELISTED;
     }
+
     player.setWhitelisted(true);
     return AddResult.ADDED;
   }
 
-  /** Removes a player from the whitelist by name; returns {@code false} if not whitelisted. */
   public boolean remove(String name) {
-
-    OfflinePlayer match = findWhitelisted(name);
+    var match = findWhitelisted(name);
     if (match == null) {
       return false;
     }
+
     match.setWhitelisted(false);
     return true;
   }
 
-  /** Removes an already-resolved player from the whitelist. */
   public void remove(OfflinePlayer player) {
     player.setWhitelisted(false);
   }

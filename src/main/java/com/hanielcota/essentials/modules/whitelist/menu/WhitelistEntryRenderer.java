@@ -13,7 +13,7 @@ public record WhitelistEntryRenderer(ConfigHandle<WhitelistConfig> config) {
   /** A whitelisted player as a head item. */
   public ItemTemplate render(OfflinePlayer player) {
     var snap = config.value();
-    String name = WhitelistService.nameOf(player);
+    var name = WhitelistService.nameOf(player);
     return ItemTemplate.builder(Material.PLAYER_HEAD)
         .head(player.getUniqueId())
         .name(snap.formatItemName(name))

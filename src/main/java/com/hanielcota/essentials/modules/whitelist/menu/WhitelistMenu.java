@@ -13,7 +13,6 @@ import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,10 +37,13 @@ public final class WhitelistMenu implements Menu {
   private final WhitelistEntryRenderer renderer;
   private final WhitelistClickHandler clickHandler;
 
-  /** Content slots cover every row but the last, which is left for pagination controls. */
+  // Content slots cover every row but the last, which is left for pagination controls.
   private static List<Integer> contentSlots(int rows) {
-    int count = rows > MIN_ROWS ? (rows - 1) * SLOTS_PER_ROW : SLOTS_PER_ROW;
-    return IntStream.range(0, count).boxed().toList();
+    var count = rows > MIN_ROWS ? (rows - 1) * SLOTS_PER_ROW : SLOTS_PER_ROW;
+    var slots = new ArrayList<Integer>(count);
+
+    for (var i = 0; i < count; i++) slots.add(i);
+    return slots;
   }
 
   private static ItemTemplate pageButton(String name) {
@@ -56,7 +58,7 @@ public final class WhitelistMenu implements Menu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = config.value();
-    int rows = snap.effectiveRows();
+    var rows = snap.effectiveRows();
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(rows)).build();
 
     var builder =
@@ -69,10 +71,10 @@ public final class WhitelistMenu implements Menu {
     // Without page buttons a whitelist larger than one page is unreachable. The last
     // row is free for them only when the menu has more than one row.
     if (rows > MIN_ROWS) {
-      int lastRow = (rows - 1) * SLOTS_PER_ROW;
+      var lastRow = (rows - 1) * SLOTS_PER_ROW;
       builder
-          .previousPageButton(lastRow + 3, pageButton("<yellow>Â« PÃ¡gina anterior"))
-          .nextPageButton(lastRow + 5, pageButton("<yellow>PrÃ³xima pÃ¡gina Â»"));
+          .previousPageButton(lastRow + 3, pageButton("<yellow>« Página anterior"))
+          .nextPageButton(lastRow + 5, pageButton("<yellow>Próxima página »"));
     }
 
     builder.build().register();
@@ -97,11 +99,11 @@ public final class WhitelistMenu implements Menu {
    * #SKIP} entries that consume the leading indices without rendering anything.
    */
   private List<SlotDefinition> emptyState() {
-    int contentRows = contentSlots(config.value().effectiveRows()).size() / SLOTS_PER_ROW;
-    int centerSlot = (contentRows / 2) * SLOTS_PER_ROW + SLOTS_PER_ROW / 2;
+    var contentRows = contentSlots(config.value().effectiveRows()).size() / SLOTS_PER_ROW;
+    var centerSlot = (contentRows / 2) * SLOTS_PER_ROW + SLOTS_PER_ROW / 2;
 
     var slots = new ArrayList<SlotDefinition>(centerSlot + 1);
-    for (int i = 0; i < centerSlot; i++) {
+    for (var i = 0; i < centerSlot; i++) {
       slots.add(SKIP);
     }
     slots.add(SlotDefinition.of(-1, renderer.renderEmpty(), click -> {}));
