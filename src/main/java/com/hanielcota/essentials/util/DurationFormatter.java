@@ -7,12 +7,12 @@ public final class DurationFormatter {
   private DurationFormatter() {}
 
   public static String format(Duration duration) {
-    long totalSeconds = Math.max(0L, duration.toSeconds());
+    var totalSeconds = Math.max(0L, duration.toSeconds());
 
-    long days = totalSeconds / 86_400L;
-    long hours = (totalSeconds % 86_400L) / 3_600L;
-    long minutes = (totalSeconds % 3_600L) / 60L;
-    long seconds = totalSeconds % 60L;
+    var days = totalSeconds / 86_400L;
+    var hours = (totalSeconds % 86_400L) / 3_600L;
+    var minutes = (totalSeconds % 3_600L) / 60L;
+    var seconds = totalSeconds % 60L;
 
     var sb = new StringBuilder();
     if (days > 0) sb.append(days).append("d ");

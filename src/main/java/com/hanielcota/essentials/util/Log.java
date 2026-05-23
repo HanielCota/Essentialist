@@ -20,10 +20,10 @@ public final class Log {
       return pattern;
     }
     var sb = new StringBuilder(pattern.length() + args.length * 16);
-    int argIdx = 0;
-    int pos = 0;
+    var argIdx = 0;
+    var pos = 0;
     while (pos < pattern.length()) {
-      int next = pattern.indexOf("{}", pos);
+      var next = pattern.indexOf("{}", pos);
       if (next < 0 || argIdx >= args.length) {
         sb.append(pattern, pos, pattern.length());
         return sb.toString();
