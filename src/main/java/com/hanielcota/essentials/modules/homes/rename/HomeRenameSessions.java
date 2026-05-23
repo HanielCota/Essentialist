@@ -4,16 +4,15 @@ import com.hanielcota.essentials.scheduler.Task;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Per-player rename sessions: which home is being renamed and the scheduled timeout that fires if
- * the player never sends a chat message. Sole responsibility: lifecycle of the {@link Pending}
- * entry — start (replacing any prior one), consume on completion, cancel on quit.
+ * the player never sends a chat message.
+ *
+ * <p>Pure POJO state — start (replacing any prior), consume on completion, cancel on demand. Quit
+ * cleanup lives in {@code HomeTeleportListener} per SRP.
  */
-public final class HomeRenameSessions implements Listener {
+public final class HomeRenameSessions {
 
   private final ConcurrentHashMap<UUID, Pending> pending = new ConcurrentHashMap<>();
 
@@ -29,11 +28,6 @@ public final class HomeRenameSessions implements Listener {
   public void cancel(UUID player) {
     var prior = pending.remove(player);
     if (prior != null) prior.timeoutTask().cancel();
-  }
-
-  @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
-    cancel(event.getPlayer().getUniqueId());
   }
 
   public record Pending(String homeName, Task timeoutTask) {}

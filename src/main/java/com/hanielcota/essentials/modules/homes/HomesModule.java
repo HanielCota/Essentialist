@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.homes.command.HomeCommand;
 import com.hanielcota.essentials.modules.homes.command.HomesCommand;
 import com.hanielcota.essentials.modules.homes.command.SetHomeCommand;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.listener.HomeTeleportListener;
 import com.hanielcota.essentials.modules.homes.menu.DeleteHomeDialog;
 import com.hanielcota.essentials.modules.homes.menu.HomeClickHandler;
 import com.hanielcota.essentials.modules.homes.menu.HomeEntryRenderer;
@@ -57,10 +58,8 @@ public final class HomesModule extends AbstractModule {
     var teleporter = new HomeTeleporter(config, delayed, framework);
 
     var actionTarget = new HomesActionTarget();
-    registerListener(actionTarget);
-
     var renameSessions = new HomeRenameSessions();
-    registerListener(renameSessions);
+    registerListener(new HomeTeleportListener(delayed, actionTarget, renameSessions));
 
     var rename =
         new HomeRenameOrchestrator(

@@ -3,16 +3,15 @@ package com.hanielcota.essentials.modules.homes.menu;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
- * Tracks which home a player is currently acting on across the sub-flows opened from the /homes
- * menu (delete confirmation, material picker, chat-driven rename). The home name is captured when
- * the dispatch click fires, so the sub-flow does not need to look up which home was clicked.
+ * Per-player record of which home a sub-flow opened from /homes is acting on (delete dialog,
+ * material picker, chat-driven rename). The home name is captured when the dispatch click fires, so
+ * the sub-flow does not need to look up which home was clicked.
+ *
+ * <p>Pure POJO state — quit cleanup lives in {@code HomeTeleportListener} per SRP.
  */
-public final class HomesActionTarget implements Listener {
+public final class HomesActionTarget {
 
   private final ConcurrentHashMap<UUID, String> targets = new ConcurrentHashMap<>();
 
@@ -26,10 +25,5 @@ public final class HomesActionTarget implements Listener {
 
   public void clear(UUID player) {
     targets.remove(player);
-  }
-
-  @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
-    targets.remove(event.getPlayer().getUniqueId());
   }
 }

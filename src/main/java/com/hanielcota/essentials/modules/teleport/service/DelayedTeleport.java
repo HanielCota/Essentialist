@@ -37,7 +37,7 @@ public final class DelayedTeleport implements Listener {
   public void schedule(Player player, Location destination, Duration delay, Callback callback) {
 
     var uuid = player.getUniqueId();
-    cancelSilently(uuid);
+    cancel(uuid);
 
     if (delay.isZero() || delay.isNegative()) {
       callback.onScheduled(0);
@@ -55,7 +55,12 @@ public final class DelayedTeleport implements Listener {
     return pending.containsKey(player);
   }
 
-  private void cancelSilently(UUID player) {
+  /**
+   * Silently drops the pending teleport for {@code player} — no callback fires. Public so
+   * per-module listeners (e.g. {@code HomeTeleportListener}) can own their own cancel rules in
+   * addition to the shared move/damage/quit handling done here.
+   */
+  public void cancel(UUID player) {
     var p = pending.remove(player);
     if (p != null) {
       p.task.cancel();
@@ -101,7 +106,7 @@ public final class DelayedTeleport implements Listener {
 
   @EventHandler
   public void onQuit(PlayerQuitEvent event) {
-    cancelSilently(event.getPlayer().getUniqueId());
+    cancel(event.getPlayer().getUniqueId());
   }
 
   private void fireCancelled(UUID player) {
