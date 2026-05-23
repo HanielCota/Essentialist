@@ -13,7 +13,7 @@
 [![Paper](https://img.shields.io/badge/Paper-1.21.11+-00ADD8?style=for-the-badge&logo=minecraft&logoColor=white)](https://papermc.io/)
 [![License](https://img.shields.io/badge/License-MIT-43A047?style=for-the-badge)](LICENSE)
 
-[Overview](#overview) · [Features](#features) · [Commands](#commands) · [Installation](#installation) · [Configuration](#configuration) · [Building](#building-from-source)
+[Overview](#overview) · [Features](#features) · [Commands](#commands) · [Installation](#installation) · [Configuration](#configuration) · [Releases](#releases) · [Building](#building-from-source)
 
 </div>
 
@@ -228,6 +228,19 @@ Useful development commands:
 ./gradlew spotlessApply
 ./gradlew spotlessCheck
 ```
+
+## Releases
+
+Releases are published from version tags.
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+When a tag starting with `v` is pushed, GitHub Actions builds the plugin, creates a GitHub Release, generates release notes, and uploads the jar from `build/libs/`.
+
+GitHub Packages is not enabled by default because Essentialist is distributed as a server plugin jar. Packages are useful later if the project exposes a separate API module that other plugins should consume through Maven.
 
 ## Project Layout
 
