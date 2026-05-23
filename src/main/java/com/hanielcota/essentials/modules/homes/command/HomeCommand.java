@@ -3,8 +3,11 @@ package com.hanielcota.essentials.modules.homes.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.HomesMessages;
+import com.hanielcota.essentials.modules.homes.service.Home;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
+import com.hanielcota.essentials.modules.teleport.service.DelayedTeleportPrompt;
 import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -15,7 +18,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import java.util.UUID;
 import org.bukkit.entity.Player;
 
 @Command("home")
@@ -25,10 +28,7 @@ import org.bukkit.entity.Player;
 @Description("Teleporta para uma home (ou \"home\" se ausente).")
 @Syntax("/home [nome]")
 public record HomeCommand(
-    ConfigHandle<HomesConfig> config,
-    HomeService service,
-    DelayedTeleport delayed,
-    PaperCommandFramework framework) {
+    ConfigHandle<HomesConfig> config, HomeService service, DelayedTeleport delayed) {
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
@@ -39,9 +39,7 @@ public record HomeCommand(
 
     var home = service.find(sender.getUniqueId(), name);
     if (home.isEmpty()) {
-      var key =
-          service.count(sender.getUniqueId()) == 0 ? messages.noHomes() : messages.unknownHome();
-      actor.sendError(Placeholders.format(key, "name", name));
+      actor.sendError(missingMessage(messages, sender.getUniqueId(), name));
       return;
     }
 
@@ -51,41 +49,23 @@ public record HomeCommand(
       return;
     }
 
-    var resolvedName = home.get().name();
-    var senderActor = framework.actorOf(sender);
     delayed.schedule(
-        sender,
-        resolved.get(),
-        snap.teleportDelay(),
-        new DelayedTeleport.Callback() {
-          @Override
-          public void onScheduled(long seconds) {
-            if (seconds > 0) {
-              senderActor.sendMessage(
-                  Placeholders.format(
-                      messages.teleporting(),
-                      "name",
-                      resolvedName,
-                      "seconds",
-                      Long.toString(seconds)));
-            }
-          }
+        sender, resolved.get(), snap.teleportDelay(), prompt(actor, messages, home.get()));
+  }
 
-          @Override
-          public void onSuccess() {
-            senderActor.sendSuccess(
-                Placeholders.format(messages.teleported(), "name", resolvedName));
-          }
+  private DelayedTeleportPrompt prompt(CommandActor actor, HomesMessages messages, Home home) {
+    return new DelayedTeleportPrompt(
+        actor,
+        Placeholders.format(messages.teleporting(), "name", home.name()),
+        Placeholders.format(messages.teleported(), "name", home.name()),
+        messages.cancelled(),
+        messages.failed());
+  }
 
-          @Override
-          public void onCancelled() {
-            senderActor.sendError(messages.cancelled());
-          }
-
-          @Override
-          public void onFailed() {
-            senderActor.sendError(messages.failed());
-          }
-        });
+  private String missingMessage(HomesMessages messages, UUID owner, String name) {
+    if (service.count(owner) == 0) {
+      return messages.noHomes();
+    }
+    return Placeholders.format(messages.unknownHome(), "name", name);
   }
 }

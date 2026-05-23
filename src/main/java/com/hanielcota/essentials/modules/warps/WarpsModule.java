@@ -11,7 +11,6 @@ import com.hanielcota.essentials.modules.warps.command.WarpsCommand;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import com.hanielcota.essentials.modules.warps.service.WarpStore;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
 
 /**
@@ -37,10 +36,9 @@ public final class WarpsModule extends AbstractModule {
     registerService(WarpService.class, warpService);
 
     var delayed = service(DelayedTeleport.class);
-    var framework = service(PaperCommandFramework.class);
 
     registerCommand(new SetWarpCommand(config, warpService));
-    registerCommand(new WarpCommand(config, warpService, delayed, framework));
+    registerCommand(new WarpCommand(config, warpService, delayed));
     registerCommand(new DelWarpCommand(config, warpService));
     registerCommand(new WarpsCommand(config, warpService));
   }

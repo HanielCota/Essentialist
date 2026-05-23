@@ -105,9 +105,11 @@ public final class HomeStore {
   public boolean delete(UUID owner, String name) {
     Objects.requireNonNull(owner, "owner");
     Objects.requireNonNull(name, "name");
-    var before = count(owner);
+    if (find(owner, name).isEmpty()) {
+      return false;
+    }
     sqlExecutor.update(DELETE, owner.toString(), name);
-    return count(owner) < before;
+    return true;
   }
 
   private static Home readRow(ResultSet rs) throws SQLException {

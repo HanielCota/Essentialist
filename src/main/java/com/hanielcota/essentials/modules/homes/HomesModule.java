@@ -12,7 +12,6 @@ import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeStore;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
 
 /**
@@ -38,10 +37,9 @@ public final class HomesModule extends AbstractModule {
     registerService(HomeService.class, homeService);
 
     var delayed = service(DelayedTeleport.class);
-    var framework = service(PaperCommandFramework.class);
 
     registerCommand(new SetHomeCommand(config, homeService));
-    registerCommand(new HomeCommand(config, homeService, delayed, framework));
+    registerCommand(new HomeCommand(config, homeService, delayed));
     registerCommand(new DelHomeCommand(config, homeService));
     registerCommand(new HomesCommand(config, homeService));
   }

@@ -9,7 +9,6 @@ import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.spawn.service.SpawnStore;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
 
 /**
@@ -34,9 +33,8 @@ public final class SpawnModule extends AbstractModule {
     registerService(SpawnService.class, spawnService);
 
     var delayed = service(DelayedTeleport.class);
-    var framework = service(PaperCommandFramework.class);
 
     registerCommand(new SetSpawnCommand(config, spawnService));
-    registerCommand(new SpawnCommand(config, spawnService, delayed, framework));
+    registerCommand(new SpawnCommand(config, spawnService, delayed));
   }
 }

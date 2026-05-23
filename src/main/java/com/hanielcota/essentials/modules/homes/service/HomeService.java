@@ -51,12 +51,15 @@ public final class HomeService {
     Objects.requireNonNull(location, "location");
 
     var ownerId = owner.getUniqueId();
-    var existing = store.find(ownerId, name).isPresent();
-    if (!existing && store.count(ownerId) >= limits.resolve(owner)) {
+    if (store.find(ownerId, name).isPresent()) {
+      store.save(Home.of(ownerId, name, location));
+      return SaveResult.UPDATED;
+    }
+    if (store.count(ownerId) >= limits.resolve(owner)) {
       return SaveResult.LIMIT_REACHED;
     }
     store.save(Home.of(ownerId, name, location));
-    return existing ? SaveResult.UPDATED : SaveResult.CREATED;
+    return SaveResult.CREATED;
   }
 
   /** Deletes the home. Returns {@code true} when a row was removed. */

@@ -1,0 +1,48 @@
+package com.hanielcota.essentials.modules.teleport.service;
+
+import com.hanielcota.essentials.util.Placeholders;
+import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.Objects;
+
+/**
+ * Standard chat feedback for a {@link DelayedTeleport} warm-up.
+ *
+ * <p>Sole responsibility: route each lifecycle hook to the right {@link CommandActor} channel.
+ * Templates are pre-formatted by the caller (e.g. with {@code {name}} already resolved); this class
+ * only fills the {@code {seconds}} placeholder of {@link #teleporting}.
+ */
+public record DelayedTeleportPrompt(
+    CommandActor actor, String teleporting, String teleported, String cancelled, String failed)
+    implements DelayedTeleport.Callback {
+
+  public DelayedTeleportPrompt {
+    Objects.requireNonNull(actor, "actor");
+    Objects.requireNonNull(teleporting, "teleporting");
+    Objects.requireNonNull(teleported, "teleported");
+    Objects.requireNonNull(cancelled, "cancelled");
+    Objects.requireNonNull(failed, "failed");
+  }
+
+  @Override
+  public void onScheduled(long seconds) {
+    if (seconds <= 0) {
+      return;
+    }
+    actor.sendMessage(Placeholders.format(teleporting, "seconds", Long.toString(seconds)));
+  }
+
+  @Override
+  public void onSuccess() {
+    actor.sendSuccess(teleported);
+  }
+
+  @Override
+  public void onCancelled() {
+    actor.sendError(cancelled);
+  }
+
+  @Override
+  public void onFailed() {
+    actor.sendError(failed);
+  }
+}
