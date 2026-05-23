@@ -12,12 +12,11 @@ import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -47,26 +46,26 @@ public final class BackMenu implements Menu, Listener {
    */
   private final Map<UUID, List<HistoryEntry>> prefetched = new ConcurrentHashMap<>();
 
-  /**
-   * Filters configured slot indices to those that fit inside a menu of {@code capacity} slots,
-   * dropping nulls, negatives, out-of-range and duplicate values. Falls back to the leading slots
-   * when nothing usable remains, since {@link PaginationConfig} rejects an empty content-slot list.
-   */
+  // Filters configured slot indices to fit inside `capacity`, dropping nulls/out-of-range/duplicates.
+  // Falls back to leading slots when nothing usable remains — PaginationConfig rejects empty lists.
   private static List<Integer> sanitizeContentSlots(List<Integer> configured, int capacity) {
-    var valid =
-        configured.stream()
-            .filter(Objects::nonNull)
-            .filter(slot -> slot >= 0 && slot < capacity)
-            .distinct()
-            .toList();
+    var valid = new ArrayList<Integer>(configured.size());
+    var seen = new HashSet<Integer>(configured.size());
+
+    for (var slot : configured) {
+      if (slot == null || slot < 0 || slot >= capacity) continue;
+      if (seen.add(slot)) valid.add(slot);
+    }
     if (!valid.isEmpty()) {
       return valid;
     }
-    int fallback = Math.min(capacity, TeleportHistory.CAPACITY);
-    return IntStream.range(0, fallback).boxed().toList();
+
+    var fallback = Math.min(capacity, TeleportHistory.CAPACITY);
+    var leading = new ArrayList<Integer>(fallback);
+    for (var i = 0; i < fallback; i++) leading.add(i);
+    return leading;
   }
 
-  /** Stores a history snapshot to be consumed by this viewer's next menu render. */
   public void prefetch(@NonNull UUID viewer, @NonNull List<HistoryEntry> entries) {
     prefetched.put(viewer, List.copyOf(entries));
   }
@@ -79,7 +78,7 @@ public final class BackMenu implements Menu, Listener {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = config.value();
-    int rows = Math.max(MIN_ROWS, Math.min(MAX_ROWS, snap.menuRows()));
+    var rows = Math.max(MIN_ROWS, Math.min(MAX_ROWS, snap.menuRows()));
     var slots = sanitizeContentSlots(snap.menuContentSlots(), rows * SLOTS_PER_ROW);
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
 
@@ -99,7 +98,7 @@ public final class BackMenu implements Menu, Listener {
     }
     var slots = new ArrayList<SlotDefinition>(entries.size());
 
-    for (int i = 0; i < entries.size(); i++) {
+    for (var i = 0; i < entries.size(); i++) {
       var entry = entries.get(i);
       var template = renderer.render(entry, i + 1);
       slots.add(SlotDefinition.of(-1, template, click -> clickHandler.handle(click, entry)));

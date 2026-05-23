@@ -26,7 +26,7 @@ public record BackCommand(
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var entries = history.list(sender.getUniqueId());
     if (entries.isEmpty()) {
       actor.sendError(config.value().noBack());
