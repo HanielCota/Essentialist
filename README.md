@@ -47,11 +47,11 @@ a estabilidade do servidor.
 
 ## 📋 Requisitos
 
-| Requisito                       | Versão Suportada                                                         |
-|:--------------------------------|:-------------------------------------------------------------------------|
-| **Plataforma de Servidor**      | [Paper](https://papermc.io/) `1.21.11` ou mais recente                  |
-| **Ambiente de Execução (Java)** | OpenJDK `25` ou superior                                                 |
-| **Banco de Dados**              | SQLite (embarcado automaticamente)                                       |
+| Requisito                       | Versão Suportada                                       |
+|:--------------------------------|:-------------------------------------------------------|
+| **Plataforma de Servidor**      | [Paper](https://papermc.io/) `1.21.11` ou mais recente |
+| **Ambiente de Execução (Java)** | OpenJDK `25` ou superior                               |
+| **Banco de Dados**              | SQLite (embarcado automaticamente)                     |
 
 ---
 

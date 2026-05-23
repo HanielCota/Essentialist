@@ -33,7 +33,8 @@ public final class HomesMenuFactory {
       @NonNull Scheduler scheduler) {
 
     var renderer = new HomeEntryRenderer(config);
-    var clickHandler = new HomeClickHandler(teleporter, framework, actionTarget, rename, scheduler);
+    var clickHandler =
+        new HomeClickHandler(teleporter, framework, actionTarget, rename, scheduler, menus);
     var homesMenu = new HomesMenu(config, homeService, renderer, clickHandler);
 
     var dialogs =

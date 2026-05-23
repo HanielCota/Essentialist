@@ -11,20 +11,6 @@ import org.junit.jupiter.api.Test;
 
 class SqlHomeMapperTest {
 
-  @Test
-  void fallsBackToDefaultIconWhenPersistedMaterialIsNotRenderable() throws Exception {
-    var home = SqlHomeMapper.read(resultSet("AIR"));
-
-    assertEquals(Material.RED_BED, home.material());
-  }
-
-  @Test
-  void fallsBackToDefaultIconWhenPersistedMaterialIsUnknown() throws Exception {
-    var home = SqlHomeMapper.read(resultSet("not_a_material"));
-
-    assertEquals(Material.RED_BED, home.material());
-  }
-
   private static ResultSet resultSet(String material) {
     var values =
         Map.<String, Object>of(
@@ -63,5 +49,19 @@ class SqlHomeMapperTest {
                 default -> throw new UnsupportedOperationException(method.getName());
               };
             });
+  }
+
+  @Test
+  void fallsBackToDefaultIconWhenPersistedMaterialIsNotRenderable() throws Exception {
+    var home = SqlHomeMapper.read(resultSet("AIR"));
+
+    assertEquals(Material.RED_BED, home.material());
+  }
+
+  @Test
+  void fallsBackToDefaultIconWhenPersistedMaterialIsUnknown() throws Exception {
+    var home = SqlHomeMapper.read(resultSet("not_a_material"));
+
+    assertEquals(Material.RED_BED, home.material());
   }
 }

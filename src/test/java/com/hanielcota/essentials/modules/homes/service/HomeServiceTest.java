@@ -18,38 +18,6 @@ import org.junit.jupiter.api.Test;
 
 class HomeServiceTest {
 
-  @Test
-  void renameDoesNotReportSuccessWhenRepositoryRefusesMutation() {
-    var owner = UUID.randomUUID();
-    var home = new Home(owner, "base", "world", 0, 64, 0, 0, 0, Material.RED_BED, 1);
-    var repository = new RefusingRenameRepository(home);
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 1));
-
-    var result = service.rename(owner, "base", "main");
-
-    assertEquals(HomeService.RenameResult.NOT_FOUND, result);
-  }
-
-  @Test
-  void saveNormalizesNullMaterialToDefaultIcon() {
-    var owner = UUID.randomUUID();
-    var repository = new RecordingRepository();
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 3));
-
-    service.save(player(owner), "base", location(), null);
-
-    assertEquals(Material.RED_BED, repository.saved.material());
-  }
-
-  @Test
-  void setMaterialRejectsNonRenderableIconBeforeRepositoryMutation() {
-    var repository = new RecordingRepository();
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 3));
-
-    assertFalse(service.setMaterial(UUID.randomUUID(), "base", Material.AIR));
-    assertEquals(0, repository.updateMaterialCalls);
-  }
-
   private static Player player(UUID owner) {
     return (Player)
         Proxy.newProxyInstance(
@@ -82,6 +50,38 @@ class HomeServiceTest {
                 });
 
     return new Location(world, 1, 2, 3);
+  }
+
+  @Test
+  void renameDoesNotReportSuccessWhenRepositoryRefusesMutation() {
+    var owner = UUID.randomUUID();
+    var home = new Home(owner, "base", "world", 0, 64, 0, 0, 0, Material.RED_BED, 1);
+    var repository = new RefusingRenameRepository(home);
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 1));
+
+    var result = service.rename(owner, "base", "main");
+
+    assertEquals(HomeService.RenameResult.NOT_FOUND, result);
+  }
+
+  @Test
+  void saveNormalizesNullMaterialToDefaultIcon() {
+    var owner = UUID.randomUUID();
+    var repository = new RecordingRepository();
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 3));
+
+    service.save(player(owner), "base", location(), null);
+
+    assertEquals(Material.RED_BED, repository.saved.material());
+  }
+
+  @Test
+  void setMaterialRejectsNonRenderableIconBeforeRepositoryMutation() {
+    var repository = new RecordingRepository();
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 3));
+
+    assertFalse(service.setMaterial(UUID.randomUUID(), "base", Material.AIR));
+    assertEquals(0, repository.updateMaterialCalls);
   }
 
   private static final class RefusingRenameRepository implements HomeRepository {

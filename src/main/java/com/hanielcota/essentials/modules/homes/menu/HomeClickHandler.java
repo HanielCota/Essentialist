@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.ItemClickHandler;
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenamePrompter;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
@@ -28,6 +29,7 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
   private final HomesActionTarget target;
   private final HomeRenamePrompter rename;
   private final Scheduler scheduler;
+  private final MenuService menus;
 
   @Override
   public void handle(@NonNull ClickContext click, @NonNull Home home) {
@@ -68,7 +70,9 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
     this.target.set(uuid, homeName);
 
     if (delay) {
-      this.scheduler.runOnEntityLater(player, () -> click.open(menuId), SUBMENU_OPEN_DELAY);
+      click.close();
+      this.scheduler.runOnEntityLater(
+          player, () -> this.menus.open(player, menuId), SUBMENU_OPEN_DELAY);
       return;
     }
 
