@@ -14,9 +14,15 @@ public final class ClearModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
-    var config = configure("clear", ClearConfig.class, ClearConfig::defaults, new ClearService());
-    registerCommand(
-        new ClearCommand(
-            config, service(ClearService.class), service(PaperCommandFramework.class)));
+    var defaultValues = ClearConfig.defaults();
+    var clearService = new ClearService();
+
+    var configHandle = configure("clear", ClearConfig.class, () -> defaultValues, clearService);
+
+    var activeService = service(ClearService.class);
+    var commandFramework = service(PaperCommandFramework.class);
+
+    var clearCommand = new ClearCommand(configHandle, activeService, commandFramework);
+    registerCommand(clearCommand);
   }
 }
