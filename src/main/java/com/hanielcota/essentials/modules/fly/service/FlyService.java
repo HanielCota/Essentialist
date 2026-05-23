@@ -23,7 +23,7 @@ public final class FlyService {
 
   /** Enables or disables flight explicitly. See {@link #toggle} for the Creative/Spectator note. */
   public Result set(Player player, boolean enable) {
-    GameMode mode = player.getGameMode();
+    var mode = player.getGameMode();
     if (mode == GameMode.CREATIVE || mode == GameMode.SPECTATOR) {
       return Result.UNSUPPORTED;
     }
