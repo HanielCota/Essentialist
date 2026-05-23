@@ -30,7 +30,7 @@ public record SpeedConfig(
   }
 
   private static MessagePair resolve(String self, String other, int valor) {
-    String formatted = Integer.toString(valor);
+    var formatted = Integer.toString(valor);
     return new MessagePair(self.replace("{valor}", formatted), other.replace("{valor}", formatted));
   }
 

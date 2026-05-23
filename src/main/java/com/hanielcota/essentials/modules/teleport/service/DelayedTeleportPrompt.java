@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.teleport.service;
 
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.core.CommandActor;
 
 /**
@@ -19,7 +18,7 @@ public record DelayedTeleportPrompt(
     if (seconds <= 0) {
       return;
     }
-    actor.sendMessage(Placeholders.format(teleporting, "seconds", Long.toString(seconds)));
+    actor.sendMessage(teleporting.replace("{seconds}", Long.toString(seconds)));
   }
 
   @Override
