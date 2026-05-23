@@ -1,0 +1,69 @@
+name: Bug report
+description: Report something that is not working as expected.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem. Please include enough detail for someone else to reproduce it.
+
+  - type: input
+    id: essentialist-version
+    attributes:
+      label: Essentialist version
+      description: The plugin version shown in the jar name or server logs.
+      placeholder: "0.1.0-SNAPSHOT"
+    validations:
+      required: true
+
+  - type: input
+    id: server-version
+    attributes:
+      label: Server version
+      description: Include the exact Paper version from `/version`.
+      placeholder: "Paper 1.21.11"
+    validations:
+      required: true
+
+  - type: input
+    id: java-version
+    attributes:
+      label: Java version
+      description: Include the output from `java -version` if possible.
+      placeholder: "Java 25"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the problem in plain language.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: List the commands or actions that trigger the issue.
+      placeholder: |
+        1. Run `/...`
+        2. Click `...`
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or error messages
+      description: Paste relevant console output. Use a paste service for long logs.
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra context
+      description: Add screenshots, configuration snippets, or anything else that may help.
