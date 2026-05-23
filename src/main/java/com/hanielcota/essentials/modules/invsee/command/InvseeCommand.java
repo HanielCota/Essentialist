@@ -24,7 +24,7 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
 
   @DefaultSubcommand
   public void execute(CommandActor sender, @OnlinePlayer Player target) {
-    Player viewer = sender.unwrap(Player.class);
+    var viewer = sender.unwrap(Player.class);
     var snap = config.value();
     if (target.equals(viewer)) {
       sender.sendError(snap.self());

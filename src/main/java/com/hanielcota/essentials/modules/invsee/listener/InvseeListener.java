@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
 
 @RequiredArgsConstructor
 public final class InvseeListener implements Listener {
@@ -17,7 +16,7 @@ public final class InvseeListener implements Listener {
 
   @EventHandler
   public void onClick(InventoryClickEvent event) {
-    Inventory top = event.getView().getTopInventory();
+    var top = event.getView().getTopInventory();
     if (!(top.getHolder() instanceof InvseeHolder holder)) {
       return;
     }
@@ -30,11 +29,11 @@ public final class InvseeListener implements Listener {
 
   @EventHandler
   public void onDrag(InventoryDragEvent event) {
-    Inventory top = event.getView().getTopInventory();
+    var top = event.getView().getTopInventory();
     if (!(top.getHolder() instanceof InvseeHolder holder)) {
       return;
     }
-    for (int rawSlot : event.getRawSlots()) {
+    for (var rawSlot : event.getRawSlots()) {
       if (rawSlot < top.getSize() && rawSlot >= InvseeService.FIRST_LOCKED_SLOT) {
         event.setCancelled(true);
         return;
