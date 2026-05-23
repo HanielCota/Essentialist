@@ -83,18 +83,15 @@ public final class TitleService {
 
       while (segments.size() < 2) {
         var open = input.indexOf('"', cursor);
-        if (open < 0) {
-          break;
+        if (open >= 0) {
+          var close = input.indexOf('"', open + 1);
+          if (close < 0) {
+            segments.add(input.substring(open + 1));
+          } else {
+            segments.add(input.substring(open + 1, close));
+            cursor = close + 1;
+          }
         }
-
-        var close = input.indexOf('"', open + 1);
-        if (close < 0) {
-          segments.add(input.substring(open + 1));
-          break;
-        }
-
-        segments.add(input.substring(open + 1, close));
-        cursor = close + 1;
       }
 
       return segments;

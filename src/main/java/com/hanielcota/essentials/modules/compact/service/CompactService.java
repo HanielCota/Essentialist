@@ -31,18 +31,17 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
     var remaining = amount;
     for (var slot = 0; slot < inv.getSize() && remaining > 0; slot++) {
       var item = inv.getItem(slot);
-      if (item == null || item.getType() != material || !ItemStacks.isPlain(item)) {
-        continue;
-      }
-      var take = Math.min(remaining, item.getAmount());
-      var left = item.getAmount() - take;
-      remaining -= take;
+      if (item != null && item.getType() == material && ItemStacks.isPlain(item)) {
+        var take = Math.min(remaining, item.getAmount());
+        var left = item.getAmount() - take;
+        remaining -= take;
 
-      if (left == 0) {
-        inv.setItem(slot, null);
-        continue;
+        if (left == 0) {
+          inv.setItem(slot, null);
+        } else {
+          item.setAmount(left);
+        }
       }
-      item.setAmount(left);
     }
   }
 
@@ -57,19 +56,18 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       var total = entry.getValue();
       var recipe = recipes.get(ingredient);
       var unit = recipe.amount();
-      if (unit <= 0) continue;
+      var blocks = unit > 0 ? total / unit : 0;
 
-      var blocks = total / unit;
-      if (blocks == 0) continue;
+      if (blocks > 0) {
+        removeFromInventory(inv, ingredient, blocks * unit);
+        var produced = new ItemStack(recipe.block(), blocks);
+        var overflow = inv.addItem(produced);
 
-      removeFromInventory(inv, ingredient, blocks * unit);
-      var produced = new ItemStack(recipe.block(), blocks);
-      var overflow = inv.addItem(produced);
-
-      for (var drop : overflow.values()) {
-        player.getWorld().dropItem(player.getLocation(), drop);
+        for (var drop : overflow.values()) {
+          player.getWorld().dropItem(player.getLocation(), drop);
+        }
+        blocksCompacted += blocks;
       }
-      blocksCompacted += blocks;
     }
     return blocksCompacted;
   }

@@ -10,17 +10,9 @@ public final class ClearService {
     var total = 0;
 
     for (var item : items) {
-      if (item == null) {
-        continue;
+      if (item != null && !item.getType().isAir()) {
+        total += item.getAmount();
       }
-
-      var type = item.getType();
-      if (type.isAir()) {
-        continue;
-      }
-
-      var amount = item.getAmount();
-      total += amount;
     }
 
     return total;

@@ -21,25 +21,19 @@ public final class HomeLimitResolver {
     var maxLimit = Integer.MIN_VALUE;
 
     for (var attachmentInfo : player.getEffectivePermissions()) {
-      if (!attachmentInfo.getValue()) {
-        continue;
-      }
-
       var permission = attachmentInfo.getPermission();
-      if (!permission.startsWith(LIMIT_PERMISSION_PREFIX)) {
-        continue;
-      }
+      if (attachmentInfo.getValue() && permission.startsWith(LIMIT_PERMISSION_PREFIX)) {
+        try {
+          var prefixLength = LIMIT_PERMISSION_PREFIX.length();
+          var limitSuffix = permission.substring(prefixLength);
+          var limit = Integer.parseInt(limitSuffix);
 
-      try {
-        var prefixLength = LIMIT_PERMISSION_PREFIX.length();
-        var limitSuffix = permission.substring(prefixLength);
-        var limit = Integer.parseInt(limitSuffix);
-
-        if (limit > maxLimit) {
-          maxLimit = limit;
+          if (limit > maxLimit) {
+            maxLimit = limit;
+          }
+        } catch (NumberFormatException _) {
+          // Skip invalid formats
         }
-      } catch (NumberFormatException _) {
-        // Skip invalid formats
       }
     }
 
