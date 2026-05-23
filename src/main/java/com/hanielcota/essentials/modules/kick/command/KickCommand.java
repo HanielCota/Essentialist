@@ -29,7 +29,7 @@ public record KickCommand(ConfigHandle<KickConfig> config, KickService service) 
       @OnlinePlayer Player target,
       @DefaultValue("") @GreedyString @Arg("motivo") String motivo) {
     var snap = config.value();
-    String reason = snap.reasonOr(motivo.strip());
+    var reason = snap.reasonOr(motivo.strip());
 
     service.kick(target, snap.formatScreen(reason));
     sender.sendSuccess(snap.formatKicked(target.getName(), reason));
