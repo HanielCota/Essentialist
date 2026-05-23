@@ -4,10 +4,8 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.HomesMessages;
-import com.hanielcota.essentials.modules.homes.service.Home;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
-import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
-import com.hanielcota.essentials.modules.teleport.service.DelayedTeleportPrompt;
+import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -27,7 +25,7 @@ import org.bukkit.entity.Player;
 @Description("Teleporta para uma home (ou \"home\" se ausente).")
 @Syntax("/home [nome]")
 public record HomeCommand(
-    ConfigHandle<HomesConfig> config, HomeService service, DelayedTeleport delayed) {
+    ConfigHandle<HomesConfig> config, HomeService service, HomeTeleporter teleporter) {
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
@@ -42,23 +40,7 @@ public record HomeCommand(
       return;
     }
 
-    var resolved = home.get().resolve();
-    if (resolved.isEmpty()) {
-      actor.sendError(messages.worldGone());
-      return;
-    }
-
-    delayed.schedule(
-        sender, resolved.get(), snap.teleportDelay(), prompt(actor, messages, home.get()));
-  }
-
-  private DelayedTeleportPrompt prompt(CommandActor actor, HomesMessages messages, Home home) {
-    return new DelayedTeleportPrompt(
-        actor,
-        messages.teleporting().replace("{name}", home.name()),
-        messages.teleported().replace("{name}", home.name()),
-        messages.cancelled(),
-        messages.failed());
+    teleporter.teleport(sender, home.get(), actor);
   }
 
   private String missingMessage(HomesMessages messages, UUID owner, String name) {

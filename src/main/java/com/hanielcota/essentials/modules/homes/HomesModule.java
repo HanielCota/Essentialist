@@ -19,6 +19,7 @@ import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeStore;
+import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
@@ -51,6 +52,8 @@ public final class HomesModule extends AbstractModule {
     var framework = service(PaperCommandFramework.class);
     var scheduler = service(Scheduler.class);
 
+    var teleporter = new HomeTeleporter(config, delayed, framework);
+
     var actionTarget = new HomesActionTarget();
     registerListener(actionTarget);
 
@@ -58,8 +61,7 @@ public final class HomesModule extends AbstractModule {
     registerListener(rename);
 
     var renderer = new HomeEntryRenderer(config);
-    var clickHandler =
-        new HomeClickHandler(config, homeService, delayed, framework, actionTarget, rename);
+    var clickHandler = new HomeClickHandler(teleporter, framework, actionTarget, rename);
     var menu = new HomesMenu(config, homeService, renderer, clickHandler);
     registerMenu(menu);
     registerListener(menu);
@@ -68,7 +70,7 @@ public final class HomesModule extends AbstractModule {
     registerMenu(new MaterialPickerMenu(config, homeService, menus, actionTarget));
 
     registerCommand(new SetHomeCommand(config, homeService));
-    registerCommand(new HomeCommand(config, homeService, delayed));
+    registerCommand(new HomeCommand(config, homeService, teleporter));
     registerCommand(new DelHomeCommand(config, homeService));
     registerCommand(new HomesCommand(config, homeService, menus, menu));
   }
