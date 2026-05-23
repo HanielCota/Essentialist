@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -25,11 +24,12 @@ public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @Arg("nome") String name) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var messages = config.value().messages();
     var existed = service.find(name).isPresent();
+
     service.save(name, sender);
     var template = existed ? messages.warpUpdated() : messages.warpSet();
-    actor.sendSuccess(Placeholders.format(template, "name", name));
+    actor.sendSuccess(template.replace("{name}", name));
   }
 }

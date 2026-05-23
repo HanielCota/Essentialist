@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -26,9 +25,9 @@ public record DelWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
   public void execute(CommandActor actor, @Arg("nome") String name) {
     var messages = config.value().messages();
     if (!service.delete(name)) {
-      actor.sendError(Placeholders.format(messages.unknownWarp(), "name", name));
+      actor.sendError(messages.unknownWarp().replace("{name}", name));
       return;
     }
-    actor.sendSuccess(Placeholders.format(messages.warpDeleted(), "name", name));
+    actor.sendSuccess(messages.warpDeleted().replace("{name}", name));
   }
 }

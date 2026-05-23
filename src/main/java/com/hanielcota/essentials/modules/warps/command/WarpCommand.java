@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.config.WarpsMessages;
 import com.hanielcota.essentials.modules.warps.service.Warp;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -30,19 +29,19 @@ public record WarpCommand(
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @Arg("nome") String name) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var snap = config.value();
     var messages = snap.messages();
 
     var warp = service.find(name);
     if (warp.isEmpty()) {
-      actor.sendError(Placeholders.format(messages.unknownWarp(), "name", name));
+      actor.sendError(messages.unknownWarp().replace("{name}", name));
       return;
     }
 
     var resolvedName = warp.get().name();
     if (!service.canUse(sender, resolvedName)) {
-      actor.sendError(Placeholders.format(messages.noPermission(), "name", resolvedName));
+      actor.sendError(messages.noPermission().replace("{name}", resolvedName));
       return;
     }
 
@@ -59,8 +58,8 @@ public record WarpCommand(
   private DelayedTeleportPrompt prompt(CommandActor actor, WarpsMessages messages, Warp warp) {
     return new DelayedTeleportPrompt(
         actor,
-        Placeholders.format(messages.teleporting(), "name", warp.name()),
-        Placeholders.format(messages.teleported(), "name", warp.name()),
+        messages.teleporting().replace("{name}", warp.name()),
+        messages.teleported().replace("{name}", warp.name()),
         messages.cancelled(),
         messages.failed());
   }

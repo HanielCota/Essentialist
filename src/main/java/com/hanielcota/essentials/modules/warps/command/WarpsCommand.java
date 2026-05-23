@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.warps.service.Warp;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.Numbers;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -15,7 +14,6 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Map;
 import org.bukkit.entity.Player;
 
 @Command("warps")
@@ -28,7 +26,7 @@ public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var messages = config.value().messages();
 
     var warps = service.listVisibleTo(sender);
@@ -38,8 +36,7 @@ public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service
     }
 
     var message = ClickableMessage.create();
-    message.append(
-        Placeholders.format(messages.listHeader(), "count", Integer.toString(warps.size())));
+    message.append(messages.listHeader().replace("{count}", Integer.toString(warps.size())));
 
     for (var warp : warps) {
       message
@@ -48,19 +45,17 @@ public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service
               renderEntry(warp, messages.listEntry()),
               slot ->
                   slot.runCommand("/warp " + warp.name())
-                      .hover(Placeholders.format(messages.listEntryHover(), "name", warp.name())));
+                      .hover(messages.listEntryHover().replace("{name}", warp.name())));
     }
     message.send(sender);
   }
 
   private static String renderEntry(Warp warp, String template) {
-    return Placeholders.format(
-        template,
-        Map.of(
-            "name", warp.name(),
-            "world", warp.world(),
-            "x", Numbers.compact(warp.x()),
-            "y", Numbers.compact(warp.y()),
-            "z", Numbers.compact(warp.z())));
+    return template
+        .replace("{name}", warp.name())
+        .replace("{world}", warp.world())
+        .replace("{x}", Numbers.compact(warp.x()))
+        .replace("{y}", Numbers.compact(warp.y()))
+        .replace("{z}", Numbers.compact(warp.z()));
   }
 }
