@@ -15,7 +15,9 @@ import com.hanielcota.essentials.modules.homes.menu.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
 import com.hanielcota.essentials.modules.homes.menu.MaterialPickerMenu;
+import com.hanielcota.essentials.modules.homes.rename.DefaultHomeNameValidator;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
+import com.hanielcota.essentials.modules.homes.rename.HomeRenameSessions;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeStore;
@@ -57,7 +59,12 @@ public final class HomesModule extends AbstractModule {
     var actionTarget = new HomesActionTarget();
     registerListener(actionTarget);
 
-    var rename = new HomeRenameOrchestrator(config, homeService, scheduler);
+    var renameSessions = new HomeRenameSessions();
+    registerListener(renameSessions);
+
+    var rename =
+        new HomeRenameOrchestrator(
+            config, homeService, scheduler, renameSessions, new DefaultHomeNameValidator());
     registerListener(rename);
 
     var renderer = new HomeEntryRenderer(config);
