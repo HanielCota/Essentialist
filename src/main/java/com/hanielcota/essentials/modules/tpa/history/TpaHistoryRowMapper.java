@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
-import com.hanielcota.essentials.database.Sql;
 import com.hanielcota.essentials.modules.tpa.model.Destination;
 import com.hanielcota.essentials.modules.tpa.model.Participant;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
@@ -56,7 +55,8 @@ final class TpaHistoryRowMapper {
 
   /**
    * Reads one row into a {@link TpaHistoryEntry}, or {@code null} when a persisted enum name no
-   * longer exists in code — {@link Sql#query} drops null rows from the result.
+   * longer exists in code — {@link com.hanielcota.essentials.database.SqlExecutor#query} drops null
+   * rows from the result.
    */
   @Nullable TpaHistoryEntry map(ResultSet rs) throws SQLException {
     var type = parseEnum(TeleportRequestType.class, rs.getString("type"));

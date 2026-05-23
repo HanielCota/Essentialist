@@ -19,13 +19,16 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jspecify.annotations.NonNull;
 
 /**
  * Read-only menu of a player's last {@link TpaHistory#CAPACITY} sent teleport requests. Items are
  * display-only — clicking them does nothing.
  */
-public final class TpaHistoryMenu implements Menu {
+public final class TpaHistoryMenu implements Menu, Listener {
 
   public static final String ID = "essentials.tpahistory";
 
@@ -110,5 +113,10 @@ public final class TpaHistoryMenu implements Menu {
       slots.add(SlotDefinition.of(-1, template, click -> {}));
     }
     return slots;
+  }
+
+  @EventHandler
+  public void onQuit(PlayerQuitEvent event) {
+    prefetched.remove(event.getPlayer().getUniqueId());
   }
 }

@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
-import com.hanielcota.essentials.database.DatabaseProvider;
-import com.hanielcota.essentials.database.Sql;
+import com.hanielcota.essentials.database.SqlExecutor;
 import java.util.Objects;
 
 /**
@@ -39,8 +38,8 @@ final class TpaHistorySchema {
   private TpaHistorySchema() {}
 
   /** Creates the table and its lookup index if they do not exist yet. */
-  static void create(DatabaseProvider database) {
-    Objects.requireNonNull(database, "database");
-    Sql.ddl(database, CREATE_TABLE, CREATE_INDEX);
+  static void create(SqlExecutor sqlExecutor) {
+    Objects.requireNonNull(sqlExecutor, "sqlExecutor");
+    sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
   }
 }

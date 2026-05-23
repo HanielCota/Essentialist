@@ -7,16 +7,14 @@ import java.util.function.Consumer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import org.jspecify.annotations.NonNull;
 
 /**
  * Fluent builder for interactive (clickable / hoverable) chat messages.
  *
  * <p>Each segment is written in MiniMessage format and may receive click and hover actions through
- * a {@link Segment} lambda. The builder itself is a {@link ComponentLike}, so it can be passed
- * anywhere Adventure expects a component.
+ * a {@link ClickableMessageSegment} lambda. The builder itself is a {@link ComponentLike}, so it
+ * can be passed anywhere Adventure expects a component.
  *
  * <pre>{@code
  * ClickableMessage.create()
@@ -53,7 +51,7 @@ public final class ClickableMessage implements ComponentLike {
   }
 
   /** Appends a MiniMessage segment configured with click and/or hover actions. */
-  public ClickableMessage append(String mini, Consumer<Segment> action) {
+  public ClickableMessage append(String mini, Consumer<ClickableMessageSegment> action) {
     Objects.requireNonNull(mini, "mini");
     return append(ComponentUtils.mini(mini), action);
   }
@@ -65,11 +63,11 @@ public final class ClickableMessage implements ComponentLike {
   }
 
   /** Appends an already-built component configured with click and/or hover actions. */
-  public ClickableMessage append(Component component, Consumer<Segment> action) {
+  public ClickableMessage append(Component component, Consumer<ClickableMessageSegment> action) {
     Objects.requireNonNull(component, "component");
     Objects.requireNonNull(action, "action");
 
-    var segment = new Segment();
+    var segment = new ClickableMessageSegment();
     action.accept(segment);
     parts.add(segment.applyTo(component));
     return this;
@@ -104,74 +102,9 @@ public final class ClickableMessage implements ComponentLike {
   public void send(Audience... audiences) {
     Objects.requireNonNull(audiences, "audiences");
 
-    Component message = build();
-    for (Audience audience : audiences) {
+    var message = build();
+    for (var audience : audiences) {
       Objects.requireNonNull(audience, "audience").sendMessage(message);
-    }
-  }
-
-  /** Configures the click and hover actions of a single message segment. */
-  public static final class Segment {
-
-    private ClickEvent click;
-    private HoverEvent<?> hover;
-    private String insertion;
-
-    private Segment() {}
-
-    /** Runs the given command (e.g. {@code "/spawn"}) when the segment is clicked. */
-    public Segment runCommand(String command) {
-      this.click = ClickEvent.runCommand(Objects.requireNonNull(command, "command"));
-      return this;
-    }
-
-    /** Places the given text in the player's chat box when the segment is clicked. */
-    public Segment suggestCommand(String command) {
-      this.click = ClickEvent.suggestCommand(Objects.requireNonNull(command, "command"));
-      return this;
-    }
-
-    /** Opens the given URL when the segment is clicked. */
-    public Segment openUrl(String url) {
-      this.click = ClickEvent.openUrl(Objects.requireNonNull(url, "url"));
-      return this;
-    }
-
-    /** Copies the given text to the player's clipboard when the segment is clicked. */
-    public Segment copyToClipboard(String text) {
-      this.click = ClickEvent.copyToClipboard(Objects.requireNonNull(text, "text"));
-      return this;
-    }
-
-    /** Inserts the given text into the chat box when the segment is shift-clicked. */
-    public Segment insertion(String text) {
-      this.insertion = Objects.requireNonNull(text, "text");
-      return this;
-    }
-
-    /** Shows a MiniMessage tooltip when the segment is hovered. */
-    public Segment hover(String mini) {
-      return hover(ComponentUtils.mini(mini));
-    }
-
-    /** Shows a component tooltip when the segment is hovered. */
-    public Segment hover(Component tooltip) {
-      this.hover = HoverEvent.showText(Objects.requireNonNull(tooltip, "tooltip"));
-      return this;
-    }
-
-    private Component applyTo(Component component) {
-      Component result = component;
-      if (click != null) {
-        result = result.clickEvent(click);
-      }
-      if (hover != null) {
-        result = result.hoverEvent(hover);
-      }
-      if (insertion != null) {
-        result = result.insertion(insertion);
-      }
-      return result;
     }
   }
 }

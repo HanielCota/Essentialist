@@ -10,7 +10,11 @@ import com.hanielcota.essentials.config.YamlConfigService;
 import com.hanielcota.essentials.core.EssentialsCore;
 import com.hanielcota.essentials.core.lifecycle.LifecyclePhase;
 import com.hanielcota.essentials.database.DatabaseProvider;
+import com.hanielcota.essentials.database.DefaultSqlExecutor;
+import com.hanielcota.essentials.database.SqlConnectionFactory;
+import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.database.SqliteDatabase;
+import com.hanielcota.essentials.exception.PluginException;
 import com.hanielcota.essentials.module.Module;
 import com.hanielcota.essentials.module.ModuleManager;
 import com.hanielcota.essentials.paper.*;
@@ -20,6 +24,9 @@ import com.hanielcota.essentials.service.DefaultServiceRegistry;
 import com.hanielcota.essentials.service.ServiceRegistry;
 import com.hanielcota.essentials.user.*;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
@@ -85,13 +92,29 @@ public final class EssentialsBootstrap {
   }
 
   private void registerDatabase(ServiceRegistry services) {
-    var database = new SqliteDatabase(plugin.getDataFolder().toPath().resolve("essentials.db"));
+    var dbPath = plugin.getDataFolder().toPath().resolve("essentials.db");
+    createDirectories(dbPath.getParent());
+
+    var database = new SqliteDatabase(dbPath);
     database.connect();
     services.register(DatabaseProvider.class, database);
+    services.register(SqlConnectionFactory.class, database);
+    services.register(SqlExecutor.class, new DefaultSqlExecutor(database));
+  }
+
+  private void createDirectories(Path path) {
+    if (path == null) {
+      return;
+    }
+    try {
+      Files.createDirectories(path);
+    } catch (IOException e) {
+      throw new PluginException("Failed to create database directory: " + path, e);
+    }
   }
 
   private void registerUserStack(ServiceRegistry services) {
-    var sessions = new UserSessionService();
+    var sessions = new DefaultUserSessionService();
     services.register(UserSessionService.class, sessions);
 
     plugin.getServer().getPluginManager().registerEvents(new UserSessionListener(sessions), plugin);

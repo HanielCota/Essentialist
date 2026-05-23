@@ -19,9 +19,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jspecify.annotations.NonNull;
 
-public final class BackMenu implements Menu {
+public final class BackMenu implements Menu, Listener {
 
   public static final String ID = "essentials.back";
 
@@ -115,5 +118,10 @@ public final class BackMenu implements Menu {
     }
 
     return slots;
+  }
+
+  @EventHandler
+  public void onQuit(PlayerQuitEvent event) {
+    prefetched.remove(event.getPlayer().getUniqueId());
   }
 }

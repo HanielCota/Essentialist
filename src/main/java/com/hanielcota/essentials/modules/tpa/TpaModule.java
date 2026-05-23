@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa;
 
 import com.github.hanielcota.menuframework.api.MenuService;
-import com.hanielcota.essentials.database.DatabaseProvider;
+import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
@@ -47,7 +47,7 @@ public final class TpaModule extends AbstractModule {
   protected void onEnable() {
     var config = config("tpa", TpaConfig.class, TpaConfig::defaults);
 
-    var history = new AsyncTpaHistory(new SqliteTpaHistory(service(DatabaseProvider.class)));
+    var history = new AsyncTpaHistory(new SqliteTpaHistory(service(SqlExecutor.class)));
 
     var store = new InMemoryRequestStore();
     var notifier = new TpaNotifier(config);
@@ -62,6 +62,7 @@ public final class TpaModule extends AbstractModule {
 
     var menu = new TpaHistoryMenu(config, history, new TpaHistoryEntryRenderer(config));
     registerMenu(menu);
+    registerListener(menu);
 
     var framework = service(PaperCommandFramework.class);
     var menus = service(MenuService.class);

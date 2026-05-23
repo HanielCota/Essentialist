@@ -22,6 +22,7 @@ public final class InfoModule extends AbstractModule {
 
     var menu = new InfoMenu(config, service);
     registerMenu(menu);
+    registerListener(menu);
     registerCommand(new InfoCommand(menu, menus));
   }
 }

@@ -1,69 +1,77 @@
 package com.hanielcota.essentials.database;
 
-import com.hanielcota.essentials.exception.PluginException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * SQLite implementation of {@link DatabaseProvider} that manages connection pool initialization and
+ * teardown in a thread-safe manner.
+ */
 public final class SqliteDatabase implements DatabaseProvider {
 
   private final Path file;
-  private volatile HikariDataSource source;
+  private final AtomicReference<HikariDataSource> sourceRef = new AtomicReference<>();
 
+  /**
+   * Constructs a new SqliteDatabase.
+   *
+   * @param file the path to the database file
+   */
   public SqliteDatabase(Path file) {
     this.file = Objects.requireNonNull(file, "file");
   }
 
   @Override
-  public synchronized void connect() {
-    if (source != null && !source.isClosed()) {
+  public void connect() {
+    var current = sourceRef.get();
+    if (current != null && !current.isClosed()) {
       return;
     }
-    ensureParent();
 
-    var config = new HikariConfig();
-    config.setPoolName("Essentialist-SQLite");
-    config.setDriverClassName("org.sqlite.JDBC");
-    config.setJdbcUrl("jdbc:sqlite:" + file);
-    config.setMaximumPoolSize(1);
-    config.setConnectionTestQuery("SELECT 1");
-    config.addDataSourceProperty("foreign_keys", "true");
-    config.addDataSourceProperty("journal_mode", "WAL");
+    synchronized (sourceRef) {
+      current = sourceRef.get();
+      if (current != null && !current.isClosed()) {
+        return;
+      }
 
-    this.source = new HikariDataSource(config);
+      var config = new HikariConfig();
+      config.setPoolName("Essentialist-SQLite");
+      config.setDriverClassName("org.sqlite.JDBC");
+      config.setJdbcUrl("jdbc:sqlite:" + file);
+      config.setMaximumPoolSize(1);
+      config.setConnectionTestQuery("SELECT 1");
+      config.addDataSourceProperty("foreign_keys", "true");
+      config.addDataSourceProperty("journal_mode", "WAL");
+
+      sourceRef.set(new HikariDataSource(config));
+    }
   }
 
   @Override
-  public synchronized void close() {
-    if (source != null) {
-      source.close();
-      source = null;
+  public void close() {
+    synchronized (sourceRef) {
+      var current = sourceRef.getAndSet(null);
+      if (current == null) {
+        return;
+      }
+      current.close();
     }
   }
 
   @Override
   public Connection getConnection() throws SQLException {
-    var current = source;
-    if (current == null || current.isClosed()) {
+    var current = sourceRef.get();
+    if (current == null) {
+      throw new SQLException("Database is not connected");
+    }
+    if (current.isClosed()) {
       throw new SQLException("Database is not connected");
     }
     return current.getConnection();
-  }
-
-  private void ensureParent() {
-    var parent = file.getParent();
-    if (parent == null) {
-      return;
-    }
-    try {
-      Files.createDirectories(parent);
-    } catch (IOException e) {
-      throw new PluginException("Failed to create database directory: " + parent, e);
-    }
   }
 }

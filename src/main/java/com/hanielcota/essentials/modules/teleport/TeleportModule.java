@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.teleport;
 
-import com.hanielcota.essentials.database.DatabaseProvider;
+import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.teleport.command.TeleportCommand;
 import com.hanielcota.essentials.modules.teleport.command.TeleportHereCommand;
@@ -19,7 +19,7 @@ public final class TeleportModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("teleport", TeleportConfig.class, TeleportConfig::defaults);
-    var history = new SqliteTeleportHistory(service(DatabaseProvider.class));
+    var history = new SqliteTeleportHistory(service(SqlExecutor.class));
     registerService(TeleportHistory.class, history);
     registerCloseable(history);
 

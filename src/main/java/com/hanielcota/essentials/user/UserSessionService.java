@@ -1,28 +1,13 @@
 package com.hanielcota.essentials.user;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public final class UserSessionService {
+public interface UserSessionService {
 
-  private final Map<UUID, UserSession> sessions = new ConcurrentHashMap<>();
+  Optional<UserSession> sessionOf(UUID id);
 
-  public Optional<UserSession> sessionOf(UUID id) {
-    return Optional.ofNullable(sessions.get(Objects.requireNonNull(id, "id")));
-  }
+  UserSession openSession(UUID playerId);
 
-  public UserSession openSession(UUID playerId) {
-    Objects.requireNonNull(playerId, "playerId");
-    UserSession session = new UserSession(playerId, Instant.now());
-    sessions.put(playerId, session);
-    return session;
-  }
-
-  public void closeSession(UUID id) {
-    sessions.remove(Objects.requireNonNull(id, "id"));
-  }
+  void closeSession(UUID id);
 }

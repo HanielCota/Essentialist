@@ -22,6 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -29,7 +32,7 @@ import org.jspecify.annotations.NonNull;
  * via {@link ClickContext#refresh()} — it never opens a separate menu, which keeps the framework's
  * navigation history and session intact.
  */
-public final class InfoMenu implements Menu {
+public final class InfoMenu implements Menu, Listener {
 
   public static final String ID = "essentials.info";
 
@@ -147,6 +150,13 @@ public final class InfoMenu implements Menu {
   private void switchTab(ClickContext click, Tab tab) {
     openTab.put(click.player().getUniqueId(), tab);
     click.refresh();
+  }
+
+  @EventHandler
+  public void onQuit(PlayerQuitEvent event) {
+    var id = event.getPlayer().getUniqueId();
+    openTab.remove(id);
+    playerTarget.remove(id);
   }
 
   private enum Tab {

@@ -60,3 +60,6 @@ desktop.ini
 # ===== Local / secret config =====
 .env
 *.local
+
+# ===== AI tool configs =====
+.antigravitycli/
