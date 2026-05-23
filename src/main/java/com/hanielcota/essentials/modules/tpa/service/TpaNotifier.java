@@ -32,9 +32,12 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
     ClickableMessage.create()
         .append(requestLine)
         .newline()
-        .append(messages.buttonAccept(), slot -> slot.runCommand("/tpaccept " + requester).hover(acceptHover))
+        .append(
+            messages.buttonAccept(),
+            slot -> slot.runCommand("/tpaccept " + requester).hover(acceptHover))
         .append("  ")
-        .append(messages.buttonDeny(), slot -> slot.runCommand("/tpdeny " + requester).hover(denyHover))
+        .append(
+            messages.buttonDeny(), slot -> slot.runCommand("/tpdeny " + requester).hover(denyHover))
         .send(target);
   }
 

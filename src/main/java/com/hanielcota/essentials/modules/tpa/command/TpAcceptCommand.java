@@ -46,7 +46,8 @@ public record TpAcceptCommand(
         TpaRequests.replyRequester(this.framework, request, messages.accepted(), true);
       }
       case REQUESTER_OFFLINE -> {
-        var offlineMsg = messages.requesterOffline().replace("{player}", request.requester().name());
+        var offlineMsg =
+            messages.requesterOffline().replace("{player}", request.requester().name());
         actor.sendError(offlineMsg);
       }
       case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());

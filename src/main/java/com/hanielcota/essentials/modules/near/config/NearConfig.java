@@ -37,7 +37,10 @@ public record NearConfig(
     var radiusStr = Integer.toString(radius);
     var countStr = Integer.toString(count);
 
-    return found.replace("{radius}", radiusStr).replace("{count}", countStr).replace("{players}", players);
+    return found
+        .replace("{radius}", radiusStr)
+        .replace("{count}", countStr)
+        .replace("{players}", players);
   }
 
   public String formatNone(int radius) {

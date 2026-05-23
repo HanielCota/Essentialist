@@ -59,6 +59,9 @@ public record GiveConfig(
     var amountStr = Integer.toString(amount);
     var countStr = Integer.toString(count);
 
-    return givenAll.replace("{amount}", amountStr).replace("{item}", item).replace("{count}", countStr);
+    return givenAll
+        .replace("{amount}", amountStr)
+        .replace("{item}", item)
+        .replace("{count}", countStr);
   }
 }
