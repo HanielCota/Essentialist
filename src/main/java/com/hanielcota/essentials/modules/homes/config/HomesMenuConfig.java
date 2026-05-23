@@ -9,7 +9,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 /** Visual + layout settings for /homes and the material picker submenu. */
 @ConfigSerializable
 public record HomesMenuConfig(
-    @Comment("/homes menu title. Placeholders: {count}, {limit}.") String title,
+    @Comment("/homes menu title (MiniMessage).") String title,
     @Comment("/homes menu rows (1-6).") int rows,
     @Comment("/homes item name. Placeholders: {name}.") String itemName,
     @Comment(
@@ -23,7 +23,7 @@ public record HomesMenuConfig(
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
-        "<dark_gray>Suas homes <gray>(<gold>{count}</gold>/<gold>{limit}</gold>)",
+        "<dark_gray>Suas homes",
         6,
         "<gold>{name}",
         List.of(
@@ -88,12 +88,6 @@ public record HomesMenuConfig(
             Material.BREWING_STAND,
             Material.CAULDRON,
             Material.SHIELD));
-  }
-
-  public String formatTitle(int count, int limit) {
-    return title
-        .replace("{count}", Integer.toString(count))
-        .replace("{limit}", Integer.toString(limit));
   }
 
   public String formatItemName(String name) {

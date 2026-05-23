@@ -33,9 +33,8 @@ public record HomesMessages(
     @Comment("Shown when the delayed teleport is cancelled by movement or damage.")
         String cancelled,
     @Comment("Shown when the teleport itself fails.") String failed,
-    @Comment("Title of the delete-confirmation dialog. Placeholders: {name}.")
-        String deleteConfirmTitle,
-    @Comment("Centre item of the delete dialog. Placeholders: {name}.") String deleteConfirmPrompt,
+    @Comment("Title of the delete-confirmation dialog.") String deleteConfirmTitle,
+    @Comment("Centre item of the delete dialog.") String deleteConfirmPrompt,
     @Comment("Label of the yes button in the delete dialog.") String deleteConfirmYes,
     @Comment("Label of the no button in the delete dialog.") String deleteConfirmNo,
     @Comment("Lore line of the picker entry. Placeholders: {material}.") String pickerItemLore,
@@ -72,8 +71,8 @@ public record HomesMessages(
         "<green>Você foi teleportado para <gold>{name}</gold>.",
         "<red>Teleporte cancelado.",
         "<red>O teleporte não pôde ser concluído.",
-        "<dark_red>Excluir <gold>{name}</gold>?",
-        "<red>Excluir <gold>{name}</gold>?",
+        "<dark_red>Excluir esta home?",
+        "<red>Excluir esta home?",
         "<green>Sim, excluir",
         "<red>Cancelar",
         "<gray>Clique para usar <white>{material}",
