@@ -1,264 +1,254 @@
 <p align="center">
-  <img src="assets/essentialist_banner.png" alt="Essentialist Banner" width="800">
+  <img src="assets/essentialist_banner.png" alt="Essentialist banner" width="820">
 </p>
 
 <div align="center">
 
-# ⚡ Essentialist
+# Essentialist
 
-**Um plugin de essentials modular, moderno e altamente otimizado para servidores Paper.**
+**A clean, modular essentials plugin for modern Paper servers.**
 
 [![Build](https://img.shields.io/github/actions/workflow/status/HanielCota/Essentialist/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=build)](https://github.com/HanielCota/Essentialist/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-25-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/technologies/downloads/)
 [![Paper](https://img.shields.io/badge/Paper-1.21.11+-00ADD8?style=for-the-badge&logo=minecraft&logoColor=white)](https://papermc.io/)
 [![License](https://img.shields.io/badge/License-MIT-43A047?style=for-the-badge)](LICENSE)
 
----
-
-**Essentialist** redefine o conceito de utilitários de servidor. Ao invés de uma arquitetura monolítica pesada, o
-projeto é estruturado em **módulos independentes** carregados dinamicamente via `ServiceLoader`. Recursos não utilizados
-não consomem memória ou processamento, e qualquer falha em um módulo ativa um sistema de rollback automático que protege
-a estabilidade do servidor.
-
-[Funcionalidades](#-funcionalidades) • [Requisitos](#-requisitos) • [Instalação](#-instalação) • [Comandos](#-comandos-e-módulos) • [Arquitetura](#-arquitetura-do-sistema) • [Configuração](#-configuração-dos-módulos) • [Compilação](#-compilando-o-projeto)
+[Overview](#overview) · [Features](#features) · [Commands](#commands) · [Installation](#installation) · [Configuration](#configuration) · [Building](#building-from-source)
 
 </div>
 
 ---
 
-## ✨ Funcionalidades
+## Overview
 
-* 🧩 **Arquitetura Modular**: Cada recurso é um `Module` isolado com ciclo de vida explícito (`BOOTING` ➔ `ENABLED` ➔
-  `DISABLING`).
-* 🧵 **Preparado para agendamento moderno**: Fluxos críticos usam schedulers compatíveis com Paper moderno, sem declarar
-  suporte completo a Folia enquanto todos os módulos globais não forem isolados por região.
-* 🔄 **Recarregamento Dinâmico (Hot-Reload)**: Modifique as configurações e aplique-as instantaneamente com
-  `/essentials reload` sem reiniciar o servidor.
-* 💾 **Persistência Robusta**: Histórico de teletransporte (`/back`) e sistemas complexos salvos localmente via **SQLite
-  ** com pool de conexões **HikariCP**.
-* 💬 **Formatação Rica (MiniMessage)**: Suporte completo a tags modernas do Kyori Adventure, gradientes, cores RGB e
-  eventos de hover/click.
-* 🖥️ **Menus Interativos (GUIs)**: Painéis visuais ricos para gerenciamento de Homes, informações de jogadores (
-  `/informacoes`) e whitelist.
-* 🛡️ **Proteção e Confirmação**: Cooldowns integrados por comando e necessidade de confirmação antes de executar ações
-  destrutivas (ex: `/limpar`).
+Essentialist gives Paper servers the everyday tools players and staff expect: teleporting, homes, warps, flight, healing, inventory utilities, moderation commands, chat tools, and more.
 
----
+The plugin is built around small modules instead of one large block of code. Each feature loads on its own, keeps its own configuration, and can be managed without forcing every other feature to depend on it. That keeps the project easier to maintain and easier to understand.
 
-## 📋 Requisitos
+In plain terms: Essentialist is meant to be the server utility plugin that stays organized as it grows.
 
-| Requisito                       | Versão Suportada                                       |
-|:--------------------------------|:-------------------------------------------------------|
-| **Plataforma de Servidor**      | [Paper](https://papermc.io/) `1.21.11` ou mais recente |
-| **Ambiente de Execução (Java)** | OpenJDK `25` ou superior                               |
-| **Banco de Dados**              | SQLite (embarcado automaticamente)                     |
+## Features
 
----
+| Area | What it includes |
+|:--|:--|
+| Teleportation | Spawn, back, direct teleport, teleport requests, homes, and warps. |
+| Player utilities | Fly, speed, gamemode, heal, feed, night vision, hat, trash, ping, and nearby players. |
+| Inventory tools | Clear inventory, give items, enchant, repair, compact ores, smelt ores, rename items, invsee, and ender chest access. |
+| Staff tools | Kick, whitelist management, clear chat, online count, player info, titles, and action bar messages. |
+| Menus | GUI screens for homes, player information, and whitelist management. |
+| Storage | SQLite-backed data for features that need to remember player information. |
+| Messages | MiniMessage support for modern colors, gradients, hover text, and clickable messages. |
 
-## 📦 Instalação
+## Requirements
 
-1. Baixe a versão mais recente do arquivo `Essentialist-<version>.jar`.
-2. Insira o arquivo na pasta `plugins/` do seu servidor.
-3. Inicie ou reinicie o servidor.
-4. As pastas e arquivos de configuração individuais de cada módulo serão criados em `plugins/Essentialist/`.
+| Requirement | Version |
+|:--|:--|
+| Server software | Paper `1.21.11` or newer |
+| Java runtime | Java `25` or newer |
+| Database | SQLite, bundled locally |
 
----
+## Installation
 
-## ⌨️ Comandos e Módulos
+1. Download the latest `Essentialist-<version>.jar`.
+2. Place it inside your server's `plugins/` folder.
+3. Start or restart the server.
+4. Edit the generated files inside `plugins/Essentialist/` if you want to change messages, cooldowns, limits, or module behavior.
+5. Use `/essentials reload` after changing configuration files.
 
-Os comandos do **Essentialist** são organizados por categorias para facilitar a navegação. Todos os comandos possuem
-cooldowns configuráveis e suporte a targeting (aplicar o comando em si mesmo ou em terceiros via permissões `.others`).
+## Commands
 
-### 🧭 Teletransporte & Localização
+Most commands use permissions, cooldowns, and clear feedback messages. Commands that accept another player usually require an extra `.others` permission, such as `essentials.fly.others`.
 
-| Comando                | Aliases | Descrição                                                            | Permissão                |
-|:-----------------------|:--------|:---------------------------------------------------------------------|:-------------------------|
-| `/spawn`               | —       | Teleporta o jogador para o spawn do servidor (com atraso).           | `essentials.spawn.use`   |
-| `/setspawn`            | —       | Define o ponto de spawn global na posição atual do jogador.          | `essentials.spawn.set`   |
-| `/back`                | —       | Retorna à última localização registrada (morte ou teletransporte).   | `essentials.back`        |
-| `/tp <jogador>`        | —       | Teleporta o remetente até outro jogador.                             | `essentials.tp`          |
-| `/tp move <de> <para>` | —       | Teleporta um jogador até o outro.                                    | `essentials.tp.others`   |
-| `/tp pos <x> <y> <z>`  | —       | Teleporta para coordenadas específicas no mundo.                     | `essentials.tp`          |
-| `/tphere <jogador>`    | —       | Teleporta outro jogador até a sua posição atual.                     | `essentials.tphere`      |
-| `/tpa <jogador>`       | —       | Envia um pedido de teletransporte até o jogador.                     | `essentials.tpa`         |
-| `/tpahere <jogador>`   | —       | Solicita que o jogador se teleporte até você.                        | `essentials.tpa`         |
-| `/tpaccept [jogador]`  | —       | Aceita um pedido de teletransporte pendente.                         | `essentials.tpa`         |
-| `/tpdeny [jogador]`    | —       | Recusa um pedido de teletransporte pendente.                         | `essentials.tpa`         |
-| `/tpacancel [jogador]` | —       | Cancela um pedido de teletransporte enviado.                         | `essentials.tpa`         |
-| `/tpahistory`          | —       | Mostra o histórico recente de solicitações de teletransporte.        | `essentials.tpa`         |
-| `/warp <nome>`         | —       | Teleporta para uma warp existente.                                   | `essentials.warp.use`    |
-| `/setwarp <nome>`      | —       | Cria uma nova warp na localização atual.                             | `essentials.warp.create` |
-| `/delwarp <nome>`      | —       | Remove uma warp existente.                                           | `essentials.warp.delete` |
-| `/warps`               | —       | Abre uma lista interativa e clicável com todas as warps disponíveis. | `essentials.warp.list`   |
+### Teleportation
 
----
+| Command | What it does | Permission |
+|:--|:--|:--|
+| `/spawn` | Sends you to the server spawn. | `essentials.spawn.use` |
+| `/setspawn` | Sets the server spawn at your current location. | `essentials.spawn.set` |
+| `/back` | Returns to a previous location or teleport history. | `essentials.back` |
+| `/tp <player>` | Teleports you to another player. | `essentials.tp` |
+| `/tp move <from> <to>` | Moves one player to another player. | `essentials.tp.others` |
+| `/tp pos <x> <y> <z>` | Teleports to coordinates. | `essentials.tp` |
+| `/tphere <player>` | Brings another player to you. | `essentials.tphere` |
+| `/tpa <player>` | Asks to teleport to a player. | `essentials.tpa` |
+| `/tpahere <player>` | Asks a player to teleport to you. | `essentials.tpa` |
+| `/tpaccept [player]` | Accepts a pending teleport request. | `essentials.tpa` |
+| `/tpdeny [player]` | Denies a pending teleport request. | `essentials.tpa` |
+| `/tpacancel` | Cancels your pending teleport request. | `essentials.tpa` |
+| `/tpahistory [player]` | Opens recent teleport request history. | `essentials.tpa.history` |
+| `/home [name]` | Teleports to one of your homes. | `essentials.home.use` |
+| `/sethome [name] [material]` | Saves a home with an optional icon. | `essentials.home.set` |
+| `/delhome [name]` | Deletes one of your homes. | `essentials.home.delete` |
+| `/homes` | Opens the homes menu. | `essentials.home.list` |
+| `/warp <name>` | Teleports to a warp. | `essentials.warp` |
+| `/setwarp <name>` | Creates or replaces a warp. | `essentials.warp.set` |
+| `/delwarp <name>` | Deletes a warp. | `essentials.warp.delete` |
+| `/warps` | Lists available warps. | `essentials.warp.list` |
 
-### 🕹️ Utilidades & Jogabilidade
+### Gameplay
 
-| Comando                       | Aliases  | Descrição                                                                 | Permissão                |
-|:------------------------------|:---------|:--------------------------------------------------------------------------|:-------------------------|
-| `/fly [jogador]`              | —        | Ativa ou desativa o modo de voo do jogador.                               | `essentials.fly`         |
-| `/speed walk <1-10> [player]` | —        | Define a velocidade de caminhada do jogador.                              | `essentials.speed`       |
-| `/speed fly <1-10> [player]`  | —        | Define a velocidade de voo do jogador.                                    | `essentials.speed`       |
-| `/speed reset [jogador]`      | —        | Restaura as velocidades padrão de caminhada e voo.                        | `essentials.speed`       |
-| `/gamemode <modo> [jogador]`  | `/gm`    | Altera o modo de jogo (`survival`, `creative`, `adventure`, `spectator`). | `essentials.gamemode`    |
-| `/curar [jogador]`            | `/heal`  | Restaura totalmente a vida e remove efeitos negativos.                    | `essentials.heal`        |
-| `/curar todos`                | —        | Restaura a vida de todos os jogadores online.                             | `essentials.heal.all`    |
-| `/alimentar [jogador]`        | `/feed`  | Restaura a fome e saturação do jogador.                                   | `essentials.feed`        |
-| `/luz [jogador]`              | `/light` | Alterna a visão noturna (efeito permanente de light).                     | `essentials.light`       |
-| `/chapeu`                     | `/hat`   | Equipa o item que está na mão principal do jogador como capacete.         | `essentials.hat`         |
-| `/lixo`                       | `/trash` | Abre um inventário virtual temporário para descarte de itens.             | `essentials.trash`       |
-| `/home [nome]`                | —        | Teleporta para uma de suas homes registradas.                             | `essentials.home.use`    |
-| `/sethome [nome] [material]`  | —        | Define uma home na localização atual com um ícone customizado.            | `essentials.home.set`    |
-| `/delhome [nome]`             | —        | Exclui uma home registrada.                                               | `essentials.home.delete` |
-| `/homes`                      | —        | Abre uma GUI para gerenciar, teletransportar e customizar suas homes.     | `essentials.home.list`   |
+| Command | What it does | Permission |
+|:--|:--|:--|
+| `/fly [player]` | Toggles flight. | `essentials.fly` |
+| `/fly on [player]` | Enables flight. | `essentials.fly` |
+| `/fly off [player]` | Disables flight. | `essentials.fly` |
+| `/speed walk <value> [player]` | Sets walking speed. | `essentials.speed` |
+| `/speed fly <value> [player]` | Sets flying speed. | `essentials.speed` |
+| `/speed reset [player]` | Restores default speeds. | `essentials.speed` |
+| `/gamemode <mode> [player]` | Changes gamemode. Alias: `/gm`. | `essentials.gamemode` |
+| `/curar [player]` | Restores health. Alias: `/heal`. | `essentials.heal` |
+| `/curar todos` | Heals every online player. | `essentials.heal.all` |
+| `/alimentar [player]` | Restores hunger and saturation. Alias: `/feed`. | `essentials.feed` |
+| `/alimentar todos` | Feeds every online player. | `essentials.feed.all` |
+| `/matar [player]` | Kills the target player. Alias: `/kill`. | `essentials.kill` |
+| `/luz [player]` | Toggles night vision. Alias: `/light`. | `essentials.light` |
+| `/chapeu` | Wears the item in your hand as a helmet. Alias: `/hat`. | `essentials.hat` |
+| `/lixo` | Opens a temporary trash inventory. Alias: `/trash`. | `essentials.trash` |
 
----
+### Items and Inventories
 
-### 📦 Gerenciamento de Itens & Inventário
+| Command | What it does | Permission |
+|:--|:--|:--|
+| `/limpar [player]` | Clears an inventory after confirmation. Alias: `/clear`. | `essentials.clear` |
+| `/give <item> [amount] [player]` | Gives an item to a player. | `essentials.give` |
+| `/give all <item> [amount]` | Gives an item to all online players. | `essentials.give.all` |
+| `/enchant <enchant> [level]` | Enchants the item in your hand. | `essentials.enchant` |
+| `/enchant remove <enchant>` | Removes one enchantment. | `essentials.enchant` |
+| `/enchant clear` | Removes all enchantments. | `essentials.enchant` |
+| `/reparar [player]` | Repairs the item in hand. Alias: `/repair`. | `essentials.repair` |
+| `/reparar tudo [player]` | Repairs inventory and armor items. | `essentials.repair` |
+| `/compactar` | Turns ores and ingots into blocks. Alias: `/compact`. | `essentials.compact` |
+| `/derreter` | Smelts ores in your inventory. Alias: `/smelt`. | `essentials.smelt` |
+| `/rename [name]` | Renames the item in your hand, or clears the custom name. | `essentials.rename` |
+| `/invsee <player>` | Opens another player's inventory, armor, and off-hand. | `essentials.invsee` |
+| `/echest [player]` | Opens an ender chest. Alias: `/enderchest`. | `essentials.echest` |
 
-| Comando                           | Aliases       | Descrição                                                             | Permissão             |
-|:----------------------------------|:--------------|:----------------------------------------------------------------------|:----------------------|
-| `/limpar [jogador]`               | `/clear`      | Limpa o inventário (solicita confirmação).                            | `essentials.clear`    |
-| `/give <item> [quant] [jogador]`  | —             | Concede itens específicos a um jogador.                               | `essentials.give`     |
-| `/give all <item> [quant]`        | —             | Concede um item específico para todos os jogadores online.            | `essentials.give.all` |
-| `/enchant <encantamento> [level]` | —             | Encanta o item seguro na mão principal.                               | `essentials.enchant`  |
-| `/enchant remove <encant>`        | —             | Remove um encantamento específico do item.                            | `essentials.enchant`  |
-| `/enchant clear`                  | —             | Remove todos os encantamentos do item.                                | `essentials.enchant`  |
-| `/reparar [jogador]`              | `/repair`     | Repara a durabilidade do item que está na mão.                        | `essentials.repair`   |
-| `/reparar tudo [jogador]`         | `all`         | Repara todos os itens do inventário e armadura.                       | `essentials.repair`   |
-| `/compactar`                      | `/compact`    | Compacta minérios e lingotes do inventário em blocos.                 | `essentials.compact`  |
-| `/derreter`                       | `/smelt`      | Funde minérios brutos presentes no inventário.                        | `essentials.smelt`    |
-| `/rename [nome]`                  | —             | Renomeia o item da mão principal (aceita MiniMessage).                | `essentials.rename`   |
-| `/invsee <jogador>`               | —             | Abre e edita o inventário e armaduras de outro jogador em tempo real. | `essentials.invsee`   |
-| `/echest [jogador]`               | `/enderchest` | Abre o baú do fim (Ender Chest) pessoal ou de outro jogador.          | `essentials.echest`   |
+### Server and Staff
 
----
+| Command | What it does | Permission |
+|:--|:--|:--|
+| `/essentials reload` | Reloads plugin configuration files. | `essentials.admin.reload` |
+| `/actionbar <message>` | Sends an action bar message to yourself. | `essentials.actionbar` |
+| `/actionbar broadcast <message>` | Sends an action bar message to everyone. | `essentials.actionbar.broadcast` |
+| `/title [player] "title" ["subtitle"]` | Shows a title to a player. | `essentials.title` |
+| `/title broadcast "title" ["subtitle"]` | Shows a title to everyone. | `essentials.title.broadcast` |
+| `/clearchat` | Clears the public chat. | `essentials.clearchat` |
+| `/whitelist` | Opens the whitelist menu. | `essentials.whitelist` |
+| `/whitelist add <player>` | Adds a player to the whitelist. | `essentials.whitelist` |
+| `/whitelist remove <player>` | Removes a player from the whitelist. | `essentials.whitelist` |
+| `/kick <player> [reason]` | Kicks a player from the server. | `essentials.kick` |
+| `/ping [player]` | Shows a player's ping. | `essentials.ping` |
+| `/near [radius]` | Lists nearby players. | `essentials.near` |
+| `/online` | Shows current online player count. | `essentials.online` |
+| `/informacoes [player]` | Opens a player information panel. | `essentials.info` |
 
-### 🛡️ Administração & Informação
+## Configuration
 
-| Comando                       | Aliases | Descrição                                                          | Permissão                        |
-|:------------------------------|:--------|:-------------------------------------------------------------------|:---------------------------------|
-| `/essentials reload`          | —       | Recarrega todos os arquivos de configuração sem reiniciar.         | `essentials.admin.reload`        |
-| `/actionbar <msg>`            | —       | Envia uma mensagem de action bar para si mesmo.                    | `essentials.actionbar`           |
-| `/actionbar broadcast <msg>`  | —       | Transmite uma action bar para todos os jogadores conectados.       | `essentials.actionbar.broadcast` |
-| `/title [jogador] <msg>`      | —       | Exibe um título na tela de um jogador específico.                  | `essentials.title`               |
-| `/title broadcast <msg>`      | —       | Transmite um título para todos os jogadores online.                | `essentials.title.broadcast`     |
-| `/clearchat`                  | —       | Limpa o chat global para todos os jogadores.                       | `essentials.clearchat`           |
-| `/whitelist`                  | —       | Abre a interface gráfica de gerenciamento da whitelist.            | `essentials.whitelist`           |
-| `/whitelist add <jogador>`    | —       | Adiciona um jogador à whitelist do servidor.                       | `essentials.whitelist`           |
-| `/whitelist remove <jogador>` | —       | Remove um jogador da whitelist do servidor.                        | `essentials.whitelist`           |
-| `/kick <jogador> [motivo]`    | —       | Expulsa um jogador ativo do servidor.                              | `essentials.kick`                |
-| `/ping [jogador]`             | —       | Exibe a latência de rede atual do jogador em milissegundos.        | `essentials.ping`                |
-| `/near [raio]`                | —       | Detecta e lista jogadores próximos dentro de um raio configurável. | `essentials.near`                |
-| `/online`                     | —       | Mostra a contagem de jogadores online e o limite do servidor.      | `essentials.online`              |
-| `/informacoes [jogador]`      | —       | Abre um painel GUI detalhado com estatísticas do jogador.          | `essentials.info`                |
+Essentialist keeps configuration split by feature. Instead of one huge file, each module can create its own YAML file inside:
 
-> [!NOTE]
-> Para aplicar comandos a outros jogadores (targeting), conceda a permissão correspondente com o sufixo `.others` (ex:
-`essentials.fly.others`, `essentials.feed.others`).
+```text
+plugins/Essentialist/
+```
 
----
+That makes it easier to change one feature without digging through unrelated settings.
 
-## 🏗️ Arquitetura do Sistema
+Example of the kind of settings a module may expose:
 
-O **Essentialist** foi desenvolvido com as melhores práticas de engenharia de software para a plataforma Bukkit/Paper.
+```yaml
+repaired-hand: "<green>Item repaired successfully."
+blacklist:
+  - "minecraft:elytra"
+repair-all-limit: 41
+```
+
+Messages support MiniMessage formatting, so server owners can use modern colors and effects:
+
+```text
+<green>Done.</green>
+<gradient:#00ff99:#00aaff>Welcome back.</gradient>
+<hover:show_text:'Click to teleport'>[Warp]</hover>
+```
+
+## How It Works
+
+Essentialist is organized as a set of modules loaded through Java's `ServiceLoader`.
 
 ```mermaid
 flowchart TD
-    A[EssentialsPlugin: OnEnable] --> B[ServiceRegistry: DI Container]
-    B --> C[ServiceLoader: Discover Modules]
-    C --> D[ModuleManager: Resolve Dependency Graph]
-    D --> E{Topological Sort}
-    E -->|Sucesso| F[Inicializar Módulos em Ordem]
-    E -->|Ciclo / Falha| G[Rollback do Estado e Log de Erro]
-    F --> H[Carregar ConfigHandles Individuais]
-    H --> I[Registrar Comandos e Escutadores]
+    A[Paper starts Essentialist] --> B[Core services are registered]
+    B --> C[Modules are discovered]
+    C --> D[Dependencies are sorted]
+    D --> E[Commands, listeners, menus, and configs are loaded]
+    E --> F[Server features are ready]
 ```
 
-### Detalhes Técnicos
+This structure gives the project a few practical benefits:
 
-* **Injeção de Dependências**: Sistema leve e customizado através de um `ServiceRegistry` integrado. Sem reflexão pesada
-  em tempo de execução.
-* **Ordem de Dependência (Topological Sort)**: O `ModuleManager` calcula as dependências declaradas entre os módulos em
-  tempo de carregamento. Por exemplo, o módulo `/back` depende do módulo `teleport`. Se `teleport` falhar ou for
-  desativado, `back` é desativado automaticamente, evitando erros em cascata.
-* **Persistência**: Uma única pool de conexões robusta gerenciada pelo **HikariCP** conecta à base local SQLite,
-  garantindo consultas rápidas e não-bloqueantes para operações como `/back` e `/homes`.
+| Benefit | Why it matters |
+|:--|:--|
+| Smaller feature boundaries | A command like `/fly` does not need to live beside unrelated code like `/warps`. |
+| Safer startup | Modules declare dependencies, so required features can load in the right order. |
+| Cleaner configuration | Each module can keep its own settings and messages. |
+| Easier development | New commands can be added without turning the project into one large file tree. |
 
----
+## Tech Stack
 
-## ⚙️ Configuração dos Módulos
+| Part | Technology |
+|:--|:--|
+| Language | Java 25 |
+| Server API | Paper API for Minecraft `1.21.11+` |
+| Build tool | Gradle with Kotlin DSL |
+| Final jar | Shadow plugin |
+| Commands | CommandFramework |
+| Menus | MenuFramework |
+| Configuration | Configurate YAML |
+| Database | SQLite with HikariCP |
+| Formatting | Spotless and google-java-format |
 
-Cada funcionalidade cria seu próprio arquivo YAML dentro da pasta do plugin (`plugins/Essentialist/`). Isso evita
-arquivos gigantes e facilita a manutenção.
+## Building From Source
 
-Exemplo de configuração para o módulo `/reparar` (`repair.yml`):
-
-```yaml
-# repair.yml
-repaired-hand: "<green>Item reparado com sucesso."
-repaired-hand-other: "<green>Você reparou o item de <gold>{player}</gold>."
-blacklist:
-  - "minecraft:elytra"   # Itens que não podem ser reparados por este comando
-repair-all-limit: 41     # Limite de itens processados por vez no '/reparar tudo'
-```
-
-> [!TIP]
-> Use tags MiniMessage do Kyori Adventure para criar efeitos visuais avançados como
-`<gradient:red:blue>Texto</gradient>` e `<hover:show_text:'Clique aqui!'>[Link]</hover>`.
-
----
-
-## 🔨 Compilando o Projeto
-
-Para compilar o código fonte e gerar o arquivo jar final, você precisa do **JDK 25** instalado em seu ambiente.
+You need JDK `25` installed.
 
 ```bash
-# 1. Clone o repositório
 git clone https://github.com/HanielCota/Essentialist.git
 cd Essentialist
-
-# 2. Compile e gere o jar otimizado (Shadow Jar)
 ./gradlew build
 ```
 
-O arquivo compilado com todas as dependências sombreadas e realocadas será salvo na pasta `build/libs/` com o nome
-`Essentialist-<version>-all.jar`.
+The compiled plugin will be created in:
 
-### Padronização de Código (Spotless)
-
-O projeto utiliza o **Spotless** configurado com a formatação padrão da Google para Java. Garanta que seu código siga as
-regras executando:
-
-```bash
-./gradlew spotlessApply   # Aplica a formatação automaticamente
-./gradlew spotlessCheck   # Valida a conformidade da formatação
+```text
+build/libs/Essentialist-<version>.jar
 ```
 
----
+Useful development commands:
 
-## 🧰 Stack Tecnológica
+```bash
+./gradlew test
+./gradlew spotlessApply
+./gradlew spotlessCheck
+```
 
-| Componente                | Tecnologia                                                         |
-|:--------------------------|:-------------------------------------------------------------------|
-| **Linguagem**             | Java 25                                                            |
-| **Build & Tooling**       | Gradle (Kotlin DSL) + Shadow Plugin                                |
-| **API Minecraft**         | Paper API (Minecraft 1.21.11+)                                     |
-| **Framework de Comandos** | [CommandFramework](https://github.com/HanielCota/CommandFramework) |
-| **Framework de Menus**    | [MenuFramework](https://github.com/HanielCota/MenuFramework)       |
-| **Mapeamento de Config**  | Configurate (YAML)                                                 |
-| **Banco de Dados**        | SQLite + HikariCP                                                  |
-| **Linters & Formatters**  | Spotless / google-java-format                                      |
+## Project Layout
 
----
+```text
+src/main/java/com/hanielcota/essentials/
+├── bootstrap/   startup and service wiring
+├── command/     shared command helpers
+├── config/      configuration loading
+├── database/    SQLite and async database access
+├── menu/        shared menu integration
+├── module/      module lifecycle and dependency loading
+├── modules/     player-facing and staff-facing features
+├── scheduler/   Paper scheduler abstraction
+├── service/     small service registry
+└── user/        player session support
+```
 
-## 📄 Licença
+## License
 
-Este projeto está licenciado sob a licença **MIT**. Consulte o arquivo [`LICENSE`](LICENSE) para obter mais detalhes.
-
----
+Essentialist is released under the [MIT License](LICENSE).
 
 <div align="center">
-  <sub>Desenvolvido com 💖 por <a href="https://github.com/HanielCota">HanielCota</a></sub>
+  <sub>Made by <a href="https://github.com/HanielCota">HanielCota</a>.</sub>
 </div>
