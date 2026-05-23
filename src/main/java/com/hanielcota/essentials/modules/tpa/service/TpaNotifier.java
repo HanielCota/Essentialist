@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.ComponentUtils;
-import com.hanielcota.essentials.util.Placeholders;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,13 +18,11 @@ import org.bukkit.entity.Player;
  */
 public record TpaNotifier(ConfigHandle<TpaConfig> config) {
 
-  /** Sends the target the clickable accept / deny prompt for an incoming request. */
   public void sendPrompt(Player target, TeleportRequest request) {
-
     var snap = config.value();
     var messages = snap.messages();
-    String requester = request.requester().name();
-    long seconds = snap.requestExpiry().toSeconds();
+    var requester = request.requester().name();
+    var seconds = snap.requestExpiry().toSeconds();
 
     ClickableMessage.create()
         .append(messages.formatRequestReceived(request.type(), requester, seconds))
@@ -34,39 +31,32 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
             messages.buttonAccept(),
             slot ->
                 slot.runCommand("/tpaccept " + requester)
-                    .hover(Placeholders.format(messages.buttonHoverAccept(), "player", requester)))
+                    .hover(messages.buttonHoverAccept().replace("{player}", requester)))
         .append("  ")
         .append(
             messages.buttonDeny(),
             slot ->
                 slot.runCommand("/tpdeny " + requester)
-                    .hover(Placeholders.format(messages.buttonHoverDeny(), "player", requester)))
+                    .hover(messages.buttonHoverDeny().replace("{player}", requester)))
         .send(target);
   }
 
-  /** Tells the requester, if still online, that their request expired. */
   public void notifyExpired(TeleportRequest request) {
     var requester = Bukkit.getPlayer(request.requester().id());
-    if (requester != null) {
-      requester.sendMessage(
-          ComponentUtils.mini(
-              Placeholders.format(
-                  config.value().messages().expired(), "player", request.target().name())));
-    }
+    if (requester == null) return;
+
+    var line = config.value().messages().expired().replace("{player}", request.target().name());
+    requester.sendMessage(ComponentUtils.mini(line));
   }
 
-  /**
-   * Tells the party other than {@code quitter}, if still online, that {@code request} died because
-   * {@code quitterName} disconnected.
-   */
+  // Tells the party other than `quitter`, if online, that the request died because they disconnected.
   public void notifyPartnerLeft(TeleportRequest request, UUID quitter, String quitterName) {
-    UUID recipient =
-        request.requester().id().equals(quitter) ? request.target().id() : request.requester().id();
+    var requesterId = request.requester().id();
+    var recipient = requesterId.equals(quitter) ? request.target().id() : requesterId;
     var online = Bukkit.getPlayer(recipient);
-    if (online != null) {
-      online.sendMessage(
-          ComponentUtils.mini(
-              Placeholders.format(config.value().messages().partnerLeft(), "player", quitterName)));
-    }
+    if (online == null) return;
+
+    var line = config.value().messages().partnerLeft().replace("{player}", quitterName);
+    online.sendMessage(ComponentUtils.mini(line));
   }
 }

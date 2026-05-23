@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.config;
 
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
-import com.hanielcota.essentials.util.Placeholders;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -9,7 +8,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
  * Every chat line the {@code /tpa} request flow can send.
  *
  * <p>Templates are exposed raw; callers fill {@code {player}} (and any other placeholders) at the
- * call site with {@link Placeholders}.
+ * call site with {@link String#replace(CharSequence, CharSequence)}.
  */
 @ConfigSerializable
 public record TpaMessages(
@@ -88,6 +87,6 @@ public record TpaMessages(
   /** The request line shown to the target, picked by {@code type}. */
   public String formatRequestReceived(TeleportRequestType type, String player, long seconds) {
     var line = type == TeleportRequestType.TPAHERE ? requestReceivedHere : requestReceived;
-    return Placeholders.format(line, "player", player, "seconds", seconds);
+    return line.replace("{player}", player).replace("{seconds}", Long.toString(seconds));
   }
 }

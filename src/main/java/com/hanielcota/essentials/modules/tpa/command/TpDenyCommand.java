@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -30,7 +29,7 @@ public record TpDenyCommand(
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") String requester) {
     var messages = config.value().messages();
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
 
     var resolved = TpaRequests.resolveIncoming(service, sender, requester, messages, actor);
     if (resolved.isEmpty()) {
@@ -39,8 +38,7 @@ public record TpDenyCommand(
     var request = resolved.get();
 
     service.deny(request);
-    actor.sendSuccess(
-        Placeholders.format(messages.deniedSelf(), "player", request.requester().name()));
+    actor.sendSuccess(messages.deniedSelf().replace("{player}", request.requester().name()));
     TpaRequests.replyRequester(framework, request, messages.denied(), false);
   }
 }

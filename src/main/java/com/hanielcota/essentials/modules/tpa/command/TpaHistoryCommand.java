@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -19,7 +18,6 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.UUID;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 @Command("tpahistory")
@@ -39,7 +37,7 @@ public record TpaHistoryCommand(
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") @Arg("jogador") String targetName) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var snap = config.value();
 
     if (targetName.isEmpty()) {
@@ -54,12 +52,12 @@ public record TpaHistoryCommand(
 
     var resolved = players.offlineByName(targetName);
     if (resolved.isEmpty()) {
-      actor.sendError(Placeholders.format(snap.messages().playerNotFound(), "player", targetName));
+      actor.sendError(snap.messages().playerNotFound().replace("{player}", targetName));
       return;
     }
 
-    OfflinePlayer target = resolved.get();
-    String resolvedName = target.getName() != null ? target.getName() : targetName;
+    var target = resolved.get();
+    var resolvedName = target.getName() != null ? target.getName() : targetName;
     openFor(actor, sender, target.getUniqueId(), /* self */ false, resolvedName);
   }
 
@@ -72,14 +70,14 @@ public record TpaHistoryCommand(
       actor.sendError(
           self
               ? snap.messages().noHistory()
-              : Placeholders.format(snap.messages().noHistoryOther(), "player", subjectName));
+              : snap.messages().noHistoryOther().replace("{player}", subjectName));
       return;
     }
 
     if (!self) {
       actor.sendMessage(
           ComponentUtils.mini(
-              Placeholders.format(snap.messages().viewingOther(), "player", subjectName)));
+              snap.messages().viewingOther().replace("{player}", subjectName)));
     }
 
     menu.prefetch(viewer.getUniqueId(), entries);

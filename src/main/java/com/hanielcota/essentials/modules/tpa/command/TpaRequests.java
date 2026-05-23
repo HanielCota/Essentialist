@@ -4,7 +4,6 @@ import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Optional;
@@ -27,13 +26,14 @@ final class TpaRequests {
       Player target,
       TeleportRequestType type,
       String confirmationTemplate) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     if (sender.getUniqueId().equals(target.getUniqueId())) {
       actor.sendError(messages.selfTarget());
       return;
     }
+
     service.create(sender, target, type);
-    actor.sendSuccess(Placeholders.format(confirmationTemplate, "player", target.getName()));
+    actor.sendSuccess(confirmationTemplate.replace("{player}", target.getName()));
   }
 
   /**
@@ -52,7 +52,6 @@ final class TpaRequests {
       String requesterName,
       TpaMessages messages,
       CommandActor actor) {
-
     if (!requesterName.isBlank()) {
       var found = service.incomingFrom(viewer.getUniqueId(), requesterName);
       if (found.isEmpty()) {
@@ -87,7 +86,7 @@ final class TpaRequests {
       return;
     }
     var actor = framework.actorOf(requesterPlayer);
-    var line = Placeholders.format(template, "player", request.target().name());
+    var line = template.replace("{player}", request.target().name());
     if (asSuccess) {
       actor.sendSuccess(line);
     } else {

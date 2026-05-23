@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -30,7 +29,7 @@ public record TpAcceptCommand(
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") String requester) {
     var messages = config.value().messages();
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
 
     var resolved = TpaRequests.resolveIncoming(service, sender, requester, messages, actor);
     if (resolved.isEmpty()) {
@@ -38,18 +37,19 @@ public record TpAcceptCommand(
     }
     var request = resolved.get();
 
-    switch (service.accept(request)) {
+    var result = service.accept(request);
+    switch (result) {
       case SUCCESS -> {
         actor.sendSuccess(
-            Placeholders.format(messages.acceptedSelf(), "player", request.requester().name()));
+            messages.acceptedSelf().replace("{player}", request.requester().name()));
         TpaRequests.replyRequester(framework, request, messages.accepted(), true);
       }
       case REQUESTER_OFFLINE ->
           actor.sendError(
-              Placeholders.format(
-                  messages.requesterOffline(), "player", request.requester().name()));
+              messages.requesterOffline().replace("{player}", request.requester().name()));
       case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
       case NOT_FOUND -> actor.sendError(messages.noIncoming());
+      default -> throw new IllegalStateException("Unexpected result: " + result);
     }
   }
 }

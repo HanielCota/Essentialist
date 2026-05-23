@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.tpa.listener;
 
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaNotifier;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,8 +20,8 @@ public final class TpaQuitListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onQuit(PlayerQuitEvent event) {
-    UUID quitter = event.getPlayer().getUniqueId();
-    String quitterName = event.getPlayer().getName();
+    var quitter = event.getPlayer().getUniqueId();
+    var quitterName = event.getPlayer().getName();
     for (var request : service.cancelAllOf(quitter)) {
       notifier.notifyPartnerLeft(request, quitter, quitterName);
     }
