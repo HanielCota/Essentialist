@@ -100,8 +100,10 @@ public final class MaterialPickerMenu implements Menu {
                 var homeName = this.target.consume(clickedUuid);
                 this.target.consumeCategory(clickedUuid);
 
+                ctx.close();
+
                 if (homeName == null) {
-                  ctx.open(HomesMenu.ID);
+                  this.menus.open(clicked, HomesMenu.ID);
                   return;
                 }
 
@@ -113,7 +115,7 @@ public final class MaterialPickerMenu implements Menu {
                 var replyComponent = ComponentUtils.mini(replyText);
                 clicked.sendMessage(replyComponent);
 
-                ctx.open(HomesMenu.ID);
+                this.menus.open(clicked, HomesMenu.ID);
               }));
     }
 
@@ -133,9 +135,11 @@ public final class MaterialPickerMenu implements Menu {
         BACK_SLOT,
         back,
         ctx -> {
-          var uuid = ctx.player().getUniqueId();
+          var clicked = ctx.player();
+          var uuid = clicked.getUniqueId();
           this.target.consumeCategory(uuid);
-          ctx.open(MaterialCategoryMenu.ID);
+          ctx.close();
+          this.menus.open(clicked, MaterialCategoryMenu.ID);
         });
   }
 }

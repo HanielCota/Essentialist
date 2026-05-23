@@ -72,7 +72,8 @@ public final class MaterialCategoryMenu implements Menu {
                 var clicked = ctx.player();
                 var clickedUuid = clicked.getUniqueId();
                 this.target.setCategory(clickedUuid, category);
-                ctx.open(MaterialPickerMenu.ID);
+                ctx.close();
+                this.menus.open(clicked, MaterialPickerMenu.ID);
               }));
     }
 
