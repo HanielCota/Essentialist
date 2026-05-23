@@ -26,9 +26,9 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config, EnderChes
   @DefaultSubcommand
   @PermissionForOther(".others")
   public void execute(CommandActor sender, @TargetOrSelf Player target) {
-    Player viewer = sender.unwrap(Player.class);
+    var viewer = sender.unwrap(Player.class);
     var snap = config.value();
-    boolean self = target.equals(viewer);
+    var self = target.equals(viewer);
 
     service.open(viewer, target);
     sender.sendSuccess(snap.whenOpened().forSender(self, target.getName()));
