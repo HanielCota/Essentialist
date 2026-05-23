@@ -44,10 +44,10 @@ public record LightCommand(
   }
 
   private void announce(CommandActor sender, Player subject, boolean enabled) {
-    var pair = config.value().toggle(enabled);
+    var messages = config.value().toggle(enabled);
     String name = subject.getName();
     boolean self = Senders.isSelf(sender, subject);
     var target = framework.actorOf(subject);
-    sender.sendDualMessage(target, pair.forSender(self, name), pair.forTarget(name));
+    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
   }
 }

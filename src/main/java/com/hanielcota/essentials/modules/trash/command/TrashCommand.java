@@ -25,6 +25,7 @@ public record TrashCommand(ConfigHandle<TrashConfig> config, TrashService servic
   public void execute(CommandActor actor) {
     Player player = actor.unwrap(Player.class);
     var snap = config.value();
+
     service.openTrash(player, snap.size(), snap.title());
   }
 }

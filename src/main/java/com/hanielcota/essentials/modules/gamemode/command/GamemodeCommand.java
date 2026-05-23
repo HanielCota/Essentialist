@@ -41,10 +41,10 @@ public record GamemodeCommand(
       return;
     }
 
-    var pair = snap.whenUpdated(mode);
+    var messages = snap.whenUpdated(mode);
     var target = framework.actorOf(subject);
-    String selfMessage = pair.forSender(self, name);
+    String selfMessage = messages.forSender(self, name);
 
-    sender.sendDualMessage(target, selfMessage, pair.forTarget(name));
+    sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
   }
 }

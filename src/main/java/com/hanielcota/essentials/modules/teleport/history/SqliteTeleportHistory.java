@@ -96,9 +96,9 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     var z = rs.getDouble("z");
     var yaw = (float) rs.getDouble("yaw");
     var pitch = (float) rs.getDouble("pitch");
-    var loc = new Location(world, x, y, z, yaw, pitch);
+    var location = new Location(world, x, y, z, yaw, pitch);
     var createdAt = rs.getLong("created_at");
-    return new HistoryEntry(id, loc, createdAt);
+    return new HistoryEntry(id, location, createdAt);
   }
 
   @Override

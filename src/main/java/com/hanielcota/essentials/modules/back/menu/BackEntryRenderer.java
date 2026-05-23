@@ -9,7 +9,6 @@ import com.hanielcota.essentials.util.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 
 public record BackEntryRenderer(ConfigHandle<BackConfig> config)
@@ -17,34 +16,26 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config)
 
   @Override
   public @NonNull ItemTemplate render(@NonNull HistoryEntry entry, int humanIndex) {
-    Objects.requireNonNull(entry, "entry");
-
     var snap = config.value();
-    var loc = entry.location();
+    var location = entry.location();
 
-    var entryWorld = loc.getWorld();
+    var entryWorld = location.getWorld();
     var worldName = entryWorld != null ? entryWorld.getName() : "?";
 
-    var moment =
-        LocalDateTime.ofInstant(Instant.ofEpochMilli(entry.createdAt()), ZoneId.systemDefault());
+    var instant = Instant.ofEpochMilli(entry.createdAt());
+    var moment = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
     var time = snap.timeFormatter().format(moment);
 
-    var xStr = Numbers.compact(loc.getX());
-    var yStr = Numbers.compact(loc.getY());
-    var zStr = Numbers.compact(loc.getZ());
+    var xStr = Numbers.compact(location.getX());
+    var yStr = Numbers.compact(location.getY());
+    var zStr = Numbers.compact(location.getZ());
 
     var loreTemplate = snap.itemLore();
     var lore = new String[loreTemplate.size()];
 
     for (var i = 0; i < loreTemplate.size(); i++) {
-      lore[i] =
-          loreTemplate
-              .get(i)
-              .replace("{world}", worldName)
-              .replace("{x}", xStr)
-              .replace("{y}", yStr)
-              .replace("{z}", zStr)
-              .replace("{time}", time);
+      lore[i] = formatLine(loreTemplate.get(i), worldName, xStr, yStr, zStr, time);
     }
 
     return ItemTemplate.builder(snap.itemMaterial())
@@ -53,5 +44,13 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config)
         .glow(snap.itemGlow())
         .italic(false)
         .build();
+  }
+
+  private String formatLine(String line, String world, String x, String y, String z, String time) {
+    return line.replace("{world}", world)
+        .replace("{x}", x)
+        .replace("{y}", y)
+        .replace("{z}", z)
+        .replace("{time}", time);
   }
 }

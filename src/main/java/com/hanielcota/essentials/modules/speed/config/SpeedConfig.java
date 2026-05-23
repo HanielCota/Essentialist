@@ -30,8 +30,8 @@ public record SpeedConfig(
   }
 
   private static MessagePair resolve(String self, String other, int valor) {
-    String value = Integer.toString(valor);
-    return new MessagePair(self.replace("{valor}", value), other.replace("{valor}", value));
+    String formatted = Integer.toString(valor);
+    return new MessagePair(self.replace("{valor}", formatted), other.replace("{valor}", formatted));
   }
 
   public MessagePair whenWalkSet(int valor) {

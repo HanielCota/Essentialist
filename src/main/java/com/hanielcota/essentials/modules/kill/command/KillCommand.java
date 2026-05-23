@@ -38,10 +38,10 @@ public record KillCommand(
       return;
     }
 
-    var pair = snap.whenKilled();
+    var messages = snap.whenKilled();
     var target = framework.actorOf(subject);
-    String selfMessage = pair.forSender(self, name);
+    String selfMessage = messages.forSender(self, name);
 
-    sender.sendDualMessage(target, selfMessage, pair.forTarget(name));
+    sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
   }
 }

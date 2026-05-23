@@ -70,10 +70,10 @@ public record GiveCommand(
       return;
     }
 
-    var pair = leftover > 0 ? snap.whenPartial() : snap.whenGiven();
+    var messages = leftover > 0 ? snap.whenPartial() : snap.whenGiven();
     var target = framework.actorOf(subject);
-    String selfMessage = fill(pair.forSender(self, name), itemName, given, leftover);
-    String targetMessage = fill(pair.forTarget(name), itemName, given, leftover);
+    String selfMessage = fill(messages.forSender(self, name), itemName, given, leftover);
+    String targetMessage = fill(messages.forTarget(name), itemName, given, leftover);
 
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }
@@ -113,8 +113,8 @@ public record GiveCommand(
       }
 
       count++;
-      var pair = leftover > 0 ? snap.whenPartial() : snap.whenGiven();
-      recipient.sendSuccess(fill(pair.forTarget(player.getName()), itemName, given, leftover));
+      var messages = leftover > 0 ? snap.whenPartial() : snap.whenGiven();
+      recipient.sendSuccess(fill(messages.forTarget(player.getName()), itemName, given, leftover));
     }
 
     sender.sendSuccess(

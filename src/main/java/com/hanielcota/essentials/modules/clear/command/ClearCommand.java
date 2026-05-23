@@ -39,11 +39,11 @@ public record ClearCommand(
       return;
     }
 
-    var pair = snap.whenCleared();
+    var messages = snap.whenCleared();
     String count = Integer.toString(removed);
     var target = framework.actorOf(subject);
-    String selfMessage = pair.forSender(self, name).replace("{count}", count);
-    String targetMessage = pair.forTarget(name).replace("{count}", count);
+    String selfMessage = messages.forSender(self, name).replace("{count}", count);
+    String targetMessage = messages.forTarget(name).replace("{count}", count);
 
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }

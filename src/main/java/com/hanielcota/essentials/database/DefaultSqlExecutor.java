@@ -113,9 +113,9 @@ public final class DefaultSqlExecutor implements SqlExecutor {
     try (var conn = connectionFactory.getConnection();
         var stmt = conn.createStatement()) {
 
-      for (var s : statements) {
-        if (s != null && !s.isBlank()) {
-          stmt.addBatch(s);
+      for (var statement : statements) {
+        if (statement != null && !statement.isBlank()) {
+          stmt.addBatch(statement);
         }
       }
       stmt.executeBatch();

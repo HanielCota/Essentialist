@@ -68,11 +68,11 @@ public record SpeedCommand(
     announce(sender, subject, config.value().whenReset());
   }
 
-  private void announce(CommandActor sender, Player subject, MessagePair pair) {
+  private void announce(CommandActor sender, Player subject, MessagePair messages) {
     var name = subject.getName();
     var isSelf = Senders.isSelf(sender, subject);
     var target = framework.actorOf(subject);
 
-    sender.sendDualMessage(target, pair.forSender(isSelf, name), pair.forTarget(name));
+    sender.sendDualMessage(target, messages.forSender(isSelf, name), messages.forTarget(name));
   }
 }

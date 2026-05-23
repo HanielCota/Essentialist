@@ -15,7 +15,7 @@ public final class PlayerDeathListener implements Listener {
   @EventHandler(priority = EventPriority.MONITOR)
   public void onDeath(PlayerDeathEvent event) {
     var player = event.getEntity();
-    var loc = player.getLocation();
-    history.push(player.getUniqueId(), loc);
+    var location = player.getLocation();
+    history.push(player.getUniqueId(), location);
   }
 }

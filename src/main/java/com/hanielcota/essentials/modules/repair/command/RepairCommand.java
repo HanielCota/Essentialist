@@ -37,10 +37,10 @@ public record RepairCommand(
       case EMPTY_HAND -> sender.sendError(snap.whenEmptyHand().forSender(self, name));
       case NOTHING_TO_REPAIR -> sender.sendError(snap.whenNothingHand().forSender(self, name));
       case REPAIRED -> {
-        var pair = snap.whenHandRepaired();
+        var messages = snap.whenHandRepaired();
         var target = framework.actorOf(subject);
-        String selfMessage = pair.forSender(self, name);
-        sender.sendDualMessage(target, selfMessage, pair.forTarget(name));
+        String selfMessage = messages.forSender(self, name);
+        sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
       }
       default -> throw new IllegalStateException("Unexpected repair result: " + result);
     }
@@ -58,11 +58,11 @@ public record RepairCommand(
       return;
     }
 
-    var pair = snap.whenAllRepaired();
+    var messages = snap.whenAllRepaired();
     String count = Integer.toString(repaired);
     var target = framework.actorOf(subject);
-    String selfMessage = pair.forSender(self, name).replace("{count}", count);
-    String targetMessage = pair.forTarget(name).replace("{count}", count);
+    String selfMessage = messages.forSender(self, name).replace("{count}", count);
+    String targetMessage = messages.forTarget(name).replace("{count}", count);
 
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }

@@ -46,9 +46,9 @@ public record HealCommand(
       return;
     }
 
-    var pair = snap.whenHealed();
+    var messages = snap.whenHealed();
     var target = framework.actorOf(subject);
-    sender.sendDualMessage(target, pair.forSender(self, name), pair.forTarget(name));
+    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
   }
 
   @Subcommand("todos")

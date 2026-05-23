@@ -51,8 +51,8 @@ public record FlyCommand(
       return;
     }
 
-    var pair = snap.toggle(result == FlyService.Result.ENABLED);
+    var messages = snap.toggle(result == FlyService.Result.ENABLED);
     var target = framework.actorOf(subject);
-    sender.sendDualMessage(target, pair.forSender(self, name), pair.forTarget(name));
+    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
   }
 }

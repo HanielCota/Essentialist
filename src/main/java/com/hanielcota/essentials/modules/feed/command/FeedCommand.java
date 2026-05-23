@@ -41,9 +41,9 @@ public record FeedCommand(
       return;
     }
 
-    var pair = snap.whenFed();
+    var messages = snap.whenFed();
     var target = framework.actorOf(subject);
-    sender.sendDualMessage(target, pair.forSender(self, name), pair.forTarget(name));
+    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
   }
 
   @Subcommand("todos")
