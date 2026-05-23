@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.tpa.model;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -10,10 +9,6 @@ import java.util.UUID;
  * where a request id is expected, and vice versa.
  */
 public record RequestId(UUID value) {
-
-  public RequestId {
-    Objects.requireNonNull(value, "value");
-  }
 
   /** Generates a fresh, unique request id. */
   public static RequestId random() {

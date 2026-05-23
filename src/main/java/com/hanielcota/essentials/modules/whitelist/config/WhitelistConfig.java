@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.whitelist.config;
 
 import java.util.List;
-import java.util.Objects;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -55,7 +54,6 @@ public record WhitelistConfig(
   }
 
   private static String withPlayer(String template, String player) {
-    Objects.requireNonNull(player, "player");
     return template.replace("{player}", player);
   }
 
@@ -70,7 +68,6 @@ public record WhitelistConfig(
 
   /** Item lore with {@code {player}} resolved on every line. */
   public List<String> formatLore(String player) {
-    Objects.requireNonNull(player, "player");
     return itemLore.stream().map(line -> line.replace("{player}", player)).toList();
   }
 

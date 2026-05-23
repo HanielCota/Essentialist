@@ -4,9 +4,9 @@ import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,19 +19,15 @@ import org.bukkit.event.player.PlayerQuitEvent;
  * Teleports a player after a configurable delay, cancelling on movement or damage.
  *
  * <p>Used by {@code /spawn}, {@code /home} and {@code /warp} so warm-ups and cancel rules stay
- * consistent. Holds the only timer state for pending warm-ups — one per player. Callers route
+ * consistent. Holds the only timer state for pending warm-ups â€” one per player. Callers route
  * messaging through {@link Callback}; this class never sends chat itself.
  */
+@RequiredArgsConstructor
 public final class DelayedTeleport implements Listener {
 
   private final Scheduler scheduler;
   private final TeleportService teleport;
   private final Map<UUID, Pending> pending = new ConcurrentHashMap<>();
-
-  public DelayedTeleport(Scheduler scheduler, TeleportService teleport) {
-    this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
-    this.teleport = Objects.requireNonNull(teleport, "teleport");
-  }
 
   /**
    * Schedules a teleport to {@code destination} after {@code delay}. A {@link Duration#isZero()
@@ -39,10 +35,6 @@ public final class DelayedTeleport implements Listener {
    * player is cancelled silently first.
    */
   public void schedule(Player player, Location destination, Duration delay, Callback callback) {
-    Objects.requireNonNull(player, "player");
-    Objects.requireNonNull(destination, "destination");
-    Objects.requireNonNull(delay, "delay");
-    Objects.requireNonNull(callback, "callback");
 
     var uuid = player.getUniqueId();
     cancelSilently(uuid);

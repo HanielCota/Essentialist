@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.compact.config.CompactConfig.Recipe;
 import com.hanielcota.essentials.util.ItemStacks;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,10 +13,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public record CompactService(ConfigHandle<CompactConfig> config) {
-
-  public CompactService {
-    Objects.requireNonNull(config, "config");
-  }
 
   private static Map<Material, Integer> countByMaterial(Inventory inv, Set<Material> wanted) {
     Map<Material, Integer> totals = new EnumMap<>(Material.class);

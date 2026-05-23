@@ -6,7 +6,6 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -73,7 +72,7 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
   private final AsyncDatabaseWriter writer;
 
   public SqliteTeleportHistory(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = Objects.requireNonNull(sqlExecutor, "sqlExecutor");
+    this.sqlExecutor = sqlExecutor;
     this.writer = new DefaultAsyncDatabaseWriter("Essentialist-TeleportHistory");
     sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
   }
@@ -104,8 +103,6 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
 
   @Override
   public void push(UUID player, Location location) {
-    Objects.requireNonNull(player, "player");
-    Objects.requireNonNull(location, "location");
     var world = location.getWorld();
     if (world == null) {
       return;
@@ -133,13 +130,11 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
 
   @Override
   public List<HistoryEntry> list(UUID player) {
-    Objects.requireNonNull(player, "player");
     return sqlExecutor.query(LIST, SqliteTeleportHistory::readEntry, player.toString(), CAPACITY);
   }
 
   @Override
   public void remove(UUID player, long entryId) {
-    Objects.requireNonNull(player, "player");
     if (entryId <= 0) {
       return;
     }

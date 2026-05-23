@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.teleport.service;
 
 import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Objects;
 
 /**
  * Standard chat feedback for a {@link DelayedTeleport} warm-up.
@@ -14,14 +13,6 @@ import java.util.Objects;
 public record DelayedTeleportPrompt(
     CommandActor actor, String teleporting, String teleported, String cancelled, String failed)
     implements DelayedTeleport.Callback {
-
-  public DelayedTeleportPrompt {
-    Objects.requireNonNull(actor, "actor");
-    Objects.requireNonNull(teleporting, "teleporting");
-    Objects.requireNonNull(teleported, "teleported");
-    Objects.requireNonNull(cancelled, "cancelled");
-    Objects.requireNonNull(failed, "failed");
-  }
 
   @Override
   public void onScheduled(long seconds) {

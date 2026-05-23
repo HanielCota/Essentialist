@@ -4,10 +4,10 @@ import com.hanielcota.essentials.util.Log;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Implementation of {@link ConfigService} using {@link YamlConfigHandle} as the backing storage.
@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  * <p>Responsibility for loading individual configurations is delegated to YamlConfigHandle,
  * adhering to Single Responsibility Principle (SRP).
  */
+@RequiredArgsConstructor
 public final class YamlConfigService implements ConfigService {
 
   private static final Log LOG = Log.of(YamlConfigService.class);
@@ -23,16 +24,9 @@ public final class YamlConfigService implements ConfigService {
   private final Map<String, YamlConfigHandle<?>> handles = new ConcurrentHashMap<>();
   private final CopyOnWriteArrayList<Runnable> reloadCallbacks = new CopyOnWriteArrayList<>();
 
-  public YamlConfigService(Path baseDir) {
-    this.baseDir = Objects.requireNonNull(baseDir, "baseDir");
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   public <T> ConfigHandle<T> load(String name, Class<T> type, Supplier<T> defaults) {
-    Objects.requireNonNull(name, "name");
-    Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(defaults, "defaults");
 
     var handle =
         handles.computeIfAbsent(
@@ -82,7 +76,6 @@ public final class YamlConfigService implements ConfigService {
 
   @Override
   public AutoCloseable onReload(Runnable callback) {
-    Objects.requireNonNull(callback, "callback");
 
     reloadCallbacks.add(callback);
     return () -> reloadCallbacks.remove(callback);

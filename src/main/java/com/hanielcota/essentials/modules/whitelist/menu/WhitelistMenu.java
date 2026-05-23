@@ -13,12 +13,13 @@ import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.NonNull;
 
+@RequiredArgsConstructor
 public final class WhitelistMenu implements Menu {
 
   public static final String ID = "essentials.whitelist";
@@ -37,17 +38,6 @@ public final class WhitelistMenu implements Menu {
   private final WhitelistEntryRenderer renderer;
   private final WhitelistClickHandler clickHandler;
 
-  public WhitelistMenu(
-      ConfigHandle<WhitelistConfig> config,
-      WhitelistService service,
-      WhitelistEntryRenderer renderer,
-      WhitelistClickHandler clickHandler) {
-    this.config = Objects.requireNonNull(config, "config");
-    this.service = Objects.requireNonNull(service, "service");
-    this.renderer = Objects.requireNonNull(renderer, "renderer");
-    this.clickHandler = Objects.requireNonNull(clickHandler, "clickHandler");
-  }
-
   /** Content slots cover every row but the last, which is left for pagination controls. */
   private static List<Integer> contentSlots(int rows) {
     int count = rows > MIN_ROWS ? (rows - 1) * SLOTS_PER_ROW : SLOTS_PER_ROW;
@@ -65,7 +55,6 @@ public final class WhitelistMenu implements Menu {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    Objects.requireNonNull(menus, "menus");
     var snap = config.value();
     int rows = snap.effectiveRows();
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(rows)).build();
@@ -82,8 +71,8 @@ public final class WhitelistMenu implements Menu {
     if (rows > MIN_ROWS) {
       int lastRow = (rows - 1) * SLOTS_PER_ROW;
       builder
-          .previousPageButton(lastRow + 3, pageButton("<yellow>« Página anterior"))
-          .nextPageButton(lastRow + 5, pageButton("<yellow>Próxima página »"));
+          .previousPageButton(lastRow + 3, pageButton("<yellow>Â« PÃ¡gina anterior"))
+          .nextPageButton(lastRow + 5, pageButton("<yellow>PrÃ³xima pÃ¡gina Â»"));
     }
 
     builder.build().register();

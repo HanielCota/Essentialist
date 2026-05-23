@@ -4,7 +4,6 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,12 +57,11 @@ public final class WarpStore {
   private final SqlExecutor sqlExecutor;
 
   public WarpStore(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = Objects.requireNonNull(sqlExecutor, "sqlExecutor");
+    this.sqlExecutor = sqlExecutor;
     sqlExecutor.ddl(CREATE_TABLE);
   }
 
   public Optional<Warp> find(String name) {
-    Objects.requireNonNull(name, "name");
     var rows = sqlExecutor.query(SELECT_ONE, WarpStore::readRow, name);
     return rows.isEmpty() ? Optional.empty() : Optional.of(rows.getFirst());
   }
@@ -73,7 +71,6 @@ public final class WarpStore {
   }
 
   public void save(Warp warp) {
-    Objects.requireNonNull(warp, "warp");
     sqlExecutor.update(
         UPSERT,
         warp.name(),
@@ -89,7 +86,6 @@ public final class WarpStore {
 
   /** Deletes the warp. Returns {@code true} when a row was removed. */
   public boolean delete(String name) {
-    Objects.requireNonNull(name, "name");
     var before = find(name).isPresent();
     sqlExecutor.update(DELETE, name);
     return before;

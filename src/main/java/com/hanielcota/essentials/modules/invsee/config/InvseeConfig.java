@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.invsee.config;
 
-import java.util.Objects;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -18,12 +17,10 @@ public record InvseeConfig(
   }
 
   public String formatTitle(String player) {
-    Objects.requireNonNull(player, "player");
     return menuTitle.replace("{player}", player);
   }
 
   public String formatOpened(String player) {
-    Objects.requireNonNull(player, "player");
     return opened.replace("{player}", player);
   }
 }

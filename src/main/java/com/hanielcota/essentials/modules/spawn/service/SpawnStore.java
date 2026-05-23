@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.spawn.service;
 import com.hanielcota.essentials.database.SqlExecutor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -41,7 +40,7 @@ public final class SpawnStore {
   private final SqlExecutor sqlExecutor;
 
   public SpawnStore(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = Objects.requireNonNull(sqlExecutor, "sqlExecutor");
+    this.sqlExecutor = sqlExecutor;
     sqlExecutor.ddl(CREATE_TABLE);
   }
 
@@ -53,7 +52,6 @@ public final class SpawnStore {
 
   /** Overwrites the stored spawn with {@code location}. */
   public void save(SpawnLocation location) {
-    Objects.requireNonNull(location, "location");
     sqlExecutor.update(
         UPSERT,
         location.world(),

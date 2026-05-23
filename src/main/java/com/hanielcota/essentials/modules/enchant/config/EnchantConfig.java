@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.enchant.config;
 
-import java.util.Objects;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -27,19 +26,16 @@ public record EnchantConfig(
   }
 
   public String formatApplied(String enchantment, int level) {
-    Objects.requireNonNull(enchantment, "enchantment");
     return applied
         .replace("{enchantment}", enchantment)
         .replace("{level}", Integer.toString(level));
   }
 
   public String formatRemoved(String enchantment) {
-    Objects.requireNonNull(enchantment, "enchantment");
     return removed.replace("{enchantment}", enchantment);
   }
 
   public String formatNotEnchanted(String enchantment) {
-    Objects.requireNonNull(enchantment, "enchantment");
     return notEnchanted.replace("{enchantment}", enchantment);
   }
 

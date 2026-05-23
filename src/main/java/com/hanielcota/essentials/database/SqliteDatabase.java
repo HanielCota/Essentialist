@@ -5,13 +5,14 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+import lombok.RequiredArgsConstructor;
 
 /**
  * SQLite implementation of {@link DatabaseProvider} that manages connection pool initialization and
  * teardown in a thread-safe manner.
  */
+@RequiredArgsConstructor
 public final class SqliteDatabase implements DatabaseProvider {
 
   private final Path file;
@@ -22,10 +23,6 @@ public final class SqliteDatabase implements DatabaseProvider {
    *
    * @param file the path to the database file
    */
-  public SqliteDatabase(Path file) {
-    this.file = Objects.requireNonNull(file, "file");
-  }
-
   @Override
   public void connect() {
     var current = sourceRef.get();

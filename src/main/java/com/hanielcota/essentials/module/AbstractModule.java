@@ -9,7 +9,6 @@ import com.hanielcota.essentials.util.Log;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -25,7 +24,7 @@ public abstract class AbstractModule implements Module {
   private ModuleContext context;
 
   protected AbstractModule(ModuleMetadata metadata) {
-    this.metadata = Objects.requireNonNull(metadata, "metadata");
+    this.metadata = metadata;
   }
 
   protected AbstractModule(String id) {
@@ -39,7 +38,7 @@ public abstract class AbstractModule implements Module {
 
   @Override
   public final void enable(ModuleContext context) {
-    this.context = Objects.requireNonNull(context, "context");
+    this.context = context;
     onEnable();
   }
 
@@ -108,26 +107,21 @@ public abstract class AbstractModule implements Module {
   }
 
   protected final void registerMenu(Menu menu) {
-    Objects.requireNonNull(menu, "menu");
     MenuService menus = service(MenuService.class);
     menus.register(menu);
     registerCloseable(() -> menus.unregisterDefinition(menu.id()));
   }
 
   protected final void registerListener(Listener listener) {
-    Objects.requireNonNull(listener, "listener");
     plugin().getServer().getPluginManager().registerEvents(listener, plugin());
     listeners.add(listener);
   }
 
   protected final void registerCloseable(AutoCloseable closeable) {
-    Objects.requireNonNull(closeable, "closeable");
     this.closeable.add(closeable);
   }
 
   protected final <T> void registerService(Class<T> type, T instance) {
-    Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(instance, "instance");
     var services = context().services();
     services.unregister(type);
     services.register(type, instance);

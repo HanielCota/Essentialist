@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.rename.service;
 
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.Nullable;
@@ -8,7 +7,6 @@ import org.jspecify.annotations.Nullable;
 public final class RenameService {
 
   public Result rename(Player player, @Nullable Component name) {
-    Objects.requireNonNull(player, "player");
 
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {

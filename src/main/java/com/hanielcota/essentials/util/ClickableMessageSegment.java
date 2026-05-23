@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.util;
 
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -21,31 +20,31 @@ public final class ClickableMessageSegment {
 
   /** Runs the given command (e.g. {@code "/spawn"}) when the segment is clicked. */
   public ClickableMessageSegment runCommand(String command) {
-    this.click = ClickEvent.runCommand(Objects.requireNonNull(command, "command"));
+    this.click = ClickEvent.runCommand(command);
     return this;
   }
 
   /** Places the given text in the player's chat box when the segment is clicked. */
   public ClickableMessageSegment suggestCommand(String command) {
-    this.click = ClickEvent.suggestCommand(Objects.requireNonNull(command, "command"));
+    this.click = ClickEvent.suggestCommand(command);
     return this;
   }
 
   /** Opens the given URL when the segment is clicked. */
   public ClickableMessageSegment openUrl(String url) {
-    this.click = ClickEvent.openUrl(Objects.requireNonNull(url, "url"));
+    this.click = ClickEvent.openUrl(url);
     return this;
   }
 
   /** Copies the given text to the player's clipboard when the segment is clicked. */
   public ClickableMessageSegment copyToClipboard(String text) {
-    this.click = ClickEvent.copyToClipboard(Objects.requireNonNull(text, "text"));
+    this.click = ClickEvent.copyToClipboard(text);
     return this;
   }
 
   /** Inserts the given text into the chat box when the segment is shift-clicked. */
   public ClickableMessageSegment insertion(String text) {
-    this.insertion = Objects.requireNonNull(text, "text");
+    this.insertion = text;
     return this;
   }
 
@@ -56,7 +55,7 @@ public final class ClickableMessageSegment {
 
   /** Shows a component tooltip when the segment is hovered. */
   public ClickableMessageSegment hover(Component tooltip) {
-    this.hover = HoverEvent.showText(Objects.requireNonNull(tooltip, "tooltip"));
+    this.hover = HoverEvent.showText(tooltip);
     return this;
   }
 

@@ -1,14 +1,12 @@
 package com.hanielcota.essentials.util;
 
 import java.time.Duration;
-import java.util.Objects;
 
 public final class DurationFormatter {
 
   private DurationFormatter() {}
 
   public static String format(Duration duration) {
-    Objects.requireNonNull(duration, "duration");
     long totalSeconds = Math.max(0L, duration.toSeconds());
 
     long days = totalSeconds / 86_400L;

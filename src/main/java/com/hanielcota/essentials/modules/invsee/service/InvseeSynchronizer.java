@@ -1,26 +1,20 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
 import com.hanielcota.essentials.scheduler.Scheduler;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 /** Schedules the write-back of an /invsee GUI to its target player. */
+@RequiredArgsConstructor
 public final class InvseeSynchronizer {
 
   private final Scheduler scheduler;
   private final InvseeService service;
 
-  public InvseeSynchronizer(Scheduler scheduler, InvseeService service) {
-    this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
-    this.service = Objects.requireNonNull(service, "service");
-  }
-
   /** Syncs {@code view} back to its target next tick, once the current click/drag is applied. */
   public void scheduleSync(InvseeHolder holder, Inventory view) {
-    Objects.requireNonNull(holder, "holder");
-    Objects.requireNonNull(view, "view");
 
     Player target = Bukkit.getPlayer(holder.targetId());
     if (target == null) {

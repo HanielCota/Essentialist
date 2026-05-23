@@ -16,9 +16,9 @@ import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -29,9 +29,10 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * Single /info menu with category and detail tabs. Switching tabs re-renders this same inventory
- * via {@link ClickContext#refresh()} — it never opens a separate menu, which keeps the framework's
- * navigation history and session intact.
+ * via {@link ClickContext#refresh()} â€” it never opens a separate menu, which keeps the
+ * framework's navigation history and session intact.
  */
+@RequiredArgsConstructor
 public final class InfoMenu implements Menu, Listener {
 
   public static final String ID = "essentials.info";
@@ -47,11 +48,6 @@ public final class InfoMenu implements Menu, Listener {
   private final InfoService service;
   private final Map<UUID, Tab> openTab = new ConcurrentHashMap<>();
   private final Map<UUID, UUID> playerTarget = new ConcurrentHashMap<>();
-
-  public InfoMenu(ConfigHandle<InfoConfig> config, InfoService service) {
-    this.config = Objects.requireNonNull(config, "config");
-    this.service = Objects.requireNonNull(service, "service");
-  }
 
   private static SlotDefinition entryItem(InfoEntry entry) {
     var builder =
@@ -70,8 +66,6 @@ public final class InfoMenu implements Menu, Listener {
    * target}, and the menu starts on the player tab whenever a different player was requested.
    */
   public void prepare(UUID viewer, UUID target) {
-    Objects.requireNonNull(viewer, "viewer");
-    Objects.requireNonNull(target, "target");
     playerTarget.put(viewer, target);
     openTab.put(viewer, viewer.equals(target) ? Tab.CATEGORIES : Tab.PLAYER);
   }
@@ -83,7 +77,6 @@ public final class InfoMenu implements Menu, Listener {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    Objects.requireNonNull(menus, "menus");
     var pagination = PaginationConfig.builder().contentSlots(CONTENT_SLOTS).build();
 
     MenuFramework.builder(ID, menus)
@@ -105,7 +98,9 @@ public final class InfoMenu implements Menu, Listener {
     };
   }
 
-  /** The player whose info {@code viewer} is looking at — the /info argument, or {@code viewer}. */
+  /**
+   * The player whose info {@code viewer} is looking at â€” the /info argument, or {@code viewer}.
+   */
   private Player resolveTarget(Player viewer) {
     UUID targetId = playerTarget.getOrDefault(viewer.getUniqueId(), viewer.getUniqueId());
     Player target = Bukkit.getPlayer(targetId);
@@ -122,7 +117,7 @@ public final class InfoMenu implements Menu, Listener {
         category(
             Material.PLAYER_HEAD,
             "<yellow>Jogador",
-            "<gray>Informações de um jogador.",
+            "<gray>InformaÃ§Ãµes de um jogador.",
             Tab.PLAYER),
         SKIP,
         category(

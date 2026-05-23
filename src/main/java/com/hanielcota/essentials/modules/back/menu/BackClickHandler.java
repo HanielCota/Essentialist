@@ -7,19 +7,12 @@ import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
-import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.jspecify.annotations.NonNull;
 
 public record BackClickHandler(
     ConfigHandle<BackConfig> config, TeleportHistory history, TeleportService teleport)
     implements ItemClickHandler<HistoryEntry> {
-
-  public BackClickHandler {
-    Objects.requireNonNull(config, "config");
-    Objects.requireNonNull(history, "history");
-    Objects.requireNonNull(teleport, "teleport");
-  }
 
   @Override
   public void handle(@NonNull ClickContext click, @NonNull HistoryEntry entry) {

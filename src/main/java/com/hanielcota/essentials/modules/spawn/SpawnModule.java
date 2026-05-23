@@ -6,6 +6,9 @@ import com.hanielcota.essentials.module.ModuleMetadata;
 import com.hanielcota.essentials.modules.spawn.command.SetSpawnCommand;
 import com.hanielcota.essentials.modules.spawn.command.SpawnCommand;
 import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
+import com.hanielcota.essentials.modules.spawn.listener.SpawnJoinListener;
+import com.hanielcota.essentials.modules.spawn.listener.SpawnRespawnListener;
+import com.hanielcota.essentials.modules.spawn.listener.SpawnVoidListener;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.spawn.service.SpawnStore;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
@@ -36,5 +39,9 @@ public final class SpawnModule extends AbstractModule {
 
     registerCommand(new SetSpawnCommand(config, spawnService));
     registerCommand(new SpawnCommand(config, spawnService, delayed));
+
+    registerListener(new SpawnJoinListener(spawnService));
+    registerListener(new SpawnRespawnListener(spawnService));
+    registerListener(new SpawnVoidListener(spawnService));
   }
 }

@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.warps.service;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -23,19 +22,9 @@ public record Warp(
     long createdAt,
     UUID createdBy) {
 
-  public Warp {
-    Objects.requireNonNull(name, "name");
-    Objects.requireNonNull(world, "world");
-    Objects.requireNonNull(createdBy, "createdBy");
-  }
-
   /** Captures a Bukkit {@link Location} as a fresh warp. */
   public static Warp of(String name, Location location, UUID createdBy) {
-    Objects.requireNonNull(name, "name");
-    Objects.requireNonNull(location, "location");
-    Objects.requireNonNull(createdBy, "createdBy");
     var world = location.getWorld();
-    Objects.requireNonNull(world, "location world");
     return new Warp(
         name,
         world.getName(),

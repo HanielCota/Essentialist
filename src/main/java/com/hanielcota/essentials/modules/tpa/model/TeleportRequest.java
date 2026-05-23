@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.tpa.model;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 
 /**
  * An active teleport request held in memory while pending.
@@ -17,14 +16,6 @@ public record TeleportRequest(
     Participant target,
     TeleportRequestType type,
     RequestWindow window) {
-
-  public TeleportRequest {
-    Objects.requireNonNull(id, "id");
-    Objects.requireNonNull(requester, "requester");
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(window, "window");
-  }
 
   /** Opens a fresh request between two participants, lasting {@code lifetime}. */
   public static TeleportRequest open(

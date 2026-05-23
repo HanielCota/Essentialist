@@ -11,9 +11,9 @@ import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -21,10 +21,11 @@ import org.bukkit.entity.Player;
 /**
  * Application service for the teleport-request use cases: create, accept, deny, cancel, expire.
  *
- * <p>Sole responsibility: orchestration. It owns no state and renders no messages — it delegates
+ * <p>Sole responsibility: orchestration. It owns no state and renders no messages â€” it delegates
  * storage to {@link RequestStore}, persistence to {@link TpaHistory}, teleporting to {@link
  * TeleportService} and player-facing notices to {@link TpaNotifier}.
  */
+@RequiredArgsConstructor
 public final class TeleportRequestService {
 
   private final ConfigHandle<TpaConfig> config;
@@ -33,27 +34,11 @@ public final class TeleportRequestService {
   private final TeleportService teleport;
   private final TpaNotifier notifier;
 
-  public TeleportRequestService(
-      ConfigHandle<TpaConfig> config,
-      RequestStore store,
-      TpaHistory history,
-      TeleportService teleport,
-      TpaNotifier notifier) {
-    this.config = Objects.requireNonNull(config, "config");
-    this.store = Objects.requireNonNull(store, "store");
-    this.history = Objects.requireNonNull(history, "history");
-    this.teleport = Objects.requireNonNull(teleport, "teleport");
-    this.notifier = Objects.requireNonNull(notifier, "notifier");
-  }
-
   /**
-   * Registers a new request — replacing (and recording as cancelled) any request the requester
-   * already had outstanding — and prompts the target.
+   * Registers a new request â€” replacing (and recording as cancelled) any request the requester
+   * already had outstanding â€” and prompts the target.
    */
   public TeleportRequest create(Player requester, Player target, TeleportRequestType type) {
-    Objects.requireNonNull(requester, "requester");
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(type, "type");
 
     store
         .outgoingOf(requester.getUniqueId())
@@ -88,7 +73,6 @@ public final class TeleportRequestService {
 
   /** Accepts a request: performs the teleport, then records the outcome. */
   public AcceptResult accept(TeleportRequest request) {
-    Objects.requireNonNull(request, "request");
 
     var requester = Bukkit.getPlayer(request.requester().id());
     var target = Bukkit.getPlayer(request.target().id());
@@ -136,11 +120,10 @@ public final class TeleportRequestService {
   }
 
   /**
-   * Cancels every request a player takes part in — used when they disconnect — and returns them so
-   * the caller can notify the other party.
+   * Cancels every request a player takes part in â€” used when they disconnect â€” and returns them
+   * so the caller can notify the other party.
    */
   public List<TeleportRequest> cancelAllOf(UUID player) {
-    Objects.requireNonNull(player, "player");
     var affected = store.involving(player);
     for (TeleportRequest request : affected) {
       resolve(request, TeleportRequestStatus.CANCELLED);

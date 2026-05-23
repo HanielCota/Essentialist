@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.bukkit.Material;
 import org.jspecify.annotations.NonNull;
 
@@ -24,7 +23,6 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
 
   @Override
   public @NonNull ItemTemplate render(@NonNull TpaHistoryEntry entry, int humanIndex) {
-    Objects.requireNonNull(entry, "entry");
 
     var settings = config.value().menu();
     var target = entry.target();

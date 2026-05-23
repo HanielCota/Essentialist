@@ -8,19 +8,15 @@ import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.module.ModuleContext;
 import com.hanielcota.essentials.module.ModuleManager;
 import com.hanielcota.essentials.service.ServiceRegistry;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public final class EssentialsCore implements EssentialsApi {
 
   private final EssentialsPlugin plugin;
   private final ServiceRegistry services;
 
   private volatile LifecyclePhase phase = LifecyclePhase.BOOTING;
-
-  public EssentialsCore(EssentialsPlugin plugin, ServiceRegistry services) {
-    this.plugin = Objects.requireNonNull(plugin, "plugin");
-    this.services = Objects.requireNonNull(services, "services");
-  }
 
   public void advance(LifecyclePhase next) {
     this.phase = next;

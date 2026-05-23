@@ -3,20 +3,17 @@ package com.hanielcota.essentials.modules.invsee.listener;
 import com.hanielcota.essentials.modules.invsee.service.InvseeHolder;
 import com.hanielcota.essentials.modules.invsee.service.InvseeService;
 import com.hanielcota.essentials.modules.invsee.service.InvseeSynchronizer;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
+@RequiredArgsConstructor
 public final class InvseeListener implements Listener {
 
   private final InvseeSynchronizer synchronizer;
-
-  public InvseeListener(InvseeSynchronizer synchronizer) {
-    this.synchronizer = Objects.requireNonNull(synchronizer, "synchronizer");
-  }
 
   @EventHandler
   public void onClick(InventoryClickEvent event) {

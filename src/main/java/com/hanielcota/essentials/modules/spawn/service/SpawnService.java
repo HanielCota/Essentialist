@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.spawn.service;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -18,7 +17,7 @@ public final class SpawnService {
   private final AtomicReference<SpawnLocation> cached = new AtomicReference<>();
 
   public SpawnService(SpawnStore store) {
-    this.store = Objects.requireNonNull(store, "store");
+    this.store = store;
     store.load().ifPresent(cached::set);
   }
 
@@ -29,7 +28,6 @@ public final class SpawnService {
 
   /** Persists {@code location} as the spawn point and refreshes the cache. */
   public void set(SpawnLocation location) {
-    Objects.requireNonNull(location, "location");
     store.save(location);
     cached.set(location);
   }

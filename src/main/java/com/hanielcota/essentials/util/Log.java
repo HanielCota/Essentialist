@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.util;
 
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,7 +12,6 @@ public final class Log {
   }
 
   public static Log of(Class<?> owner) {
-    Objects.requireNonNull(owner, "owner");
     return new Log(Logger.getLogger(owner.getName()));
   }
 

@@ -2,7 +2,6 @@ package com.hanielcota.essentials.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -52,20 +51,17 @@ public final class ClickableMessage implements ComponentLike {
 
   /** Appends a MiniMessage segment configured with click and/or hover actions. */
   public ClickableMessage append(String mini, Consumer<ClickableMessageSegment> action) {
-    Objects.requireNonNull(mini, "mini");
     return append(ComponentUtils.mini(mini), action);
   }
 
   /** Appends an already-built component. */
   public ClickableMessage append(Component component) {
-    parts.add(Objects.requireNonNull(component, "component"));
+    parts.add(component);
     return this;
   }
 
   /** Appends an already-built component configured with click and/or hover actions. */
   public ClickableMessage append(Component component, Consumer<ClickableMessageSegment> action) {
-    Objects.requireNonNull(component, "component");
-    Objects.requireNonNull(action, "action");
 
     var segment = new ClickableMessageSegment();
     action.accept(segment);
@@ -100,11 +96,10 @@ public final class ClickableMessage implements ComponentLike {
 
   /** Sends the built message to one or more audiences (players, console, broadcast, ...). */
   public void send(Audience... audiences) {
-    Objects.requireNonNull(audiences, "audiences");
 
     var message = build();
     for (var audience : audiences) {
-      Objects.requireNonNull(audience, "audience").sendMessage(message);
+      audience.sendMessage(message);
     }
   }
 }

@@ -4,7 +4,6 @@ import com.hanielcota.essentials.exception.ConfigurationException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -27,10 +26,10 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
   private final AtomicReference<T> ref = new AtomicReference<>();
 
   YamlConfigHandle(Path baseDir, String name, Class<T> type, Supplier<T> defaults) {
-    this.baseDir = Objects.requireNonNull(baseDir, "baseDir");
-    this.name = Objects.requireNonNull(name, "name");
-    this.type = Objects.requireNonNull(type, "type");
-    this.defaults = Objects.requireNonNull(defaults, "defaults");
+    this.baseDir = baseDir;
+    this.name = name;
+    this.type = type;
+    this.defaults = defaults;
   }
 
   @Override

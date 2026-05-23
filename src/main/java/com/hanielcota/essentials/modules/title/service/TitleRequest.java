@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.title.service;
 
-import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -15,7 +14,6 @@ import org.bukkit.entity.Player;
 public record TitleRequest(Player target, String message) {
 
   public static TitleRequest from(Player self, String input) {
-    Objects.requireNonNull(input, "input");
 
     var trimmedInput = input.strip();
 

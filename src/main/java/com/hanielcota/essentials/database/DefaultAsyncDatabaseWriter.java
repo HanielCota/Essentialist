@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.database;
 
 import com.hanielcota.essentials.util.Log;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -42,14 +41,12 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
    * @param executor the executor service to run tasks on
    */
   public DefaultAsyncDatabaseWriter(String threadName, ExecutorService executor) {
-    this.threadName = Objects.requireNonNull(threadName, "threadName");
-    this.executor = Objects.requireNonNull(executor, "executor");
+    this.threadName = threadName;
+    this.executor = executor;
   }
 
   @Override
   public void submit(String operation, Runnable work) {
-    Objects.requireNonNull(operation, "operation");
-    Objects.requireNonNull(work, "work");
 
     try {
       executor.execute(

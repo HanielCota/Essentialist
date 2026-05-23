@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.whitelist.service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
@@ -10,7 +9,6 @@ public final class WhitelistService {
 
   /** A player's name, falling back to the UUID string when the name is unknown. */
   public static String nameOf(OfflinePlayer player) {
-    Objects.requireNonNull(player, "player");
     String name = player.getName();
     return name != null ? name : player.getUniqueId().toString();
   }
@@ -43,7 +41,6 @@ public final class WhitelistService {
    * user cache; a name the server has never seen yields {@link AddResult#UNKNOWN_PLAYER}.
    */
   public AddResult add(String name) {
-    Objects.requireNonNull(name, "name");
 
     OfflinePlayer player = resolveKnown(name);
     if (player == null) {
@@ -58,7 +55,6 @@ public final class WhitelistService {
 
   /** Removes a player from the whitelist by name; returns {@code false} if not whitelisted. */
   public boolean remove(String name) {
-    Objects.requireNonNull(name, "name");
 
     OfflinePlayer match = findWhitelisted(name);
     if (match == null) {
@@ -70,7 +66,6 @@ public final class WhitelistService {
 
   /** Removes an already-resolved player from the whitelist. */
   public void remove(OfflinePlayer player) {
-    Objects.requireNonNull(player, "player");
     player.setWhitelisted(false);
   }
 

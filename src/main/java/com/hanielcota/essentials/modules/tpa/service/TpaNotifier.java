@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.ComponentUtils;
 import com.hanielcota.essentials.util.Placeholders;
-import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -20,14 +19,8 @@ import org.bukkit.entity.Player;
  */
 public record TpaNotifier(ConfigHandle<TpaConfig> config) {
 
-  public TpaNotifier {
-    Objects.requireNonNull(config, "config");
-  }
-
   /** Sends the target the clickable accept / deny prompt for an incoming request. */
   public void sendPrompt(Player target, TeleportRequest request) {
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(request, "request");
 
     var snap = config.value();
     var messages = snap.messages();
@@ -53,7 +46,6 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
 
   /** Tells the requester, if still online, that their request expired. */
   public void notifyExpired(TeleportRequest request) {
-    Objects.requireNonNull(request, "request");
     var requester = Bukkit.getPlayer(request.requester().id());
     if (requester != null) {
       requester.sendMessage(
@@ -68,7 +60,6 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
    * {@code quitterName} disconnected.
    */
   public void notifyPartnerLeft(TeleportRequest request, UUID quitter, String quitterName) {
-    Objects.requireNonNull(request, "request");
     UUID recipient =
         request.requester().id().equals(quitter) ? request.target().id() : request.requester().id();
     var online = Bukkit.getPlayer(recipient);

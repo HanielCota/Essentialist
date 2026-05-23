@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.rename.config;
 
-import java.util.Objects;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -18,7 +17,6 @@ public record RenameConfig(
   }
 
   public String formatRenamed(String name) {
-    Objects.requireNonNull(name, "name");
     return renamed.replace("{name}", name);
   }
 }

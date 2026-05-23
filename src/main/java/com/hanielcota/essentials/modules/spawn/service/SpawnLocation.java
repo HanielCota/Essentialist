@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.spawn.service;
 
-import java.util.Objects;
 import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,15 +12,10 @@ import org.bukkit.Location;
  */
 public record SpawnLocation(String world, double x, double y, double z, float yaw, float pitch) {
 
-  public SpawnLocation {
-    Objects.requireNonNull(world, "world");
-  }
-
   /** Captures a Bukkit {@link Location} as an immutable spawn point. */
   public static SpawnLocation of(Location location) {
-    Objects.requireNonNull(location, "location");
     var world = location.getWorld();
-    Objects.requireNonNull(world, "location world");
+
     return new SpawnLocation(
         world.getName(),
         location.getX(),

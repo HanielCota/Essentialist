@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,8 +27,9 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * Read-only menu of a player's last {@link TpaHistory#CAPACITY} sent teleport requests. Items are
- * display-only — clicking them does nothing.
+ * display-only â€” clicking them does nothing.
  */
+@RequiredArgsConstructor
 public final class TpaHistoryMenu implements Menu, Listener {
 
   public static final String ID = "essentials.tpahistory";
@@ -46,13 +48,6 @@ public final class TpaHistoryMenu implements Menu, Listener {
    * #buildSlots} call; later refreshes re-query.
    */
   private final Map<UUID, List<TpaHistoryEntry>> prefetched = new ConcurrentHashMap<>();
-
-  public TpaHistoryMenu(
-      ConfigHandle<TpaConfig> config, TpaHistory history, TpaHistoryEntryRenderer renderer) {
-    this.config = Objects.requireNonNull(config, "config");
-    this.history = Objects.requireNonNull(history, "history");
-    this.renderer = Objects.requireNonNull(renderer, "renderer");
-  }
 
   /**
    * Filters configured slot indices to those that fit inside a menu of {@code capacity} slots,
@@ -75,8 +70,6 @@ public final class TpaHistoryMenu implements Menu, Listener {
 
   /** Stores a history snapshot to be consumed by this viewer's next menu render. */
   public void prefetch(@NonNull UUID viewer, @NonNull List<TpaHistoryEntry> entries) {
-    Objects.requireNonNull(viewer, "viewer");
-    Objects.requireNonNull(entries, "entries");
     prefetched.put(viewer, List.copyOf(entries));
   }
 
@@ -87,7 +80,6 @@ public final class TpaHistoryMenu implements Menu, Listener {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    Objects.requireNonNull(menus, "menus");
     var settings = config.value().menu();
     int rows = Math.clamp(settings.rows(), MIN_ROWS, MAX_ROWS);
     var slots = sanitizeContentSlots(settings.contentSlots(), rows * SLOTS_PER_ROW);

@@ -27,17 +27,14 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public final class EssentialsBootstrap {
 
   private final EssentialsPlugin plugin;
-
-  public EssentialsBootstrap(EssentialsPlugin plugin) {
-    this.plugin = Objects.requireNonNull(plugin, "plugin");
-  }
 
   public EssentialsCore start() {
     var services = new DefaultServiceRegistry();

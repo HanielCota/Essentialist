@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.tpa.history;
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -21,13 +20,12 @@ public final class AsyncTpaHistory implements TpaHistory, AutoCloseable {
   private final AsyncDatabaseWriter writer;
 
   public AsyncTpaHistory(TpaHistory delegate) {
-    this.delegate = Objects.requireNonNull(delegate, "delegate");
+    this.delegate = delegate;
     this.writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaHistory");
   }
 
   @Override
   public void push(TpaHistoryEntry entry) {
-    Objects.requireNonNull(entry, "entry");
     writer.submit("push", () -> delegate.push(entry));
   }
 

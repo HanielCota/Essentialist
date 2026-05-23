@@ -3,17 +3,12 @@ package com.hanielcota.essentials.modules.repair.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
 import java.util.List;
-import java.util.Objects;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
 public record RepairService(ConfigHandle<RepairConfig> config) {
-
-  public RepairService {
-    Objects.requireNonNull(config, "config");
-  }
 
   private static boolean repair(ItemStack item, List<Material> blacklist) {
     if (item == null || item.getType().getMaxDurability() <= 0) {

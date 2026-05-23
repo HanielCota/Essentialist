@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
@@ -75,7 +74,7 @@ public final class SqliteTpaHistory implements TpaHistory {
   private final SqlExecutor sqlExecutor;
 
   public SqliteTpaHistory(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = Objects.requireNonNull(sqlExecutor, "sqlExecutor");
+    this.sqlExecutor = sqlExecutor;
     sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
   }
 
@@ -125,7 +124,6 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   @Override
   public void push(TpaHistoryEntry entry) {
-    Objects.requireNonNull(entry, "entry");
     sqlExecutor.tx(
         conn -> {
           insert(conn, entry);
@@ -135,7 +133,6 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   @Override
   public List<TpaHistoryEntry> list(UUID requester) {
-    Objects.requireNonNull(requester, "requester");
     return sqlExecutor.query(LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
   }
 

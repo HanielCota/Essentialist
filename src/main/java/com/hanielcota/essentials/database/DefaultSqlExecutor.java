@@ -5,12 +5,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Default implementation of {@link SqlExecutor} that handles resource cleanup and transaction
  * boundaries using standard JDBC operations.
  */
+@RequiredArgsConstructor
 public final class DefaultSqlExecutor implements SqlExecutor {
 
   private final SqlConnectionFactory connectionFactory;
@@ -20,15 +21,8 @@ public final class DefaultSqlExecutor implements SqlExecutor {
    *
    * @param connectionFactory the connection factory to use
    */
-  public DefaultSqlExecutor(SqlConnectionFactory connectionFactory) {
-    this.connectionFactory = Objects.requireNonNull(connectionFactory, "connectionFactory");
-  }
-
   @Override
   public <T> List<T> query(String sql, StatementBinder binder, ResultMapper<T> mapper) {
-    Objects.requireNonNull(sql, "sql");
-    Objects.requireNonNull(binder, "binder");
-    Objects.requireNonNull(mapper, "mapper");
 
     try (var conn = connectionFactory.getConnection();
         var stmt = conn.prepareStatement(sql)) {
@@ -53,8 +47,6 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   @Override
   public void update(String sql, StatementBinder binder) {
-    Objects.requireNonNull(sql, "sql");
-    Objects.requireNonNull(binder, "binder");
 
     try (var conn = connectionFactory.getConnection();
         var stmt = conn.prepareStatement(sql)) {
@@ -69,9 +61,6 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   @Override
   public int execute(Connection conn, String sql, Object... params) throws SQLException {
-    Objects.requireNonNull(conn, "conn");
-    Objects.requireNonNull(sql, "sql");
-    Objects.requireNonNull(params, "params");
 
     try (var stmt = conn.prepareStatement(sql)) {
       for (var i = 0; i < params.length; i++) {
@@ -83,7 +72,6 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   @Override
   public void tx(TxBlock work) {
-    Objects.requireNonNull(work, "work");
 
     try (var conn = connectionFactory.getConnection()) {
       conn.setAutoCommit(false);
@@ -121,7 +109,6 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   @Override
   public void ddl(String... statements) {
-    Objects.requireNonNull(statements, "statements");
 
     try (var conn = connectionFactory.getConnection();
         var stmt = conn.createStatement()) {

@@ -4,16 +4,17 @@ import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Drives request expiry.
  *
  * <p>Sole responsibility: once a second, hand every request that has outlived its deadline to
- * {@link TeleportRequestService#expire}. One shared timer sweeps the whole {@link RequestStore} —
- * never one delayed task per request — so spamming {@code /tpa} cannot pile up scheduler work.
+ * {@link TeleportRequestService#expire}. One shared timer sweeps the whole {@link RequestStore} â€”
+ * never one delayed task per request â€” so spamming {@code /tpa} cannot pile up scheduler work.
  * Holds no request state of its own.
  */
+@RequiredArgsConstructor
 public final class TeleportRequestExpiry {
 
   private static final Duration INTERVAL = Duration.ofSeconds(1);
@@ -23,13 +24,6 @@ public final class TeleportRequestExpiry {
   private final TeleportRequestService service;
 
   private Task task;
-
-  public TeleportRequestExpiry(
-      Scheduler scheduler, RequestStore store, TeleportRequestService service) {
-    this.scheduler = Objects.requireNonNull(scheduler, "scheduler");
-    this.store = Objects.requireNonNull(store, "store");
-    this.service = Objects.requireNonNull(service, "service");
-  }
 
   /** Starts the periodic sweep. */
   public void start() {

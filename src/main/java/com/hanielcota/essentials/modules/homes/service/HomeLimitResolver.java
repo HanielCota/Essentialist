@@ -1,18 +1,17 @@
 package com.hanielcota.essentials.modules.homes.service;
 
-import java.util.Objects;
+import java.util.Optional;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 /**
- * Resolves a player's home limit from their {@code essentials.home.limit.N} permission nodes.
- *
- * <p>The largest {@code N} the player holds wins; the configured {@code defaultLimit} kicks in when
- * the player has no matching node.
+ * Resolves a player's home limit from their {@code essentials.home.limit.N} permission nodes. The
+ * largest {@code N} the player holds wins; the configured {@code defaultLimit} kicks in when the
+ * player has no matching node.
  */
 public final class HomeLimitResolver {
 
-  private static final String PREFIX = "essentials.home.limit.";
-
+  private static final String LIMIT_PERMISSION_PREFIX = "essentials.home.limit.";
   private final int defaultLimit;
 
   public HomeLimitResolver(int defaultLimit) {
@@ -20,25 +19,22 @@ public final class HomeLimitResolver {
   }
 
   public int resolve(Player player) {
-    Objects.requireNonNull(player, "player");
-    var best = -1;
-    for (var entry : player.getEffectivePermissions()) {
-      if (!entry.getValue()) {
-        continue;
-      }
-      var node = entry.getPermission();
-      if (!node.startsWith(PREFIX)) {
-        continue;
-      }
-      try {
-        var n = Integer.parseInt(node.substring(PREFIX.length()));
-        if (n > best) {
-          best = n;
-        }
-      } catch (NumberFormatException _) {
-        // ignore malformed suffix
-      }
+    return player.getEffectivePermissions().stream()
+        .filter(PermissionAttachmentInfo::getValue)
+        .map(PermissionAttachmentInfo::getPermission)
+        .filter(permission -> permission.startsWith(LIMIT_PERMISSION_PREFIX))
+        .map(this::extractLimitFromPermission)
+        .flatMap(Optional::stream)
+        .reduce(Math::max)
+        .orElse(defaultLimit);
+  }
+
+  private Optional<Integer> extractLimitFromPermission(String permission) {
+    try {
+      String limitSuffix = permission.substring(LIMIT_PERMISSION_PREFIX.length());
+      return Optional.of(Integer.parseInt(limitSuffix));
+    } catch (NumberFormatException e) {
+      return Optional.empty();
     }
-    return best >= 0 ? best : defaultLimit;
   }
 }

@@ -11,7 +11,6 @@ import io.papermc.paper.registry.RegistryKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.bukkit.GameMode;
@@ -25,8 +24,8 @@ public final class CommandBootstrap {
 
   public CommandBootstrap(
       JavaPlugin plugin, List<Consumer<PaperCommandFramework.Builder>> customizers) {
-    this.plugin = Objects.requireNonNull(plugin, "plugin");
-    this.customizers = List.copyOf(Objects.requireNonNull(customizers, "customizers"));
+    this.plugin = plugin;
+    this.customizers = List.copyOf(customizers);
   }
 
   /** Tab-completes enchantment names (without the {@code minecraft:} namespace) by prefix. */

@@ -24,6 +24,8 @@ val sqlite = providers.gradleProperty("sqliteVersion")
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:${paperApi.get()}")
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
     implementation("com.github.HanielCota.CommandFramework:command-paper:${commandFw.get()}")
     implementation("com.github.HanielCota:MenuFramework:${menuFw.get()}")
     implementation("org.spongepowered:configurate-yaml:${configurate.get()}")

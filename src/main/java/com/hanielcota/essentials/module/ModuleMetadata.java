@@ -1,13 +1,11 @@
 package com.hanielcota.essentials.module;
 
-import java.util.Objects;
 import java.util.Set;
 
 public record ModuleMetadata(
     String id, Set<String> dependencies, String version, String description) {
 
   public ModuleMetadata {
-    Objects.requireNonNull(id, "id");
     if (id.isBlank()) {
       throw new IllegalArgumentException("id must not be blank");
     }

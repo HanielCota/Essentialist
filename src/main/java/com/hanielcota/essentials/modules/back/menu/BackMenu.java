@@ -18,12 +18,14 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jspecify.annotations.NonNull;
 
+@RequiredArgsConstructor
 public final class BackMenu implements Menu, Listener {
 
   public static final String ID = "essentials.back";
@@ -44,17 +46,6 @@ public final class BackMenu implements Menu, Listener {
    * on the first {@link #buildSlots} call; later refreshes/pagination re-query for fresh data.
    */
   private final Map<UUID, List<HistoryEntry>> prefetched = new ConcurrentHashMap<>();
-
-  public BackMenu(
-      ConfigHandle<BackConfig> config,
-      TeleportHistory history,
-      BackEntryRenderer renderer,
-      BackClickHandler clickHandler) {
-    this.config = Objects.requireNonNull(config, "config");
-    this.history = Objects.requireNonNull(history, "history");
-    this.renderer = Objects.requireNonNull(renderer, "renderer");
-    this.clickHandler = Objects.requireNonNull(clickHandler, "clickHandler");
-  }
 
   /**
    * Filters configured slot indices to those that fit inside a menu of {@code capacity} slots,
@@ -77,8 +68,6 @@ public final class BackMenu implements Menu, Listener {
 
   /** Stores a history snapshot to be consumed by this viewer's next menu render. */
   public void prefetch(@NonNull UUID viewer, @NonNull List<HistoryEntry> entries) {
-    Objects.requireNonNull(viewer, "viewer");
-    Objects.requireNonNull(entries, "entries");
     prefetched.put(viewer, List.copyOf(entries));
   }
 
@@ -89,7 +78,6 @@ public final class BackMenu implements Menu, Listener {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    Objects.requireNonNull(menus, "menus");
     var snap = config.value();
     int rows = Math.max(MIN_ROWS, Math.min(MAX_ROWS, snap.menuRows()));
     var slots = sanitizeContentSlots(snap.menuContentSlots(), rows * SLOTS_PER_ROW);

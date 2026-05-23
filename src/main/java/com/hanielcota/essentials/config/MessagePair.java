@@ -1,7 +1,5 @@
 package com.hanielcota.essentials.config;
 
-import java.util.Objects;
-
 /**
  * Immutable pair of self / other message templates. Placeholders:
  *
@@ -13,11 +11,6 @@ import java.util.Objects;
  * record before producing the pair.
  */
 public record MessagePair(String self, String other) {
-
-  public MessagePair {
-    Objects.requireNonNull(self, "self");
-    Objects.requireNonNull(other, "other");
-  }
 
   /**
    * Message from the sender's perspective.

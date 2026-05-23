@@ -6,19 +6,16 @@ import com.hanielcota.essentials.util.ComponentUtils;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public final class TitleService {
 
   private final ConfigHandle<TitleConfig> config;
-
-  public TitleService(ConfigHandle<TitleConfig> config) {
-    this.config = Objects.requireNonNull(config, "config");
-  }
 
   private static Component render(String raw) {
     try {
@@ -33,14 +30,11 @@ public final class TitleService {
   }
 
   public void send(Player target, String message) {
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(message, "message");
 
     target.showTitle(build(message));
   }
 
   public int broadcast(String message) {
-    Objects.requireNonNull(message, "message");
 
     var title = build(message);
     var onlinePlayers = Bukkit.getOnlinePlayers();

@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.tpa.model;
 
-import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.entity.Player;
 
@@ -12,14 +11,8 @@ import org.bukkit.entity.Player;
  */
 public record Participant(UUID id, String name) {
 
-  public Participant {
-    Objects.requireNonNull(id, "id");
-    Objects.requireNonNull(name, "name");
-  }
-
   /** Snapshots an online player as a participant. */
   public static Participant of(Player player) {
-    Objects.requireNonNull(player, "player");
     return new Participant(player.getUniqueId(), player.getName());
   }
 }

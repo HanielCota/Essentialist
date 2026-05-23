@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.tpa.model.Participant;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
-import java.util.Objects;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
@@ -27,13 +26,6 @@ public record TpaHistoryEntry(
     long resolvedAt,
     @Nullable Destination destination) {
 
-  public TpaHistoryEntry {
-    Objects.requireNonNull(requester, "requester");
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(type, "type");
-    Objects.requireNonNull(status, "status");
-  }
-
   /** Builds an entry with no destination — a denied, expired or cancelled request. */
   public static TpaHistoryEntry of(TeleportRequest request, TeleportRequestStatus status) {
     return of(request, status, null);
@@ -45,7 +37,6 @@ public record TpaHistoryEntry(
    */
   public static TpaHistoryEntry of(
       TeleportRequest request, TeleportRequestStatus status, @Nullable Destination destination) {
-    Objects.requireNonNull(request, "request");
     return new TpaHistoryEntry(
         request.requester().id(),
         request.target(),

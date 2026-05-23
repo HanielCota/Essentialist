@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
 import com.hanielcota.essentials.util.ComponentUtils;
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -33,8 +32,6 @@ public final class InvseeService {
 
   /** Builds the 45-slot invsee GUI populated with {@code target}'s inventory. */
   public Inventory createView(Player target, String title) {
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(title, "title");
 
     var holder = new InvseeHolder(target.getUniqueId());
     var view = Bukkit.createInventory(holder, SIZE, ComponentUtils.mini(title));
@@ -58,8 +55,6 @@ public final class InvseeService {
 
   /** Writes the editable slots of {@code view} back into {@code target}'s inventory. */
   public void sync(Player target, Inventory view) {
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(view, "view");
 
     PlayerInventory inv = target.getInventory();
     ItemStack[] storage = new ItemStack[STORAGE_SLOTS];

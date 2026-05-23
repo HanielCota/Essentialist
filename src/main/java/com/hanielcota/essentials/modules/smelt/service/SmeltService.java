@@ -3,15 +3,10 @@ package com.hanielcota.essentials.modules.smelt.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.smelt.config.SmeltConfig;
 import com.hanielcota.essentials.util.ItemStacks;
-import java.util.Objects;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public record SmeltService(ConfigHandle<SmeltConfig> config) {
-
-  public SmeltService {
-    Objects.requireNonNull(config, "config");
-  }
 
   public int smelt(Player player) {
     var mappings = config.value().mappings();

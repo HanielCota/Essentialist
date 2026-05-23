@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -31,7 +30,6 @@ public final class RequestStore {
 
   /** Adds a request and indexes it by requester and by target. */
   public void add(TeleportRequest request) {
-    Objects.requireNonNull(request, "request");
 
     byId.put(request.id(), request);
     outgoingByRequester.put(request.requester().id(), request.id());
@@ -43,7 +41,6 @@ public final class RequestStore {
 
   /** Removes a request. Returns {@code false} when it was already gone. */
   public boolean remove(TeleportRequest request) {
-    Objects.requireNonNull(request, "request");
 
     if (byId.remove(request.id()) == null) {
       return false;
@@ -56,7 +53,6 @@ public final class RequestStore {
 
   /** The target's pending requests, newest first. */
   public List<TeleportRequest> incomingFor(UUID target) {
-    Objects.requireNonNull(target, "target");
 
     var ids = incomingByTarget.get(target);
     if (ids == null || ids.isEmpty()) {
@@ -77,8 +73,6 @@ public final class RequestStore {
 
   /** A pending request to {@code target} from the named requester, case-insensitive. */
   public Optional<TeleportRequest> incomingFrom(UUID target, String requesterName) {
-    Objects.requireNonNull(target, "target");
-    Objects.requireNonNull(requesterName, "requesterName");
 
     for (var request : incomingFor(target)) {
       if (request.requester().name().equalsIgnoreCase(requesterName)) {
@@ -91,7 +85,6 @@ public final class RequestStore {
 
   /** The requester's single outstanding request, if any. */
   public Optional<TeleportRequest> outgoingOf(UUID requester) {
-    Objects.requireNonNull(requester, "requester");
 
     var id = outgoingByRequester.get(requester);
     if (id == null) {
@@ -103,7 +96,6 @@ public final class RequestStore {
 
   /** Every request whose window has lapsed by {@code now}. */
   public List<TeleportRequest> expiredAt(Instant now) {
-    Objects.requireNonNull(now, "now");
 
     var expired = new ArrayList<TeleportRequest>();
     for (var request : byId.values()) {
@@ -117,7 +109,6 @@ public final class RequestStore {
 
   /** Every request the player takes part in, as requester or as target. */
   public List<TeleportRequest> involving(UUID player) {
-    Objects.requireNonNull(player, "player");
 
     var involved = new ArrayList<TeleportRequest>();
     for (var request : byId.values()) {

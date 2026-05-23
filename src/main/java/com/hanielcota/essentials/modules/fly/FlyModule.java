@@ -3,7 +3,10 @@ package com.hanielcota.essentials.modules.fly;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.fly.command.FlyCommand;
 import com.hanielcota.essentials.modules.fly.config.FlyConfig;
+import com.hanielcota.essentials.modules.fly.listener.FlyGameModeListener;
+import com.hanielcota.essentials.modules.fly.listener.FlyQuitListener;
 import com.hanielcota.essentials.modules.fly.service.FlyService;
+import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 
 public final class FlyModule extends AbstractModule {
@@ -14,8 +17,12 @@ public final class FlyModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
-    var config = configure("fly", FlyConfig.class, FlyConfig::defaults, new FlyService());
-    registerCommand(
-        new FlyCommand(config, service(FlyService.class), service(PaperCommandFramework.class)));
+    var fly = new FlyService();
+    var config = configure("fly", FlyConfig.class, FlyConfig::defaults, fly);
+    var scheduler = service(Scheduler.class);
+
+    registerCommand(new FlyCommand(config, fly, service(PaperCommandFramework.class)));
+    registerListener(new FlyGameModeListener(scheduler, fly));
+    registerListener(new FlyQuitListener(fly));
   }
 }

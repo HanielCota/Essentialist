@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public final class ModuleManager {
 
@@ -20,14 +19,12 @@ public final class ModuleManager {
   private List<Module> enableOrder = List.of();
 
   public void register(Module module) {
-    Objects.requireNonNull(module, "module");
     if (registered.putIfAbsent(module.id(), module) == null) {
       states.put(module.id(), ModuleState.REGISTERED);
     }
   }
 
   public void enableAll(ModuleContext context) {
-    Objects.requireNonNull(context, "context");
     enableOrder = resolveLoadOrder();
 
     var succeeded = new ArrayList<Module>(enableOrder.size());

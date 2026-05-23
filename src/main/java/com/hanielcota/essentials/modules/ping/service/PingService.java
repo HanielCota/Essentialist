@@ -2,13 +2,8 @@ package com.hanielcota.essentials.modules.ping.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.ping.config.PingConfig;
-import java.util.Objects;
 
 public record PingService(ConfigHandle<PingConfig> config) {
-
-  public PingService {
-    Objects.requireNonNull(config, "config");
-  }
 
   public String format(int ping) {
     String color = colorFor(ping);

@@ -4,7 +4,6 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,30 +63,25 @@ public final class HomeStore {
   private final SqlExecutor sqlExecutor;
 
   public HomeStore(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = Objects.requireNonNull(sqlExecutor, "sqlExecutor");
+    this.sqlExecutor = sqlExecutor;
     sqlExecutor.ddl(CREATE_TABLE);
   }
 
   public Optional<Home> find(UUID owner, String name) {
-    Objects.requireNonNull(owner, "owner");
-    Objects.requireNonNull(name, "name");
     var rows = sqlExecutor.query(SELECT_ONE, HomeStore::readRow, owner.toString(), name);
     return rows.isEmpty() ? Optional.empty() : Optional.of(rows.getFirst());
   }
 
   public List<Home> list(UUID owner) {
-    Objects.requireNonNull(owner, "owner");
     return sqlExecutor.query(SELECT_ALL, HomeStore::readRow, owner.toString());
   }
 
   public int count(UUID owner) {
-    Objects.requireNonNull(owner, "owner");
     var counts = sqlExecutor.query(COUNT, rs -> rs.getInt("total"), owner.toString());
     return counts.isEmpty() ? 0 : counts.getFirst();
   }
 
   public void save(Home home) {
-    Objects.requireNonNull(home, "home");
     sqlExecutor.update(
         UPSERT,
         home.owner().toString(),
@@ -103,8 +97,6 @@ public final class HomeStore {
 
   /** Deletes the home. Returns {@code true} when a row was removed. */
   public boolean delete(UUID owner, String name) {
-    Objects.requireNonNull(owner, "owner");
-    Objects.requireNonNull(name, "name");
     if (find(owner, name).isEmpty()) {
       return false;
     }

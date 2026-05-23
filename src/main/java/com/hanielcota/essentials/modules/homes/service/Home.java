@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.homes.service;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -23,19 +22,9 @@ public record Home(
     float pitch,
     long createdAt) {
 
-  public Home {
-    Objects.requireNonNull(owner, "owner");
-    Objects.requireNonNull(name, "name");
-    Objects.requireNonNull(world, "world");
-  }
-
   /** Captures a Bukkit {@link Location} as a fresh home record. */
   public static Home of(UUID owner, String name, Location location) {
-    Objects.requireNonNull(owner, "owner");
-    Objects.requireNonNull(name, "name");
-    Objects.requireNonNull(location, "location");
     var world = location.getWorld();
-    Objects.requireNonNull(world, "location world");
     return new Home(
         owner,
         name,

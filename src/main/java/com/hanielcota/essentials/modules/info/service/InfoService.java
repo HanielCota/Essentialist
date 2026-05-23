@@ -8,24 +8,20 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+@RequiredArgsConstructor
 public final class InfoService {
 
   private static final long BYTES_PER_MB = 1024L * 1024L;
 
   private final Plugin plugin;
   private final UserSessionService sessions;
-
-  public InfoService(Plugin plugin, UserSessionService sessions) {
-    this.plugin = Objects.requireNonNull(plugin, "plugin");
-    this.sessions = Objects.requireNonNull(sessions, "sessions");
-  }
 
   private static String formattedTps() {
     double tps = Math.min(20.0, Bukkit.getTPS()[0]);
@@ -50,7 +46,7 @@ public final class InfoService {
 
   private static String gameModeName(GameMode mode) {
     return switch (mode) {
-      case SURVIVAL -> "Sobrevivência";
+      case SURVIVAL -> "SobrevivÃªncia";
       case CREATIVE -> "Criativo";
       case ADVENTURE -> "Aventura";
       case SPECTATOR -> "Espectador";
@@ -68,9 +64,9 @@ public final class InfoService {
                 + Bukkit.getOnlinePlayers().size()
                 + " <dark_gray>/ <gray>"
                 + Bukkit.getMaxPlayers()),
-        InfoEntry.of(Material.NAME_TAG, "<yellow>Versão", "<gray>" + Bukkit.getVersion()),
+        InfoEntry.of(Material.NAME_TAG, "<yellow>VersÃ£o", "<gray>" + Bukkit.getVersion()),
         InfoEntry.of(Material.COMPARATOR, "<yellow>Tempo ligado", "<gray>" + formattedUptime()),
-        InfoEntry.of(Material.REDSTONE, "<yellow>Memória", "<gray>" + formattedMemory()),
+        InfoEntry.of(Material.REDSTONE, "<yellow>MemÃ³ria", "<gray>" + formattedMemory()),
         InfoEntry.of(
             Material.GRASS_BLOCK,
             "<yellow>Mundos",
@@ -89,20 +85,19 @@ public final class InfoService {
 
   /** Live information about a single player. */
   public List<InfoEntry> playerEntries(Player player) {
-    Objects.requireNonNull(player, "player");
     var location = player.getLocation();
     return List.of(
         InfoEntry.head(
-            player.getUniqueId(), "<yellow>" + player.getName(), "<gray>Informações do jogador."),
+            player.getUniqueId(), "<yellow>" + player.getName(), "<gray>InformaÃ§Ãµes do jogador."),
         InfoEntry.of(
             Material.GOLDEN_APPLE,
             "<yellow>Vida",
-            "<gray>" + (int) Math.round(player.getHealth()) + " <red>❤"),
+            "<gray>" + (int) Math.round(player.getHealth()) + " <red>â¤"),
         InfoEntry.of(
             Material.COOKED_BEEF,
             "<yellow>Fome",
             "<gray>" + player.getFoodLevel() + " <dark_gray>/ <gray>20"),
-        InfoEntry.of(Material.EXPERIENCE_BOTTLE, "<yellow>Nível", "<gray>" + player.getLevel()),
+        InfoEntry.of(Material.EXPERIENCE_BOTTLE, "<yellow>NÃ­vel", "<gray>" + player.getLevel()),
         InfoEntry.of(
             Material.GRASS_BLOCK,
             "<yellow>Modo de jogo",
@@ -110,7 +105,7 @@ public final class InfoService {
         InfoEntry.of(Material.MAP, "<yellow>Mundo", "<gray>" + player.getWorld().getName()),
         InfoEntry.of(
             Material.COMPASS,
-            "<yellow>Localização",
+            "<yellow>LocalizaÃ§Ã£o",
             "<gray>"
                 + Numbers.compact(location.getX())
                 + ", "
@@ -119,7 +114,7 @@ public final class InfoService {
                 + Numbers.compact(location.getZ())),
         InfoEntry.of(Material.FEATHER, "<yellow>Ping", "<gray>" + player.getPing() + " ms"),
         InfoEntry.of(
-            Material.CLOCK, "<yellow>Tempo de sessão", "<gray>" + sessionDuration(player)));
+            Material.CLOCK, "<yellow>Tempo de sessÃ£o", "<gray>" + sessionDuration(player)));
   }
 
   /** Information about the Essentialist plugin itself. */
@@ -129,7 +124,7 @@ public final class InfoService {
         InfoEntry.of(
             Material.NETHER_STAR,
             "<yellow>" + meta.getName(),
-            "<gray>Versão <white>" + meta.getVersion()),
+            "<gray>VersÃ£o <white>" + meta.getVersion()),
         InfoEntry.of(
             Material.WRITABLE_BOOK, "<yellow>Autor", "<gray>" + authors(meta.getAuthors())),
         InfoEntry.of(

@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.clearchat.config;
 
-import java.util.Objects;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -19,7 +18,6 @@ public record ClearChatConfig(
   }
 
   public String formatAnnouncement(String player) {
-    Objects.requireNonNull(player, "player");
     return announcement.replace("{player}", player);
   }
 }

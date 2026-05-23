@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.clearchat.service;
 
 import com.hanielcota.essentials.util.ComponentUtils;
-import java.util.Objects;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,7 +13,6 @@ public final class ClearChatService {
 
   /** Flushes every online player's chat with blank lines, then shows the announcement. */
   public void clearChat(int lines, String announcement) {
-    Objects.requireNonNull(announcement, "announcement");
 
     Component message = ComponentUtils.mini(announcement);
     for (Player player : Bukkit.getOnlinePlayers()) {
