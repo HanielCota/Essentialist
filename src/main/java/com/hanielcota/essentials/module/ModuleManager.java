@@ -28,7 +28,7 @@ public final class ModuleManager {
     enableOrder = resolveLoadOrder();
 
     var succeeded = new ArrayList<Module>(enableOrder.size());
-    for (Module module : enableOrder) {
+    for (var module : enableOrder) {
       try {
         module.enable(context);
         states.put(module.id(), ModuleState.ENABLED);
@@ -43,7 +43,7 @@ public final class ModuleManager {
 
   public void disableAll() {
     var reversed = new ArrayList<Module>(enableOrder);
-    for (Module module : reversed.reversed()) {
+    for (var module : reversed.reversed()) {
       if (states.get(module.id()) != ModuleState.ENABLED) {
         continue;
       }
@@ -62,7 +62,7 @@ public final class ModuleManager {
   }
 
   private void rollback(List<Module> succeeded) {
-    for (int i = succeeded.size() - 1; i >= 0; i--) {
+    for (var i = succeeded.size() - 1; i >= 0; i--) {
       var module = succeeded.get(i);
       try {
         module.disable();
@@ -78,13 +78,13 @@ public final class ModuleManager {
     var inDegree = new LinkedHashMap<String, Integer>();
     var dependents = new HashMap<String, List<String>>();
 
-    for (Module module : registered.values()) {
+    for (var module : registered.values()) {
       inDegree.put(module.id(), 0);
       dependents.put(module.id(), new ArrayList<>());
     }
 
-    for (Module module : registered.values()) {
-      for (String dep : module.metadata().dependencies()) {
+    for (var module : registered.values()) {
+      for (var dep : module.metadata().dependencies()) {
         if (!registered.containsKey(dep)) {
           throw new ModuleLoadException(module.id(), "missing dependency: " + dep);
         }
@@ -102,10 +102,10 @@ public final class ModuleManager {
 
     var ordered = new ArrayList<Module>(registered.size());
     while (!ready.isEmpty()) {
-      String id = ready.poll();
+      var id = ready.poll();
       ordered.add(registered.get(id));
-      for (String next : dependents.get(id)) {
-        int remaining = inDegree.merge(next, -1, Integer::sum);
+      for (var next : dependents.get(id)) {
+        var remaining = inDegree.merge(next, -1, Integer::sum);
         if (remaining == 0) {
           ready.add(next);
         }
@@ -113,11 +113,10 @@ public final class ModuleManager {
     }
 
     if (ordered.size() != registered.size()) {
-      var stuck =
-          inDegree.entrySet().stream()
-              .filter(e -> e.getValue() > 0)
-              .map(Map.Entry::getKey)
-              .toList();
+      var stuck = new ArrayList<String>();
+      for (var entry : inDegree.entrySet()) {
+        if (entry.getValue() > 0) stuck.add(entry.getKey());
+      }
       throw new ModuleLoadException(String.join(",", stuck), "dependency cycle detected");
     }
 

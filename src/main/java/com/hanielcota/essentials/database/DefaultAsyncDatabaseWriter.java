@@ -18,11 +18,6 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   private final String threadName;
   private final ExecutorService executor;
 
-  /**
-   * Constructs a new DefaultAsyncDatabaseWriter with a default single-threaded executor.
-   *
-   * @param threadName the name of the background thread
-   */
   public DefaultAsyncDatabaseWriter(String threadName) {
     this(
         threadName,
@@ -34,12 +29,6 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
             }));
   }
 
-  /**
-   * Constructs a new DefaultAsyncDatabaseWriter with the given executor.
-   *
-   * @param threadName the name of the background thread for context
-   * @param executor the executor service to run tasks on
-   */
   public DefaultAsyncDatabaseWriter(String threadName, ExecutorService executor) {
     this.threadName = threadName;
     this.executor = executor;
@@ -47,7 +36,6 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
 
   @Override
   public void submit(String operation, Runnable work) {
-
     try {
       executor.execute(
           () -> {
@@ -69,7 +57,7 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
       if (executor.awaitTermination(DRAIN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
         return;
       }
-      int dropped = executor.shutdownNow().size();
+      var dropped = executor.shutdownNow().size();
       LOG.warn(
           "{} did not drain in {}s; {} write(s) dropped",
           threadName,

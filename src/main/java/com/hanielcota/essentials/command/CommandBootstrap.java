@@ -28,14 +28,15 @@ public final class CommandBootstrap {
     this.customizers = List.copyOf(customizers);
   }
 
-  /** Tab-completes enchantment names (without the {@code minecraft:} namespace) by prefix. */
+  // Tab-completes enchantment names (without the `minecraft:` namespace) by prefix.
   private static SuggestionProvider<Enchantment> enchantmentSuggestions() {
     return context -> {
-      String input = context.currentInput().toLowerCase(Locale.ROOT);
-      List<String> names = new ArrayList<>();
-      for (Enchantment enchantment :
+      var input = context.currentInput().toLowerCase(Locale.ROOT);
+      var names = new ArrayList<String>();
+
+      for (var enchantment :
           RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)) {
-        String name = enchantment.getKey().getKey();
+        var name = enchantment.getKey().getKey();
         if (name.startsWith(input)) {
           names.add(name);
         }
@@ -73,7 +74,9 @@ public final class CommandBootstrap {
               return CommandResult.failure(CommandStatus.ERROR, "unexpected");
             });
 
-    customizers.forEach(customizer -> customizer.accept(builder));
+    for (var customizer : customizers) {
+      customizer.accept(builder);
+    }
 
     return builder.build();
   }
