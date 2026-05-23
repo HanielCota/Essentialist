@@ -38,7 +38,8 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
 
         if (left == 0) {
           inv.setItem(slot, null);
-        } else {
+        }
+        if (left > 0) {
           item.setAmount(left);
         }
       }
