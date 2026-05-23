@@ -33,8 +33,8 @@ public record GamemodeCommand(
   public void execute(
       CommandActor sender, @Arg("modo") GameMode mode, @TargetOrSelf Player subject) {
     var snap = config.value();
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
     if (service.apply(subject, mode) == GamemodeService.Result.ALREADY_IN_MODE) {
       sender.sendError(snap.whenAlreadyInMode(mode).forSender(self, name));
@@ -43,7 +43,7 @@ public record GamemodeCommand(
 
     var messages = snap.whenUpdated(mode);
     var target = framework.actorOf(subject);
-    String selfMessage = messages.forSender(self, name);
+    var selfMessage = messages.forSender(self, name);
 
     sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
   }

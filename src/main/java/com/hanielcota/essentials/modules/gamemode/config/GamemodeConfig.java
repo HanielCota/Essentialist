@@ -33,14 +33,14 @@ public record GamemodeConfig(
   }
 
   public MessagePair whenUpdated(GameMode mode) {
-    String displayName = nameOf(mode);
+    var displayName = nameOf(mode);
     return new MessagePair(
         updated.replace("{gamemode}", displayName),
         updatedOther.replace("{gamemode}", displayName));
   }
 
   public MessagePair whenAlreadyInMode(GameMode mode) {
-    String displayName = nameOf(mode);
+    var displayName = nameOf(mode);
     return new MessagePair(
         alreadyInMode.replace("{gamemode}", displayName),
         alreadyInModeOther.replace("{gamemode}", displayName));
