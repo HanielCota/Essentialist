@@ -53,4 +53,11 @@ public record GiveConfig(
   public String formatAmountTooLarge() {
     return amountTooLarge.replace("{max}", Integer.toString(maxAmount));
   }
+
+  public String formatGivenAll(String item, int amount, int count) {
+    return givenAll
+        .replace("{amount}", Integer.toString(amount))
+        .replace("{item}", item)
+        .replace("{count}", Integer.toString(count));
+  }
 }

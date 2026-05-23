@@ -10,7 +10,7 @@ public final class GiveService {
   public int give(Player player, Material material, int amount) {
     var leftovers = player.getInventory().addItem(new ItemStack(material, amount));
 
-    int leftover = 0;
+    var leftover = 0;
     for (var stack : leftovers.values()) {
       leftover += stack.getAmount();
     }
