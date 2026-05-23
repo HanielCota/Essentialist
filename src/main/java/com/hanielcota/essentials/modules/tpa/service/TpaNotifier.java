@@ -25,30 +25,29 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
     var requester = request.requester().name();
     var seconds = snap.requestExpiry().toSeconds();
 
+    var requestLine = messages.formatRequestReceived(request.type(), requester, seconds);
+    var acceptHover = messages.buttonHoverAccept().replace("{player}", requester);
+    var denyHover = messages.buttonHoverDeny().replace("{player}", requester);
+
     ClickableMessage.create()
-        .append(messages.formatRequestReceived(request.type(), requester, seconds))
+        .append(requestLine)
         .newline()
-        .append(
-            messages.buttonAccept(),
-            slot ->
-                slot.runCommand("/tpaccept " + requester)
-                    .hover(messages.buttonHoverAccept().replace("{player}", requester)))
+        .append(messages.buttonAccept(), slot -> slot.runCommand("/tpaccept " + requester).hover(acceptHover))
         .append("  ")
-        .append(
-            messages.buttonDeny(),
-            slot ->
-                slot.runCommand("/tpdeny " + requester)
-                    .hover(messages.buttonHoverDeny().replace("{player}", requester)))
+        .append(messages.buttonDeny(), slot -> slot.runCommand("/tpdeny " + requester).hover(denyHover))
         .send(target);
   }
 
   public void notifyExpired(@NonNull TeleportRequest request) {
     var requester = Bukkit.getPlayer(request.requester().id());
-    if (requester == null) return;
+    if (requester == null) {
+      return;
+    }
 
-    var line =
-        this.config.value().messages().expired().replace("{player}", request.target().name());
-    requester.sendMessage(ComponentUtils.mini(line));
+    var messages = this.config.value().messages();
+    var expiredMsg = messages.expired().replace("{player}", request.target().name());
+    var expiredComponent = ComponentUtils.mini(expiredMsg);
+    requester.sendMessage(expiredComponent);
   }
 
   // Tells the party other than `quitter`, if online, that the request died because they
@@ -58,9 +57,13 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
     var requesterId = request.requester().id();
     var recipient = requesterId.equals(quitter) ? request.target().id() : requesterId;
     var online = Bukkit.getPlayer(recipient);
-    if (online == null) return;
+    if (online == null) {
+      return;
+    }
 
-    var line = this.config.value().messages().partnerLeft().replace("{player}", quitterName);
-    online.sendMessage(ComponentUtils.mini(line));
+    var messages = this.config.value().messages();
+    var partnerLeftMsg = messages.partnerLeft().replace("{player}", quitterName);
+    var partnerLeftComponent = ComponentUtils.mini(partnerLeftMsg);
+    online.sendMessage(partnerLeftComponent);
   }
 }

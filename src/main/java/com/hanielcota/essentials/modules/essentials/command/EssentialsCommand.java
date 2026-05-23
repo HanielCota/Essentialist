@@ -31,11 +31,13 @@ public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigSer
     var snap = this.config.value();
 
     if (report.failures().isEmpty()) {
-      actor.sendSuccess(snap.formatSuccess(report.total()));
+      var successMsg = snap.formatSuccess(report.total());
+      actor.sendSuccess(successMsg);
       return;
     }
 
     var failed = String.join(", ", report.failedNames());
-    actor.sendError(snap.formatFailure(report.succeeded(), report.total(), failed));
+    var failureMsg = snap.formatFailure(report.succeeded(), report.total(), failed);
+    actor.sendError(failureMsg);
   }
 }

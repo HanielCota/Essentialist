@@ -84,9 +84,10 @@ public final class BackMenu implements Menu, Listener {
     var slots = sanitizeContentSlots(snap.menuContentSlots(), rows * SLOTS_PER_ROW);
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
 
+    var menuTitle = ComponentUtils.mini(snap.menuTitle());
     MenuFramework.builder(ID, menus)
         .rows(rows)
-        .title(ComponentUtils.mini(snap.menuTitle()))
+        .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()

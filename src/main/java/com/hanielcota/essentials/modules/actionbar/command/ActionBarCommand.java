@@ -55,6 +55,7 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
     }
 
     var count = this.service.broadcast(message);
-    sender.sendSuccess(snap.formatBroadcasted(count));
+    var broadcastedMsg = snap.formatBroadcasted(count);
+    sender.sendSuccess(broadcastedMsg);
   }
 }

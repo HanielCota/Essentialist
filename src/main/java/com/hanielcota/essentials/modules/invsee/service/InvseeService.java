@@ -35,7 +35,8 @@ public final class InvseeService {
   public Inventory createView(@NonNull Player target, @NonNull String title) {
 
     var holder = new InvseeHolder(target.getUniqueId());
-    var view = Bukkit.createInventory(holder, SIZE, ComponentUtils.mini(title));
+    var titleComponent = ComponentUtils.mini(title);
+    var view = Bukkit.createInventory(holder, SIZE, titleComponent);
     holder.inventory(view);
 
     PlayerInventory source = target.getInventory();

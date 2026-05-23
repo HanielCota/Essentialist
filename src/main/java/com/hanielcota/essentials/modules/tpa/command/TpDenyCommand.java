@@ -39,7 +39,9 @@ public record TpDenyCommand(
     var request = resolved.get();
 
     this.service.deny(request);
-    actor.sendSuccess(messages.deniedSelf().replace("{player}", request.requester().name()));
+
+    var deniedMsg = messages.deniedSelf().replace("{player}", request.requester().name());
+    actor.sendSuccess(deniedMsg);
     TpaRequests.replyRequester(this.framework, request, messages.denied(), false);
   }
 }

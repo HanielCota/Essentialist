@@ -28,21 +28,27 @@ public record NearConfig(
   }
 
   public String formatEntry(@NonNull String player, int distance) {
-    return entry.replace("{player}", player).replace("{distance}", Integer.toString(distance));
+    var distanceStr = Integer.toString(distance);
+
+    return entry.replace("{player}", player).replace("{distance}", distanceStr);
   }
 
   public String formatFound(int radius, int count, @NonNull String players) {
-    return found
-        .replace("{radius}", Integer.toString(radius))
-        .replace("{count}", Integer.toString(count))
-        .replace("{players}", players);
+    var radiusStr = Integer.toString(radius);
+    var countStr = Integer.toString(count);
+
+    return found.replace("{radius}", radiusStr).replace("{count}", countStr).replace("{players}", players);
   }
 
   public String formatNone(int radius) {
-    return none.replace("{radius}", Integer.toString(radius));
+    var radiusStr = Integer.toString(radius);
+
+    return none.replace("{radius}", radiusStr);
   }
 
   public String formatInvalidRadius() {
-    return invalidRadius.replace("{max}", Integer.toString(maxRadius));
+    var maxStr = Integer.toString(maxRadius);
+
+    return invalidRadius.replace("{max}", maxStr);
   }
 }

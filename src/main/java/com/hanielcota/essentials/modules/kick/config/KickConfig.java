@@ -27,6 +27,7 @@ public record KickConfig(
   }
 
   public String formatKicked(@NonNull String player, @NonNull String reason) {
-    return kicked.replace("{player}", player).replace("{reason}", reason);
+    return kicked.replace("{player}", player)
+        .replace("{reason}", reason);
   }
 }

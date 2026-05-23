@@ -47,8 +47,8 @@ public record TeleportCommand(
     }
 
     var targetActor = this.framework.actorOf(target);
-    String selfMessage = snap.formatToPlayer(target.getName());
-    String otherMessage = snap.formatTeleportedTo(sender.getName());
+    var selfMessage = snap.formatToPlayer(target.getName());
+    var otherMessage = snap.formatTeleportedTo(sender.getName());
     senderActor.sendDualMessage(targetActor, selfMessage, otherMessage);
   }
 
@@ -72,10 +72,12 @@ public record TeleportCommand(
       return;
     }
 
-    sender.sendSuccess(snap.formatMoveSender(from.getName(), to.getName()));
+    var moveSenderMsg = snap.formatMoveSender(from.getName(), to.getName());
+    sender.sendSuccess(moveSenderMsg);
 
     if (!Senders.isSelf(sender, from)) {
-      this.framework.actorOf(from).sendSuccess(snap.formatMoveNotify(sender.name()));
+      var moveNotifyMsg = snap.formatMoveNotify(sender.name());
+      this.framework.actorOf(from).sendSuccess(moveNotifyMsg);
     }
   }
 
@@ -103,6 +105,7 @@ public record TeleportCommand(
       return;
     }
 
-    senderActor.sendSuccess(snap.formatToPos(x, y, z));
+    var toPosMsg = snap.formatToPos(x, y, z);
+    senderActor.sendSuccess(toPosMsg);
   }
 }

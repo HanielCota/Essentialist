@@ -121,6 +121,7 @@ public record GiveCommand(
       recipient.sendSuccess(fill(messages.forTarget(player.getName()), itemName, given, leftover));
     }
 
-    sender.sendSuccess(snap.formatGivenAll(itemName, amount, count));
+    var givenAllMsg = snap.formatGivenAll(itemName, amount, count);
+    sender.sendSuccess(givenAllMsg);
   }
 }

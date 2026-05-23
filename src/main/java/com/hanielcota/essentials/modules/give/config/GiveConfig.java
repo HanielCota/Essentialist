@@ -56,9 +56,9 @@ public record GiveConfig(
   }
 
   public String formatGivenAll(@NonNull String item, int amount, int count) {
-    return givenAll
-        .replace("{amount}", Integer.toString(amount))
-        .replace("{item}", item)
-        .replace("{count}", Integer.toString(count));
+    var amountStr = Integer.toString(amount);
+    var countStr = Integer.toString(count);
+
+    return givenAll.replace("{amount}", amountStr).replace("{item}", item).replace("{count}", countStr);
   }
 }

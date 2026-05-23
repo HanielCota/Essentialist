@@ -31,6 +31,7 @@ public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
 
     this.service.save(name, sender);
     var template = existed ? messages.warpUpdated() : messages.warpSet();
-    actor.sendSuccess(template.replace("{name}", name));
+    var successMsg = template.replace("{name}", name);
+    actor.sendSuccess(successMsg);
   }
 }

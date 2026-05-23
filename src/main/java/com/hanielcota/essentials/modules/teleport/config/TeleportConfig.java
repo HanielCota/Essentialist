@@ -52,10 +52,11 @@ public record TeleportConfig(
   }
 
   public String formatToPos(double x, double y, double z) {
-    return toPos
-        .replace("{x}", Numbers.compact(x))
-        .replace("{y}", Numbers.compact(y))
-        .replace("{z}", Numbers.compact(z));
+    var compactX = Numbers.compact(x);
+    var compactY = Numbers.compact(y);
+    var compactZ = Numbers.compact(z);
+
+    return toPos.replace("{x}", compactX).replace("{y}", compactY).replace("{z}", compactZ);
   }
 
   public String formatBroughtPlayer(@NonNull String player) {

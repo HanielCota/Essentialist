@@ -15,7 +15,10 @@ public record WhitelistClickHandler(ConfigHandle<WhitelistConfig> config, Whitel
   @Override
   public void handle(@NonNull ClickContext click, @NonNull OfflinePlayer player) {
     this.service.remove(player);
-    click.reply(this.config.value().formatRemoved(WhitelistService.nameOf(player)));
+
+    var playerName = WhitelistService.nameOf(player);
+    var removedMsg = this.config.value().formatRemoved(playerName);
+    click.reply(removedMsg);
     click.refresh();
   }
 }

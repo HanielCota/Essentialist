@@ -58,6 +58,7 @@ public record FeedCommand(
         fed++;
       }
     }
-    sender.sendSuccess(this.config.value().formatFedAll(fed));
+    var snap = this.config.value();
+    sender.sendSuccess(snap.formatFedAll(fed));
   }
 }

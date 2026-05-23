@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 public final class ActionBarService {
 
   public void send(@NonNull Player player, @NonNull String message) {
-    player.sendActionBar(ComponentUtils.mini(message));
+    var bar = ComponentUtils.mini(message);
+    player.sendActionBar(bar);
   }
 
   public int broadcast(@NonNull String message) {

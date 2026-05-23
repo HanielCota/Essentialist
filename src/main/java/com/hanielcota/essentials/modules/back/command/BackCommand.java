@@ -30,7 +30,8 @@ public record BackCommand(
     var sender = actor.unwrap(Player.class);
     var entries = this.history.list(sender.getUniqueId());
     if (entries.isEmpty()) {
-      actor.sendError(this.config.value().noBack());
+      var noBackMsg = this.config.value().noBack();
+      actor.sendError(noBackMsg);
       return;
     }
 

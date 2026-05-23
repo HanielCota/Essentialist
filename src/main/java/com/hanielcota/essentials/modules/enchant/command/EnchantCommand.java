@@ -41,7 +41,8 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       return;
     }
 
-    sender.sendSuccess(snap.formatApplied(enchantName(enchantment), level));
+    var appliedMsg = snap.formatApplied(enchantName(enchantment), level);
+    sender.sendSuccess(appliedMsg);
   }
 
   @Subcommand("remove")
@@ -56,8 +57,14 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
 
     switch (result) {
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
-      case NOT_ENCHANTED -> sender.sendError(snap.formatNotEnchanted(label));
-      case REMOVED -> sender.sendSuccess(snap.formatRemoved(label));
+      case NOT_ENCHANTED -> {
+        var notEnchantedMsg = snap.formatNotEnchanted(label);
+        sender.sendError(notEnchantedMsg);
+      }
+      case REMOVED -> {
+        var removedMsg = snap.formatRemoved(label);
+        sender.sendSuccess(removedMsg);
+      }
       case APPLIED -> throw new IllegalStateException("Unexpected enchant result: APPLIED");
     }
   }
@@ -78,6 +85,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       return;
     }
 
-    sender.sendSuccess(snap.formatCleared(removed));
+    var clearedMsg = snap.formatCleared(removed);
+    sender.sendSuccess(clearedMsg);
   }
 }

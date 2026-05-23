@@ -102,13 +102,8 @@ public record HomesMenuConfig(
     var rendered = new String[itemLore.size()];
 
     for (var i = 0; i < itemLore.size(); i++) {
-      rendered[i] =
-          itemLore
-              .get(i)
-              .replace("{world}", world)
-              .replace("{x}", xStr)
-              .replace("{y}", yStr)
-              .replace("{z}", zStr);
+      var line = itemLore.get(i);
+      rendered[i] = line.replace("{world}", world).replace("{x}", xStr).replace("{y}", yStr).replace("{z}", zStr);
     }
     return rendered;
   }

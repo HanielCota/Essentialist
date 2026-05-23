@@ -61,10 +61,11 @@ public final class WhitelistMenu implements Menu {
     var rows = snap.effectiveRows();
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(rows)).build();
 
+    var menuTitle = ComponentUtils.mini(snap.menuTitle());
     var builder =
         MenuFramework.builder(ID, menus)
             .rows(rows)
-            .title(ComponentUtils.mini(snap.menuTitle()))
+            .title(menuTitle)
             .pagination(pagination)
             .dynamicContent(this::buildSlots);
 

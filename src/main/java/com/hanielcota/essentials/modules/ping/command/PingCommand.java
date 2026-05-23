@@ -29,9 +29,9 @@ public record PingCommand(ConfigHandle<PingConfig> config, PingService service) 
     String name = subject.getName();
     boolean self = Senders.isSelf(sender, subject);
 
+    var snap = this.config.value();
     String coloredPing = this.service.format(subject.getPing());
-    String message =
-        this.config.value().message().forSender(self, name).replace("{ping}", coloredPing);
+    var message = snap.message().forSender(self, name).replace("{ping}", coloredPing);
 
     sender.sendMessage(message);
   }

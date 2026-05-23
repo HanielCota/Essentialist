@@ -46,23 +46,32 @@ public record SetHomeCommand(
 
     var material = this.materialResolver.resolve(rawMaterial);
     if (material == null) {
-      actor.sendError(messages.invalidMaterial().replace("{material}", rawMaterial));
+      var invalidMaterialMsg = messages.invalidMaterial().replace("{material}", rawMaterial);
+      actor.sendError(invalidMaterialMsg);
       return;
     }
 
     var outcome = this.service.save(sender, name, sender.getLocation(), material);
     switch (outcome) {
-      case CREATED -> actor.sendSuccess(messages.homeSet().replace("{name}", name));
-      case UPDATED -> actor.sendSuccess(messages.homeUpdated().replace("{name}", name));
-      case LIMIT_REACHED -> actor.sendError(limitReachedMessage(messages, name, sender));
+      case CREATED -> {
+        var homeSetMsg = messages.homeSet().replace("{name}", name);
+        actor.sendSuccess(homeSetMsg);
+      }
+      case UPDATED -> {
+        var homeUpdatedMsg = messages.homeUpdated().replace("{name}", name);
+        actor.sendSuccess(homeUpdatedMsg);
+      }
+      case LIMIT_REACHED -> {
+        var limitReachedMsg = limitReachedMessage(messages, name, sender);
+        actor.sendError(limitReachedMsg);
+      }
     }
   }
 
   private String limitReachedMessage(
       @NonNull HomesMessages messages, @NonNull String name, @NonNull Player sender) {
-    return messages
-        .limitReached()
-        .replace("{name}", name)
-        .replace("{limit}", Integer.toString(this.service.limit(sender)));
+    var limit = Integer.toString(this.service.limit(sender));
+
+    return messages.limitReached().replace("{name}", name).replace("{limit}", limit);
   }
 }

@@ -37,7 +37,8 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
 
     this.service.send(target, request.message());
 
-    sender.sendSuccess(snap.whenSent().forSender(toSelf, target.getName()));
+    var sentMsg = snap.whenSent().forSender(toSelf, target.getName());
+    sender.sendSuccess(sentMsg);
   }
 
   @Subcommand("broadcast")
@@ -55,6 +56,7 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
     }
 
     var count = this.service.broadcast(message);
-    sender.sendSuccess(snap.formatBroadcasted(count));
+    var broadcastedMsg = snap.formatBroadcasted(count);
+    sender.sendSuccess(broadcastedMsg);
   }
 }

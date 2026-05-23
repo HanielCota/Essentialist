@@ -38,9 +38,12 @@ public record DelHomeCommand(
     }
 
     if (!this.service.delete(sender.getUniqueId(), name)) {
-      actor.sendError(messages.unknownHome().replace("{name}", name));
+      var unknownMsg = messages.unknownHome().replace("{name}", name);
+      actor.sendError(unknownMsg);
       return;
     }
-    actor.sendSuccess(messages.homeDeleted().replace("{name}", name));
+
+    var deletedMsg = messages.homeDeleted().replace("{name}", name);
+    actor.sendSuccess(deletedMsg);
   }
 }

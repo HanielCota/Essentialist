@@ -55,14 +55,14 @@ public final class HomesMenu implements Menu {
   public void register(@NonNull MenuService menus) {
     var menuSpec = this.config.value().menu();
     var rows = Math.clamp(menuSpec.rows(), MIN_ROWS, MAX_ROWS);
-    var title = ComponentUtils.mini(menuSpec.title());
+    var menuTitle = ComponentUtils.mini(menuSpec.title());
     var contentSlots = MenuContentSlots.allRows(rows);
 
     var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
 
     MenuFramework.builder(ID, menus)
         .rows(rows)
-        .title(title)
+        .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()

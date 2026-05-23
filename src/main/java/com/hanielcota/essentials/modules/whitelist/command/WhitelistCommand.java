@@ -36,9 +36,18 @@ public record WhitelistCommand(
   public void add(@NonNull CommandActor sender, @Arg("jogador") String name) {
     var snap = this.config.value();
     switch (this.service.add(name)) {
-      case ADDED -> sender.sendSuccess(snap.formatAdded(name));
-      case ALREADY_WHITELISTED -> sender.sendError(snap.formatAlreadyAdded(name));
-      case UNKNOWN_PLAYER -> sender.sendError(snap.formatUnknownPlayer(name));
+      case ADDED -> {
+        var addedMsg = snap.formatAdded(name);
+        sender.sendSuccess(addedMsg);
+      }
+      case ALREADY_WHITELISTED -> {
+        var alreadyAddedMsg = snap.formatAlreadyAdded(name);
+        sender.sendError(alreadyAddedMsg);
+      }
+      case UNKNOWN_PLAYER -> {
+        var unknownMsg = snap.formatUnknownPlayer(name);
+        sender.sendError(unknownMsg);
+      }
     }
   }
 
@@ -46,9 +55,12 @@ public record WhitelistCommand(
   public void remove(@NonNull CommandActor sender, @Arg("jogador") String name) {
     var snap = this.config.value();
     if (this.service.remove(name)) {
-      sender.sendSuccess(snap.formatRemoved(name));
+      var removedMsg = snap.formatRemoved(name);
+      sender.sendSuccess(removedMsg);
       return;
     }
-    sender.sendError(snap.formatNotWhitelisted(name));
+
+    var notWhitelistedMsg = snap.formatNotWhitelisted(name);
+    sender.sendError(notWhitelistedMsg);
   }
 }

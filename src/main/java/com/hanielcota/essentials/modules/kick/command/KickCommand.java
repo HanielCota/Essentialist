@@ -32,7 +32,10 @@ public record KickCommand(ConfigHandle<KickConfig> config, KickService service) 
     var snap = this.config.value();
     var reason = snap.reasonOr(motivo.strip());
 
-    this.service.kick(target, snap.formatScreen(reason));
-    sender.sendSuccess(snap.formatKicked(target.getName(), reason));
+    var screenMsg = snap.formatScreen(reason);
+    this.service.kick(target, screenMsg);
+
+    var kickedMsg = snap.formatKicked(target.getName(), reason);
+    sender.sendSuccess(kickedMsg);
   }
 }

@@ -10,12 +10,11 @@ import lombok.NonNull;
 final class HomeRenameMessages {
 
   static String prompt(@NonNull HomesMessages messages, @NonNull String homeName, long seconds) {
-
     var timeoutText = seconds <= 0 ? "sem limite" : seconds + "s";
     var secondsStr = Long.toString(seconds);
 
-    return messages
-        .renamePrompt()
+    var promptTemplate = messages.renamePrompt();
+    return promptTemplate
         .replace("{name}", homeName)
         .replace("{seconds}s", timeoutText)
         .replace("{seconds}", secondsStr)

@@ -32,6 +32,7 @@ public record SmeltCommand(ConfigHandle<SmeltConfig> config, SmeltService servic
       actor.sendError(snap.nothing());
       return;
     }
-    actor.sendSuccess(snap.formatSuccess(count));
+    var successMsg = snap.formatSuccess(count);
+    actor.sendSuccess(successMsg);
   }
 }

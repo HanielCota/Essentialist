@@ -25,8 +25,11 @@ public record SetSpawnCommand(ConfigHandle<SpawnConfig> config, SpawnService ser
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     this.service.set(SpawnLocation.of(sender.getLocation()));
-    actor.sendSuccess(this.config.value().messages().spawnSet());
+
+    var snap = this.config.value();
+    var spawnSetMsg = snap.messages().spawnSet();
+    actor.sendSuccess(spawnSetMsg);
   }
 }

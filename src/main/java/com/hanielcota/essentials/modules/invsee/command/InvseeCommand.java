@@ -32,7 +32,10 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
       return;
     }
 
-    viewer.openInventory(this.service.createView(target, snap.formatTitle(target.getName())));
-    sender.sendSuccess(snap.formatOpened(target.getName()));
+    var title = snap.formatTitle(target.getName());
+    viewer.openInventory(this.service.createView(target, title));
+
+    var openedMsg = snap.formatOpened(target.getName());
+    sender.sendSuccess(openedMsg);
   }
 }

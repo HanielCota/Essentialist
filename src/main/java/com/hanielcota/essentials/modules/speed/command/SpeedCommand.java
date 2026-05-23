@@ -31,7 +31,8 @@ public record SpeedCommand(
 
   @DefaultSubcommand
   public void showUsage(@NonNull CommandActor sender) {
-    sender.sendMessage(this.config.value().usage());
+    var snap = this.config.value();
+    sender.sendMessage(snap.usage());
   }
 
   @Subcommand("walk")
@@ -40,12 +41,13 @@ public record SpeedCommand(
       @NonNull CommandActor sender,
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
+    var snap = this.config.value();
     if (!this.service.setWalkSpeed(subject, valor)) {
-      sender.sendError(this.config.value().invalid());
+      sender.sendError(snap.invalid());
       return;
     }
 
-    announce(sender, subject, this.config.value().whenWalkSet(valor));
+    announce(sender, subject, snap.whenWalkSet(valor));
   }
 
   @Subcommand("fly")
@@ -54,19 +56,21 @@ public record SpeedCommand(
       @NonNull CommandActor sender,
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
+    var snap = this.config.value();
     if (!this.service.setFlySpeed(subject, valor)) {
-      sender.sendError(this.config.value().invalid());
+      sender.sendError(snap.invalid());
       return;
     }
 
-    announce(sender, subject, this.config.value().whenFlySet(valor));
+    announce(sender, subject, snap.whenFlySet(valor));
   }
 
   @Subcommand({"reset", "resetar"})
   @PermissionForOther(".others")
   public void reset(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    var snap = this.config.value();
     this.service.reset(subject);
-    announce(sender, subject, this.config.value().whenReset());
+    announce(sender, subject, snap.whenReset());
   }
 
   private void announce(

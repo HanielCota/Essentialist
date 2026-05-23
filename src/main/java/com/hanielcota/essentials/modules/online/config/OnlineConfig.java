@@ -22,8 +22,9 @@ public record OnlineConfig(
     String template = count == 0 ? empty : count == 1 ? singular : plural;
     // Full-server-bypass players can push the count past max — never display more than max.
     int shown = Math.min(count, max);
-    return template
-        .replace("{count}", Integer.toString(shown))
-        .replace("{max}", Integer.toString(max));
+    var shownStr = Integer.toString(shown);
+    var maxStr = Integer.toString(max);
+
+    return template.replace("{count}", shownStr).replace("{max}", maxStr);
   }
 }

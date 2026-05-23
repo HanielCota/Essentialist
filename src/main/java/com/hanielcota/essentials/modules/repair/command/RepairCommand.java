@@ -40,7 +40,7 @@ public record RepairCommand(
       case REPAIRED -> {
         var messages = snap.whenHandRepaired();
         var target = this.framework.actorOf(subject);
-        String selfMessage = messages.forSender(self, name);
+        var selfMessage = messages.forSender(self, name);
         sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
       }
     }
@@ -59,10 +59,10 @@ public record RepairCommand(
     }
 
     var messages = snap.whenAllRepaired();
-    String count = Integer.toString(repaired);
+    var count = Integer.toString(repaired);
     var target = this.framework.actorOf(subject);
-    String selfMessage = messages.forSender(self, name).replace("{count}", count);
-    String targetMessage = messages.forTarget(name).replace("{count}", count);
+    var selfMessage = messages.forSender(self, name).replace("{count}", count);
+    var targetMessage = messages.forTarget(name).replace("{count}", count);
 
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }

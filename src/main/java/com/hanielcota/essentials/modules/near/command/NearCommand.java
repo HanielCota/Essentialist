@@ -32,13 +32,15 @@ public record NearCommand(ConfigHandle<NearConfig> config, NearService service) 
 
     int radius = raio < 0 ? snap.defaultRadius() : raio;
     if (radius < 1 || radius > snap.maxRadius()) {
-      actor.sendError(snap.formatInvalidRadius());
+      var invalidRadiusMsg = snap.formatInvalidRadius();
+      actor.sendError(invalidRadiusMsg);
       return;
     }
 
     var nearby = this.service.findNearby(player, radius);
     if (nearby.isEmpty()) {
-      actor.sendMessage(snap.formatNone(radius));
+      var noneMsg = snap.formatNone(radius);
+      actor.sendMessage(noneMsg);
       return;
     }
 
@@ -47,6 +49,7 @@ public record NearCommand(ConfigHandle<NearConfig> config, NearService service) 
             .map(found -> snap.formatEntry(found.player().getName(), found.distance()))
             .collect(Collectors.joining(snap.separator()));
 
-    actor.sendMessage(snap.formatFound(radius, nearby.size(), players));
+    var foundMsg = snap.formatFound(radius, nearby.size(), players);
+    actor.sendMessage(foundMsg);
   }
 }

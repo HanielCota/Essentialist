@@ -54,7 +54,8 @@ public record TpaHistoryCommand(
 
     var resolved = this.players.offlineByName(targetName);
     if (resolved.isEmpty()) {
-      actor.sendError(snap.messages().playerNotFound().replace("{player}", targetName));
+      var notFoundMsg = snap.messages().playerNotFound().replace("{player}", targetName);
+      actor.sendError(notFoundMsg);
       return;
     }
 
@@ -73,16 +74,18 @@ public record TpaHistoryCommand(
     var entries = this.history.list(subject);
 
     if (entries.isEmpty()) {
-      actor.sendError(
+      var emptyMsg =
           self
               ? snap.messages().noHistory()
-              : snap.messages().noHistoryOther().replace("{player}", subjectName));
+              : snap.messages().noHistoryOther().replace("{player}", subjectName);
+      actor.sendError(emptyMsg);
       return;
     }
 
     if (!self) {
-      actor.sendMessage(
-          ComponentUtils.mini(snap.messages().viewingOther().replace("{player}", subjectName)));
+      var viewingMsg = snap.messages().viewingOther().replace("{player}", subjectName);
+      var viewingComponent = ComponentUtils.mini(viewingMsg);
+      actor.sendMessage(viewingComponent);
     }
 
     this.menu.prefetch(viewer.getUniqueId(), entries);

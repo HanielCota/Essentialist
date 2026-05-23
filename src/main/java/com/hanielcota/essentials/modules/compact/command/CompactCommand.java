@@ -32,6 +32,7 @@ public record CompactCommand(ConfigHandle<CompactConfig> config, CompactService 
       actor.sendError(snap.nothing());
       return;
     }
-    actor.sendSuccess(snap.formatSuccess(blocks));
+    var successMsg = snap.formatSuccess(blocks);
+    actor.sendSuccess(successMsg);
   }
 }

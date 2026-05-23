@@ -46,7 +46,8 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
     this.sessions.start(uuid, homeName, timeoutTask);
 
     var promptMsg = HomeRenameMessages.prompt(snap.messages(), homeName, seconds);
-    player.sendMessage(ComponentUtils.mini(promptMsg));
+    var promptComponent = ComponentUtils.mini(promptMsg);
+    player.sendMessage(promptComponent);
   }
 
   public void handleInput(@NonNull Player player, @NonNull String oldName, @NonNull String input) {
@@ -54,19 +55,22 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
     var uuid = player.getUniqueId();
 
     if (isCancel(input)) {
-      player.sendMessage(ComponentUtils.mini(messages.renameCancelled()));
+      var cancelledComponent = ComponentUtils.mini(messages.renameCancelled());
+      player.sendMessage(cancelledComponent);
       return;
     }
 
     if (!this.validator.isValid(input)) {
-      player.sendMessage(ComponentUtils.mini(messages.invalidName()));
+      var invalidComponent = ComponentUtils.mini(messages.invalidName());
+      player.sendMessage(invalidComponent);
       return;
     }
 
     var result = this.service.rename(uuid, oldName, input);
     var resultMsg = HomeRenameMessages.result(messages, oldName, input, result);
+    var resultComponent = ComponentUtils.mini(resultMsg);
 
-    player.sendMessage(ComponentUtils.mini(resultMsg));
+    player.sendMessage(resultComponent);
   }
 
   public void handleTimeout(@NonNull Player player, long seconds) {
@@ -77,7 +81,8 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
       return;
     }
 
-    var line = HomeRenameMessages.timeout(this.config.value().messages(), seconds);
-    player.sendMessage(ComponentUtils.mini(line));
+    var timeoutMsg = HomeRenameMessages.timeout(this.config.value().messages(), seconds);
+    var timeoutComponent = ComponentUtils.mini(timeoutMsg);
+    player.sendMessage(timeoutComponent);
   }
 }

@@ -79,9 +79,10 @@ public final class InfoMenu implements Menu, Listener {
   public void register(@NonNull MenuService menus) {
     var pagination = PaginationConfig.builder().contentSlots(CONTENT_SLOTS).build();
 
+    var menuTitle = ComponentUtils.mini(this.config.value().menuTitle());
     MenuFramework.builder(ID, menus)
         .rows(ROWS)
-        .title(ComponentUtils.mini(this.config.value().menuTitle()))
+        .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()

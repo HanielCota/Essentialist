@@ -41,12 +41,14 @@ public record TpAcceptCommand(
     var result = this.service.accept(request);
     switch (result) {
       case SUCCESS -> {
-        actor.sendSuccess(messages.acceptedSelf().replace("{player}", request.requester().name()));
+        var acceptedMsg = messages.acceptedSelf().replace("{player}", request.requester().name());
+        actor.sendSuccess(acceptedMsg);
         TpaRequests.replyRequester(this.framework, request, messages.accepted(), true);
       }
-      case REQUESTER_OFFLINE ->
-          actor.sendError(
-              messages.requesterOffline().replace("{player}", request.requester().name()));
+      case REQUESTER_OFFLINE -> {
+        var offlineMsg = messages.requesterOffline().replace("{player}", request.requester().name());
+        actor.sendError(offlineMsg);
+      }
       case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
       case NOT_FOUND -> actor.sendError(messages.noIncoming());
     }

@@ -45,7 +45,10 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
     var result = this.service.rename(player, nameComponent);
 
     switch (result) {
-      case RENAMED -> sender.sendSuccess(snap.formatRenamed(trimmed));
+      case RENAMED -> {
+        var renamedMsg = snap.formatRenamed(trimmed);
+        sender.sendSuccess(renamedMsg);
+      }
       case CLEARED -> sender.sendSuccess(snap.cleared());
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
     }

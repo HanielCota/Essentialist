@@ -72,13 +72,15 @@ public final class DeleteHomeDialog extends ConfirmDialog {
 
     if (!this.service.delete(uuid, homeName)) {
       var unknownMsg = messages.unknownHome().replace("{name}", homeName);
-      player.sendMessage(ComponentUtils.mini(unknownMsg));
+      var unknownComponent = ComponentUtils.mini(unknownMsg);
+      player.sendMessage(unknownComponent);
       this.menus.open(player, HomesMenu.ID);
       return;
     }
 
     var deletedMsg = messages.homeDeleted().replace("{name}", homeName);
-    player.sendMessage(ComponentUtils.mini(deletedMsg));
+    var deletedComponent = ComponentUtils.mini(deletedMsg);
+    player.sendMessage(deletedComponent);
     this.menus.open(player, HomesMenu.ID);
   }
 

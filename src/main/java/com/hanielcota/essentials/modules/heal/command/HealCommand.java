@@ -64,6 +64,7 @@ public record HealCommand(
         healed++;
       }
     }
-    sender.sendSuccess(this.config.value().formatHealedAll(healed));
+    var snap = this.config.value();
+    sender.sendSuccess(snap.formatHealedAll(healed));
   }
 }

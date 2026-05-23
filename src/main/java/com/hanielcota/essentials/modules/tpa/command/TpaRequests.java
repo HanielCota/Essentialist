@@ -34,7 +34,9 @@ final class TpaRequests {
     }
 
     service.create(sender, target, type);
-    actor.sendSuccess(confirmationTemplate.replace("{player}", target.getName()));
+
+    var confirmationMsg = confirmationTemplate.replace("{player}", target.getName());
+    actor.sendSuccess(confirmationMsg);
   }
 
   /**
@@ -87,11 +89,12 @@ final class TpaRequests {
       return;
     }
     var actor = framework.actorOf(requesterPlayer);
-    var line = template.replace("{player}", request.target().name());
+
+    var replyMsg = template.replace("{player}", request.target().name());
     if (!asSuccess) {
-      actor.sendError(line);
+      actor.sendError(replyMsg);
       return;
     }
-    actor.sendSuccess(line);
+    actor.sendSuccess(replyMsg);
   }
 }

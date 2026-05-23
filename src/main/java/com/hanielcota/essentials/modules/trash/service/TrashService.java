@@ -14,7 +14,8 @@ public final class TrashService {
    */
   public void openTrash(@NonNull Player player, int size, @NonNull String title) {
 
-    Inventory trash = Bukkit.createInventory(null, size, ComponentUtils.mini(title));
+    var titleComponent = ComponentUtils.mini(title);
+    Inventory trash = Bukkit.createInventory(null, size, titleComponent);
     player.openInventory(trash);
   }
 }

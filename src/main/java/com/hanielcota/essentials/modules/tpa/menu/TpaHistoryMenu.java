@@ -86,9 +86,10 @@ public final class TpaHistoryMenu implements Menu, Listener {
     var slots = sanitizeContentSlots(settings.contentSlots(), rows * SLOTS_PER_ROW);
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
 
+    var menuTitle = ComponentUtils.mini(settings.title());
     MenuFramework.builder(ID, menus)
         .rows(rows)
-        .title(ComponentUtils.mini(settings.title()))
+        .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()

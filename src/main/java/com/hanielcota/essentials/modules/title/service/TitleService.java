@@ -20,7 +20,8 @@ public final class TitleService {
 
   private static Component render(@NonNull String raw) {
     try {
-      return ComponentUtils.mini(raw);
+      var component = ComponentUtils.mini(raw);
+      return component;
     } catch (RuntimeException _) {
       return Component.text(raw);
     }

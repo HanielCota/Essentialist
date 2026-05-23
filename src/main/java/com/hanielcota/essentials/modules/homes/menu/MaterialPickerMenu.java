@@ -47,14 +47,14 @@ public final class MaterialPickerMenu implements Menu {
   public void register(@NonNull MenuService menusRef) {
     var menuSpec = this.config.value().menu();
     var rows = Math.clamp(menuSpec.pickerRows(), MIN_ROWS, MAX_ROWS);
-    var title = ComponentUtils.mini(menuSpec.staticPickerTitle());
+    var menuTitle = ComponentUtils.mini(menuSpec.staticPickerTitle());
     var contentSlots = MenuContentSlots.allRows(rows);
 
     var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
 
     MenuFramework.builder(ID, menusRef)
         .rows(rows)
-        .title(title)
+        .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()
@@ -89,7 +89,8 @@ public final class MaterialPickerMenu implements Menu {
     var applied = this.service.setMaterial(uuid, homeName, material);
 
     var replyText = this.presentation.reply(messages, homeName, material, applied);
-    player.sendMessage(ComponentUtils.mini(replyText));
+    var replyComponent = ComponentUtils.mini(replyText);
+    player.sendMessage(replyComponent);
 
     this.menus.open(player, HomesMenu.ID);
   }

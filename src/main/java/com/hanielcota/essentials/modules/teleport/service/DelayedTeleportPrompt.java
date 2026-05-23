@@ -18,7 +18,9 @@ public record DelayedTeleportPrompt(
     if (seconds <= 0) {
       return;
     }
-    this.actor.sendMessage(this.teleporting.replace("{seconds}", Long.toString(seconds)));
+
+    var countdownMsg = this.teleporting.replace("{seconds}", Long.toString(seconds));
+    this.actor.sendMessage(countdownMsg);
   }
 
   @Override

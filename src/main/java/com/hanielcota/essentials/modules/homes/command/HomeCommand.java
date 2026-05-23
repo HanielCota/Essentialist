@@ -44,7 +44,8 @@ public record HomeCommand(
 
     var home = this.service.find(sender.getUniqueId(), name);
     if (home.isEmpty()) {
-      actor.sendError(missingMessage(messages, sender.getUniqueId(), name));
+      var missingMsg = missingMessage(messages, sender.getUniqueId(), name);
+      actor.sendError(missingMsg);
       return;
     }
 
@@ -56,6 +57,7 @@ public record HomeCommand(
     if (this.service.count(owner) == 0) {
       return messages.noHomes();
     }
+
     return messages.unknownHome().replace("{name}", name);
   }
 }
