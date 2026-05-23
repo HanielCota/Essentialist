@@ -28,7 +28,7 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
   public void execute(CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
     var snap = config.value();
 
-    String message = mensagem.strip();
+    var message = mensagem.strip();
     if (message.isBlank()) {
       sender.sendError(snap.usage());
       return;
@@ -44,13 +44,14 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
   @Syntax("/actionbar broadcast <mensagem>")
   public void broadcast(CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
     var snap = config.value();
-    String message = mensagem.strip();
+
+    var message = mensagem.strip();
     if (message.isBlank()) {
       sender.sendError(snap.usage());
       return;
     }
 
-    int count = service.broadcast(message);
+    var count = service.broadcast(message);
     sender.sendSuccess(snap.formatBroadcasted(count));
   }
 }
