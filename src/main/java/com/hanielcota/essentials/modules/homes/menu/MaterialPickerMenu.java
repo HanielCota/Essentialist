@@ -89,36 +89,40 @@ public final class MaterialPickerMenu implements Menu {
     var slots = new java.util.ArrayList<SlotDefinition>(icons.size() + 1);
 
     for (var icon : icons) {
+      var pickedMaterial = icon.material();
       slots.add(
-          SlotDefinition.of(-1, icon.template(), ctx -> handlePick(ctx.player(), icon.material())));
+          SlotDefinition.of(
+              -1,
+              icon.template(),
+              ctx -> {
+                var clicked = ctx.player();
+                var clickedUuid = clicked.getUniqueId();
+                var homeName = this.target.consume(clickedUuid);
+                this.target.consumeCategory(clickedUuid);
+
+                if (homeName == null) {
+                  ctx.open(HomesMenu.ID);
+                  return;
+                }
+
+                var messages = this.config.value().messages();
+                var applied = this.service.setMaterial(clickedUuid, homeName, pickedMaterial);
+
+                var replyText =
+                    this.presentation.reply(messages, homeName, pickedMaterial, applied);
+                var replyComponent = ComponentUtils.mini(replyText);
+                clicked.sendMessage(replyComponent);
+
+                ctx.open(HomesMenu.ID);
+              }));
     }
 
-    slots.add(backButtonSlot(player));
+    slots.add(backButtonSlot());
 
     return slots;
   }
 
-  private void handlePick(@NonNull Player player, @NonNull Material material) {
-    var uuid = player.getUniqueId();
-    var homeName = this.target.consume(uuid);
-    this.target.consumeCategory(uuid);
-
-    if (homeName == null) {
-      this.menus.open(player, HomesMenu.ID);
-      return;
-    }
-
-    var messages = this.config.value().messages();
-    var applied = this.service.setMaterial(uuid, homeName, material);
-
-    var replyText = this.presentation.reply(messages, homeName, material, applied);
-    var replyComponent = ComponentUtils.mini(replyText);
-    player.sendMessage(replyComponent);
-
-    this.menus.open(player, HomesMenu.ID);
-  }
-
-  private @NonNull SlotDefinition backButtonSlot(@NonNull Player player) {
+  private @NonNull SlotDefinition backButtonSlot() {
     var back =
         ItemTemplate.builder(org.bukkit.Material.BARRIER)
             .name("<red>Voltar às categorias")
@@ -131,7 +135,7 @@ public final class MaterialPickerMenu implements Menu {
         ctx -> {
           var uuid = ctx.player().getUniqueId();
           this.target.consumeCategory(uuid);
-          this.menus.open(ctx.player(), MaterialCategoryMenu.ID);
+          ctx.open(MaterialCategoryMenu.ID);
         });
   }
 }

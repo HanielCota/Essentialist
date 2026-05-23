@@ -64,16 +64,19 @@ public final class MaterialCategoryMenu implements Menu {
         continue;
       }
       var template = representativeItem(category);
-      slots.add(SlotDefinition.of(-1, template, ctx -> pickCategory(ctx.player(), category)));
+      slots.add(
+          SlotDefinition.of(
+              -1,
+              template,
+              ctx -> {
+                var clicked = ctx.player();
+                var clickedUuid = clicked.getUniqueId();
+                this.target.setCategory(clickedUuid, category);
+                ctx.open(MaterialPickerMenu.ID);
+              }));
     }
 
     return slots;
-  }
-
-  private void pickCategory(@NonNull Player player, @NonNull MaterialCategory category) {
-    var uuid = player.getUniqueId();
-    this.target.setCategory(uuid, category);
-    this.menus.open(player, MaterialPickerMenu.ID);
   }
 
   private static @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
