@@ -21,7 +21,7 @@ public record ClearChatCommand(ConfigHandle<ClearChatConfig> config, ClearChatSe
   @DefaultSubcommand
   public void execute(CommandActor actor) {
     var snap = config.value();
-    String announcement = snap.formatAnnouncement(actor.name());
+    var announcement = snap.formatAnnouncement(actor.name());
     service.clearChat(snap.effectiveLines(), announcement);
 
     // Players see the broadcast above; the console does not, so echo it there.
