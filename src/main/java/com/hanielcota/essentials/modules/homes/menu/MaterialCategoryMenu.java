@@ -3,7 +3,9 @@ package com.hanielcota.essentials.modules.homes.menu;
 import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
+import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
+import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
 import com.hanielcota.essentials.util.ComponentUtils;
@@ -42,15 +44,18 @@ public final class MaterialCategoryMenu implements Menu {
   public void register(@NonNull MenuService menusRef) {
     var title = ComponentUtils.mini("<dark_gray>Escolha uma categoria");
 
+    var pagination = PaginationConfig.builder().contentSlots(CONTENT_SLOTS).build();
+
     MenuFramework.builder(ID, menusRef)
         .rows(ROWS)
         .title(title)
+        .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()
         .register();
   }
 
-  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull Object session) {
+  private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var categories = MaterialCategory.browsable();
     var slots = new ArrayList<SlotDefinition>(categories.size());
 
