@@ -11,26 +11,26 @@ import org.bukkit.entity.Player;
 /**
  * Application service for the homes use cases.
  *
- * <p>Sole responsibility: enforce the per-player limit and delegate persistence to {@link
- * HomeStore}. Owns no state of its own; reads ({@link #find}, {@link #list}) hit the store
- * directly.
+ * <p>Sole responsibility: enforce the per-player limit and delegate persistence to a {@link
+ * HomeRepository}. Owns no state of its own; reads ({@link #find}, {@link #list}) hit the
+ * repository directly.
  */
 @RequiredArgsConstructor
 public final class HomeService {
 
-  private final HomeStore store;
+  private final HomeRepository repository;
   private final HomeLimitResolver limits;
 
   public Optional<Home> find(UUID owner, String name) {
-    return store.find(owner, name);
+    return repository.find(owner, name);
   }
 
   public List<Home> list(UUID owner) {
-    return store.list(owner);
+    return repository.list(owner);
   }
 
   public int count(UUID owner) {
-    return store.count(owner);
+    return repository.count(owner);
   }
 
   public int limit(Player owner) {
@@ -39,39 +39,39 @@ public final class HomeService {
 
   public SaveResult save(Player owner, String name, Location location, Material material) {
     var ownerId = owner.getUniqueId();
-    var existing = store.find(ownerId, name);
+    var existing = repository.find(ownerId, name);
 
     if (existing.isPresent()) {
       var keepMaterial = material != null ? material : existing.get().material();
-      store.save(Home.of(ownerId, name, location, keepMaterial));
+      repository.save(Home.of(ownerId, name, location, keepMaterial));
       return SaveResult.UPDATED;
     }
-    if (store.count(ownerId) >= limits.resolve(owner)) {
+    if (repository.count(ownerId) >= limits.resolve(owner)) {
       return SaveResult.LIMIT_REACHED;
     }
 
-    store.save(Home.of(ownerId, name, location, material));
+    repository.save(Home.of(ownerId, name, location, material));
     return SaveResult.CREATED;
   }
 
   public boolean delete(UUID owner, String name) {
-    return store.delete(owner, name);
+    return repository.delete(owner, name);
   }
 
   public RenameResult rename(UUID owner, String oldName, String newName) {
-    if (store.find(owner, oldName).isEmpty()) {
+    if (repository.find(owner, oldName).isEmpty()) {
       return RenameResult.NOT_FOUND;
     }
-    if (store.find(owner, newName).isPresent()) {
+    if (repository.find(owner, newName).isPresent()) {
       return RenameResult.NAME_TAKEN;
     }
 
-    store.rename(owner, oldName, newName);
+    repository.rename(owner, oldName, newName);
     return RenameResult.RENAMED;
   }
 
   public boolean setMaterial(UUID owner, String name, Material material) {
-    return store.updateMaterial(owner, name, material);
+    return repository.updateMaterial(owner, name, material);
   }
 
   public enum SaveResult {

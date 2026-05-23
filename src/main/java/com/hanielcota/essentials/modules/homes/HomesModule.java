@@ -20,8 +20,8 @@ import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameSessions;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
-import com.hanielcota.essentials.modules.homes.service.HomeStore;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
+import com.hanielcota.essentials.modules.homes.service.SqlHomeRepository;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
@@ -44,9 +44,9 @@ public final class HomesModule extends AbstractModule {
   protected void onEnable() {
     var config = config("homes", HomesConfig.class, HomesConfig::defaults);
 
-    var store = new HomeStore(service(SqlExecutor.class));
+    var repository = new SqlHomeRepository(service(SqlExecutor.class));
     var limits = new HomeLimitResolver(config.value().defaultLimit());
-    var homeService = new HomeService(store, limits);
+    var homeService = new HomeService(repository, limits);
     registerService(HomeService.class, homeService);
 
     var delayed = service(DelayedTeleport.class);

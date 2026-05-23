@@ -9,12 +9,12 @@ import java.util.UUID;
 import org.bukkit.Material;
 
 /**
- * SQLite-backed storage of player homes.
+ * SQLite-backed implementation of {@link HomeRepository}.
  *
  * <p>Primary key is {@code (player_id, name)} (case-insensitive on the name column) so calls to
  * {@link #save} act as upsert per player+name pair.
  */
-public final class HomeStore {
+public final class SqlHomeRepository implements HomeRepository {
 
   private static final String CREATE_TABLE =
       """
@@ -84,26 +84,30 @@ public final class HomeStore {
 
   private final SqlExecutor sqlExecutor;
 
-  public HomeStore(SqlExecutor sqlExecutor) {
+  public SqlHomeRepository(SqlExecutor sqlExecutor) {
     this.sqlExecutor = sqlExecutor;
     sqlExecutor.ddl(CREATE_TABLE);
     migrateMaterialColumn();
   }
 
+  @Override
   public Optional<Home> find(UUID owner, String name) {
-    var rows = sqlExecutor.query(SELECT_ONE, HomeStore::readRow, owner.toString(), name);
+    var rows = sqlExecutor.query(SELECT_ONE, SqlHomeRepository::readRow, owner.toString(), name);
     return rows.isEmpty() ? Optional.empty() : Optional.of(rows.getFirst());
   }
 
+  @Override
   public List<Home> list(UUID owner) {
-    return sqlExecutor.query(SELECT_ALL, HomeStore::readRow, owner.toString());
+    return sqlExecutor.query(SELECT_ALL, SqlHomeRepository::readRow, owner.toString());
   }
 
+  @Override
   public int count(UUID owner) {
     var counts = sqlExecutor.query(COUNT, rs -> rs.getInt("total"), owner.toString());
     return counts.isEmpty() ? 0 : counts.getFirst();
   }
 
+  @Override
   public void save(Home home) {
     sqlExecutor.update(
         UPSERT,
@@ -119,6 +123,7 @@ public final class HomeStore {
         home.createdAt());
   }
 
+  @Override
   public boolean delete(UUID owner, String name) {
     if (find(owner, name).isEmpty()) {
       return false;
@@ -127,6 +132,7 @@ public final class HomeStore {
     return true;
   }
 
+  @Override
   public boolean rename(UUID owner, String oldName, String newName) {
     if (find(owner, oldName).isEmpty() || find(owner, newName).isPresent()) {
       return false;
@@ -135,6 +141,7 @@ public final class HomeStore {
     return true;
   }
 
+  @Override
   public boolean updateMaterial(UUID owner, String name, Material material) {
     if (find(owner, name).isEmpty()) {
       return false;
