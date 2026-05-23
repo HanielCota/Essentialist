@@ -23,8 +23,8 @@ public record CompactCommand(ConfigHandle<CompactConfig> config, CompactService 
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
-    Player sender = actor.unwrap(Player.class);
-    int blocks = service.compact(sender);
+    var sender = actor.unwrap(Player.class);
+    var blocks = service.compact(sender);
     var snap = config.value();
 
     if (blocks == 0) {

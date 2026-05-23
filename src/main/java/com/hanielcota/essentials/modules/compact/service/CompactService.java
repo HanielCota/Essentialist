@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.compact.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.compact.config.CompactConfig;
-import com.hanielcota.essentials.modules.compact.config.CompactConfig.Recipe;
 import com.hanielcota.essentials.util.ItemStacks;
 import java.util.EnumMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
 
   private static Map<Material, Integer> countByMaterial(Inventory inv, Set<Material> wanted) {
     Map<Material, Integer> totals = new EnumMap<>(Material.class);
-    for (int slot = 0; slot < inv.getSize(); slot++) {
+    for (var slot = 0; slot < inv.getSize(); slot++) {
       var item = inv.getItem(slot);
       if (item != null && ItemStacks.isPlain(item) && wanted.contains(item.getType())) {
         totals.merge(item.getType(), item.getAmount(), Integer::sum);
@@ -26,14 +25,14 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
   }
 
   private static void removeFromInventory(Inventory inv, Material material, int amount) {
-    int remaining = amount;
-    for (int slot = 0; slot < inv.getSize() && remaining > 0; slot++) {
+    var remaining = amount;
+    for (var slot = 0; slot < inv.getSize() && remaining > 0; slot++) {
       var item = inv.getItem(slot);
       if (item == null || item.getType() != material || !ItemStacks.isPlain(item)) {
         continue;
       }
-      int take = Math.min(remaining, item.getAmount());
-      int left = item.getAmount() - take;
+      var take = Math.min(remaining, item.getAmount());
+      var left = item.getAmount() - take;
       remaining -= take;
 
       if (left == 0) {
@@ -48,22 +47,22 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
     var recipes = config.value().recipes();
     var inv = player.getInventory();
     var totals = countByMaterial(inv, recipes.keySet());
-    int blocksCompacted = 0;
 
+    var blocksCompacted = 0;
     for (var entry : totals.entrySet()) {
       var ingredient = entry.getKey();
-      int total = entry.getValue();
-      Recipe recipe = recipes.get(ingredient);
-      if (recipe.amount() <= 0) {
-        continue;
-      }
-      int blocks = total / recipe.amount();
-      if (blocks == 0) {
-        continue;
-      }
-      removeFromInventory(inv, ingredient, blocks * recipe.amount());
+      var total = entry.getValue();
+      var recipe = recipes.get(ingredient);
+      var unit = recipe.amount();
+      if (unit <= 0) continue;
+
+      var blocks = total / unit;
+      if (blocks == 0) continue;
+
+      removeFromInventory(inv, ingredient, blocks * unit);
       var produced = new ItemStack(recipe.block(), blocks);
       var overflow = inv.addItem(produced);
+
       for (var drop : overflow.values()) {
         player.getWorld().dropItem(player.getLocation(), drop);
       }
