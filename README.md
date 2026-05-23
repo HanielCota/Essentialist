@@ -238,7 +238,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-When a tag starting with `v` is pushed, GitHub Actions builds the plugin, creates a GitHub Release, generates release notes, and uploads the jar from `build/libs/`.
+When a tag starting with `v` is pushed, GitHub Actions builds the plugin, derives the plugin version from the tag, creates a GitHub Release, generates release notes, and uploads the jar from `build/libs/`. For example, `v0.1.0` builds `Essentialist-0.1.0.jar`.
 
 GitHub Packages is not enabled by default because Essentialist is distributed as a server plugin jar. Packages are useful later if the project exposes a separate API module that other plugins should consume through Maven.
 
