@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.light.listener;
 import com.hanielcota.essentials.modules.light.service.LightService;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -22,7 +21,7 @@ public final class LightRespawnListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onRespawn(PlayerRespawnEvent event) {
-    Player player = event.getPlayer();
+    var player = event.getPlayer();
     if (!service.isEnabled(player)) {
       return;
     }
