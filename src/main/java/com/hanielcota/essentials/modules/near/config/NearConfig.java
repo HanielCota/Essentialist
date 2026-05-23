@@ -31,7 +31,8 @@ public record NearConfig(
   }
 
   public String formatFound(int radius, int count, String players) {
-    return found.replace("{radius}", Integer.toString(radius))
+    return found
+        .replace("{radius}", Integer.toString(radius))
         .replace("{count}", Integer.toString(count))
         .replace("{players}", players);
   }

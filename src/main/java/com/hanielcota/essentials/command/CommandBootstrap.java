@@ -34,8 +34,7 @@ public final class CommandBootstrap {
       var input = context.currentInput().toLowerCase(Locale.ROOT);
       var names = new ArrayList<String>();
 
-      for (var enchantment :
-          RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)) {
+      for (var enchantment : RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)) {
         var name = enchantment.getKey().getKey();
         if (name.startsWith(input)) {
           names.add(name);

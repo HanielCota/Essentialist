@@ -46,7 +46,8 @@ public final class BackMenu implements Menu, Listener {
    */
   private final Map<UUID, List<HistoryEntry>> prefetched = new ConcurrentHashMap<>();
 
-  // Filters configured slot indices to fit inside `capacity`, dropping nulls/out-of-range/duplicates.
+  // Filters configured slot indices to fit inside `capacity`, dropping
+  // nulls/out-of-range/duplicates.
   // Falls back to leading slots when nothing usable remains — PaginationConfig rejects empty lists.
   private static List<Integer> sanitizeContentSlots(List<Integer> configured, int capacity) {
     var valid = new ArrayList<Integer>(configured.size());

@@ -49,7 +49,8 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
     requester.sendMessage(ComponentUtils.mini(line));
   }
 
-  // Tells the party other than `quitter`, if online, that the request died because they disconnected.
+  // Tells the party other than `quitter`, if online, that the request died because they
+  // disconnected.
   public void notifyPartnerLeft(TeleportRequest request, UUID quitter, String quitterName) {
     var requesterId = request.requester().id();
     var recipient = requesterId.equals(quitter) ? request.target().id() : requesterId;

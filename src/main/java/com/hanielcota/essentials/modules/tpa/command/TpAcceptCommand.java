@@ -40,8 +40,7 @@ public record TpAcceptCommand(
     var result = service.accept(request);
     switch (result) {
       case SUCCESS -> {
-        actor.sendSuccess(
-            messages.acceptedSelf().replace("{player}", request.requester().name()));
+        actor.sendSuccess(messages.acceptedSelf().replace("{player}", request.requester().name()));
         TpaRequests.replyRequester(framework, request, messages.accepted(), true);
       }
       case REQUESTER_OFFLINE ->

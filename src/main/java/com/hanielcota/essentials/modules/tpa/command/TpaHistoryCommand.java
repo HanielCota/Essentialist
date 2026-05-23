@@ -76,8 +76,7 @@ public record TpaHistoryCommand(
 
     if (!self) {
       actor.sendMessage(
-          ComponentUtils.mini(
-              snap.messages().viewingOther().replace("{player}", subjectName)));
+          ComponentUtils.mini(snap.messages().viewingOther().replace("{player}", subjectName)));
     }
 
     menu.prefetch(viewer.getUniqueId(), entries);
