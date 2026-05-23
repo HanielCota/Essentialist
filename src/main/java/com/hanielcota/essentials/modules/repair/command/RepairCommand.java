@@ -42,7 +42,6 @@ public record RepairCommand(
         String selfMessage = messages.forSender(self, name);
         sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
       }
-      default -> throw new IllegalStateException("Unexpected repair result: " + result);
     }
   }
 

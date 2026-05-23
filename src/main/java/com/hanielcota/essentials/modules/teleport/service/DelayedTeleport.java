@@ -41,12 +41,16 @@ public final class DelayedTeleport implements Listener {
 
     if (delay.isZero() || delay.isNegative()) {
       callback.onScheduled(0);
-      complete(player, destination, callback);
+      scheduler.runOnEntity(player, () -> complete(player, destination, callback));
       return;
     }
 
     callback.onScheduled(Math.max(1, delay.toSeconds()));
-    var task = scheduler.runLater(() -> complete(player, destination, callback), delay);
+    var task =
+        scheduler.runLater(
+            () ->
+                scheduler.runOnEntity(player, () -> completePending(player, destination, callback)),
+            delay);
     pending.put(uuid, new Pending(task, callback));
   }
 
@@ -68,16 +72,23 @@ public final class DelayedTeleport implements Listener {
   }
 
   private void complete(Player player, Location destination, Callback callback) {
-    pending.remove(player.getUniqueId());
     if (!player.isOnline()) {
       callback.onCancelled();
       return;
     }
-    if (teleport.teleportTo(player, destination)) {
-      callback.onSuccess();
-    } else {
+    if (!teleport.teleportTo(player, destination)) {
       callback.onFailed();
+      return;
     }
+    callback.onSuccess();
+  }
+
+  private void completePending(Player player, Location destination, Callback callback) {
+    var removed = pending.remove(player.getUniqueId());
+    if (removed == null || removed.callback != callback) {
+      return;
+    }
+    complete(player, destination, callback);
   }
 
   @EventHandler
@@ -117,9 +128,9 @@ public final class DelayedTeleport implements Listener {
     }
   }
 
-  private record Pending(Task task, Callback callback) {}
-
-  /** Lifecycle hooks of a delayed teleport. All callbacks run on the server thread. */
+  /**
+   * Lifecycle hooks of a delayed teleport. Completion callbacks run on the player's owning thread.
+   */
   public interface Callback {
 
     /** Called immediately. {@code seconds} is 0 when no delay was applied. */
@@ -134,4 +145,6 @@ public final class DelayedTeleport implements Listener {
     /** Called when the teleport API call itself returned false. */
     default void onFailed() {}
   }
+
+  private record Pending(Task task, Callback callback) {}
 }

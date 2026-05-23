@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.config;
+package com.hanielcota.essentials.modules.homes.config.menu;
 
 import com.hanielcota.essentials.util.Numbers;
 import java.util.List;
@@ -35,7 +35,7 @@ public record HomesMenuConfig(
             "<yellow>Shift + clique <gray>para renomear",
             "<yellow>Q (drop) <gray>para trocar o ícone"),
         false,
-        "<dark_gray>Ícone de <gold>{name}",
+        "<dark_gray>Escolha o ícone",
         6,
         List.of(
             Material.RED_BED,
@@ -77,7 +77,7 @@ public record HomesMenuConfig(
             Material.OBSIDIAN,
             Material.CRYING_OBSIDIAN,
             Material.END_PORTAL_FRAME,
-            Material.NETHER_PORTAL,
+            Material.FLINT_AND_STEEL,
             Material.CAKE,
             Material.JUKEBOX,
             Material.NOTE_BLOCK,
@@ -114,5 +114,12 @@ public record HomesMenuConfig(
 
   public String formatPickerTitle(String homeName) {
     return pickerTitle.replace("{name}", homeName);
+  }
+
+  public String staticPickerTitle() {
+    if (pickerTitle.contains("{name}")) {
+      return "<dark_gray>Escolha o ícone";
+    }
+    return pickerTitle;
   }
 }

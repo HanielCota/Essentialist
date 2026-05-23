@@ -3,7 +3,9 @@ package com.hanielcota.essentials.modules.homes.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.config.HomesMessages;
+import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
+import com.hanielcota.essentials.modules.homes.material.HomeMaterialResolver;
+import com.hanielcota.essentials.modules.homes.name.HomeNameResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -14,7 +16,6 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @Command("sethome")
@@ -23,7 +24,11 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "2s")
 @Description("Define uma home com o nome dado (ou \"home\" se ausente).")
 @Syntax("/sethome [nome] [material]")
-public record SetHomeCommand(ConfigHandle<HomesConfig> config, HomeService service) {
+public record SetHomeCommand(
+    ConfigHandle<HomesConfig> config,
+    HomeService service,
+    HomeNameResolver nameResolver,
+    HomeMaterialResolver materialResolver) {
 
   @DefaultSubcommand
   public void execute(
@@ -31,11 +36,14 @@ public record SetHomeCommand(ConfigHandle<HomesConfig> config, HomeService servi
       @DefaultValue("") @Arg("nome") String rawName,
       @DefaultValue("") @Arg("material") String rawMaterial) {
     var sender = actor.unwrap(Player.class);
-    var snap = config.value();
-    var messages = snap.messages();
-    var name = rawName.isBlank() ? snap.defaultHomeName() : rawName;
+    var messages = config.value().messages();
+    var name = nameResolver.resolve(rawName);
+    if (name == null) {
+      actor.sendError(messages.invalidName());
+      return;
+    }
 
-    var material = resolveMaterial(rawMaterial, snap.defaultMaterial());
+    var material = materialResolver.resolve(rawMaterial);
     if (material == null) {
       actor.sendError(messages.invalidMaterial().replace("{material}", rawMaterial));
       return;
@@ -46,16 +54,7 @@ public record SetHomeCommand(ConfigHandle<HomesConfig> config, HomeService servi
       case CREATED -> actor.sendSuccess(messages.homeSet().replace("{name}", name));
       case UPDATED -> actor.sendSuccess(messages.homeUpdated().replace("{name}", name));
       case LIMIT_REACHED -> actor.sendError(limitReachedMessage(messages, name, sender));
-      default -> throw new IllegalStateException("Unexpected outcome: " + outcome);
     }
-  }
-
-  private static Material resolveMaterial(String raw, Material fallback) {
-    if (raw.isBlank()) return fallback;
-
-    var match = Material.matchMaterial(raw);
-    if (match == null || !match.isItem()) return null;
-    return match;
   }
 
   private String limitReachedMessage(HomesMessages messages, String name, Player sender) {

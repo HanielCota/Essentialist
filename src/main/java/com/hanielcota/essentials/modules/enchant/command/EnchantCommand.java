@@ -57,7 +57,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
       case NOT_ENCHANTED -> sender.sendError(snap.formatNotEnchanted(label));
       case REMOVED -> sender.sendSuccess(snap.formatRemoved(label));
-      default -> throw new IllegalStateException("Unexpected enchant result: " + result);
+      case APPLIED -> throw new IllegalStateException("Unexpected enchant result: APPLIED");
     }
   }
 

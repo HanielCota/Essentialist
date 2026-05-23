@@ -5,11 +5,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Default implementation of {@link AsyncDatabaseWriter} that submits tasks to a single-threaded
  * background executor.
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
 
   private static final Log LOG = Log.of(DefaultAsyncDatabaseWriter.class);
@@ -18,7 +22,7 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   private final String threadName;
   private final ExecutorService executor;
 
-  public DefaultAsyncDatabaseWriter(String threadName) {
+  public DefaultAsyncDatabaseWriter(@NonNull String threadName) {
     this(
         threadName,
         Executors.newSingleThreadExecutor(
@@ -29,13 +33,13 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
             }));
   }
 
-  public DefaultAsyncDatabaseWriter(String threadName, ExecutorService executor) {
-    this.threadName = threadName;
-    this.executor = executor;
+  public static DefaultAsyncDatabaseWriter of(
+      @NonNull String threadName, @NonNull ExecutorService executor) {
+    return new DefaultAsyncDatabaseWriter(threadName, executor);
   }
 
   @Override
-  public void submit(String operation, Runnable work) {
+  public void submit(@NonNull String operation, @NonNull Runnable work) {
     try {
       executor.execute(
           () -> {
@@ -53,19 +57,25 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   @Override
   public void close() {
     executor.shutdown();
+
     try {
-      if (executor.awaitTermination(DRAIN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+      var timeout = DRAIN_TIMEOUT_SECONDS;
+      var unit = TimeUnit.SECONDS;
+
+      if (executor.awaitTermination(timeout, unit)) {
         return;
       }
-      var dropped = executor.shutdownNow().size();
-      LOG.warn(
-          "{} did not drain in {}s; {} write(s) dropped",
-          threadName,
-          DRAIN_TIMEOUT_SECONDS,
-          dropped);
+
+      var droppedTasks = executor.shutdownNow();
+      var droppedCount = droppedTasks.size();
+
+      LOG.warn("{} did not drain in {}s; {} write(s) dropped", threadName, timeout, droppedCount);
+
     } catch (InterruptedException _) {
       executor.shutdownNow();
-      Thread.currentThread().interrupt();
+
+      var currentThread = Thread.currentThread();
+      currentThread.interrupt();
     }
   }
 }

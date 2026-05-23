@@ -5,37 +5,56 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerProvider {
 
-  @Override
-  public Optional<Player> online(UUID id) {
-    return Optional.ofNullable(plugin.getServer().getPlayer(id));
+  public BukkitPlayerProvider(@NonNull EssentialsPlugin plugin) {
+    this.plugin = plugin;
   }
 
   @Override
-  public Optional<Player> online(String name) {
-    return Optional.ofNullable(plugin.getServer().getPlayerExact(name));
+  public Optional<Player> online(@NonNull UUID id) {
+    var server = plugin.getServer();
+    var player = server.getPlayer(id);
+
+    return Optional.ofNullable(player);
   }
 
   @Override
-  public OfflinePlayer offline(UUID id) {
-    return plugin.getServer().getOfflinePlayer(id);
+  public Optional<Player> online(@NonNull String name) {
+    var server = plugin.getServer();
+    var player = server.getPlayerExact(name);
+
+    return Optional.ofNullable(player);
   }
 
   @Override
-  public Optional<OfflinePlayer> offlineByName(String name) {
-    var current = plugin.getServer().getPlayerExact(name);
+  public OfflinePlayer offline(@NonNull UUID id) {
+    var server = plugin.getServer();
+    return server.getOfflinePlayer(id);
+  }
+
+  @Override
+  public Optional<OfflinePlayer> offlineByName(@NonNull String name) {
+    var server = plugin.getServer();
+    var current = server.getPlayerExact(name);
+
     if (current != null) {
       return Optional.of(current);
     }
-    return Optional.ofNullable(plugin.getServer().getOfflinePlayerIfCached(name));
+
+    var cachedOffline = server.getOfflinePlayerIfCached(name);
+    return Optional.ofNullable(cachedOffline);
   }
 
   @Override
   public Collection<Player> all() {
-    return List.copyOf(plugin.getServer().getOnlinePlayers());
+    var server = plugin.getServer();
+    var onlinePlayers = server.getOnlinePlayers();
+
+    return List.copyOf(onlinePlayers);
   }
 }

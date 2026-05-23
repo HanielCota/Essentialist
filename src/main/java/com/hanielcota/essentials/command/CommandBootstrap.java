@@ -13,67 +13,80 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.logging.Level;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.plugin.java.JavaPlugin;
 
+@RequiredArgsConstructor
 public final class CommandBootstrap {
 
-  private final JavaPlugin plugin;
-  private final List<Consumer<PaperCommandFramework.Builder>> customizers;
-
-  public CommandBootstrap(
-      JavaPlugin plugin, List<Consumer<PaperCommandFramework.Builder>> customizers) {
-    this.plugin = plugin;
-    this.customizers = List.copyOf(customizers);
-  }
+  private final @NonNull JavaPlugin plugin;
+  private final @NonNull List<Consumer<PaperCommandFramework.Builder>> customizers;
 
   // Tab-completes enchantment names (without the `minecraft:` namespace) by prefix.
   private static SuggestionProvider<Enchantment> enchantmentSuggestions() {
     return context -> {
-      var input = context.currentInput().toLowerCase(Locale.ROOT);
-      var names = new ArrayList<String>();
+      var currentInput = context.currentInput();
+      var input = currentInput.toLowerCase(Locale.ROOT);
 
-      for (var enchantment : RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)) {
-        var name = enchantment.getKey().getKey();
+      var names = new ArrayList<String>();
+      var registryAccess = RegistryAccess.registryAccess();
+      var enchantmentRegistry = registryAccess.getRegistry(RegistryKey.ENCHANTMENT);
+
+      for (var enchantment : enchantmentRegistry) {
+        var namespacedKey = enchantment.getKey();
+        var name = namespacedKey.getKey();
+
         if (name.startsWith(input)) {
           names.add(name);
         }
       }
+
       return names;
     };
   }
 
   public PaperCommandFramework createFramework() {
+    var logger = this.plugin.getLogger();
+
     var builder =
-        PaperCommandFramework.builder(plugin)
+        PaperCommandFramework.builder(this.plugin)
             .messageProvider(CommandMessages.portugueseBrazil())
-            .interceptor(new AuditInterceptor(plugin.getLogger()));
+            .interceptor(new AuditInterceptor(logger));
 
-    builder
-        .enumAlias(GameMode.SURVIVAL, "sobrevivência", "s", "0")
-        .enumAlias(GameMode.CREATIVE, "criativo", "c", "1")
-        .enumAlias(GameMode.ADVENTURE, "aventura", "a", "2")
-        .enumAlias(GameMode.SPECTATOR, "espectador", "sp", "3");
+    builder.enumAlias(GameMode.SURVIVAL, "sobrevivência", "s", "0");
+    builder.enumAlias(GameMode.CREATIVE, "criativo", "c", "1");
+    builder.enumAlias(GameMode.ADVENTURE, "aventura", "a", "2");
+    builder.enumAlias(GameMode.SPECTATOR, "espectador", "sp", "3");
 
-    builder.suggestionProvider("enchantments", enchantmentSuggestions());
+    var enchantmentProvider = enchantmentSuggestions();
+    builder.suggestionProvider("enchantments", enchantmentProvider);
 
-    builder
-        .onException(
-            IllegalArgumentException.class,
-            (ctx, ex) -> {
-              ctx.actor().sendError("<red>Erro: " + ex.getMessage());
-              return CommandResult.failure(CommandStatus.INVALID_USAGE, ex.getMessage());
-            })
-        .onException(
-            RuntimeException.class,
-            (ctx, ex) -> {
-              ctx.actor().sendError("<red>Ocorreu um erro inesperado.");
-              plugin.getLogger().log(Level.WARNING, ex, () -> "Unhandled command exception");
-              return CommandResult.failure(CommandStatus.ERROR, "unexpected");
-            });
+    builder.onException(
+        IllegalArgumentException.class,
+        (ctx, ex) -> {
+          var actor = ctx.actor();
+          var errorMessage = ex.getMessage();
 
-    for (var customizer : customizers) {
+          actor.sendError("<red>Erro: " + errorMessage);
+          return CommandResult.failure(CommandStatus.INVALID_USAGE, errorMessage);
+        });
+
+    builder.onException(
+        RuntimeException.class,
+        (ctx, ex) -> {
+          var actor = ctx.actor();
+          actor.sendError("<red>Ocorreu um erro inesperado.");
+
+          var pluginLogger = this.plugin.getLogger();
+          pluginLogger.log(Level.WARNING, ex, () -> "Unhandled command exception");
+
+          return CommandResult.failure(CommandStatus.ERROR, "unexpected");
+        });
+
+    for (var customizer : this.customizers) {
       customizer.accept(builder);
     }
 

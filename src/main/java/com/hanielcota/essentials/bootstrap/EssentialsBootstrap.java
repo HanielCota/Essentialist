@@ -17,18 +17,24 @@ import com.hanielcota.essentials.database.SqliteDatabase;
 import com.hanielcota.essentials.exception.PluginException;
 import com.hanielcota.essentials.module.Module;
 import com.hanielcota.essentials.module.ModuleManager;
-import com.hanielcota.essentials.paper.*;
+import com.hanielcota.essentials.paper.AudienceProvider;
+import com.hanielcota.essentials.paper.BukkitPlayerProvider;
+import com.hanielcota.essentials.paper.PaperAudienceProvider;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.PaperScheduler;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.service.DefaultServiceRegistry;
 import com.hanielcota.essentials.service.ServiceRegistry;
-import com.hanielcota.essentials.user.*;
+import com.hanielcota.essentials.user.DefaultUserSessionService;
+import com.hanielcota.essentials.user.UserSessionListener;
+import com.hanielcota.essentials.user.UserSessionService;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -51,7 +57,7 @@ public final class EssentialsBootstrap {
     registerMenus(services);
     registerUserStack(services);
 
-    var core = new EssentialsCore(plugin, services);
+    var core = new EssentialsCore(this.plugin, services);
     services.register(EssentialsApi.class, core);
 
     mirrorServicesToCommands(framework, services);
@@ -60,49 +66,67 @@ public final class EssentialsBootstrap {
     return core;
   }
 
-  private void registerScheduler(ServiceRegistry services) {
-    services.register(Scheduler.class, new PaperScheduler(plugin));
+  private void registerScheduler(@NonNull ServiceRegistry services) {
+    var scheduler = new PaperScheduler(this.plugin);
+    services.register(Scheduler.class, scheduler);
   }
 
-  private void registerPaperAdapters(ServiceRegistry services) {
-    services.register(AudienceProvider.class, new PaperAudienceProvider(plugin));
-    services.register(PlayerProvider.class, new BukkitPlayerProvider(plugin));
+  private void registerPaperAdapters(@NonNull ServiceRegistry services) {
+    var audienceProvider = new PaperAudienceProvider(this.plugin);
+    services.register(AudienceProvider.class, audienceProvider);
+
+    var playerProvider = new BukkitPlayerProvider(this.plugin);
+    services.register(PlayerProvider.class, playerProvider);
   }
 
-  private void registerConfigs(ServiceRegistry services) {
-    services.register(ConfigService.class, new YamlConfigService(plugin.getDataFolder().toPath()));
+  private void registerConfigs(@NonNull ServiceRegistry services) {
+    var dataFolder = this.plugin.getDataFolder();
+    var baseDir = dataFolder.toPath();
+
+    var configService = new YamlConfigService(baseDir);
+    services.register(ConfigService.class, configService);
   }
 
-  private PaperCommandFramework registerCommands(ServiceRegistry services, ModuleManager modules) {
+  private PaperCommandFramework registerCommands(
+      @NonNull ServiceRegistry services, @NonNull ModuleManager modules) {
     var customizers =
         modules.all().stream()
             .map(module -> (Consumer<PaperCommandFramework.Builder>) module::customizeCommands)
             .toList();
 
-    var framework = new CommandBootstrap(plugin, customizers).createFramework();
+    var framework = new CommandBootstrap(this.plugin, customizers).createFramework();
     services.register(PaperCommandFramework.class, framework);
+
     return framework;
   }
 
-  private void registerMenus(ServiceRegistry services) {
-    services.register(MenuService.class, MenuFramework.create(plugin));
+  private void registerMenus(@NonNull ServiceRegistry services) {
+    var menuService = MenuFramework.create(this.plugin);
+    services.register(MenuService.class, menuService);
   }
 
-  private void registerDatabase(ServiceRegistry services) {
-    var dbPath = plugin.getDataFolder().toPath().resolve("essentials.db");
-    createDirectories(dbPath.getParent());
+  private void registerDatabase(@NonNull ServiceRegistry services) {
+    var dataFolder = this.plugin.getDataFolder();
+    var dbPath = dataFolder.toPath().resolve("essentials.db");
+
+    var parentDir = dbPath.getParent();
+    createDirectories(parentDir);
 
     var database = new SqliteDatabase(dbPath);
     database.connect();
+
     services.register(DatabaseProvider.class, database);
     services.register(SqlConnectionFactory.class, database);
-    services.register(SqlExecutor.class, new DefaultSqlExecutor(database));
+
+    var sqlExecutor = new DefaultSqlExecutor(database);
+    services.register(SqlExecutor.class, sqlExecutor);
   }
 
   private void createDirectories(Path path) {
     if (path == null) {
       return;
     }
+
     try {
       Files.createDirectories(path);
     } catch (IOException e) {
@@ -110,25 +134,42 @@ public final class EssentialsBootstrap {
     }
   }
 
-  private void registerUserStack(ServiceRegistry services) {
+  private void registerUserStack(@NonNull ServiceRegistry services) {
     var sessions = new DefaultUserSessionService();
     services.register(UserSessionService.class, sessions);
 
-    plugin.getServer().getPluginManager().registerEvents(new UserSessionListener(sessions), plugin);
+    var server = this.plugin.getServer();
+    var pluginManager = server.getPluginManager();
+    var sessionListener = new UserSessionListener(sessions);
+
+    pluginManager.registerEvents(sessionListener, this.plugin);
   }
 
   private ModuleManager createModules() {
     var modules = new ModuleManager();
-    ServiceLoader.load(Module.class, getClass().getClassLoader()).forEach(modules::register);
+
+    var currentClass = getClass();
+    var classLoader = currentClass.getClassLoader();
+    var loader = ServiceLoader.load(Module.class, classLoader);
+
+    loader.forEach(modules::register);
     return modules;
   }
 
   @SuppressWarnings("unchecked")
-  private void mirrorServicesToCommands(PaperCommandFramework framework, ServiceRegistry services) {
-    for (Class<?> type : services.registered()) {
-      if (type != PaperCommandFramework.class) {
-        framework.registerDependency((Class<Object>) type, services.resolve((Class<Object>) type));
+  private void mirrorServicesToCommands(
+      @NonNull PaperCommandFramework framework, @NonNull ServiceRegistry services) {
+    var registeredTypes = services.registered();
+
+    for (var type : registeredTypes) {
+      if (type == PaperCommandFramework.class) {
+        continue;
       }
+
+      var castedType = (Class<Object>) type;
+      var resolvedService = services.resolve(castedType);
+
+      framework.registerDependency(castedType, resolvedService);
     }
   }
 }

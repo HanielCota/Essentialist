@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.back.listener;
 
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,15 +15,23 @@ public final class PlayerTeleportListener implements Listener {
   private final TeleportHistory history;
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onTeleport(PlayerTeleportEvent event) {
+  public void onTeleport(@NonNull PlayerTeleportEvent event) {
     var cause = event.getCause();
 
-    if (cause == TeleportCause.UNKNOWN
-        || cause == TeleportCause.DISMOUNT
-        || cause == TeleportCause.EXIT_BED) {
+    if (cause == TeleportCause.UNKNOWN) {
+      return;
+    }
+    if (cause == TeleportCause.DISMOUNT) {
+      return;
+    }
+    if (cause == TeleportCause.EXIT_BED) {
       return;
     }
 
-    history.push(event.getPlayer().getUniqueId(), event.getFrom());
+    var player = event.getPlayer();
+    var uuid = player.getUniqueId();
+    var originLocation = event.getFrom();
+
+    history.push(uuid, originLocation);
   }
 }

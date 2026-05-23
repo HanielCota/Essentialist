@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.homes.listener;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameSessions;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -31,9 +32,10 @@ public final class HomeTeleportListener implements Listener {
   private final HomeRenameSessions renameSessions;
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onMove(PlayerMoveEvent event) {
+  public void onMove(@NonNull PlayerMoveEvent event) {
     var from = event.getFrom();
     var to = event.getTo();
+
     if (from.getBlockX() == to.getBlockX()
         && from.getBlockY() == to.getBlockY()
         && from.getBlockZ() == to.getBlockZ()) {
@@ -47,8 +49,9 @@ public final class HomeTeleportListener implements Listener {
   }
 
   @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
+  public void onQuit(@NonNull PlayerQuitEvent event) {
     var uuid = event.getPlayer().getUniqueId();
+
     actionTarget.clear(uuid);
     renameSessions.cancel(uuid);
   }

@@ -8,6 +8,7 @@ import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.module.ModuleContext;
 import com.hanielcota.essentials.module.ModuleManager;
 import com.hanielcota.essentials.service.ServiceRegistry;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -18,21 +19,31 @@ public final class EssentialsCore implements EssentialsApi {
 
   private volatile LifecyclePhase phase = LifecyclePhase.BOOTING;
 
-  public void advance(LifecyclePhase next) {
+  public void advance(@NonNull LifecyclePhase next) {
     this.phase = next;
+
     if (next == LifecyclePhase.ENABLED) {
-      services.resolve(ModuleManager.class).enableAll(newContext());
+      var moduleManager = services.resolve(ModuleManager.class);
+      var context = newContext();
+
+      moduleManager.enableAll(context);
     }
   }
 
   public void shutdown() {
-    phase = LifecyclePhase.DISABLING;
+    this.phase = LifecyclePhase.DISABLING;
+
     try {
-      services.resolve(ModuleManager.class).disableAll();
+      var moduleManager = services.resolve(ModuleManager.class);
+      moduleManager.disableAll();
     } finally {
-      services.find(DatabaseProvider.class).ifPresent(DatabaseProvider::close);
-      services.find(MenuService.class).ifPresent(MenuService::shutdown);
-      phase = LifecyclePhase.DISABLED;
+      var databaseProviderOpt = services.find(DatabaseProvider.class);
+      databaseProviderOpt.ifPresent(DatabaseProvider::close);
+
+      var menuServiceOpt = services.find(MenuService.class);
+      menuServiceOpt.ifPresent(MenuService::shutdown);
+
+      this.phase = LifecyclePhase.DISABLED;
     }
   }
 

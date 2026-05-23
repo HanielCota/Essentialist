@@ -7,41 +7,43 @@ import io.github.hanielcota.commandframework.core.RichCommandInterceptor;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.logging.Logger;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.command.CommandSender;
-import org.jspecify.annotations.NonNull;
 
 /** Rich interceptor that logs every dispatched command with its resolved parameters. */
+@RequiredArgsConstructor
 public final class AuditInterceptor implements RichCommandInterceptor {
 
-  private final Logger logger;
-
-  public AuditInterceptor(Logger logger) {
-    this.logger = logger;
-  }
+  private final @NonNull Logger logger;
 
   @Override
   public @NonNull CommandResult before(
       @NonNull CommandContext context, @NonNull List<ParsedParameter<?>> parameters) {
-
     var actor = context.actor().name();
-    var route = String.join(" ", context.route().path());
+
+    var pathTokens = context.route().path();
+    var route = String.join(" ", pathTokens);
 
     if (parameters.isEmpty()) {
       var messageWithoutArgs = "[CMD] %s executed /%s".formatted(actor, route);
-      logger.info(() -> messageWithoutArgs);
+      this.logger.info(messageWithoutArgs);
+
       return CommandResult.success();
     }
 
     var joiner = new StringJoiner(", ");
-
     for (var parameter : parameters) {
-      joiner.add(simplifyValue(parameter.value()));
+      var rawValue = parameter.value();
+      var simplifiedStr = simplifyValue(rawValue);
+
+      joiner.add(simplifiedStr);
     }
 
     var args = joiner.toString();
     var messageWithArgs =
         "[CMD] %s executed /%s with parameters: [%s]".formatted(actor, route, args);
-    logger.info(() -> messageWithArgs);
+    this.logger.info(messageWithArgs);
 
     return CommandResult.success();
   }
@@ -65,7 +67,10 @@ public final class AuditInterceptor implements RichCommandInterceptor {
     }
 
     var fullString = value.toString();
-    return clazz.getSimpleName()
-        + fullString.substring(fullString.indexOf('{') != -1 ? fullString.indexOf('{') : 0);
+    var braceIndex = fullString.indexOf('{');
+    var startIndex = (braceIndex != -1) ? braceIndex : 0;
+
+    var jsonPart = fullString.substring(startIndex);
+    return clazz.getSimpleName() + jsonPart;
   }
 }

@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.yaml.NodeStyle;
@@ -17,29 +19,24 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
  * <p>Extracted to a package-private top-level class to adhere to the Single Responsibility
  * Principle (SRP) and simplify YamlConfigService.
  */
+@RequiredArgsConstructor
 final class YamlConfigHandle<T> implements ConfigHandle<T> {
 
-  private final Path baseDir;
-  private final String name;
-  private final Class<T> type;
-  private final Supplier<T> defaults;
-  private final AtomicReference<T> ref = new AtomicReference<>();
+  private final @NonNull Path baseDir;
+  private final @NonNull String name;
+  private final @NonNull Class<T> type;
+  private final @NonNull Supplier<T> defaults;
 
-  YamlConfigHandle(Path baseDir, String name, Class<T> type, Supplier<T> defaults) {
-    this.baseDir = baseDir;
-    this.name = name;
-    this.type = type;
-    this.defaults = defaults;
-  }
+  private final AtomicReference<T> ref = new AtomicReference<>();
 
   @Override
   public String name() {
-    return name;
+    return this.name;
   }
 
   @Override
   public T value() {
-    return ref.get();
+    return this.ref.get();
   }
 
   @Override
@@ -48,15 +45,17 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
   }
 
   void refresh() {
-    ref.set(readFromDisk());
+    var updatedValue = readFromDisk();
+    this.ref.set(updatedValue);
   }
 
   Class<T> type() {
-    return type;
+    return this.type;
   }
 
   private T readFromDisk() {
-    var file = baseDir.resolve(name + ".yml");
+    var fileName = this.name + ".yml";
+    var file = this.baseDir.resolve(fileName);
     ensureParent(file);
 
     var loader =
@@ -64,17 +63,21 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
 
     try {
       var node = loader.load();
-      var defaultsNode = CommentedConfigurationNode.root(node.options());
-      defaultsNode.set(type, defaults.get());
+      var options = node.options();
+      var defaultsNode = CommentedConfigurationNode.root(options);
 
-      var sizeBefore = node.childrenMap().size();
+      var defaultInstance = this.defaults.get();
+      defaultsNode.set(this.type, defaultInstance);
+
+      var initialSize = node.childrenMap().size();
       node.mergeFrom(defaultsNode);
 
-      var dirty = node.empty() || node.childrenMap().size() != sizeBefore;
-      var value = node.get(type);
+      var currentSize = node.childrenMap().size();
+      var dirty = node.empty() || initialSize != currentSize;
 
+      var value = node.get(this.type);
       if (value == null) {
-        value = defaults.get();
+        value = defaultInstance;
         dirty = true;
       }
 
@@ -83,8 +86,9 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
       }
 
       return value;
+
     } catch (ConfigurateException e) {
-      throw new ConfigurationException("Failed to load config: " + name, e);
+      throw new ConfigurationException("Failed to load config: " + this.name, e);
     }
   }
 

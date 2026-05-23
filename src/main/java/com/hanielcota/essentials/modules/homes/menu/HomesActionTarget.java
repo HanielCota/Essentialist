@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NonNull;
 
 /**
  * Per-player record of which home a sub-flow opened from /homes is acting on (delete dialog,
@@ -15,15 +15,15 @@ public final class HomesActionTarget {
 
   private final ConcurrentHashMap<UUID, String> targets = new ConcurrentHashMap<>();
 
-  public void set(UUID player, String homeName) {
+  public void set(@NonNull UUID player, @NonNull String homeName) {
     targets.put(player, homeName);
   }
 
-  public Optional<String> consume(UUID player) {
-    return Optional.ofNullable(targets.remove(player));
+  public String consume(@NonNull UUID player) {
+    return targets.remove(player);
   }
 
-  public void clear(UUID player) {
+  public void clear(@NonNull UUID player) {
     targets.remove(player);
   }
 }

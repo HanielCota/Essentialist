@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.warps.service;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
@@ -11,7 +12,7 @@ import org.bukkit.permissions.Permissible;
  * Application service for the warps use cases.
  *
  * <p>Sole responsibility: delegate persistence to {@link WarpStore} and apply the per-warp
- * permission check {@code essentials.warp.use.<name>} (lowercased) â€” or the bypass node {@code
+ * permission check {@code essentials.warp.use.<name>} (lowercased) — or the bypass node {@code
  * essentials.warp.use.*}.
  */
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public final class WarpService {
 
   private final WarpStore store;
 
-  public Optional<Warp> find(String name) {
+  public Optional<Warp> find(@NonNull String name) {
     return store.find(name);
   }
 
@@ -30,21 +31,29 @@ public final class WarpService {
     return store.list();
   }
 
-  public List<Warp> listVisibleTo(Permissible permissible) {
+  public List<Warp> listVisibleTo(@NonNull Permissible permissible) {
     return store.list().stream().filter(warp -> canUse(permissible, warp.name())).toList();
   }
 
-  public void save(String name, Player creator) {
-    store.save(Warp.of(name, creator.getLocation(), creator.getUniqueId()));
+  public void save(@NonNull String name, @NonNull Player creator) {
+    var location = creator.getLocation();
+    var uniqueId = creator.getUniqueId();
+    var warp = Warp.of(name, location, uniqueId);
+
+    store.save(warp);
   }
 
-  public boolean delete(String name) {
+  public boolean delete(@NonNull String name) {
     return store.delete(name);
   }
 
   /** Whether {@code permissible} may use the warp named {@code name}. */
-  public boolean canUse(Permissible permissible, String name) {
-    return permissible.hasPermission(USE_WILDCARD)
-        || permissible.hasPermission(USE_PREFIX + name.toLowerCase(Locale.ROOT));
+  public boolean canUse(@NonNull Permissible permissible, @NonNull String name) {
+    if (permissible.hasPermission(USE_WILDCARD)) {
+      return true;
+    }
+
+    var permissionNode = USE_PREFIX + name.toLowerCase(Locale.ROOT);
+    return permissible.hasPermission(permissionNode);
   }
 }

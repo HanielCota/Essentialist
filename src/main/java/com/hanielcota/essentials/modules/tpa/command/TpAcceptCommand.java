@@ -48,7 +48,6 @@ public record TpAcceptCommand(
               messages.requesterOffline().replace("{player}", request.requester().name()));
       case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
       case NOT_FOUND -> actor.sendError(messages.noIncoming());
-      default -> throw new IllegalStateException("Unexpected result: " + result);
     }
   }
 }

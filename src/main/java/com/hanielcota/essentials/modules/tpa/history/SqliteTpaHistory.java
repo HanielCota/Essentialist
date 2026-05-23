@@ -12,14 +12,15 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Synchronous SQLite-backed {@link TpaHistory}: owns the table, the statements and the row
- * translation in one place. Off-thread execution is layered on separately by {@link
- * AsyncTpaHistory}.
- */
+/** SQLite-backed implementation of {@link TpaHistory}. */
+@RequiredArgsConstructor
 public final class SqliteTpaHistory implements TpaHistory {
+
+  private static final int CAPACITY = 10;
 
   private static final String CREATE_TABLE =
       """
@@ -42,7 +43,7 @@ public final class SqliteTpaHistory implements TpaHistory {
   private static final String CREATE_INDEX =
       """
       CREATE INDEX IF NOT EXISTS idx_tpa_history_requester \
-      ON tpa_history(requester_id, created_at)
+      ON tpa_history (requester_id, created_at DESC)\
       """;
 
   private static final String INSERT =
@@ -54,14 +55,11 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   private static final String TRIM =
       """
-      DELETE FROM tpa_history
-      WHERE requester_id = ?
-        AND id NOT IN (
-          SELECT id FROM tpa_history
-          WHERE requester_id = ?
-          ORDER BY created_at DESC
-          LIMIT ?
-        )
+      DELETE FROM tpa_history \
+      WHERE requester_id = ? AND id NOT IN (
+        SELECT id FROM tpa_history \
+        WHERE requester_id = ? ORDER BY created_at DESC LIMIT ?
+      )
       """;
 
   private static final String LIST =
@@ -71,10 +69,9 @@ public final class SqliteTpaHistory implements TpaHistory {
       WHERE requester_id = ? ORDER BY created_at DESC LIMIT ?\
       """;
 
-  private final SqlExecutor sqlExecutor;
+  private final @NonNull SqlExecutor sqlExecutor;
 
-  public SqliteTpaHistory(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = sqlExecutor;
+  public static void install(SqlExecutor sqlExecutor) {
     sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
   }
 
@@ -82,9 +79,9 @@ public final class SqliteTpaHistory implements TpaHistory {
       PreparedStatement stmt, int index, @Nullable Object value, int sqlType) throws SQLException {
     if (value == null) {
       stmt.setNull(index, sqlType);
-    } else {
-      stmt.setObject(index, value, sqlType);
+      return;
     }
+    stmt.setObject(index, value, sqlType);
   }
 
   /**

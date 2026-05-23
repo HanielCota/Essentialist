@@ -1,5 +1,6 @@
-package com.hanielcota.essentials.modules.homes.service;
+package com.hanielcota.essentials.modules.homes.repository;
 
+import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,6 +17,8 @@ public interface HomeRepository {
   Optional<Home> find(UUID owner, String name);
 
   List<Home> list(UUID owner);
+
+  List<Home> listAll();
 
   int count(UUID owner);
 

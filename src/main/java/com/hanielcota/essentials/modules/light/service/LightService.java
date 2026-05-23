@@ -15,6 +15,11 @@ public final class LightService {
     this.key = new NamespacedKey(plugin, "light_night_vision");
   }
 
+  private static void applyEffect(Player player) {
+    player.addPotionEffect(
+        new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0));
+  }
+
   /**
    * Toggles command-managed night vision.
    *
@@ -39,12 +44,12 @@ public final class LightService {
   public void set(Player player, boolean enabled) {
     var pdc = player.getPersistentDataContainer();
     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
-    if (enabled) {
-      pdc.set(key, PersistentDataType.BYTE, (byte) 1);
-      applyEffect(player);
-    } else {
+    if (!enabled) {
       pdc.remove(key);
+      return;
     }
+    pdc.set(key, PersistentDataType.BYTE, (byte) 1);
+    applyEffect(player);
   }
 
   /**
@@ -55,10 +60,5 @@ public final class LightService {
   public void reapply(Player player) {
     player.removePotionEffect(PotionEffectType.NIGHT_VISION);
     applyEffect(player);
-  }
-
-  private static void applyEffect(Player player) {
-    player.addPotionEffect(
-        new PotionEffect(PotionEffectType.NIGHT_VISION, PotionEffect.INFINITE_DURATION, 0));
   }
 }

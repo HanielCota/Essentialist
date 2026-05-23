@@ -2,13 +2,19 @@ package com.hanielcota.essentials.paper;
 
 import com.hanielcota.essentials.EssentialsPlugin;
 import java.util.UUID;
+import lombok.NonNull;
 import net.kyori.adventure.audience.Audience;
 
 public record PaperAudienceProvider(EssentialsPlugin plugin) implements AudienceProvider {
 
+  public PaperAudienceProvider(@NonNull EssentialsPlugin plugin) {
+    this.plugin = plugin;
+  }
+
   @Override
   public Audience console() {
-    return plugin.getServer().getConsoleSender();
+    var server = plugin.getServer();
+    return server.getConsoleSender();
   }
 
   @Override
@@ -17,8 +23,14 @@ public record PaperAudienceProvider(EssentialsPlugin plugin) implements Audience
   }
 
   @Override
-  public Audience player(UUID id) {
-    var player = plugin.getServer().getPlayer(id);
-    return player == null ? Audience.empty() : player;
+  public Audience player(@NonNull UUID id) {
+    var server = plugin.getServer();
+    var player = server.getPlayer(id);
+
+    if (player == null) {
+      return Audience.empty();
+    }
+
+    return player;
   }
 }

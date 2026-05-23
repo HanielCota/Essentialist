@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.warps.service;
 
 import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -22,27 +23,52 @@ public record Warp(
     long createdAt,
     UUID createdBy) {
 
-  /** Captures a Bukkit {@link Location} as a fresh warp. */
-  public static Warp of(String name, Location location, UUID createdBy) {
-    var world = location.getWorld();
-    return new Warp(
-        name,
-        world.getName(),
-        location.getX(),
-        location.getY(),
-        location.getZ(),
-        location.getYaw(),
-        location.getPitch(),
-        System.currentTimeMillis(),
-        createdBy);
+  public Warp(
+      @NonNull String name,
+      @NonNull String world,
+      double x,
+      double y,
+      double z,
+      float yaw,
+      float pitch,
+      long createdAt,
+      @NonNull UUID createdBy) {
+    this.name = name;
+    this.world = world;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.yaw = yaw;
+    this.pitch = pitch;
+    this.createdAt = createdAt;
+    this.createdBy = createdBy;
   }
 
-  /** Materialises the warp back into a Bukkit location, or empty when the world is unloaded. */
+  /** Captures a Bukkit {@link Location} as a fresh warp. */
+  public static Warp of(@NonNull String name, @NonNull Location location, @NonNull UUID createdBy) {
+    var worldInstance = location.getWorld();
+    var worldName = worldInstance.getName();
+
+    var x = location.getX();
+    var y = location.getY();
+    var z = location.getZ();
+
+    var yaw = location.getYaw();
+    var pitch = location.getPitch();
+    var currentTime = System.currentTimeMillis();
+
+    return new Warp(name, worldName, x, y, z, yaw, pitch, currentTime, createdBy);
+  }
+
+  /** Materializes the warp back into a Bukkit location, or empty when the world is unloaded. */
   public Optional<Location> resolve() {
-    var w = Bukkit.getWorld(world);
-    if (w == null) {
+    var worldInstance = Bukkit.getWorld(world);
+
+    if (worldInstance == null) {
       return Optional.empty();
     }
-    return Optional.of(new Location(w, x, y, z, yaw, pitch));
+
+    var location = new Location(worldInstance, x, y, z, yaw, pitch);
+    return Optional.of(location);
   }
 }

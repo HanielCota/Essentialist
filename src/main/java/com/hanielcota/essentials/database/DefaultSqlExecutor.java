@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -16,14 +17,9 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   private final SqlConnectionFactory connectionFactory;
 
-  /**
-   * Constructs a new DefaultSqlExecutor.
-   *
-   * @param connectionFactory the connection factory to use
-   */
   @Override
-  public <T> List<T> query(String sql, StatementBinder binder, ResultMapper<T> mapper) {
-
+  public <T> List<T> query(
+      @NonNull String sql, @NonNull StatementBinder binder, @NonNull ResultMapper<T> mapper) {
     try (var conn = connectionFactory.getConnection();
         var stmt = conn.prepareStatement(sql)) {
 
@@ -38,6 +34,7 @@ public final class DefaultSqlExecutor implements SqlExecutor {
             result.add(row);
           }
         }
+
         return List.copyOf(result);
       }
     } catch (SQLException e) {
@@ -46,13 +43,17 @@ public final class DefaultSqlExecutor implements SqlExecutor {
   }
 
   @Override
-  public void update(String sql, StatementBinder binder) {
+  public void update(@NonNull String sql, @NonNull StatementBinder binder) {
+    updateCount(sql, binder);
+  }
 
+  @Override
+  public int updateCount(@NonNull String sql, @NonNull StatementBinder binder) {
     try (var conn = connectionFactory.getConnection();
         var stmt = conn.prepareStatement(sql)) {
 
       binder.bind(stmt);
-      stmt.executeUpdate();
+      return stmt.executeUpdate();
 
     } catch (SQLException e) {
       throw new PluginException("SQL update failed: " + sql, e);
@@ -60,19 +61,24 @@ public final class DefaultSqlExecutor implements SqlExecutor {
   }
 
   @Override
-  public int execute(Connection conn, String sql, Object... params) throws SQLException {
-
+  public int execute(@NonNull Connection conn, @NonNull String sql, Object... params)
+      throws SQLException {
     try (var stmt = conn.prepareStatement(sql)) {
-      for (var i = 0; i < params.length; i++) {
-        stmt.setObject(i + 1, params[i]);
+      var length = params.length;
+
+      for (var i = 0; i < length; i++) {
+        var paramIndex = i + 1;
+        var paramValue = params[i];
+
+        stmt.setObject(paramIndex, paramValue);
       }
+
       return stmt.executeUpdate();
     }
   }
 
   @Override
-  public void tx(TxBlock work) {
-
+  public void tx(@NonNull TxBlock work) {
     try (var conn = connectionFactory.getConnection()) {
       conn.setAutoCommit(false);
       SQLException primary = null;
@@ -93,7 +99,7 @@ public final class DefaultSqlExecutor implements SqlExecutor {
         } catch (SQLException restoreError) {
           if (primary == null) {
             primary = restoreError;
-          } else {
+          } else if (primary != restoreError) {
             primary.addSuppressed(restoreError);
           }
         }
@@ -109,15 +115,16 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   @Override
   public void ddl(String... statements) {
-
     try (var conn = connectionFactory.getConnection();
         var stmt = conn.createStatement()) {
 
       for (var statement : statements) {
-        if (statement != null && !statement.isBlank()) {
-          stmt.addBatch(statement);
+        if (statement == null || statement.isBlank()) {
+          continue;
         }
+        stmt.addBatch(statement);
       }
+
       stmt.executeBatch();
 
     } catch (SQLException e) {

@@ -3,10 +3,10 @@ package com.hanielcota.essentials.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import lombok.NonNull;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Fluent builder for interactive (clickable / hoverable) chat messages.
@@ -44,28 +44,33 @@ public final class ClickableMessage implements ComponentLike {
   }
 
   /** Appends a plain MiniMessage segment with no interactive actions. */
-  public ClickableMessage append(String mini) {
-    parts.add(ComponentUtils.mini(mini));
+  public ClickableMessage append(@NonNull String mini) {
+    var component = ComponentUtils.mini(mini);
+    parts.add(component);
     return this;
   }
 
   /** Appends a MiniMessage segment configured with click and/or hover actions. */
-  public ClickableMessage append(String mini, Consumer<ClickableMessageSegment> action) {
-    return append(ComponentUtils.mini(mini), action);
+  public ClickableMessage append(
+      @NonNull String mini, @NonNull Consumer<ClickableMessageSegment> action) {
+    var component = ComponentUtils.mini(mini);
+    return append(component, action);
   }
 
   /** Appends an already-built component. */
-  public ClickableMessage append(Component component) {
+  public ClickableMessage append(@NonNull Component component) {
     parts.add(component);
     return this;
   }
 
   /** Appends an already-built component configured with click and/or hover actions. */
-  public ClickableMessage append(Component component, Consumer<ClickableMessageSegment> action) {
-
+  public ClickableMessage append(
+      @NonNull Component component, @NonNull Consumer<ClickableMessageSegment> action) {
     var segment = new ClickableMessageSegment();
     action.accept(segment);
-    parts.add(segment.applyTo(component));
+
+    var modifiedComponent = segment.applyTo(component);
+    parts.add(modifiedComponent);
     return this;
   }
 
@@ -86,7 +91,9 @@ public final class ClickableMessage implements ComponentLike {
     if (parts.isEmpty()) {
       return Component.empty();
     }
-    return Component.textOfChildren(parts.toArray(Component[]::new));
+
+    var componentArray = parts.toArray(Component[]::new);
+    return Component.textOfChildren(componentArray);
   }
 
   @Override
@@ -95,9 +102,9 @@ public final class ClickableMessage implements ComponentLike {
   }
 
   /** Sends the built message to one or more audiences (players, console, broadcast, ...). */
-  public void send(Audience... audiences) {
-
+  public void send(@NonNull Audience... audiences) {
     var message = build();
+
     for (var audience : audiences) {
       audience.sendMessage(message);
     }

@@ -16,6 +16,8 @@ public interface Scheduler {
    */
   void runOnEntity(Entity entity, Runnable task);
 
+  Task runOnEntityLater(Entity entity, Runnable task, Duration delay);
+
   Task runLater(Runnable task, Duration delay);
 
   Task runTimer(Runnable task, Duration initialDelay, Duration period);

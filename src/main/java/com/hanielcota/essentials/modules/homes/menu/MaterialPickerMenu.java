@@ -4,20 +4,20 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.config.HomesMessages;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialPickerPresentation;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MenuContentSlots;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Material picker submenu. Opened when the player drops (Q) a home in /homes; clicking a material
@@ -31,12 +31,12 @@ public final class MaterialPickerMenu implements Menu {
 
   private static final int MIN_ROWS = 1;
   private static final int MAX_ROWS = 6;
-  private static final int SLOTS_PER_ROW = 9;
 
   private final ConfigHandle<HomesConfig> config;
   private final HomeService service;
   private final MenuService menus;
   private final HomesActionTarget target;
+  private final MaterialPickerPresentation presentation;
 
   @Override
   public @NonNull String id() {
@@ -45,70 +45,52 @@ public final class MaterialPickerMenu implements Menu {
 
   @Override
   public void register(@NonNull MenuService menusRef) {
-    var menu = config.value().menu();
-    var rows = Math.clamp(menu.pickerRows(), MIN_ROWS, MAX_ROWS);
+    var menuSpec = config.value().menu();
+    var rows = Math.clamp(menuSpec.pickerRows(), MIN_ROWS, MAX_ROWS);
+    var title = ComponentUtils.mini(menuSpec.staticPickerTitle());
+    var contentSlots = MenuContentSlots.allRows(rows);
+
+    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
 
     MenuFramework.builder(ID, menusRef)
         .rows(rows)
-        .title(ComponentUtils.mini(menu.pickerTitle().replace("{name}", "?")))
-        .pagination(PaginationConfig.builder().contentSlots(contentSlots(rows)).build())
+        .title(title)
+        .pagination(pagination)
         .dynamicContent(this::buildSlots)
         .build()
         .register();
   }
 
-  private static List<Integer> contentSlots(int rows) {
-    var capacity = rows * SLOTS_PER_ROW;
-    var slots = new ArrayList<Integer>(capacity);
-
-    for (var i = 0; i < capacity; i++) slots.add(i);
-    return slots;
-  }
-
-  private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
-    var palette = config.value().menu().palette();
+  private List<SlotDefinition> buildSlots(@NonNull Player player, MenuSession session) {
+    var menuSpec = config.value().menu();
+    var palette = menuSpec.palette();
     var loreTemplate = config.value().messages().pickerItemLore();
+
     var slots = new ArrayList<SlotDefinition>(palette.size());
 
-    for (var i = 0; i < palette.size(); i++) {
-      var material = palette.get(i);
-      var template = renderMaterial(material, loreTemplate);
+    for (var material : palette) {
+      var template = presentation.render(material, loreTemplate);
       slots.add(SlotDefinition.of(-1, template, click -> handlePick(click.player(), material)));
     }
+
     return slots;
   }
 
-  private static ItemTemplate renderMaterial(Material material, String loreTemplate) {
-    var pretty = MaterialNames.pretty(material);
-    return ItemTemplate.builder(material)
-        .name("<gold>" + pretty)
-        .lore(new String[] {loreTemplate.replace("{material}", pretty)})
-        .italic(false)
-        .build();
-  }
-
-  private void handlePick(Player player, Material material) {
-    var homeName = target.consume(player.getUniqueId()).orElse(null);
-    var messages = config.value().messages();
+  private void handlePick(@NonNull Player player, @NonNull Material material) {
+    var uuid = player.getUniqueId();
+    var homeName = target.consume(uuid);
 
     if (homeName == null) {
       menus.open(player, HomesMenu.ID);
       return;
     }
 
-    var applied = service.setMaterial(player.getUniqueId(), homeName, material);
-    player.sendMessage(ComponentUtils.mini(replyFor(messages, homeName, material, applied)));
-    menus.open(player, HomesMenu.ID);
-  }
+    var messages = config.value().messages();
+    var applied = service.setMaterial(uuid, homeName, material);
 
-  private static String replyFor(
-      HomesMessages messages, String homeName, Material material, boolean applied) {
-    if (!applied) {
-      return messages.unknownHome().replace("{name}", homeName);
-    }
-    return messages
-        .materialUpdated()
-        .replace("{name}", homeName)
-        .replace("{material}", MaterialNames.pretty(material));
+    var replyText = presentation.reply(messages, homeName, material, applied);
+    player.sendMessage(ComponentUtils.mini(replyText));
+
+    menus.open(player, HomesMenu.ID);
   }
 }

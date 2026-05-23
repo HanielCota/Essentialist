@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.homes.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.name.HomeNameResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -21,14 +22,19 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "2s")
 @Description("Remove uma home pelo nome (ou \"home\" se ausente).")
 @Syntax("/delhome [nome]")
-public record DelHomeCommand(ConfigHandle<HomesConfig> config, HomeService service) {
+public record DelHomeCommand(
+    ConfigHandle<HomesConfig> config, HomeService service, HomeNameResolver nameResolver) {
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
     var sender = actor.unwrap(Player.class);
-    var snap = config.value();
-    var messages = snap.messages();
-    var name = rawName.isBlank() ? snap.defaultHomeName() : rawName;
+    var messages = config.value().messages();
+    var name = nameResolver.resolve(rawName);
+
+    if (name == null) {
+      actor.sendError(messages.invalidName());
+      return;
+    }
 
     if (!service.delete(sender.getUniqueId(), name)) {
       actor.sendError(messages.unknownHome().replace("{name}", name));

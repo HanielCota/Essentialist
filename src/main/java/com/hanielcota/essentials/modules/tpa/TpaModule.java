@@ -46,8 +46,10 @@ public final class TpaModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("tpa", TpaConfig.class, TpaConfig::defaults);
+    var executor = service(SqlExecutor.class);
+    SqliteTpaHistory.install(executor);
 
-    var history = new AsyncTpaHistory(new SqliteTpaHistory(service(SqlExecutor.class)));
+    var history = new AsyncTpaHistory(new SqliteTpaHistory(executor));
 
     var store = new RequestStore();
     var notifier = new TpaNotifier(config);

@@ -87,10 +87,10 @@ final class TpaRequests {
     }
     var actor = framework.actorOf(requesterPlayer);
     var line = template.replace("{player}", request.target().name());
-    if (asSuccess) {
-      actor.sendSuccess(line);
-    } else {
+    if (!asSuccess) {
       actor.sendError(line);
+      return;
     }
+    actor.sendSuccess(line);
   }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -26,25 +27,30 @@ public final class YamlConfigService implements ConfigService {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <T> ConfigHandle<T> load(String name, Class<T> type, Supplier<T> defaults) {
-
+  public <T> ConfigHandle<T> load(
+      @NonNull String name, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {
     var handle =
-        handles.computeIfAbsent(
+        this.handles.computeIfAbsent(
             name,
             key -> {
-              var newHandle = new YamlConfigHandle<>(baseDir, key, type, defaults);
+              var newHandle = new YamlConfigHandle<>(this.baseDir, key, type, defaults);
               newHandle.refresh();
               return newHandle;
             });
 
-    if (!handle.type().equals(type)) {
+    var existingType = handle.type();
+    if (!existingType.equals(type)) {
+      var configName = handle.name();
+      var existingTypeName = existingType.getName();
+      var requestedTypeName = type.getName();
+
       throw new IllegalStateException(
           "Config "
-              + name
+              + configName
               + " already loaded with type "
-              + handle.type().getName()
+              + existingTypeName
               + ", refused to re-load as "
-              + type.getName());
+              + requestedTypeName);
     }
 
     return (ConfigHandle<T>) handle;
@@ -54,16 +60,19 @@ public final class YamlConfigService implements ConfigService {
   public ReloadReport reloadAll() {
     var failures = new LinkedHashMap<String, String>();
 
-    for (var handle : handles.values()) {
+    var configHandles = this.handles.values();
+    for (var handle : configHandles) {
       try {
         handle.refresh();
       } catch (RuntimeException e) {
-        var errorMessage = e.getMessage() != null ? e.getMessage() : e.toString();
+        var exceptionMessage = e.getMessage();
+        var errorMessage = (exceptionMessage != null) ? exceptionMessage : e.toString();
+
         failures.put(handle.name(), errorMessage);
       }
     }
 
-    for (var callback : reloadCallbacks) {
+    for (var callback : this.reloadCallbacks) {
       try {
         callback.run();
       } catch (RuntimeException e) {
@@ -71,13 +80,13 @@ public final class YamlConfigService implements ConfigService {
       }
     }
 
-    return new ReloadReport(handles.size(), failures);
+    var totalHandlesCount = this.handles.size();
+    return new ReloadReport(totalHandlesCount, failures);
   }
 
   @Override
-  public AutoCloseable onReload(Runnable callback) {
-
-    reloadCallbacks.add(callback);
-    return () -> reloadCallbacks.remove(callback);
+  public AutoCloseable onReload(@NonNull Runnable callback) {
+    this.reloadCallbacks.add(callback);
+    return () -> this.reloadCallbacks.remove(callback);
   }
 }

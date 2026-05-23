@@ -38,7 +38,7 @@ public interface SqlExecutor {
     return query(
         sql,
         stmt -> {
-          for (int i = 0; i < params.length; i++) {
+          for (var i = 0; i < params.length; i++) {
             stmt.setObject(i + 1, params[i]);
           }
         },
@@ -54,16 +54,36 @@ public interface SqlExecutor {
   void update(String sql, StatementBinder binder);
 
   /**
+   * Executes an update and returns the number of affected rows.
+   *
+   * @param sql the update SQL
+   * @param binder statement parameter binder
+   * @return affected row count
+   */
+  int updateCount(String sql, StatementBinder binder);
+
+  /**
    * Positional-parameter variant of update.
    *
    * @param sql the update SQL
    * @param params update parameters
    */
   default void update(String sql, Object... params) {
-    update(
+    updateCount(sql, params);
+  }
+
+  /**
+   * Positional-parameter variant of updateCount.
+   *
+   * @param sql the update SQL
+   * @param params update parameters
+   * @return affected row count
+   */
+  default int updateCount(String sql, Object... params) {
+    return updateCount(
         sql,
         stmt -> {
-          for (int i = 0; i < params.length; i++) {
+          for (var i = 0; i < params.length; i++) {
             stmt.setObject(i + 1, params[i]);
           }
         });

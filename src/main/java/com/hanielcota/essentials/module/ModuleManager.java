@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.NonNull;
 
 public final class ModuleManager {
 
@@ -18,58 +19,73 @@ public final class ModuleManager {
   private final Map<String, ModuleState> states = new LinkedHashMap<>();
   private List<Module> enableOrder = List.of();
 
-  public void register(Module module) {
-    if (registered.putIfAbsent(module.id(), module) == null) {
-      states.put(module.id(), ModuleState.REGISTERED);
+  public void register(@NonNull Module module) {
+    var moduleId = module.id();
+
+    if (registered.putIfAbsent(moduleId, module) == null) {
+      states.put(moduleId, ModuleState.REGISTERED);
     }
   }
 
-  public void enableAll(ModuleContext context) {
+  public void enableAll(@NonNull ModuleContext context) {
     enableOrder = resolveLoadOrder();
 
-    var succeeded = new ArrayList<Module>(enableOrder.size());
+    var size = enableOrder.size();
+    var succeeded = new ArrayList<Module>(size);
+
     for (var module : enableOrder) {
+      var moduleId = module.id();
       try {
         module.enable(context);
-        states.put(module.id(), ModuleState.ENABLED);
+        states.put(moduleId, ModuleState.ENABLED);
         succeeded.add(module);
       } catch (RuntimeException e) {
-        states.put(module.id(), ModuleState.FAILED);
+        states.put(moduleId, ModuleState.FAILED);
         rollback(succeeded);
-        throw new ModuleLoadException(module.id(), "enable() failed", e);
+        throw new ModuleLoadException(moduleId, "enable() failed", e);
       }
     }
   }
 
   public void disableAll() {
     var reversed = new ArrayList<Module>(enableOrder);
+
     for (var module : reversed.reversed()) {
-      if (states.get(module.id()) != ModuleState.ENABLED) {
+      var moduleId = module.id();
+      var currentState = states.get(moduleId);
+
+      if (currentState != ModuleState.ENABLED) {
         continue;
       }
+
       try {
         module.disable();
-        states.put(module.id(), ModuleState.DISABLED);
+        states.put(moduleId, ModuleState.DISABLED);
       } catch (RuntimeException e) {
-        states.put(module.id(), ModuleState.FAILED);
-        LOG.error(e, "Module disable failed: {}", module.id());
+        states.put(moduleId, ModuleState.FAILED);
+        LOG.error(e, "Module disable failed: {}", moduleId);
       }
     }
   }
 
   public Collection<Module> all() {
-    return List.copyOf(registered.values());
+    var values = registered.values();
+    return List.copyOf(values);
   }
 
-  private void rollback(List<Module> succeeded) {
-    for (var i = succeeded.size() - 1; i >= 0; i--) {
+  private void rollback(@NonNull List<Module> succeeded) {
+    var lastIndex = succeeded.size() - 1;
+
+    for (var i = lastIndex; i >= 0; i--) {
       var module = succeeded.get(i);
+      var moduleId = module.id();
+
       try {
         module.disable();
-        states.put(module.id(), ModuleState.DISABLED);
+        states.put(moduleId, ModuleState.DISABLED);
       } catch (RuntimeException e) {
-        states.put(module.id(), ModuleState.FAILED);
-        LOG.error(e, "Rollback disable failed: {}", module.id());
+        states.put(moduleId, ModuleState.FAILED);
+        LOG.error(e, "Rollback disable failed: {}", moduleId);
       }
     }
   }
@@ -79,17 +95,24 @@ public final class ModuleManager {
     var dependents = new HashMap<String, List<String>>();
 
     for (var module : registered.values()) {
-      inDegree.put(module.id(), 0);
-      dependents.put(module.id(), new ArrayList<>());
+      var moduleId = module.id();
+      inDegree.put(moduleId, 0);
+      dependents.put(moduleId, new ArrayList<>());
     }
 
     for (var module : registered.values()) {
-      for (var dep : module.metadata().dependencies()) {
+      var moduleId = module.id();
+      var metadata = module.metadata();
+      var dependencies = metadata.dependencies();
+
+      for (var dep : dependencies) {
         if (!registered.containsKey(dep)) {
-          throw new ModuleLoadException(module.id(), "missing dependency: " + dep);
+          throw new ModuleLoadException(moduleId, "missing dependency: " + dep);
         }
-        dependents.get(dep).add(module.id());
-        inDegree.merge(module.id(), 1, Integer::sum);
+
+        var dependentList = dependents.get(dep);
+        dependentList.add(moduleId);
+        inDegree.merge(moduleId, 1, Integer::sum);
       }
     }
 
@@ -100,11 +123,16 @@ public final class ModuleManager {
       }
     }
 
-    var ordered = new ArrayList<Module>(registered.size());
+    var totalRegisteredSize = registered.size();
+    var ordered = new ArrayList<Module>(totalRegisteredSize);
+
     while (!ready.isEmpty()) {
       var id = ready.poll();
-      ordered.add(registered.get(id));
-      for (var next : dependents.get(id)) {
+      var currentModule = registered.get(id);
+      ordered.add(currentModule);
+
+      var nextDependents = dependents.get(id);
+      for (var next : nextDependents) {
         var remaining = inDegree.merge(next, -1, Integer::sum);
         if (remaining == 0) {
           ready.add(next);
@@ -112,12 +140,16 @@ public final class ModuleManager {
       }
     }
 
-    if (ordered.size() != registered.size()) {
+    if (ordered.size() != totalRegisteredSize) {
       var stuck = new ArrayList<String>();
       for (var entry : inDegree.entrySet()) {
-        if (entry.getValue() > 0) stuck.add(entry.getKey());
+        if (entry.getValue() > 0) {
+          stuck.add(entry.getKey());
+        }
       }
-      throw new ModuleLoadException(String.join(",", stuck), "dependency cycle detected");
+
+      var cycleIds = String.join(",", stuck);
+      throw new ModuleLoadException(cycleIds, "dependency cycle detected");
     }
 
     return List.copyOf(ordered);

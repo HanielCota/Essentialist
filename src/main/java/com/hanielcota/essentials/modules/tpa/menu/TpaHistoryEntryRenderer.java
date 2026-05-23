@@ -19,6 +19,26 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
 
   private static final String UNKNOWN = "—";
 
+  private static String formatLine(
+      String line,
+      String targetName,
+      String type,
+      String status,
+      String world,
+      String x,
+      String y,
+      String z,
+      String time) {
+    return line.replace("{target}", targetName)
+        .replace("{type}", type)
+        .replace("{status}", status)
+        .replace("{world}", world)
+        .replace("{x}", x)
+        .replace("{y}", y)
+        .replace("{z}", z)
+        .replace("{time}", time);
+  }
+
   @Override
   public @NonNull ItemTemplate render(@NonNull TpaHistoryEntry entry, int humanIndex) {
     var settings = config.value().menu();
@@ -70,25 +90,5 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
       lore[i] = formatLine(template.get(i), targetName, type, status, world, x, y, z, time);
     }
     return lore;
-  }
-
-  private static String formatLine(
-      String line,
-      String targetName,
-      String type,
-      String status,
-      String world,
-      String x,
-      String y,
-      String z,
-      String time) {
-    return line.replace("{target}", targetName)
-        .replace("{type}", type)
-        .replace("{status}", status)
-        .replace("{world}", world)
-        .replace("{x}", x)
-        .replace("{y}", y)
-        .replace("{z}", z)
-        .replace("{time}", time);
   }
 }

@@ -4,25 +4,12 @@ import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
-import com.hanielcota.essentials.modules.homes.command.DelHomeCommand;
-import com.hanielcota.essentials.modules.homes.command.HomeCommand;
-import com.hanielcota.essentials.modules.homes.command.HomesCommand;
-import com.hanielcota.essentials.modules.homes.command.SetHomeCommand;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.listener.HomeTeleportListener;
-import com.hanielcota.essentials.modules.homes.menu.DeleteHomeDialog;
-import com.hanielcota.essentials.modules.homes.menu.HomeClickHandler;
-import com.hanielcota.essentials.modules.homes.menu.HomeEntryRenderer;
-import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
-import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
-import com.hanielcota.essentials.modules.homes.menu.MaterialPickerMenu;
-import com.hanielcota.essentials.modules.homes.rename.DefaultHomeNameValidator;
-import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
-import com.hanielcota.essentials.modules.homes.rename.HomeRenameSessions;
-import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
+import com.hanielcota.essentials.modules.homes.factory.HomesCommandFactory;
+import com.hanielcota.essentials.modules.homes.factory.HomesInteractionFactory;
+import com.hanielcota.essentials.modules.homes.factory.HomesMenuFactory;
+import com.hanielcota.essentials.modules.homes.factory.HomesServiceFactory;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
-import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
-import com.hanielcota.essentials.modules.homes.service.SqlHomeRepository;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
@@ -44,40 +31,67 @@ public final class HomesModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("homes", HomesConfig.class, HomesConfig::defaults);
+    var runtime = runtimeServices();
 
-    var repository = new SqlHomeRepository(service(SqlExecutor.class));
-    var limits = new HomeLimitResolver(config.value().defaultLimit());
-    var homeService = new HomeService(repository, limits);
+    // 1. Core Services Layer
+    var sqlExecutor = service(SqlExecutor.class);
+    var serviceComponents = new HomesServiceFactory().create(config, sqlExecutor);
+    var homeService = serviceComponents.service();
+
+    registerCloseable(serviceComponents.closeable());
     registerService(HomeService.class, homeService);
 
-    var delayed = service(DelayedTeleport.class);
-    var menus = service(MenuService.class);
-    var framework = service(PaperCommandFramework.class);
-    var scheduler = service(Scheduler.class);
+    // 2. Interaction & Flow Layer
+    var interactionFactory = new HomesInteractionFactory();
+    var interactions =
+        interactionFactory.create(
+            config, homeService, runtime.scheduler(), runtime.delayed(), runtime.framework());
 
-    var teleporter = new HomeTeleporter(config, delayed, framework);
+    registerListener(interactions.teleportListener());
+    registerListener(interactions.renameListener());
 
-    var actionTarget = new HomesActionTarget();
-    var renameSessions = new HomeRenameSessions();
-    registerListener(new HomeTeleportListener(delayed, actionTarget, renameSessions));
+    // 3. User Interface Layer (Menus & Dialogs)
+    var menuFactory = new HomesMenuFactory();
+    var menus =
+        menuFactory.create(
+            config,
+            homeService,
+            runtime.menus(),
+            runtime.framework(),
+            interactions.teleporter(),
+            interactions.actionTarget(),
+            interactions.rename(),
+            runtime.scheduler());
 
-    var rename =
-        new HomeRenameOrchestrator(
-            config, homeService, scheduler, renameSessions, new DefaultHomeNameValidator());
-    registerListener(rename);
+    registerMenu(menus.homesMenu());
+    registerListener(menus.cleanupListener());
+    menus.dialogs().forEach(this::registerMenu);
 
-    var renderer = new HomeEntryRenderer(config);
-    var clickHandler = new HomeClickHandler(teleporter, framework, actionTarget, rename);
-    var menu = new HomesMenu(config, homeService, renderer, clickHandler);
-    registerMenu(menu);
-    registerListener(menu);
+    // 4. Command Dispatch Layer
+    var commandFactory = new HomesCommandFactory();
+    var commands =
+        commandFactory.create(
+            config,
+            homeService,
+            runtime.menus(),
+            interactions.teleporter(),
+            menus.homesMenu(),
+            interactions.nameResolver());
 
-    registerMenu(new DeleteHomeDialog(config, homeService, menus, actionTarget));
-    registerMenu(new MaterialPickerMenu(config, homeService, menus, actionTarget));
-
-    registerCommand(new SetHomeCommand(config, homeService));
-    registerCommand(new HomeCommand(config, homeService, teleporter));
-    registerCommand(new DelHomeCommand(config, homeService));
-    registerCommand(new HomesCommand(config, homeService, menus, menu));
+    commands.forEach(this::registerCommand);
   }
+
+  private HomesRuntime runtimeServices() {
+    return new HomesRuntime(
+        service(MenuService.class),
+        service(PaperCommandFramework.class),
+        service(Scheduler.class),
+        service(DelayedTeleport.class));
+  }
+
+  private record HomesRuntime(
+      MenuService menus,
+      PaperCommandFramework framework,
+      Scheduler scheduler,
+      DelayedTeleport delayed) {}
 }

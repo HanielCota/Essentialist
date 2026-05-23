@@ -14,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("warps")
@@ -24,8 +25,26 @@ import org.bukkit.entity.Player;
 @Syntax("/warps")
 public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service) {
 
+  public WarpsCommand(@NonNull ConfigHandle<WarpsConfig> config, @NonNull WarpService service) {
+    this.config = config;
+    this.service = service;
+  }
+
+  private static String renderEntry(@NonNull Warp warp, @NonNull String template) {
+    var compactX = Numbers.compact(warp.x());
+    var compactY = Numbers.compact(warp.y());
+    var compactZ = Numbers.compact(warp.z());
+
+    return template
+        .replace("{name}", warp.name())
+        .replace("{world}", warp.world())
+        .replace("{x}", compactX)
+        .replace("{y}", compactY)
+        .replace("{z}", compactZ);
+  }
+
   @DefaultSubcommand
-  public void execute(CommandActor actor) {
+  public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
     var messages = config.value().messages();
 
@@ -35,27 +54,22 @@ public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service
       return;
     }
 
+    var warpsCountStr = Integer.toString(warps.size());
+    var header = messages.listHeader().replace("{count}", warpsCountStr);
+
     var message = ClickableMessage.create();
-    message.append(messages.listHeader().replace("{count}", Integer.toString(warps.size())));
+    message.append(header);
 
     for (var warp : warps) {
-      message
-          .newline()
-          .append(
-              renderEntry(warp, messages.listEntry()),
-              slot ->
-                  slot.runCommand("/warp " + warp.name())
-                      .hover(messages.listEntryHover().replace("{name}", warp.name())));
-    }
-    message.send(sender);
-  }
+      var warpName = warp.name();
+      var entryText = renderEntry(warp, messages.listEntry());
 
-  private static String renderEntry(Warp warp, String template) {
-    return template
-        .replace("{name}", warp.name())
-        .replace("{world}", warp.world())
-        .replace("{x}", Numbers.compact(warp.x()))
-        .replace("{y}", Numbers.compact(warp.y()))
-        .replace("{z}", Numbers.compact(warp.z()));
+      var command = "/warp " + warpName;
+      var hoverText = messages.listEntryHover().replace("{name}", warpName);
+
+      message.newline().append(entryText, slot -> slot.runCommand(command).hover(hoverText));
+    }
+
+    message.send(sender);
   }
 }

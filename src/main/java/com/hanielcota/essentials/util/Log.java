@@ -2,66 +2,82 @@ package com.hanielcota.essentials.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE, staticName = "of")
 public final class Log {
 
   private final Logger jul;
 
-  private Log(Logger jul) {
-    this.jul = jul;
+  public static Log of(@NonNull Class<?> owner) {
+    var loggerName = owner.getName();
+    var javaLogger = Logger.getLogger(loggerName);
+
+    return of(javaLogger);
   }
 
-  public static Log of(Class<?> owner) {
-    return new Log(Logger.getLogger(owner.getName()));
-  }
-
-  private static String format(String pattern, Object[] args) {
+  private static String format(@NonNull String pattern, @NonNull Object[] args) {
     if (args.length == 0) {
       return pattern;
     }
-    var sb = new StringBuilder(pattern.length() + args.length * 16);
+
+    var patternLength = pattern.length();
+    var capacity = patternLength + (args.length * 16);
+    var sb = new StringBuilder(capacity);
+
     var argIdx = 0;
     var pos = 0;
-    while (pos < pattern.length()) {
+
+    while (pos < patternLength) {
       var next = pattern.indexOf("{}", pos);
+
       if (next < 0 || argIdx >= args.length) {
-        sb.append(pattern, pos, pattern.length());
+        sb.append(pattern, pos, patternLength);
         return sb.toString();
       }
+
       sb.append(pattern, pos, next);
       sb.append(args[argIdx++]);
       pos = next + 2;
     }
+
     return sb.toString();
   }
 
-  public void info(String pattern, Object... args) {
+  public void info(@NonNull String pattern, Object... args) {
     if (jul.isLoggable(Level.INFO)) {
-      jul.info(format(pattern, args));
+      var formattedMessage = format(pattern, args);
+      jul.info(formattedMessage);
     }
   }
 
-  public void warn(String pattern, Object... args) {
+  public void warn(@NonNull String pattern, Object... args) {
     if (jul.isLoggable(Level.WARNING)) {
-      jul.warning(format(pattern, args));
+      var formattedMessage = format(pattern, args);
+      jul.warning(formattedMessage);
     }
   }
 
-  public void warn(Throwable thrown, String pattern, Object... args) {
+  public void warn(@NonNull Throwable thrown, @NonNull String pattern, Object... args) {
     if (jul.isLoggable(Level.WARNING)) {
-      jul.log(Level.WARNING, format(pattern, args), thrown);
+      var formattedMessage = format(pattern, args);
+      jul.log(Level.WARNING, formattedMessage, thrown);
     }
   }
 
-  public void error(String pattern, Object... args) {
+  public void error(@NonNull String pattern, Object... args) {
     if (jul.isLoggable(Level.SEVERE)) {
-      jul.severe(format(pattern, args));
+      var formattedMessage = format(pattern, args);
+      jul.severe(formattedMessage);
     }
   }
 
-  public void error(Throwable thrown, String pattern, Object... args) {
+  public void error(@NonNull Throwable thrown, @NonNull String pattern, Object... args) {
     if (jul.isLoggable(Level.SEVERE)) {
-      jul.log(Level.SEVERE, format(pattern, args), thrown);
+      var formattedMessage = format(pattern, args);
+      jul.log(Level.SEVERE, formattedMessage, thrown);
     }
   }
 }

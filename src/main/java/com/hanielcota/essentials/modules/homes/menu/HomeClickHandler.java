@@ -2,12 +2,15 @@ package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.ItemClickHandler;
-import com.hanielcota.essentials.modules.homes.service.Home;
-import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
+import com.hanielcota.essentials.modules.homes.domain.Home;
+import com.hanielcota.essentials.modules.homes.rename.HomeRenamePrompter;
+import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
+import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import java.time.Duration;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.inventory.ClickType;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Routes a /homes menu click to one of four sub-flows by {@link ClickType}: LEFT teleports via
@@ -18,35 +21,53 @@ import org.jspecify.annotations.NonNull;
 @RequiredArgsConstructor
 public final class HomeClickHandler implements ItemClickHandler<Home> {
 
+  private static final Duration SUBMENU_OPEN_DELAY = Duration.ofMillis(150);
+
   private final HomeTeleporter teleporter;
   private final PaperCommandFramework framework;
   private final HomesActionTarget target;
   private final HomeRenamePrompter rename;
+  private final Scheduler scheduler;
 
   @Override
   public void handle(@NonNull ClickContext click, @NonNull Home home) {
     var type = click.clickType();
+    var player = click.player();
+    var homeName = home.name();
 
     if (type.isShiftClick()) {
       click.close();
-      rename.prompt(click.player(), home.name());
+      rename.prompt(player, homeName);
       return;
     }
+
     if (type == ClickType.DROP || type == ClickType.CONTROL_DROP) {
-      openSubMenuFor(click, home, MaterialPickerMenu.ID);
+      openSubMenuFor(click, homeName, MaterialPickerMenu.ID, true);
       return;
     }
+
     if (type.isRightClick()) {
-      openSubMenuFor(click, home, DeleteHomeDialog.ID);
+      openSubMenuFor(click, homeName, DeleteHomeDialog.ID, false);
       return;
     }
 
     click.close();
-    teleporter.teleport(click.player(), home, framework.actorOf(click.player()));
+
+    var actor = framework.actorOf(player);
+    teleporter.teleport(player, home, actor);
   }
 
-  private void openSubMenuFor(ClickContext click, Home home, String menuId) {
-    target.set(click.player().getUniqueId(), home.name());
+  private void openSubMenuFor(ClickContext click, String homeName, String menuId, boolean delay) {
+    var player = click.player();
+    var uuid = player.getUniqueId();
+
+    target.set(uuid, homeName);
+
+    if (delay) {
+      scheduler.runOnEntityLater(player, () -> click.open(menuId), SUBMENU_OPEN_DELAY);
+      return;
+    }
+
     click.open(menuId);
   }
 }

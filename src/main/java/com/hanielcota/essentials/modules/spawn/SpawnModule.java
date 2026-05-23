@@ -30,8 +30,10 @@ public final class SpawnModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("spawn", SpawnConfig.class, SpawnConfig::defaults);
+    var executor = service(SqlExecutor.class);
+    SpawnStore.install(executor);
 
-    var store = new SpawnStore(service(SqlExecutor.class));
+    var store = new SpawnStore(executor);
     var spawnService = new SpawnService(store);
     registerService(SpawnService.class, spawnService);
 

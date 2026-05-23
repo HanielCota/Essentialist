@@ -7,11 +7,11 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ComponentUtils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.jspecify.annotations.NonNull;
 
 /**
  * Yes/no confirmation before deleting a home. The home to act on is read from {@link
@@ -34,51 +34,59 @@ public final class DeleteHomeDialog extends ConfirmDialog {
 
   @Override
   protected @NonNull Component title() {
-    return ComponentUtils.mini(config.value().messages().deleteConfirmTitle());
+    var titleText = config.value().messages().deleteConfirmTitle();
+    return ComponentUtils.mini(titleText);
   }
 
   @Override
   protected @NonNull ItemTemplate promptItem() {
-    return ItemTemplate.builder(Material.PAPER)
-        .name(config.value().messages().deleteConfirmPrompt())
-        .italic(false)
-        .build();
+    var promptName = config.value().messages().deleteConfirmPrompt();
+
+    return ItemTemplate.builder(Material.PAPER).name(promptName).italic(false).build();
   }
 
   @Override
   protected @NonNull ItemTemplate yesButton() {
-    return ItemTemplate.builder(Material.LIME_WOOL)
-        .name(config.value().messages().deleteConfirmYes())
-        .italic(false)
-        .build();
+    var yesName = config.value().messages().deleteConfirmYes();
+
+    return ItemTemplate.builder(Material.LIME_WOOL).name(yesName).italic(false).build();
   }
 
   @Override
   protected @NonNull ItemTemplate noButton() {
-    return ItemTemplate.builder(Material.RED_WOOL)
-        .name(config.value().messages().deleteConfirmNo())
-        .italic(false)
-        .build();
+    var noName = config.value().messages().deleteConfirmNo();
+
+    return ItemTemplate.builder(Material.RED_WOOL).name(noName).italic(false).build();
   }
 
   @Override
   protected void onConfirm(@NonNull Player player) {
-    var homeName = target.consume(player.getUniqueId()).orElse(null);
-    if (homeName == null) return;
+    var uuid = player.getUniqueId();
+    var homeName = target.consume(uuid);
 
-    var messages = config.value().messages();
-    if (service.delete(player.getUniqueId(), homeName)) {
-      player.sendMessage(ComponentUtils.mini(messages.homeDeleted().replace("{name}", homeName)));
-    } else {
-      player.sendMessage(ComponentUtils.mini(messages.unknownHome().replace("{name}", homeName)));
+    if (homeName == null) {
+      return;
     }
 
+    var messages = config.value().messages();
+
+    if (!service.delete(uuid, homeName)) {
+      var unknownMsg = messages.unknownHome().replace("{name}", homeName);
+      player.sendMessage(ComponentUtils.mini(unknownMsg));
+      menus.open(player, HomesMenu.ID);
+      return;
+    }
+
+    var deletedMsg = messages.homeDeleted().replace("{name}", homeName);
+    player.sendMessage(ComponentUtils.mini(deletedMsg));
     menus.open(player, HomesMenu.ID);
   }
 
   @Override
   protected void onCancel(@NonNull Player player) {
-    target.clear(player.getUniqueId());
+    var uuid = player.getUniqueId();
+
+    target.clear(uuid);
     menus.open(player, HomesMenu.ID);
   }
 }

@@ -47,7 +47,6 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
       case RENAMED -> sender.sendSuccess(snap.formatRenamed(trimmed));
       case CLEARED -> sender.sendSuccess(snap.cleared());
       case EMPTY_HAND -> sender.sendError(snap.emptyHand());
-      default -> throw new IllegalStateException("Unexpected rename result: " + result);
     }
   }
 }

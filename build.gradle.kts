@@ -24,6 +24,7 @@ val sqlite = providers.gradleProperty("sqliteVersion")
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:${paperApi.get()}")
+    testImplementation("io.papermc.paper:paper-api:${paperApi.get()}")
     compileOnly("org.projectlombok:lombok:1.18.46")
     annotationProcessor("org.projectlombok:lombok:1.18.46")
     implementation("com.github.HanielCota.CommandFramework:command-paper:${commandFw.get()}")
@@ -31,6 +32,8 @@ dependencies {
     implementation("org.spongepowered:configurate-yaml:${configurate.get()}")
     implementation("com.zaxxer:HikariCP:${hikari.get()}")
     implementation("org.xerial:sqlite-jdbc:${sqlite.get()}")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 spotless {
@@ -54,6 +57,10 @@ tasks {
         options.release = 25
         options.compilerArgs.add("-parameters")
         options.compilerArgs.add("-Xlint:deprecation")
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
     processResources {

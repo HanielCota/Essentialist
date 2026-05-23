@@ -30,8 +30,10 @@ public final class WarpsModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("warps", WarpsConfig.class, WarpsConfig::defaults);
+    var executor = service(SqlExecutor.class);
+    WarpStore.install(executor);
 
-    var store = new WarpStore(service(SqlExecutor.class));
+    var store = new WarpStore(executor);
     var warpService = new WarpService(store);
     registerService(WarpService.class, warpService);
 

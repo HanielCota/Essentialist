@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.menu;
+package com.hanielcota.essentials.modules.homes.rename;
 
 import org.bukkit.entity.Player;
 

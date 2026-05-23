@@ -4,6 +4,8 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * SQLite-backed singleton storage of the server spawn.
@@ -11,6 +13,7 @@ import java.util.Optional;
  * <p>The table has at most one row (enforced by {@code CHECK (singleton = 1)}); {@link #save} uses
  * {@code INSERT OR REPLACE} so the spawn is overwritten in place.
  */
+@RequiredArgsConstructor
 public final class SpawnStore {
 
   private static final String CREATE_TABLE =
@@ -37,11 +40,20 @@ public final class SpawnStore {
       SELECT world, x, y, z, yaw, pitch FROM spawn WHERE singleton = 1\
       """;
 
-  private final SqlExecutor sqlExecutor;
+  private final @NonNull SqlExecutor sqlExecutor;
 
-  public SpawnStore(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = sqlExecutor;
+  public static void install(SqlExecutor sqlExecutor) {
     sqlExecutor.ddl(CREATE_TABLE);
+  }
+
+  private static SpawnLocation readRow(ResultSet rs) throws SQLException {
+    return new SpawnLocation(
+        rs.getString("world"),
+        rs.getDouble("x"),
+        rs.getDouble("y"),
+        rs.getDouble("z"),
+        (float) rs.getDouble("yaw"),
+        (float) rs.getDouble("pitch"));
   }
 
   /** Returns the stored spawn, or empty when {@code /setspawn} has not run yet. */
@@ -60,15 +72,5 @@ public final class SpawnStore {
         location.z(),
         location.yaw(),
         location.pitch());
-  }
-
-  private static SpawnLocation readRow(ResultSet rs) throws SQLException {
-    return new SpawnLocation(
-        rs.getString("world"),
-        rs.getDouble("x"),
-        rs.getDouble("y"),
-        rs.getDouble("z"),
-        (float) rs.getDouble("yaw"),
-        (float) rs.getDouble("pitch"));
   }
 }

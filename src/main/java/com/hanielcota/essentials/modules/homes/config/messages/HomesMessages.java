@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.config;
+package com.hanielcota.essentials.modules.homes.config.messages;
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -33,13 +33,15 @@ public record HomesMessages(
     @Comment("Lore line of the picker entry. Placeholders: {material}.") String pickerItemLore,
     @Comment("Confirmation after the icon changes. Placeholders: {name}, {material}.")
         String materialUpdated,
-    @Comment("Chat instruction shown after shift+click. Placeholders: {name}, {seconds}.")
+    @Comment(
+            "Chat instruction shown after shift+click. Placeholders: {name}, {seconds}, {timeout}.")
         String renamePrompt,
     @Comment("Shown when the player types 'cancel' (or its alias) to abort the rename.")
         String renameCancelled,
     @Comment("Shown when the rename input window expires. Placeholders: {seconds}.")
         String renameTimeout,
-    @Comment("Shown when the new name is empty, too long, or invalid.") String renameInvalid,
+    @Comment("Shown when a home name is empty, too long, or contains unsafe characters.")
+        String renameInvalid,
     @Comment("Shown when the new name is already used. Placeholders: {name}.") String renameTaken,
     @Comment("Shown when the home disappeared during the rename window. Placeholders: {name}.")
         String renameLost,
@@ -71,9 +73,13 @@ public record HomesMessages(
             + "(ou <gold>cancel</gold>). Você tem <gold>{seconds}s</gold>.",
         "<yellow>Renomeação cancelada.",
         "<red>O tempo para renomear (<gold>{seconds}s</gold>) expirou.",
-        "<red>Nome inválido. Use entre 1 e 32 caracteres sem espaços.",
+        "<red>Nome inválido. Use 1-32 caracteres: letras, números, _ ou -.",
         "<red>Você já tem uma home chamada <gold>{name}</gold>.",
         "<red>A home <gold>{name}</gold> desapareceu antes da renomeação.",
         "<green>Home <gold>{old}</gold> renomeada para <gold>{new}</gold>.");
+  }
+
+  public String invalidName() {
+    return renameInvalid;
   }
 }
