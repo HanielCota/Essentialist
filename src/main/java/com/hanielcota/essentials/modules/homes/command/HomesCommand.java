@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.homes.service.Home;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.Numbers;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -27,7 +26,7 @@ public record HomesCommand(ConfigHandle<HomesConfig> config, HomeService service
 
   @DefaultSubcommand
   public void execute(CommandActor actor) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var snap = config.value();
     var messages = snap.messages();
 
@@ -40,12 +39,10 @@ public record HomesCommand(ConfigHandle<HomesConfig> config, HomeService service
     var limit = service.limit(sender);
     var message = ClickableMessage.create();
     message.append(
-        Placeholders.format(
-            messages.listHeader(),
-            "count",
-            Integer.toString(homes.size()),
-            "limit",
-            Integer.toString(limit)));
+        messages
+            .listHeader()
+            .replace("{count}", Integer.toString(homes.size()))
+            .replace("{limit}", Integer.toString(limit)));
 
     for (var home : homes) {
       message
@@ -54,19 +51,17 @@ public record HomesCommand(ConfigHandle<HomesConfig> config, HomeService service
               renderEntry(home, messages.listEntry()),
               slot ->
                   slot.runCommand("/home " + home.name())
-                      .hover(Placeholders.format(messages.listEntryHover(), "name", home.name())));
+                      .hover(messages.listEntryHover().replace("{name}", home.name())));
     }
     message.send(sender);
   }
 
   private static String renderEntry(Home home, String template) {
-    return Placeholders.format(
-        template,
-        java.util.Map.of(
-            "name", home.name(),
-            "world", home.world(),
-            "x", Numbers.compact(home.x()),
-            "y", Numbers.compact(home.y()),
-            "z", Numbers.compact(home.z())));
+    return template
+        .replace("{name}", home.name())
+        .replace("{world}", home.world())
+        .replace("{x}", Numbers.compact(home.x()))
+        .replace("{y}", Numbers.compact(home.y()))
+        .replace("{z}", Numbers.compact(home.z()));
   }
 }

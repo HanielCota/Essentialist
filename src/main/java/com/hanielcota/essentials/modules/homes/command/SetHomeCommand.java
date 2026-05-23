@@ -3,8 +3,8 @@ package com.hanielcota.essentials.modules.homes.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.HomesMessages;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -26,23 +26,24 @@ public record SetHomeCommand(ConfigHandle<HomesConfig> config, HomeService servi
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var snap = config.value();
     var messages = snap.messages();
     var name = rawName.isBlank() ? snap.defaultHomeName() : rawName;
 
     var outcome = service.save(sender, name, sender.getLocation());
     switch (outcome) {
-      case CREATED -> actor.sendSuccess(Placeholders.format(messages.homeSet(), "name", name));
-      case UPDATED -> actor.sendSuccess(Placeholders.format(messages.homeUpdated(), "name", name));
-      case LIMIT_REACHED ->
-          actor.sendError(
-              Placeholders.format(
-                  messages.limitReached(),
-                  "name",
-                  name,
-                  "limit",
-                  Integer.toString(service.limit(sender))));
+      case CREATED -> actor.sendSuccess(messages.homeSet().replace("{name}", name));
+      case UPDATED -> actor.sendSuccess(messages.homeUpdated().replace("{name}", name));
+      case LIMIT_REACHED -> actor.sendError(limitReachedMessage(messages, name, sender));
+      default -> throw new IllegalStateException("Unexpected outcome: " + outcome);
     }
+  }
+
+  private String limitReachedMessage(HomesMessages messages, String name, Player sender) {
+    return messages
+        .limitReached()
+        .replace("{name}", name)
+        .replace("{limit}", Integer.toString(service.limit(sender)));
   }
 }

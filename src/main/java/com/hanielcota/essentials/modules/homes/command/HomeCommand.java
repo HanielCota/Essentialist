@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.homes.service.Home;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleportPrompt;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -32,7 +31,7 @@ public record HomeCommand(
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var snap = config.value();
     var messages = snap.messages();
     var name = rawName.isBlank() ? snap.defaultHomeName() : rawName;
@@ -56,8 +55,8 @@ public record HomeCommand(
   private DelayedTeleportPrompt prompt(CommandActor actor, HomesMessages messages, Home home) {
     return new DelayedTeleportPrompt(
         actor,
-        Placeholders.format(messages.teleporting(), "name", home.name()),
-        Placeholders.format(messages.teleported(), "name", home.name()),
+        messages.teleporting().replace("{name}", home.name()),
+        messages.teleported().replace("{name}", home.name()),
         messages.cancelled(),
         messages.failed());
   }
@@ -66,6 +65,6 @@ public record HomeCommand(
     if (service.count(owner) == 0) {
       return messages.noHomes();
     }
-    return Placeholders.format(messages.unknownHome(), "name", name);
+    return messages.unknownHome().replace("{name}", name);
   }
 }

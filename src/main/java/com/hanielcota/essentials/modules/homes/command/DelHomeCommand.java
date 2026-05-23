@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
-import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -26,15 +25,15 @@ public record DelHomeCommand(ConfigHandle<HomesConfig> config, HomeService servi
 
   @DefaultSubcommand
   public void execute(CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
-    Player sender = actor.unwrap(Player.class);
+    var sender = actor.unwrap(Player.class);
     var snap = config.value();
     var messages = snap.messages();
     var name = rawName.isBlank() ? snap.defaultHomeName() : rawName;
 
     if (!service.delete(sender.getUniqueId(), name)) {
-      actor.sendError(Placeholders.format(messages.unknownHome(), "name", name));
+      actor.sendError(messages.unknownHome().replace("{name}", name));
       return;
     }
-    actor.sendSuccess(Placeholders.format(messages.homeDeleted(), "name", name));
+    actor.sendSuccess(messages.homeDeleted().replace("{name}", name));
   }
 }
