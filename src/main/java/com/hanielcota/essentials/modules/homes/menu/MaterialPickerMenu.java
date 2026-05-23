@@ -9,6 +9,7 @@ import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.HomesMessages;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
@@ -20,8 +21,8 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * Material picker submenu. Opened when the player drops (Q) a home in /homes; clicking a material
- * updates that home's icon and reopens /homes. The home name is read from {@link
- * HomesActionTarget}, which {@link HomeClickHandler} set just before opening this menu.
+ * updates that home's icon and reopens /homes. The home being modified is read from {@link
+ * HomesActionTarget}, populated by {@link HomeClickHandler} right before this menu opens.
  */
 @RequiredArgsConstructor
 public final class MaterialPickerMenu implements Menu {
@@ -65,24 +66,23 @@ public final class MaterialPickerMenu implements Menu {
   }
 
   private List<SlotDefinition> buildSlots(Player player, MenuSession session) {
-    var menu = config.value().menu();
-    var palette = menu.palette();
+    var palette = config.value().menu().palette();
+    var loreTemplate = config.value().messages().pickerItemLore();
     var slots = new ArrayList<SlotDefinition>(palette.size());
 
     for (var i = 0; i < palette.size(); i++) {
       var material = palette.get(i);
-      var template = renderMaterial(material);
+      var template = renderMaterial(material, loreTemplate);
       slots.add(SlotDefinition.of(-1, template, click -> handlePick(click.player(), material)));
     }
     return slots;
   }
 
-  private ItemTemplate renderMaterial(Material material) {
-    var loreLine =
-        config.value().messages().pickerItemLore().replace("{material}", prettyName(material));
+  private static ItemTemplate renderMaterial(Material material, String loreTemplate) {
+    var pretty = MaterialNames.pretty(material);
     return ItemTemplate.builder(material)
-        .name("<gold>" + prettyName(material))
-        .lore(new String[] {loreLine})
+        .name("<gold>" + pretty)
+        .lore(new String[] {loreTemplate.replace("{material}", pretty)})
         .italic(false)
         .build();
   }
@@ -96,21 +96,19 @@ public final class MaterialPickerMenu implements Menu {
       return;
     }
 
-    if (service.setMaterial(player.getUniqueId(), homeName, material)) {
-      player.sendMessage(
-          ComponentUtils.mini(
-              messages
-                  .materialUpdated()
-                  .replace("{name}", homeName)
-                  .replace("{material}", prettyName(material))));
-    } else {
-      player.sendMessage(ComponentUtils.mini(messages.unknownHome().replace("{name}", homeName)));
-    }
-
+    var applied = service.setMaterial(player.getUniqueId(), homeName, material);
+    player.sendMessage(ComponentUtils.mini(replyFor(messages, homeName, material, applied)));
     menus.open(player, HomesMenu.ID);
   }
 
-  private static String prettyName(Material material) {
-    return material.name().toLowerCase().replace('_', ' ');
+  private static String replyFor(
+      HomesMessages messages, String homeName, Material material, boolean applied) {
+    if (!applied) {
+      return messages.unknownHome().replace("{name}", homeName);
+    }
+    return messages
+        .materialUpdated()
+        .replace("{name}", homeName)
+        .replace("{material}", MaterialNames.pretty(material));
   }
 }

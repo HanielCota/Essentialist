@@ -20,10 +20,6 @@ public final class HomesActionTarget implements Listener {
     targets.put(player, homeName);
   }
 
-  public Optional<String> peek(UUID player) {
-    return Optional.ofNullable(targets.get(player));
-  }
-
   public Optional<String> consume(UUID player) {
     return Optional.ofNullable(targets.remove(player));
   }
