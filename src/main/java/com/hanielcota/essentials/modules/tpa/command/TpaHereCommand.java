@@ -26,14 +26,7 @@ public record TpaHereCommand(ConfigHandle<TpaConfig> config, TeleportRequestServ
   @DefaultSubcommand
   public void execute(CommandActor actor, @OnlinePlayer Player target) {
     var messages = config.value().messages();
-    Player sender = actor.unwrap(Player.class);
-
-    if (sender.getUniqueId().equals(target.getUniqueId())) {
-      actor.sendError(messages.selfTarget());
-      return;
-    }
-
-    service.create(sender, target, TeleportRequestType.TPAHERE);
-    actor.sendSuccess(messages.formatRequestSentHere(target.getName()));
+    TpaRequests.send(
+        service, messages, actor, target, TeleportRequestType.TPAHERE, messages.requestSentHere());
   }
 }

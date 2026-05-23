@@ -4,6 +4,7 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -13,7 +14,6 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Command("tpdeny")
@@ -39,11 +39,8 @@ public record TpDenyCommand(
     var request = resolved.get();
 
     service.deny(request);
-    actor.sendSuccess(messages.formatDeniedSelf(request.requester().name()));
-
-    var requesterPlayer = Bukkit.getPlayer(request.requester().id());
-    if (requesterPlayer != null) {
-      framework.actorOf(requesterPlayer).sendError(messages.formatDenied(request.target().name()));
-    }
+    actor.sendSuccess(
+        Placeholders.format(messages.deniedSelf(), "player", request.requester().name()));
+    TpaRequests.replyRequester(framework, request, messages.denied(), false);
   }
 }

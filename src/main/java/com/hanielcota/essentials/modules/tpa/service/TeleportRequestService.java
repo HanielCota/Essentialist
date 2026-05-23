@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
  * Application service for the teleport-request use cases: create, accept, deny, cancel, expire.
  *
  * <p>Sole responsibility: orchestration. It owns no state and renders no messages — it delegates
- * storage to {@link RequestStore}, persistence to {@link TpaHistory}, the teleport to {@link
+ * storage to {@link RequestStore}, persistence to {@link TpaHistory}, teleporting to {@link
  * TeleportService} and player-facing notices to {@link TpaNotifier}.
  */
 public final class TeleportRequestService {

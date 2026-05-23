@@ -26,14 +26,7 @@ public record TpaCommand(ConfigHandle<TpaConfig> config, TeleportRequestService 
   @DefaultSubcommand
   public void execute(CommandActor actor, @OnlinePlayer Player target) {
     var messages = config.value().messages();
-    Player sender = actor.unwrap(Player.class);
-
-    if (sender.getUniqueId().equals(target.getUniqueId())) {
-      actor.sendError(messages.selfTarget());
-      return;
-    }
-
-    service.create(sender, target, TeleportRequestType.TPA);
-    actor.sendSuccess(messages.formatRequestSent(target.getName()));
+    TpaRequests.send(
+        service, messages, actor, target, TeleportRequestType.TPA, messages.requestSent());
   }
 }

@@ -5,7 +5,12 @@ import com.hanielcota.essentials.util.Placeholders;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
-/** Every chat line the {@code /tpa} request flow can send. */
+/**
+ * Every chat line the {@code /tpa} request flow can send.
+ *
+ * <p>Templates are exposed raw; callers fill {@code {player}} (and any other placeholders) at the
+ * call site with {@link Placeholders}.
+ */
 @ConfigSerializable
 public record TpaMessages(
     @Comment("/tpa sender confirmation. Placeholders: {player}.") String requestSent,
@@ -80,69 +85,9 @@ public record TpaMessages(
         "<gray>Mostrando o histórico de teleportes de <gold>{player}</gold>.");
   }
 
-  public String formatRequestSent(String player) {
-    return requestSent.replace("{player}", player);
-  }
-
-  public String formatRequestSentHere(String player) {
-    return requestSentHere.replace("{player}", player);
-  }
-
-  public String formatCancelled(String player) {
-    return cancelled.replace("{player}", player);
-  }
-
-  public String formatExpired(String player) {
-    return expired.replace("{player}", player);
-  }
-
-  public String formatAccepted(String player) {
-    return accepted.replace("{player}", player);
-  }
-
-  public String formatDenied(String player) {
-    return denied.replace("{player}", player);
-  }
-
-  public String formatRequesterOffline(String player) {
-    return requesterOffline.replace("{player}", player);
-  }
-
-  public String formatAcceptedSelf(String player) {
-    return acceptedSelf.replace("{player}", player);
-  }
-
-  public String formatDeniedSelf(String player) {
-    return deniedSelf.replace("{player}", player);
-  }
-
-  public String formatHoverAccept(String player) {
-    return buttonHoverAccept.replace("{player}", player);
-  }
-
-  public String formatHoverDeny(String player) {
-    return buttonHoverDeny.replace("{player}", player);
-  }
-
-  public String formatPartnerLeft(String player) {
-    return partnerLeft.replace("{player}", player);
-  }
-
-  public String formatNoHistoryOther(String player) {
-    return noHistoryOther.replace("{player}", player);
-  }
-
-  public String formatPlayerNotFound(String player) {
-    return playerNotFound.replace("{player}", player);
-  }
-
-  public String formatViewingOther(String player) {
-    return viewingOther.replace("{player}", player);
-  }
-
   /** The request line shown to the target, picked by {@code type}. */
   public String formatRequestReceived(TeleportRequestType type, String player, long seconds) {
-    String line = type == TeleportRequestType.TPAHERE ? requestReceivedHere : requestReceived;
+    var line = type == TeleportRequestType.TPAHERE ? requestReceivedHere : requestReceived;
     return Placeholders.format(line, "player", player, "seconds", seconds);
   }
 }

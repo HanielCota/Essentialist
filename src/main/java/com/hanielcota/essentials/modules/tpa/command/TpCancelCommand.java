@@ -4,6 +4,7 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -34,6 +35,6 @@ public record TpCancelCommand(ConfigHandle<TpaConfig> config, TeleportRequestSer
 
     var request = pending.get();
     service.cancel(request);
-    actor.sendSuccess(messages.formatCancelled(request.target().name()));
+    actor.sendSuccess(Placeholders.format(messages.cancelled(), "player", request.target().name()));
   }
 }

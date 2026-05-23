@@ -4,6 +4,7 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -13,7 +14,6 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Command("tpaccept")
@@ -40,16 +40,14 @@ public record TpAcceptCommand(
 
     switch (service.accept(request)) {
       case SUCCESS -> {
-        actor.sendSuccess(messages.formatAcceptedSelf(request.requester().name()));
-        var requesterPlayer = Bukkit.getPlayer(request.requester().id());
-        if (requesterPlayer != null) {
-          framework
-              .actorOf(requesterPlayer)
-              .sendSuccess(messages.formatAccepted(request.target().name()));
-        }
+        actor.sendSuccess(
+            Placeholders.format(messages.acceptedSelf(), "player", request.requester().name()));
+        TpaRequests.replyRequester(framework, request, messages.accepted(), true);
       }
       case REQUESTER_OFFLINE ->
-          actor.sendError(messages.formatRequesterOffline(request.requester().name()));
+          actor.sendError(
+              Placeholders.format(
+                  messages.requesterOffline(), "player", request.requester().name()));
       case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
       case NOT_FOUND -> actor.sendError(messages.noIncoming());
     }

@@ -8,6 +8,7 @@ import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.util.Placeholders;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -53,7 +54,7 @@ public record TpaHistoryCommand(
 
     var resolved = players.offlineByName(targetName);
     if (resolved.isEmpty()) {
-      actor.sendError(snap.messages().formatPlayerNotFound(targetName));
+      actor.sendError(Placeholders.format(snap.messages().playerNotFound(), "player", targetName));
       return;
     }
 
@@ -69,12 +70,16 @@ public record TpaHistoryCommand(
 
     if (entries.isEmpty()) {
       actor.sendError(
-          self ? snap.messages().noHistory() : snap.messages().formatNoHistoryOther(subjectName));
+          self
+              ? snap.messages().noHistory()
+              : Placeholders.format(snap.messages().noHistoryOther(), "player", subjectName));
       return;
     }
 
     if (!self) {
-      actor.sendMessage(ComponentUtils.mini(snap.messages().formatViewingOther(subjectName)));
+      actor.sendMessage(
+          ComponentUtils.mini(
+              Placeholders.format(snap.messages().viewingOther(), "player", subjectName)));
     }
 
     menu.prefetch(viewer.getUniqueId(), entries);

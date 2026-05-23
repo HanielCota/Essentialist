@@ -5,6 +5,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.util.Placeholders;
 import java.util.Objects;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -40,12 +41,13 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
             messages.buttonAccept(),
             slot ->
                 slot.runCommand("/tpaccept " + requester)
-                    .hover(messages.formatHoverAccept(requester)))
+                    .hover(Placeholders.format(messages.buttonHoverAccept(), "player", requester)))
         .append("  ")
         .append(
             messages.buttonDeny(),
             slot ->
-                slot.runCommand("/tpdeny " + requester).hover(messages.formatHoverDeny(requester)))
+                slot.runCommand("/tpdeny " + requester)
+                    .hover(Placeholders.format(messages.buttonHoverDeny(), "player", requester)))
         .send(target);
   }
 
@@ -55,7 +57,9 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
     var requester = Bukkit.getPlayer(request.requester().id());
     if (requester != null) {
       requester.sendMessage(
-          ComponentUtils.mini(config.value().messages().formatExpired(request.target().name())));
+          ComponentUtils.mini(
+              Placeholders.format(
+                  config.value().messages().expired(), "player", request.target().name())));
     }
   }
 
@@ -70,7 +74,8 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
     var online = Bukkit.getPlayer(recipient);
     if (online != null) {
       online.sendMessage(
-          ComponentUtils.mini(config.value().messages().formatPartnerLeft(quitterName)));
+          ComponentUtils.mini(
+              Placeholders.format(config.value().messages().partnerLeft(), "player", quitterName)));
     }
   }
 }

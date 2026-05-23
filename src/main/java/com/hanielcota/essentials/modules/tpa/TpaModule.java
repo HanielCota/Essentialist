@@ -17,7 +17,7 @@ import com.hanielcota.essentials.modules.tpa.history.SqliteTpaHistory;
 import com.hanielcota.essentials.modules.tpa.listener.TpaQuitListener;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
-import com.hanielcota.essentials.modules.tpa.service.InMemoryRequestStore;
+import com.hanielcota.essentials.modules.tpa.service.RequestStore;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExpiry;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaNotifier;
@@ -31,9 +31,9 @@ import java.util.Set;
  * {@code /tpacancel} and a configurable {@code /tpahistory} menu. Depends on the {@code teleport}
  * module for the shared {@link TeleportService}.
  *
- * <p>This class only wires collaborators together; each does one job — see {@link
- * InMemoryRequestStore} (state), {@link TeleportRequestService} (orchestration), {@link
- * TeleportRequestExpiry} (timing) and {@link TpaNotifier} (out-of-band messages).
+ * <p>This class only wires collaborators together; each does one job — see {@link RequestStore}
+ * (state), {@link TeleportRequestService} (orchestration), {@link TeleportRequestExpiry} (timing)
+ * and {@link TpaNotifier} (out-of-band messages).
  */
 public final class TpaModule extends AbstractModule {
 
@@ -49,7 +49,7 @@ public final class TpaModule extends AbstractModule {
 
     var history = new AsyncTpaHistory(new SqliteTpaHistory(service(SqlExecutor.class)));
 
-    var store = new InMemoryRequestStore();
+    var store = new RequestStore();
     var notifier = new TpaNotifier(config);
     var requestService =
         new TeleportRequestService(
