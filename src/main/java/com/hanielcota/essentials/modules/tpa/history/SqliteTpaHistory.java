@@ -79,45 +79,6 @@ public final class SqliteTpaHistory implements TpaHistory {
     sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
   }
 
-  @Override
-  public void push(TpaHistoryEntry entry) {
-    Objects.requireNonNull(entry, "entry");
-    sqlExecutor.tx(
-        conn -> {
-          insert(conn, entry);
-          trim(conn, entry.requester());
-        });
-  }
-
-  @Override
-  public List<TpaHistoryEntry> list(UUID requester) {
-    Objects.requireNonNull(requester, "requester");
-    return sqlExecutor.query(LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
-  }
-
-  private void insert(Connection conn, TpaHistoryEntry entry) throws SQLException {
-    try (var statement = conn.prepareStatement(INSERT)) {
-      var destination = entry.destination();
-      statement.setString(1, entry.requester().toString());
-      statement.setString(2, entry.target().id().toString());
-      statement.setString(3, entry.target().name());
-      statement.setString(4, entry.type().name());
-      statement.setString(5, entry.status().name());
-      statement.setLong(6, entry.createdAt());
-      statement.setLong(7, entry.resolvedAt());
-      setNullable(statement, 8, destination == null ? null : destination.world(), Types.VARCHAR);
-      setNullable(statement, 9, destination == null ? null : destination.x(), Types.REAL);
-      setNullable(statement, 10, destination == null ? null : destination.y(), Types.REAL);
-      setNullable(statement, 11, destination == null ? null : destination.z(), Types.REAL);
-      statement.executeUpdate();
-    }
-  }
-
-  private void trim(Connection conn, UUID requester) throws SQLException {
-    var requesterId = requester.toString();
-    sqlExecutor.execute(conn, TRIM, requesterId, requesterId, CAPACITY);
-  }
-
   private static void setNullable(
       PreparedStatement stmt, int index, @Nullable Object value, int sqlType) throws SQLException {
     if (value == null) {
@@ -160,5 +121,44 @@ public final class SqliteTpaHistory implements TpaHistory {
     } catch (IllegalArgumentException | NullPointerException _) {
       return null;
     }
+  }
+
+  @Override
+  public void push(TpaHistoryEntry entry) {
+    Objects.requireNonNull(entry, "entry");
+    sqlExecutor.tx(
+        conn -> {
+          insert(conn, entry);
+          trim(conn, entry.requester());
+        });
+  }
+
+  @Override
+  public List<TpaHistoryEntry> list(UUID requester) {
+    Objects.requireNonNull(requester, "requester");
+    return sqlExecutor.query(LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
+  }
+
+  private void insert(Connection conn, TpaHistoryEntry entry) throws SQLException {
+    try (var statement = conn.prepareStatement(INSERT)) {
+      var destination = entry.destination();
+      statement.setString(1, entry.requester().toString());
+      statement.setString(2, entry.target().id().toString());
+      statement.setString(3, entry.target().name());
+      statement.setString(4, entry.type().name());
+      statement.setString(5, entry.status().name());
+      statement.setLong(6, entry.createdAt());
+      statement.setLong(7, entry.resolvedAt());
+      setNullable(statement, 8, destination == null ? null : destination.world(), Types.VARCHAR);
+      setNullable(statement, 9, destination == null ? null : destination.x(), Types.REAL);
+      setNullable(statement, 10, destination == null ? null : destination.y(), Types.REAL);
+      setNullable(statement, 11, destination == null ? null : destination.z(), Types.REAL);
+      statement.executeUpdate();
+    }
+  }
+
+  private void trim(Connection conn, UUID requester) throws SQLException {
+    var requesterId = requester.toString();
+    sqlExecutor.execute(conn, TRIM, requesterId, requesterId, CAPACITY);
   }
 }

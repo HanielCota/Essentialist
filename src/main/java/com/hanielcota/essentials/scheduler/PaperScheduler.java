@@ -14,6 +14,10 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
     Objects.requireNonNull(plugin, "plugin");
   }
 
+  private static Consumer<ScheduledTask> adapt(Runnable task) {
+    return scheduled -> task.run();
+  }
+
   @Override
   public void runSync(Runnable task) {
     Objects.requireNonNull(task, "task");
@@ -94,9 +98,5 @@ public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
                 Math.max(1L, period.toMillis()),
                 TimeUnit.MILLISECONDS);
     return new ScheduledTaskHandle(handle);
-  }
-
-  private static Consumer<ScheduledTask> adapt(Runnable task) {
-    return scheduled -> task.run();
   }
 }

@@ -25,6 +25,10 @@ public final class RequestStore {
   private final Map<UUID, RequestId> outgoingByRequester = new ConcurrentHashMap<>();
   private final Map<UUID, Set<RequestId>> incomingByTarget = new ConcurrentHashMap<>();
 
+  private static boolean takesPart(TeleportRequest request, UUID player) {
+    return request.requester().id().equals(player) || request.target().id().equals(player);
+  }
+
   /** Adds a request and indexes it by requester and by target. */
   public void add(TeleportRequest request) {
     Objects.requireNonNull(request, "request");
@@ -135,9 +139,5 @@ public final class RequestStore {
     if (ids.isEmpty()) {
       incomingByTarget.remove(target, ids);
     }
-  }
-
-  private static boolean takesPart(TeleportRequest request, UUID player) {
-    return request.requester().id().equals(player) || request.target().id().equals(player);
   }
 }
