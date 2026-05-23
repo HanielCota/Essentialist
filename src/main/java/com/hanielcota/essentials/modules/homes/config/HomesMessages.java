@@ -20,13 +20,6 @@ public record HomesMessages(
     @Comment("Shown by /home when the target world is no longer loaded.") String worldGone,
     @Comment("/sethome when the given material name is invalid. Placeholders: {material}.")
         String invalidMaterial,
-    @Comment("/homes header. Placeholders: {count}, {limit}.") String listHeader,
-    @Comment(
-            "Clickable list item shown by /homes — one per home. Placeholders: {name}, {world}, "
-                + "{x}, {y}, {z}.")
-        String listEntry,
-    @Comment("Tooltip shown when hovering a /homes entry. Placeholders: {name}.")
-        String listEntryHover,
     @Comment("Shown on /home start when a delay is configured. Placeholders: {name}, {seconds}.")
         String teleporting,
     @Comment("Shown after /home completes successfully. Placeholders: {name}.") String teleported,
@@ -63,9 +56,6 @@ public record HomesMessages(
         "<yellow>Home <gold>{name}</gold> removida.",
         "<red>O mundo desta home não está carregado.",
         "<red>Material inválido: <gold>{material}</gold>.",
-        "<gray>Suas homes (<gold>{count}</gold><gray>/<gold>{limit}</gold><gray>):",
-        "<gold>{name}</gold> <gray>— <white>{world} {x}, {y}, {z}",
-        "<gray>Clique para ir até <gold>{name}</gold>.",
         "<yellow>Teleportando para <gold>{name}</gold> em <gold>{seconds}s</gold>. "
             + "Não se mova nem tome dano.",
         "<green>Você foi teleportado para <gold>{name}</gold>.",
