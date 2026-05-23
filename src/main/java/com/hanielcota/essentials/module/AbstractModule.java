@@ -19,7 +19,7 @@ public abstract class AbstractModule implements Module {
 
   private final ModuleMetadata metadata;
   private final List<Listener> listeners = new ArrayList<>();
-  private final List<AutoCloseable> closeable = new ArrayList<>();
+  private final List<AutoCloseable> closeables = new ArrayList<>();
   private final List<Class<?>> ownedServices = new ArrayList<>();
   private ModuleContext context;
 
@@ -47,20 +47,22 @@ public abstract class AbstractModule implements Module {
     try {
       onDisable();
     } finally {
-      for (Listener listener : listeners) {
+      for (var listener : listeners) {
         HandlerList.unregisterAll(listener);
       }
       listeners.clear();
-      for (AutoCloseable closeable : closeable) {
+
+      for (var closeable : closeables) {
         try {
           closeable.close();
         } catch (Exception e) {
           LOG.warn(e, "Closeable threw during disable of {}", id());
         }
       }
-      closeable.clear();
+      closeables.clear();
+
       if (context != null) {
-        for (Class<?> type : ownedServices) {
+        for (var type : ownedServices) {
           context.services().unregister(type);
         }
       }
@@ -118,7 +120,7 @@ public abstract class AbstractModule implements Module {
   }
 
   protected final void registerCloseable(AutoCloseable closeable) {
-    this.closeable.add(closeable);
+    this.closeables.add(closeable);
   }
 
   protected final <T> void registerService(Class<T> type, T instance) {
