@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.bukkit.entity.Player;
 @Command("rename")
 @EssentialsCommand
 @Permission("essentials.rename")
+@PlayerOnly
 @Cooldown(duration = "3s")
 @Description("Renomeia o item na mão; sem nome, remove o nome customizado.")
 @Syntax("/rename [nome]")

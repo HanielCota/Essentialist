@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 @Command("enchant")
 @EssentialsCommand
 @Permission("essentials.enchant")
+@PlayerOnly
 @Cooldown(duration = "3s")
 @Description("Encanta o item na mão.")
 @Syntax("/enchant <encantamento> [nível] | /enchant remove <encantamento> | /enchant clear")

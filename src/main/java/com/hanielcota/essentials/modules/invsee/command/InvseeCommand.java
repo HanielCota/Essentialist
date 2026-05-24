@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 @Command("invsee")
 @EssentialsCommand
 @Permission("essentials.invsee")
+@PlayerOnly
 @Cooldown(duration = "3s")
 @Description("Abre o inventário, a armadura e a off-hand de outro jogador.")
 @Syntax("/invsee <jogador>")

@@ -9,6 +9,7 @@ import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 @Command(value = "compactar", aliases = "compact")
 @EssentialsCommand
 @Permission("essentials.compact")
+@PlayerOnly
 @Cooldown(duration = "5s")
 @Description("Compacta minérios e barras em blocos no seu inventário.")
 @Syntax("/compactar")
