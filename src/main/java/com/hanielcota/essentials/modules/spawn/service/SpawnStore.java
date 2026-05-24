@@ -16,35 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class SpawnStore {
 
-  private static final String CREATE_TABLE =
-      """
-      CREATE TABLE IF NOT EXISTS spawn (
-        singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
-        world TEXT NOT NULL,
-        x REAL NOT NULL,
-        y REAL NOT NULL,
-        z REAL NOT NULL,
-        yaw REAL NOT NULL,
-        pitch REAL NOT NULL
-      )
-      """;
-
-  private static final String UPSERT =
-      """
-      INSERT OR REPLACE INTO spawn (singleton, world, x, y, z, yaw, pitch) \
-      VALUES (1, ?, ?, ?, ?, ?, ?)\
-      """;
-
-  private static final String SELECT =
-      """
-      SELECT world, x, y, z, yaw, pitch FROM spawn WHERE singleton = 1\
-      """;
-
   private final @NonNull SqlExecutor sqlExecutor;
-
-  public static void install(@NonNull SqlExecutor sqlExecutor) {
-    sqlExecutor.ddl(CREATE_TABLE);
-  }
 
   private static SpawnLocation readRow(@NonNull ResultSet rs) throws SQLException {
     return new SpawnLocation(
@@ -58,14 +30,14 @@ public final class SpawnStore {
 
   /** Returns the stored spawn, or empty when {@code /setspawn} has not run yet. */
   public Optional<SpawnLocation> load() {
-    var rows = this.sqlExecutor.query(SELECT, SpawnStore::readRow);
+    var rows = this.sqlExecutor.query(SpawnTable.SELECT, SpawnStore::readRow);
     return rows.isEmpty() ? Optional.empty() : Optional.of(rows.getFirst());
   }
 
   /** Overwrites the stored spawn with {@code location}. */
   public void save(@NonNull SpawnLocation location) {
     this.sqlExecutor.update(
-        UPSERT,
+        SpawnTable.UPSERT,
         location.world(),
         location.x(),
         location.y(),

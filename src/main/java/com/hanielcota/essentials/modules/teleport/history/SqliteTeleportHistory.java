@@ -13,56 +13,6 @@ import org.bukkit.Location;
 
 public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseable {
 
-  private static final String CREATE_TABLE =
-      """
-      CREATE TABLE IF NOT EXISTS teleport_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        player_id TEXT NOT NULL,
-        world TEXT NOT NULL,
-        x REAL NOT NULL,
-        y REAL NOT NULL,
-        z REAL NOT NULL,
-        yaw REAL NOT NULL,
-        pitch REAL NOT NULL,
-        created_at INTEGER NOT NULL
-      )
-      """;
-
-  private static final String CREATE_INDEX =
-      """
-      CREATE INDEX IF NOT EXISTS idx_teleport_history_player \
-      ON teleport_history(player_id, created_at)\
-      """;
-
-  private static final String INSERT =
-      """
-      INSERT INTO teleport_history (player_id, world, x, y, z, yaw, pitch, created_at) \
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)\
-      """;
-
-  private static final String TRIM =
-      """
-      DELETE FROM teleport_history
-      WHERE player_id = ?
-        AND id NOT IN (
-          SELECT id FROM teleport_history
-          WHERE player_id = ?
-          ORDER BY created_at DESC
-          LIMIT ?
-        )
-      """;
-
-  private static final String LIST =
-      """
-      SELECT id, world, x, y, z, yaw, pitch, created_at FROM teleport_history \
-      WHERE player_id = ? ORDER BY created_at DESC LIMIT ?\
-      """;
-
-  private static final String DELETE_BY_ID =
-      """
-      DELETE FROM teleport_history WHERE id = ? AND player_id = ?\
-      """;
-
   private final SqlExecutor sqlExecutor;
 
   /**
@@ -75,7 +25,6 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
   public SqliteTeleportHistory(SqlExecutor sqlExecutor) {
     this.sqlExecutor = sqlExecutor;
     this.writer = new DefaultAsyncDatabaseWriter("Essentialist-TeleportHistory");
-    sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
   }
 
   /**
@@ -124,15 +73,25 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
             this.sqlExecutor.tx(
                 conn -> {
                   this.sqlExecutor.execute(
-                      conn, INSERT, playerId, worldName, x, y, z, yaw, pitch, createdAt);
-                  this.sqlExecutor.execute(conn, TRIM, playerId, playerId, CAPACITY);
+                      conn,
+                      TeleportHistoryTable.INSERT,
+                      playerId,
+                      worldName,
+                      x,
+                      y,
+                      z,
+                      yaw,
+                      pitch,
+                      createdAt);
+                  this.sqlExecutor.execute(
+                      conn, TeleportHistoryTable.TRIM, playerId, playerId, CAPACITY);
                 }));
   }
 
   @Override
   public List<HistoryEntry> list(@NonNull UUID player) {
     return this.sqlExecutor.query(
-        LIST, SqliteTeleportHistory::readEntry, player.toString(), CAPACITY);
+        TeleportHistoryTable.LIST, SqliteTeleportHistory::readEntry, player.toString(), CAPACITY);
   }
 
   @Override
@@ -141,7 +100,9 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
       return;
     }
     var playerId = player.toString();
-    this.writer.submit("remove", () -> this.sqlExecutor.update(DELETE_BY_ID, entryId, playerId));
+    this.writer.submit(
+        "remove",
+        () -> this.sqlExecutor.update(TeleportHistoryTable.DELETE_BY_ID, entryId, playerId));
   }
 
   @Override

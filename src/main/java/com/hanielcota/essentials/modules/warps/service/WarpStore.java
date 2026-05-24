@@ -18,50 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class WarpStore {
 
-  private static final String CREATE_TABLE =
-      """
-      CREATE TABLE IF NOT EXISTS warps (
-        name TEXT PRIMARY KEY COLLATE NOCASE,
-        world TEXT NOT NULL,
-        x REAL NOT NULL,
-        y REAL NOT NULL,
-        z REAL NOT NULL,
-        yaw REAL NOT NULL,
-        pitch REAL NOT NULL,
-        created_at INTEGER NOT NULL,
-        created_by_id TEXT NOT NULL
-      )
-      """;
-
-  private static final String UPSERT =
-      """
-      INSERT OR REPLACE INTO warps \
-      (name, world, x, y, z, yaw, pitch, created_at, created_by_id) \
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\
-      """;
-
-  private static final String DELETE =
-      """
-      DELETE FROM warps WHERE name = ?\
-      """;
-
-  private static final String SELECT_ONE =
-      """
-      SELECT name, world, x, y, z, yaw, pitch, created_at, created_by_id \
-      FROM warps WHERE name = ?\
-      """;
-
-  private static final String SELECT_ALL =
-      """
-      SELECT name, world, x, y, z, yaw, pitch, created_at, created_by_id \
-      FROM warps ORDER BY name\
-      """;
-
   private final SqlExecutor sqlExecutor;
-
-  public static void install(@NonNull SqlExecutor sqlExecutor) {
-    sqlExecutor.ddl(CREATE_TABLE);
-  }
 
   private static Warp readRow(@NonNull ResultSet rs) throws SQLException {
     var name = rs.getString("name");
@@ -81,7 +38,7 @@ public final class WarpStore {
   }
 
   public Optional<Warp> find(@NonNull String name) {
-    var rows = this.sqlExecutor.query(SELECT_ONE, WarpStore::readRow, name);
+    var rows = this.sqlExecutor.query(WarpTable.SELECT_ONE, WarpStore::readRow, name);
 
     if (rows.isEmpty()) {
       return Optional.empty();
@@ -91,14 +48,14 @@ public final class WarpStore {
   }
 
   public List<Warp> list() {
-    return this.sqlExecutor.query(SELECT_ALL, WarpStore::readRow);
+    return this.sqlExecutor.query(WarpTable.SELECT_ALL, WarpStore::readRow);
   }
 
   public void save(@NonNull Warp warp) {
     var creatorIdStr = warp.createdBy().toString();
 
     this.sqlExecutor.update(
-        UPSERT,
+        WarpTable.UPSERT,
         warp.name(),
         warp.world(),
         warp.x(),
@@ -117,7 +74,7 @@ public final class WarpStore {
       return false;
     }
 
-    this.sqlExecutor.update(DELETE, name);
+    this.sqlExecutor.update(WarpTable.DELETE, name);
     return true;
   }
 }

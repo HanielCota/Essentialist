@@ -15,6 +15,7 @@ import com.hanielcota.essentials.modules.tpa.command.TpaHistoryCommand;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.SqliteTpaHistory;
+import com.hanielcota.essentials.modules.tpa.history.TpaHistoryTable;
 import com.hanielcota.essentials.modules.tpa.listener.TpaHistoryMenuCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaQuitListener;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryEntryRenderer;
@@ -61,7 +62,7 @@ public final class TpaModule extends AbstractModule {
 
   private AsyncTpaHistory history() {
     var executor = service(SqlExecutor.class);
-    SqliteTpaHistory.install(executor);
+    TpaHistoryTable.install(executor);
 
     var history = new AsyncTpaHistory(new SqliteTpaHistory(executor));
     registerCloseable(history);

@@ -11,6 +11,7 @@ import com.hanielcota.essentials.modules.warps.command.WarpsCommand;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import com.hanielcota.essentials.modules.warps.service.WarpStore;
+import com.hanielcota.essentials.modules.warps.service.WarpTable;
 import java.util.Set;
 
 /**
@@ -31,7 +32,7 @@ public final class WarpsModule extends AbstractModule {
   protected void onEnable() {
     var config = config("warps", WarpsConfig.class, WarpsConfig::defaults);
     var executor = service(SqlExecutor.class);
-    WarpStore.install(executor);
+    WarpTable.install(executor);
 
     var store = new WarpStore(executor);
     var warpService = new WarpService(store);
