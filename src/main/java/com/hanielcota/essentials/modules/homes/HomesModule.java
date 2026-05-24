@@ -40,6 +40,7 @@ public final class HomesModule extends AbstractModule {
     var homeService = serviceComponents.service();
 
     registerCloseable(serviceComponents.closeable());
+    registerListener(serviceComponents.cacheListener());
     registerService(HomeService.class, homeService);
 
     // 2. Interaction & Flow Layer

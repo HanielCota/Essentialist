@@ -42,12 +42,6 @@ public final class SqlHomeTable {
       FROM homes WHERE player_id = ? ORDER BY name\
       """;
 
-  static final String SELECT_ALL_HOMES =
-      """
-      SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at \
-      FROM homes ORDER BY player_id, name\
-      """;
-
   static final String COUNT =
       """
       SELECT COUNT(*) AS total FROM homes WHERE player_id = ?\

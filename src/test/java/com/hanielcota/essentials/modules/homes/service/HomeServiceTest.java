@@ -106,11 +106,6 @@ class HomeServiceTest {
     }
 
     @Override
-    public List<Home> listAll() {
-      return List.of(home);
-    }
-
-    @Override
     public int count(UUID owner) {
       return 1;
     }
@@ -146,11 +141,6 @@ class HomeServiceTest {
 
     @Override
     public List<Home> list(UUID owner) {
-      return List.of();
-    }
-
-    @Override
-    public List<Home> listAll() {
       return List.of();
     }
 

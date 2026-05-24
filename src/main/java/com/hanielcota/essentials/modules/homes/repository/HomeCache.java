@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.homes.repository;
 
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,8 +13,16 @@ public final class HomeCache {
 
   private final ConcurrentHashMap<UUID, HomeBucket> homes = new ConcurrentHashMap<>();
 
-  public HomeCache(@NonNull Collection<Home> homes) {
-    homes.forEach(this::save);
+  /** Replaces (or creates) the bucket for {@code owner} with {@code homes}, atomically. */
+  void loadFor(@NonNull UUID owner, @NonNull Collection<Home> homes) {
+    var bucket = new HomeBucket();
+    homes.forEach(bucket::save);
+    this.homes.put(owner, bucket);
+  }
+
+  /** Drops {@code owner}'s bucket from memory. SQL is untouched. */
+  void evictFor(@NonNull UUID owner) {
+    this.homes.remove(owner);
   }
 
   Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
@@ -34,14 +41,6 @@ public final class HomeCache {
     }
 
     return bucket.list();
-  }
-
-  List<Home> listAll() {
-    var homeComparator = Comparator.comparing(Home::name);
-
-    var flattened = this.homes.values().stream().flatMap(bucket -> bucket.list().stream());
-
-    return flattened.sorted(homeComparator).toList();
   }
 
   int count(@NonNull UUID owner) {
