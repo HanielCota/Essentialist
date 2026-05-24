@@ -25,7 +25,7 @@ public final class InfoModule extends AbstractModule {
     var menuState = new InfoMenuState();
     var menu = new InfoMenu(config, service, menuState);
     registerMenu(menu);
-    var cleanupListener = new InfoMenuCleanupListener(menuState);
+    var cleanupListener = new InfoMenuCleanupListener(menuState, menus);
     registerListener(cleanupListener);
 
     var infoCommand = new InfoCommand(menuState, menus);
