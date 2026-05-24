@@ -52,8 +52,12 @@ public final class InvseeService {
 
     var targetId = target.getUniqueId();
     var viewerId = viewer.getUniqueId();
+    // Any existing holder — even the same viewer — denies the new view. The previous view's
+    // InventoryCloseEvent will fire `release(...)` for the old holder; allowing two open views
+    // from the same viewer would let the old close handler free the lock while the new view is
+    // still live and editing.
     var existing = this.activeByTarget.putIfAbsent(targetId, viewerId);
-    if (existing != null && !existing.equals(viewerId)) {
+    if (existing != null) {
       return Optional.empty();
     }
 
