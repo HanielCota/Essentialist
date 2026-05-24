@@ -13,11 +13,11 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Min;
+import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
-import io.github.hanielcota.commandframework.annotation.PermissionForOther;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
-import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Locale;
@@ -29,7 +29,7 @@ import org.bukkit.entity.Player;
 @Permission("essentials.give")
 @Cooldown(duration = "3s")
 @Description("Dá itens a um jogador.")
-@Syntax("/give <item> [quantidade] [jogador]")
+@Syntax("/give <item> [quantidade] | /give para <jogador> <item> [quantidade]")
 public record GiveCommand(
     ConfigHandle<GiveConfig> config,
     GiveService service,
@@ -43,22 +43,48 @@ public record GiveCommand(
     return withAmount.replace("{leftover}", Integer.toString(leftover));
   }
 
+  /**
+   * Gives the caller (self) the item. CommandFramework parameter parsing is positional-strict and
+   * does not backtrack: trying to fit both an optional amount and an optional target into the same
+   * default subcommand made {@code /give DIAMOND Alice} unparsable (Alice fed to the int parser).
+   * Self-only here, with an explicit {@code /give para} subcommand for the other-player case.
+   */
   @DefaultSubcommand
-  @PermissionForOther(".others")
+  @PlayerOnly
   public void execute(
       @NonNull CommandActor sender,
       @Arg("item") Material item,
-      @DefaultValue("1") @Min(1) @Arg("quantidade") int amount,
-      @TargetOrSelf Player subject) {
+      @DefaultValue("1") @Min(1) @Arg("quantidade") int amount) {
+    var subject = sender.unwrap(Player.class);
+    deliver(sender, subject, item, amount, true);
+  }
+
+  @Subcommand({"para", "to"})
+  @Permission("essentials.give.others")
+  @Description("Dá itens a outro jogador.")
+  @Syntax("/give para <jogador> <item> [quantidade]")
+  public void executeFor(
+      @NonNull CommandActor sender,
+      @OnlinePlayer @NonNull Player subject,
+      @Arg("item") Material item,
+      @DefaultValue("1") @Min(1) @Arg("quantidade") int amount) {
+    var self = Senders.isSelf(sender, subject);
+    deliver(sender, subject, item, amount, self);
+  }
+
+  private void deliver(
+      @NonNull CommandActor sender,
+      @NonNull Player subject,
+      @NonNull Material item,
+      int amount,
+      boolean self) {
     var snap = this.config.value();
     var name = subject.getName();
-    var self = Senders.isSelf(sender, subject);
 
     if (!item.isItem()) {
       sender.sendError(snap.invalidItem());
       return;
     }
-
     if (amount > snap.maxAmount()) {
       sender.sendError(snap.formatAmountTooLarge());
       return;
@@ -82,10 +108,14 @@ public record GiveCommand(
       messages = snap.whenPartial();
     }
 
-    var target = this.framework.actorOf(subject);
-    var selfMessage = format(messages.forSender(self, name), itemName, result);
-    var targetMessage = format(messages.forTarget(name), itemName, result);
+    if (self) {
+      sender.sendSuccess(format(messages.forSender(true, name), itemName, result));
+      return;
+    }
 
+    var target = this.framework.actorOf(subject);
+    var selfMessage = format(messages.forSender(false, name), itemName, result);
+    var targetMessage = format(messages.forTarget(name), itemName, result);
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }
 
