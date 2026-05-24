@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.whitelist.config;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -13,11 +14,7 @@ public record WhitelistConfig(
     @Comment("Rows in the whitelist menu (clamped to 1-6).") int menuRows,
     @Comment("Slots used by whitelist entries. Leave empty to use every row except the last.")
         List<Integer> menuContentSlots,
-    @Comment("Slot of the previous-page button.") int previousPageSlot,
-    @Comment("Slot of the next-page button.") int nextPageSlot,
-    @Comment("Material of pagination buttons.") Material pageButtonMaterial,
-    @Comment("Name of the previous-page button.") String previousPageName,
-    @Comment("Name of the next-page button.") String nextPageName,
+    @Comment("Previous/next page buttons.") NavigationButtonsConfig navigation,
     @Comment("Item name for each whitelisted player. Placeholder: {player}.") String itemName,
     @Comment("Item lore for each whitelisted player. Placeholder: {player}.") List<String> itemLore,
     @Comment("Material of the placeholder shown when the whitelist is empty.")
@@ -36,18 +33,13 @@ public record WhitelistConfig(
         String menuPlayerOnly) {
 
   private static final int MIN_ROWS = 1;
-  private static final int MAX_ROWS = 6;
 
   public static WhitelistConfig defaults() {
     return new WhitelistConfig(
         "<dark_gray>Whitelist",
         6,
         List.of(),
-        48,
-        50,
-        Material.ARROW,
-        "<yellow>« Página anterior",
-        "<yellow>Próxima página »",
+        NavigationButtonsConfig.defaults(48, 50),
         "<yellow>{player}",
         List.of("<gray>Clique para <red>remover</red> da whitelist."),
         Material.BARRIER,
@@ -86,14 +78,6 @@ public record WhitelistConfig(
     return MenuLayouts.sanitizeSlots(menuContentSlots, effectiveRows());
   }
 
-  public int effectivePreviousPageSlot() {
-    return sanitizeNavigationSlot(previousPageSlot, 3);
-  }
-
-  public int effectiveNextPageSlot() {
-    return sanitizeNavigationSlot(nextPageSlot, 5);
-  }
-
   public String formatItemName(@NonNull String player) {
     return withPlayer(itemName, player);
   }
@@ -123,10 +107,5 @@ public record WhitelistConfig(
 
   public String formatUnknownPlayer(@NonNull String player) {
     return withPlayer(unknownPlayer, player);
-  }
-
-  private int sanitizeNavigationSlot(int configuredSlot, int fallbackColumn) {
-    var lastRow = (effectiveRows() - 1) * 9;
-    return MenuLayouts.sanitizeSlot(configuredSlot, effectiveRows(), lastRow + fallbackColumn);
   }
 }

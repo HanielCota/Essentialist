@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.config.menu;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import com.hanielcota.essentials.util.Numbers;
 import java.util.List;
 import lombok.NonNull;
@@ -13,13 +14,11 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public record HomesMenuConfig(
     @Comment("/homes menu title (MiniMessage).") String title,
     @Comment("/homes menu rows (1-6).") int rows,
-    @Comment("/homes content slots (0-based). Leave empty to use every slot.")
+    @Comment("/homes content slots (0-based). Leave empty to use every slot except the last row.")
         List<Integer> contentSlots,
+    @Comment("/homes previous/next page buttons.") NavigationButtonsConfig navigation,
     @Comment("/homes item name. Placeholders: {name}.") String itemName,
-    @Comment(
-            "/homes item lore. Placeholders: {world}, {x}, {y}, {z}. "
-                + "Tip: hint the click actions here.")
-        List<String> itemLore,
+    @Comment("/homes item lore. Placeholders: {world}, {x}, {y}, {z}.") List<String> itemLore,
     @Comment("Add an enchant glow to the /homes items.") boolean itemGlow,
     @Comment("Material category submenu title.") String categoryTitle,
     @Comment("Material category submenu rows (1-6).") int categoryRows,
@@ -31,6 +30,8 @@ public record HomesMenuConfig(
     @Comment("Material picker content slots (0-based).") List<Integer> pickerContentSlots,
     @Comment("Material picker item name. Placeholder: {material}.") String pickerItemName,
     @Comment("Material picker item lore. Placeholder: {material}.") List<String> pickerItemLore,
+    @Comment("Material picker previous/next page buttons.")
+        NavigationButtonsConfig pickerNavigation,
     @Comment("Slot of the picker back button.") int pickerBackSlot,
     @Comment("Material of the picker back button.") Material pickerBackMaterial,
     @Comment("Name of the picker back button.") String pickerBackName,
@@ -43,11 +44,14 @@ public record HomesMenuConfig(
     @Comment("Slot of the delete-confirmation no button.") int deleteNoSlot,
     @Comment("Material of the delete-confirmation no button.") Material deleteNoMaterial) {
 
+  private static final int MIN_ROWS = 1;
+
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
         "<dark_gray>Suas homes",
         6,
         List.of(),
+        NavigationButtonsConfig.defaults(48, 50),
         "<gold>{name}",
         List.of(
             "<gray>Mundo: <white>{world}",
@@ -72,6 +76,7 @@ public record HomesMenuConfig(
             38, 39, 40, 41, 42, 43),
         "<gold>{material}",
         List.of("<gray>Clique para usar <white>{material}", "<gray>Clique para escolher"),
+        NavigationButtonsConfig.defaults(48, 50),
         49,
         Material.BARRIER,
         "<red>Voltar às categorias",
@@ -129,9 +134,12 @@ public record HomesMenuConfig(
   }
 
   public List<Integer> effectiveContentSlots() {
-    return contentSlots.isEmpty()
-        ? MenuLayouts.allSlots(effectiveRows())
-        : MenuLayouts.sanitizeSlots(contentSlots, effectiveRows());
+    if (contentSlots.isEmpty()) {
+      var effRows = effectiveRows();
+      var count = effRows > MIN_ROWS ? (effRows - 1) * 9 : 9;
+      return MenuLayouts.fallbackContentSlots(effRows, count);
+    }
+    return MenuLayouts.sanitizeSlots(contentSlots, effectiveRows());
   }
 
   public List<Integer> effectiveCategoryContentSlots() {

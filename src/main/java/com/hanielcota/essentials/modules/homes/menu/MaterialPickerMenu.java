@@ -8,6 +8,7 @@ import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
 import com.hanielcota.essentials.util.ComponentUtils;
@@ -51,12 +52,15 @@ public final class MaterialPickerMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menusRef) {
     var menuSpec = this.config.value().menu();
     var menuTitle = ComponentUtils.mini(menuSpec.staticPickerTitle());
+    var rows = menuSpec.effectivePickerRows();
 
-    var pagination =
-        PaginationConfig.builder().contentSlots(menuSpec.effectivePickerContentSlots()).build();
+    var paginationBuilder =
+        PaginationConfig.builder().contentSlots(menuSpec.effectivePickerContentSlots());
+    PageNavigation.apply(menusRef, paginationBuilder, ID, rows, menuSpec.pickerNavigation());
+    var pagination = paginationBuilder.build();
 
     MenuFramework.builder(ID, menusRef)
-        .rows(menuSpec.effectivePickerRows())
+        .rows(rows)
         .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)

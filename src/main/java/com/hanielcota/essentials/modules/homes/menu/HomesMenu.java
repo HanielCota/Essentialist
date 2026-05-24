@@ -7,6 +7,7 @@ import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
@@ -21,6 +22,8 @@ import org.bukkit.entity.Player;
 public final class HomesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.homes";
+
+  private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<HomesConfig> config;
   private final HomeService service;
@@ -40,7 +43,11 @@ public final class HomesMenu implements EssentialsMenu {
     var menuTitle = ComponentUtils.mini(menuSpec.title());
     var contentSlots = menuSpec.effectiveContentSlots();
 
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
+    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
+    if (rows > MIN_ROWS) {
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, menuSpec.navigation());
+    }
+    var pagination = paginationBuilder.build();
 
     MenuFramework.builder(ID, menus)
         .rows(rows)

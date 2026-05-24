@@ -3,11 +3,11 @@ package com.hanielcota.essentials.modules.whitelist.menu;
 import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.whitelist.config.WhitelistConfig;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
 import com.hanielcota.essentials.util.ComponentUtils;
@@ -23,8 +23,6 @@ public final class WhitelistMenu implements EssentialsMenu {
   public static final String ID = "essentials.whitelist";
 
   private static final int MIN_ROWS = 1;
-  private static final String PREVIOUS_TEMPLATE = ID + ".previous";
-  private static final String NEXT_TEMPLATE = ID + ".next";
 
   private final ConfigHandle<WhitelistConfig> config;
   private final WhitelistService service;
@@ -43,12 +41,7 @@ public final class WhitelistMenu implements EssentialsMenu {
     var paginationBuilder = PaginationConfig.builder().contentSlots(snap.effectiveContentSlots());
 
     if (rows > MIN_ROWS) {
-      menus.registerTemplate(PREVIOUS_TEMPLATE, pageButton(snap.previousPageName()));
-      menus.registerTemplate(NEXT_TEMPLATE, pageButton(snap.nextPageName()));
-      paginationBuilder
-          .navigationSlots(List.of(snap.effectivePreviousPageSlot(), snap.effectiveNextPageSlot()))
-          .previousTemplate(PREVIOUS_TEMPLATE)
-          .nextTemplate(NEXT_TEMPLATE);
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, snap.navigation());
     }
 
     var pagination = paginationBuilder.build();
@@ -85,12 +78,5 @@ public final class WhitelistMenu implements EssentialsMenu {
     var centerSlot = slots.get(slots.size() / 2);
 
     return List.of(SlotDefinition.of(centerSlot, this.renderer.renderEmpty(), click -> {}));
-  }
-
-  private ItemTemplate pageButton(@NonNull String name) {
-    return ItemTemplate.builder(this.config.value().pageButtonMaterial())
-        .name(name)
-        .italic(false)
-        .build();
   }
 }
