@@ -1,17 +1,14 @@
 package com.hanielcota.essentials.modules.vanish.menu;
 
-import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
-import com.hanielcota.essentials.menu.PageNavigation;
+import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
-import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,9 +20,11 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public final class VanishMenu implements EssentialsMenu {
 
+  // Matches the convention shared by every other menu (WhitelistMenu.ID, BackMenu.ID, etc.).
+  // The id()/ID lookalike is intentional — keeping the constant uppercase and the accessor
+  // lowercase preserves both the field-as-constant convention and the EssentialsMenu interface.
+  @SuppressWarnings("java:S1845")
   public static final String ID = "essentials.vanish.list";
-
-  private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<VanishConfig> config;
   private final VanishService service;
@@ -48,25 +47,16 @@ public final class VanishMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
-    var rows = snap.effectiveRows();
-    var paginationBuilder = PaginationConfig.builder().contentSlots(snap.effectiveContentSlots());
-
-    if (rows > MIN_ROWS) {
-      PageNavigation.apply(menus, paginationBuilder, ID, rows, snap.navigation());
-    }
-
-    var pagination = paginationBuilder.build();
-    var infoTemplate = buildInfoTemplate(snap);
-
-    var menuTitle = ComponentUtils.mini(snap.menuTitle());
-    MenuFramework.builder(ID, menus)
-        .rows(rows)
-        .title(menuTitle)
-        .pagination(pagination)
-        .slot(snap.effectiveInfoSlot(), infoTemplate, null)
-        .dynamicContent(this::buildSlots)
-        .build()
-        .register();
+    PaginatedInfoMenus.register(
+        menus,
+        ID,
+        snap.effectiveRows(),
+        snap.menuTitle(),
+        snap.effectiveContentSlots(),
+        snap.navigation(),
+        snap.effectiveInfoSlot(),
+        buildInfoTemplate(snap),
+        this::buildSlots);
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player viewer, @NonNull MenuSession session) {

@@ -41,6 +41,7 @@ public record VanishConfig(
     @Comment("Shown when the teleport call itself fails.") String teleportFailed) {
 
   private static final int MIN_ROWS = 1;
+  private static final String PLAYER_PLACEHOLDER = "{player}";
 
   public static VanishConfig defaults() {
     return new VanishConfig(
@@ -114,7 +115,7 @@ public record VanishConfig(
   }
 
   public String formatItemName(@NonNull String player) {
-    return itemName.replace("{player}", player);
+    return itemName.replace(PLAYER_PLACEHOLDER, player);
   }
 
   public List<String> formatItemLore(
@@ -135,7 +136,7 @@ public record VanishConfig(
   }
 
   public String formatTeleportTargetGone(@NonNull String player) {
-    return teleportTargetGone.replace("{player}", player);
+    return teleportTargetGone.replace(PLAYER_PLACEHOLDER, player);
   }
 
   private static String formatLine(
@@ -146,7 +147,7 @@ public record VanishConfig(
       @NonNull String y,
       @NonNull String z) {
     return template
-        .replace("{player}", player)
+        .replace(PLAYER_PLACEHOLDER, player)
         .replace("{world}", world)
         .replace("{x}", x)
         .replace("{y}", y)
