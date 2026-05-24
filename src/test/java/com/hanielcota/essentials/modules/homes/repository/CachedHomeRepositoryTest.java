@@ -85,7 +85,7 @@ class CachedHomeRepositoryTest {
   }
 
   @Test
-  void evictForRunsAfterPendingWritesDrain() {
+  void evictForDropsCacheImmediatelyWithoutBlockingPendingWrites() {
     var owner = UUID.randomUUID();
     var delegate = new RecordingHomeRepository(home(owner, "base"));
     var writer = new RecordingWriter();
@@ -96,13 +96,32 @@ class CachedHomeRepositoryTest {
     repository.save(home(owner, "second"));
     repository.evictFor(owner);
 
-    assertTrue(repository.find(owner, "second").isPresent());
-    assertEquals(2, writer.pending());
+    assertFalse(repository.find(owner, "second").isPresent());
+    assertEquals(1, writer.pending());
 
     writer.runAll();
 
-    assertFalse(repository.find(owner, "second").isPresent());
     assertEquals(1, delegate.saveCalls);
+  }
+
+  @Test
+  void quickReconnectAfterEvictKeepsFreshlyLoadedBucket() {
+    var owner = UUID.randomUUID();
+    var delegate = new RecordingHomeRepository(home(owner, "base"));
+    var writer = new RecordingWriter();
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
+    var repository = new CachedHomeRepository(delegate, writer, cache);
+
+    // Quit -> evict, then immediate reconnect repopulates the bucket. The previous bug deferred
+    // eviction through the writer queue: the deferred eviction would fire after loadFor and
+    // wipe the fresh bucket. We assert the fresh bucket survives.
+    repository.evictFor(owner);
+    repository.loadFor(owner);
+    writer.runAll();
+
+    assertTrue(repository.find(owner, "base").isPresent());
+    assertEquals(1, repository.count(owner));
   }
 
   private static final class RecordingWriter implements AsyncDatabaseWriter {

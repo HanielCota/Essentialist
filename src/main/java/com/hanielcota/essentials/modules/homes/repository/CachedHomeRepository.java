@@ -31,14 +31,16 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   }
 
   /**
-   * Drops {@code owner} from the in-memory cache after pending writes drain.
+   * Drops {@code owner} from the in-memory cache.
    *
-   * <p>Deferred through the single-threaded writer queue so a rapid disconnect/reconnect cannot
-   * read SQL state older than the cache that just got evicted: any queued save/delete/rename for
-   * this owner runs first, then the eviction.
+   * <p>Runs synchronously on the caller's thread (typically PlayerQuitEvent on the main thread).
+   * The cache is independent of pending SQL writes — every {@link #save}/{@link #delete}/{@link
+   * #rename}/{@link #updateMaterial} captures its payload before submitting to the writer — so
+   * eviction does not need to wait for the writer to drain. Deferring it through the writer queue
+   * would race a fresh {@link #loadFor} from a quick reconnect and wipe the freshly loaded bucket.
    */
   public void evictFor(@NonNull UUID owner) {
-    this.writer.submit("evict home cache", () -> this.cache.evictFor(owner));
+    this.cache.evictFor(owner);
   }
 
   @Override
