@@ -52,35 +52,35 @@ public record HomesMessages(
 
   public static HomesMessages defaults() {
     return new HomesMessages(
-        "<green>Home <gold>{name}</gold> definida.",
-        "<green>Home <gold>{name}</gold> atualizada.",
-        "<red>Você já atingiu o seu limite de homes (<gold>{limit}</gold>). "
-            + "Use /delhome para liberar espaço.",
-        "<red>Você não tem nenhuma home chamada <gold>{name}</gold>.",
-        "<red>Você ainda não tem nenhuma home. Use <gold>/sethome [nome]</gold>.",
-        "<yellow>Home <gold>{name}</gold> removida.",
-        "<red>O mundo desta home não está carregado.",
-        "<red>Material inválido: <gold>{material}</gold>.",
-        "<yellow>Teleportando para <gold>{name}</gold> em <gold>{seconds}s</gold>. "
-            + "Não tome dano.",
+        "<green>Home <gold>{name}</gold> set.",
+        "<green>Home <gold>{name}</gold> updated.",
+        "<red>You have reached your home limit (<gold>{limit}</gold>). "
+            + "Use /delhome to free a slot.",
+        "<red>You don't have any home named <gold>{name}</gold>.",
+        "<red>You don't have any homes yet. Use <gold>/sethome [name]</gold>.",
+        "<yellow>Home <gold>{name}</gold> removed.",
+        "<red>The world of this home is not loaded.",
+        "<red>Invalid material: <gold>{material}</gold>.",
+        "<yellow>Teleporting to <gold>{name}</gold> in <gold>{seconds}s</gold>. "
+            + "Don't take damage.",
         "<red><u>[Cancel]</u>",
         "<gray>Click to cancel the teleport.",
-        "<green>Você foi teleportado para <gold>{name}</gold>.",
-        "<red>Teleporte cancelado.",
-        "<red>O teleporte não pôde ser concluído.",
-        "<dark_red>Excluir esta home?",
-        "<red>Excluir esta home?",
-        "<green>Sim, excluir",
-        "<red>Cancelar",
-        "<green>Ícone de <gold>{name}</gold> alterado para <gold>{material}</gold>.",
-        "<yellow>Digite no chat o novo nome para <gold>{name}</gold> "
-            + "(ou <gold>cancel</gold>). Você tem <gold>{seconds}s</gold>.",
-        "<yellow>Renomeação cancelada.",
-        "<red>O tempo para renomear (<gold>{seconds}s</gold>) expirou.",
-        "<red>Nome inválido. Use 1-32 caracteres: letras, números, _ ou -.",
-        "<red>Você já tem uma home chamada <gold>{name}</gold>.",
-        "<red>A home <gold>{name}</gold> desapareceu antes da renomeação.",
-        "<green>Home <gold>{old}</gold> renomeada para <gold>{new}</gold>.");
+        "<green>You were teleported to <gold>{name}</gold>.",
+        "<red>Teleport cancelled.",
+        "<red>The teleport could not be completed.",
+        "<dark_red>Delete this home?",
+        "<red>Delete this home?",
+        "<green>Yes, delete",
+        "<red>Cancel",
+        "<green>Icon of <gold>{name}</gold> changed to <gold>{material}</gold>.",
+        "<yellow>Type the new name for <gold>{name}</gold> in chat "
+            + "(or <gold>cancel</gold>). You have <gold>{seconds}s</gold>.",
+        "<yellow>Rename cancelled.",
+        "<red>The rename window (<gold>{seconds}s</gold>) expired.",
+        "<red>Invalid name. Use 1-32 characters: letters, digits, _ or -.",
+        "<red>You already have a home named <gold>{name}</gold>.",
+        "<red>Home <gold>{name}</gold> disappeared before the rename completed.",
+        "<green>Home <gold>{old}</gold> renamed to <gold>{new}</gold>.");
   }
 
   public String invalidName() {
