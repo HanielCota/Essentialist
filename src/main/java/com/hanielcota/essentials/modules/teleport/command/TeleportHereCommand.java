@@ -33,14 +33,22 @@ public record TeleportHereCommand(
       return;
     }
 
-    if (!target.teleport(sender.getLocation())) {
-      senderActor.sendError(snap.teleportFailed());
-      return;
-    }
-
-    var targetActor = this.framework.actorOf(target);
-    String selfMessage = snap.formatBroughtPlayer(target.getName());
-    String otherMessage = snap.formatBroughtBy(sender.getName());
-    senderActor.sendDualMessage(targetActor, selfMessage, otherMessage);
+    var destination = sender.getLocation();
+    var senderName = sender.getName();
+    var targetName = target.getName();
+    target
+        .teleportAsync(destination)
+        .thenAccept(
+            success -> {
+              if (!Boolean.TRUE.equals(success)) {
+                senderActor.sendError(snap.teleportFailed());
+                return;
+              }
+              var targetActor = this.framework.actorOf(target);
+              senderActor.sendDualMessage(
+                  targetActor,
+                  snap.formatBroughtPlayer(targetName),
+                  snap.formatBroughtBy(senderName));
+            });
   }
 }
