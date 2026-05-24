@@ -69,21 +69,20 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
       var defaultInstance = this.defaults.get();
       defaultsNode.set(this.type, defaultInstance);
 
-      var initialSize = node.childrenMap().size();
       node.mergeFrom(defaultsNode);
-
-      var currentSize = node.childrenMap().size();
-      var dirty = node.empty() || initialSize != currentSize;
 
       var value = node.get(this.type);
       if (value == null) {
         value = defaultInstance;
-        dirty = true;
       }
 
-      if (dirty) {
-        loader.save(node);
-      }
+      // Always rewrite. Detecting whether mergeFrom introduced new keys reliably
+      // requires deep node comparison; comparing top-level childrenMap().size()
+      // (the previous heuristic) missed any nested key added inside an existing
+      // section, leaving the file stale forever. The file IO is a one-time cost
+      // at config load, so paying it unconditionally is cheaper than the
+      // alternative bug.
+      loader.save(node);
 
       return value;
 
