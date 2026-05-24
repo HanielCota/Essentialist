@@ -31,7 +31,6 @@ import com.hanielcota.essentials.user.UserSessionService;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import lombok.NonNull;
@@ -110,9 +109,13 @@ public final class EssentialsBootstrap {
   private void registerDatabase(@NonNull ServiceRegistry services) {
     var dataFolder = this.plugin.getDataFolder();
     var dbPath = dataFolder.toPath().resolve("data").resolve("essentials.db");
-
     var parentDir = dbPath.getParent();
-    createDirectories(parentDir);
+
+    try {
+      Files.createDirectories(parentDir);
+    } catch (IOException e) {
+      throw new PluginException("Failed to create database directory: " + parentDir, e);
+    }
 
     var database = new SqliteDatabase(dbPath);
     database.connect();
@@ -122,18 +125,6 @@ public final class EssentialsBootstrap {
 
     var sqlExecutor = new DefaultSqlExecutor(database);
     services.register(SqlExecutor.class, sqlExecutor);
-  }
-
-  private void createDirectories(@NonNull Path path) {
-    if (path == null) {
-      return;
-    }
-
-    try {
-      Files.createDirectories(path);
-    } catch (IOException e) {
-      throw new PluginException("Failed to create database directory: " + path, e);
-    }
   }
 
   private void registerUserStack(@NonNull ServiceRegistry services) {

@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.teleport.command;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
-import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -26,7 +25,7 @@ import org.bukkit.entity.Player;
 @Description("Teleporta o jogador para outro jogador ou coordenadas.")
 @Syntax("/tp <jogador> | /tp move <de> <para> | /tp pos <x> <y> <z>")
 public record TeleportCommand(
-    ConfigHandle<TeleportConfig> config, TeleportService service, PaperCommandFramework framework) {
+    ConfigHandle<TeleportConfig> config, PaperCommandFramework framework) {
 
   @DefaultSubcommand
   @PlayerOnly
@@ -42,7 +41,7 @@ public record TeleportCommand(
     }
 
     var targetLocation = target.getLocation();
-    if (!this.service.teleportTo(sender, targetLocation)) {
+    if (!sender.teleport(targetLocation)) {
       senderActor.sendError(snap.teleportFailed());
       return;
     }
@@ -69,7 +68,7 @@ public record TeleportCommand(
     }
 
     var toLocation = to.getLocation();
-    if (!this.service.teleportTo(from, toLocation)) {
+    if (!from.teleport(toLocation)) {
       sender.sendError(snap.teleportFailed());
       return;
     }
@@ -106,7 +105,7 @@ public record TeleportCommand(
       return;
     }
 
-    if (!this.service.teleportTo(sender, destination)) {
+    if (!sender.teleport(destination)) {
       senderActor.sendError(snap.teleportFailed());
       return;
     }

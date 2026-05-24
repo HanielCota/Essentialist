@@ -26,7 +26,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public final class DelayedTeleport implements Listener {
 
   private final Scheduler scheduler;
-  private final TeleportService teleport;
   private final Map<UUID, Pending> pending = new ConcurrentHashMap<>();
 
   /**
@@ -79,7 +78,7 @@ public final class DelayedTeleport implements Listener {
       callback.onCancelled();
       return;
     }
-    if (!this.teleport.teleportTo(player, destination)) {
+    if (!player.teleport(destination)) {
       callback.onFailed();
       return;
     }

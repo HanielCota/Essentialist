@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
-import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpCancelCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpDenyCommand;
@@ -72,9 +71,7 @@ public final class TpaModule extends AbstractModule {
   private TpaRuntime requestRuntime(ConfigHandle<TpaConfig> config, AsyncTpaHistory history) {
     var store = new RequestStore();
     var notifier = new TpaNotifier(config);
-    var requestService =
-        new TeleportRequestService(
-            config, store, history, service(TeleportService.class), notifier);
+    var requestService = new TeleportRequestService(config, store, history, notifier);
 
     var expiry = new TeleportRequestExpiry(service(Scheduler.class), store, requestService);
     expiry.start();

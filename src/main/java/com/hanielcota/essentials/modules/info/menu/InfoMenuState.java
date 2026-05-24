@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public final class InfoMenuState {
@@ -26,7 +27,7 @@ public final class InfoMenuState {
 
   public Player resolveTarget(@NonNull Player viewer) {
     UUID targetId = this.playerTarget.getOrDefault(viewer.getUniqueId(), viewer.getUniqueId());
-    Player target = org.bukkit.Bukkit.getPlayer(targetId);
+    Player target = Bukkit.getPlayer(targetId);
     return target != null ? target : viewer;
   }
 

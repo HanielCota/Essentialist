@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
@@ -23,8 +22,8 @@ import org.bukkit.entity.Player;
  * Application service for the teleport-request use cases: create, accept, deny, cancel, expire.
  *
  * <p>Sole responsibility: orchestration. It owns no state and renders no messages â€” it delegates
- * storage to {@link RequestStore}, persistence to {@link TpaHistory}, teleporting to {@link
- * TeleportService} and player-facing notices to {@link TpaNotifier}.
+ * storage to {@link RequestStore}, persistence to {@link TpaHistory} and player-facing notices to
+ * {@link TpaNotifier}.
  */
 @RequiredArgsConstructor
 public final class TeleportRequestService {
@@ -32,7 +31,6 @@ public final class TeleportRequestService {
   private final ConfigHandle<TpaConfig> config;
   private final RequestStore store;
   private final TpaHistory history;
-  private final TeleportService teleport;
   private final TpaNotifier notifier;
 
   /**
@@ -99,7 +97,7 @@ public final class TeleportRequestService {
     Player benchmark = toTarget ? target : requester;
     Location landing = benchmark.getLocation();
 
-    if (!this.teleport.teleportTo(mover, landing)) {
+    if (!mover.teleport(landing)) {
       this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
       return AcceptResult.TELEPORT_FAILED;
     }

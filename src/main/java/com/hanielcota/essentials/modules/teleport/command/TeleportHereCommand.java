@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.teleport.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
-import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -22,7 +21,7 @@ import org.bukkit.entity.Player;
 @Description("Teleporta um jogador até você.")
 @Syntax("/tphere <jogador>")
 public record TeleportHereCommand(
-    ConfigHandle<TeleportConfig> config, TeleportService service, PaperCommandFramework framework) {
+    ConfigHandle<TeleportConfig> config, PaperCommandFramework framework) {
 
   @DefaultSubcommand
   public void execute(@NonNull Player sender, @OnlinePlayer @NonNull Player target) {
@@ -34,7 +33,7 @@ public record TeleportHereCommand(
       return;
     }
 
-    if (!this.service.teleportTo(target, sender.getLocation())) {
+    if (!target.teleport(sender.getLocation())) {
       senderActor.sendError(snap.teleportFailed());
       return;
     }

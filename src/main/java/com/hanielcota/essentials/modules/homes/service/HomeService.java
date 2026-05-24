@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Application service for the homes use cases.
@@ -45,7 +46,7 @@ public final class HomeService {
       @NonNull Player owner,
       @NonNull String name,
       @NonNull Location location,
-      @org.jspecify.annotations.Nullable Material material) {
+      @Nullable Material material) {
     var ownerId = owner.getUniqueId();
     var existing = this.repository.find(ownerId, name);
     var sanitizedMaterial = HomeMaterials.sanitizeIcon(material);
@@ -84,9 +85,7 @@ public final class HomeService {
   }
 
   public boolean setMaterial(
-      @NonNull UUID owner,
-      @NonNull String name,
-      @org.jspecify.annotations.Nullable Material material) {
+      @NonNull UUID owner, @NonNull String name, @Nullable Material material) {
     if (!HomeMaterials.isUsableIcon(material)) {
       return false;
     }

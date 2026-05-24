@@ -5,21 +5,10 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
-import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 
-public record BackClickHandler(
-    ConfigHandle<BackConfig> config, TeleportHistory history, TeleportService teleport) {
-
-  public BackClickHandler(
-      @NonNull ConfigHandle<BackConfig> config,
-      @NonNull TeleportHistory history,
-      @NonNull TeleportService teleport) {
-    this.config = config;
-    this.history = history;
-    this.teleport = teleport;
-  }
+public record BackClickHandler(ConfigHandle<BackConfig> config, TeleportHistory history) {
 
   public void handle(@NonNull ClickContext click, @NonNull HistoryEntry entry) {
     var player = click.player();
@@ -45,7 +34,7 @@ public record BackClickHandler(
       return;
     }
 
-    if (!this.teleport.teleportTo(player, target)) {
+    if (!player.teleport(target)) {
       click.reply(snap.noBack());
       return;
     }

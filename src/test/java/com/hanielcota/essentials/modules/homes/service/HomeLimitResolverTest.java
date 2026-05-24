@@ -9,6 +9,7 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.junit.jupiter.api.Test;
 
 class HomeLimitResolverTest {
@@ -69,24 +70,23 @@ class HomeLimitResolverTest {
     }
 
     @Override
+    public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PermissionAttachment addAttachment(Plugin plugin) {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
     public PermissionAttachment addAttachment(
-        org.bukkit.plugin.Plugin plugin, String name, boolean value) {
+        Plugin plugin, String name, boolean value, int ticks) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public PermissionAttachment addAttachment(org.bukkit.plugin.Plugin plugin) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PermissionAttachment addAttachment(
-        org.bukkit.plugin.Plugin plugin, String name, boolean value, int ticks) {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public PermissionAttachment addAttachment(org.bukkit.plugin.Plugin plugin, int ticks) {
+    public PermissionAttachment addAttachment(Plugin plugin, int ticks) {
       throw new UnsupportedOperationException();
     }
 
