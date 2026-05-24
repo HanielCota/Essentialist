@@ -46,7 +46,12 @@ public final class InvseeProtectionListener implements Listener {
 
   @EventHandler
   public void onTargetDeath(@NonNull PlayerDeathEvent event) {
-    closeViewsTargeting(event.getEntity().getUniqueId());
+    var targetId = event.getEntity().getUniqueId();
+    closeViewsTargeting(targetId);
+    // Mirror onTargetQuit — don't rely on each viewer's InventoryCloseEvent racing through the
+    // event bus to free the lock. On Folia the close may be deferred until the viewer's region
+    // tick, which would refuse a fresh /invsee against the same target in the meantime.
+    this.service.releaseTarget(targetId);
   }
 
   @EventHandler

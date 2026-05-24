@@ -37,6 +37,8 @@ public final class SpawnVoidListener implements Listener {
     // teleport the player back to wherever they were going seconds later.
     this.delayed.cancelAndNotify(player.getUniqueId());
     player.setFallDistance(0);
-    player.teleport(spawn.get());
+    // teleportAsync so a cross-world spawn (e.g. nether-void → overworld spawn) does not stall the
+    // damage event on chunk load. Discard the future — the rescue is fire-and-forget.
+    player.teleportAsync(spawn.get());
   }
 }

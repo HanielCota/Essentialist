@@ -70,12 +70,9 @@ public final class WarpStore {
 
   /** Deletes the warp. Returns {@code true} when a row was removed. */
   public boolean delete(@NonNull String name) {
-    var before = find(name).isPresent();
-    if (!before) {
-      return false;
-    }
-
-    this.sqlExecutor.update(WarpTable.DELETE, name);
-    return true;
+    // One DELETE — the affected-row count tells us whether the warp existed, so concurrent /delwarp
+    // calls don't both observe-then-double-delete.
+    var affected = this.sqlExecutor.updateCount(WarpTable.DELETE, name);
+    return affected > 0;
   }
 }

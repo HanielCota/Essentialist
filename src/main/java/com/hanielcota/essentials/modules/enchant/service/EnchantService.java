@@ -51,7 +51,10 @@ public final class EnchantService {
       return 0;
     }
 
-    enchantments.keySet().forEach(held::removeEnchantment);
+    // Snapshot the keys before iterating — Bukkit returns an unmodifiable copy today, but the
+    // contract leaves room for implementations that would throw on concurrent removal.
+    var keys = java.util.Set.copyOf(enchantments.keySet());
+    keys.forEach(held::removeEnchantment);
     return enchantments.size();
   }
 

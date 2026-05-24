@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PermissionForOther;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Player;
 @Command(value = "echest", aliases = "enderchest")
 @EssentialsCommand
 @Permission("essentials.echest")
+@PlayerOnly
 @Cooldown(duration = "3s")
 @Description("Abre o seu Ender Chest ou o de outro jogador.")
 @Syntax("/echest [jogador]")
