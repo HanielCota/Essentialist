@@ -27,13 +27,14 @@ public record HatCommand(ConfigHandle<HatConfig> config, HatService service) {
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
     Player sender = actor.unwrap(Player.class);
-    var result = this.service.equip(sender);
     var snap = this.config.value();
+    var result = this.service.equip(sender, snap);
 
-    if (result == HatService.Result.EMPTY_HAND) {
-      actor.sendError(snap.emptyHand());
-      return;
+    switch (result) {
+      case EQUIPPED -> actor.sendSuccess(snap.equipped());
+      case EMPTY_HAND -> actor.sendError(snap.emptyHand());
+      case NOT_ALLOWED -> actor.sendError(snap.notAllowed());
+      case INVENTORY_FULL -> actor.sendError(snap.inventoryFull());
     }
-    actor.sendSuccess(snap.equipped());
   }
 }
