@@ -26,17 +26,29 @@ class CachedHomeRepositoryTest {
   }
 
   @Test
+  void loadForPullsFromDelegateAndPopulatesCache() {
+    var owner = UUID.randomUUID();
+    var delegate = new RecordingHomeRepository(home(owner, "base"));
+    var writer = new RecordingWriter();
+    var repository = new CachedHomeRepository(delegate, writer, new HomeCache());
+
+    repository.loadFor(owner);
+
+    assertEquals(1, delegate.listCalls);
+    assertTrue(repository.find(owner, "BASE").isPresent());
+    assertEquals(1, repository.count(owner));
+    assertEquals(List.of("base"), names(repository.list(owner)));
+    assertEquals(0, delegate.findCalls + delegate.countCalls);
+  }
+
+  @Test
   void servesReadsFromMemoryAndQueuesWrites() {
     var owner = UUID.randomUUID();
     var delegate = new RecordingHomeRepository(home(owner, "base"));
     var writer = new RecordingWriter();
-    var repository = new CachedHomeRepository(delegate, writer, new HomeCache(delegate.listAll()));
-
-    assertTrue(repository.find(owner, "BASE").isPresent());
-    assertEquals(1, repository.count(owner));
-    assertEquals(List.of("base"), names(repository.list(owner)));
-    assertEquals(1, delegate.listAllCalls);
-    assertEquals(0, delegate.findCalls + delegate.listCalls + delegate.countCalls);
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
+    var repository = new CachedHomeRepository(delegate, writer, cache);
 
     repository.save(home(owner, "mine"));
 
@@ -54,7 +66,9 @@ class CachedHomeRepositoryTest {
     var owner = UUID.randomUUID();
     var delegate = new RecordingHomeRepository(home(owner, "base"));
     var writer = new RecordingWriter();
-    var repository = new CachedHomeRepository(delegate, writer, new HomeCache(delegate.listAll()));
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
+    var repository = new CachedHomeRepository(delegate, writer, cache);
 
     assertTrue(repository.rename(owner, "BASE", "main"));
     assertFalse(repository.find(owner, "base").isPresent());
@@ -68,6 +82,27 @@ class CachedHomeRepositoryTest {
 
     assertEquals(1, delegate.renameCalls);
     assertEquals(1, delegate.deleteCalls);
+  }
+
+  @Test
+  void evictForRunsAfterPendingWritesDrain() {
+    var owner = UUID.randomUUID();
+    var delegate = new RecordingHomeRepository(home(owner, "base"));
+    var writer = new RecordingWriter();
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
+    var repository = new CachedHomeRepository(delegate, writer, cache);
+
+    repository.save(home(owner, "second"));
+    repository.evictFor(owner);
+
+    assertTrue(repository.find(owner, "second").isPresent());
+    assertEquals(2, writer.pending());
+
+    writer.runAll();
+
+    assertFalse(repository.find(owner, "second").isPresent());
+    assertEquals(1, delegate.saveCalls);
   }
 
   private static final class RecordingWriter implements AsyncDatabaseWriter {
@@ -96,7 +131,6 @@ class CachedHomeRepositoryTest {
   private static final class RecordingHomeRepository implements HomeRepository {
 
     private final List<Home> homes = new ArrayList<>();
-    private int listAllCalls;
     private int findCalls;
     private int listCalls;
     private int countCalls;
@@ -117,13 +151,7 @@ class CachedHomeRepositoryTest {
     @Override
     public List<Home> list(UUID owner) {
       listCalls++;
-      return List.of();
-    }
-
-    @Override
-    public List<Home> listAll() {
-      listAllCalls++;
-      return List.copyOf(homes);
+      return List.copyOf(this.homes);
     }
 
     @Override

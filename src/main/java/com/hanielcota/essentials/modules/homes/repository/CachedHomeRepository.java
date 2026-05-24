@@ -30,9 +30,15 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
     this.cache.loadFor(owner, homes);
   }
 
-  /** Drops {@code owner} from the in-memory cache. SQL is untouched. */
+  /**
+   * Drops {@code owner} from the in-memory cache after pending writes drain.
+   *
+   * <p>Deferred through the single-threaded writer queue so a rapid disconnect/reconnect cannot
+   * read SQL state older than the cache that just got evicted: any queued save/delete/rename for
+   * this owner runs first, then the eviction.
+   */
   public void evictFor(@NonNull UUID owner) {
-    this.cache.evictFor(owner);
+    this.writer.submit("evict home cache", () -> this.cache.evictFor(owner));
   }
 
   @Override

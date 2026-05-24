@@ -19,7 +19,8 @@ class HomeCacheTest {
   @Test
   void storesAndFindsHomesCaseInsensitively() {
     var owner = UUID.randomUUID();
-    var cache = new HomeCache(List.of(home(owner, "base")));
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
 
     assertTrue(cache.find(owner, "BASE").isPresent());
     assertEquals(1, cache.count(owner));
@@ -29,7 +30,8 @@ class HomeCacheTest {
   @Test
   void renameDeleteAndMaterialUpdateAreAtomicForOnePlayerBucket() {
     var owner = UUID.randomUUID();
-    var cache = new HomeCache(List.of(home(owner, "base")));
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
 
     assertTrue(cache.rename(owner, "BASE", "main").isPresent());
     assertFalse(cache.find(owner, "base").isPresent());
@@ -37,6 +39,18 @@ class HomeCacheTest {
         Material.COMPASS,
         cache.updateMaterial(owner, "MAIN", Material.COMPASS).orElseThrow().material());
     assertTrue(cache.delete(owner, "main").isPresent());
+    assertEquals(0, cache.count(owner));
+  }
+
+  @Test
+  void evictForRemovesBucket() {
+    var owner = UUID.randomUUID();
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
+
+    cache.evictFor(owner);
+
+    assertFalse(cache.find(owner, "base").isPresent());
     assertEquals(0, cache.count(owner));
   }
 }

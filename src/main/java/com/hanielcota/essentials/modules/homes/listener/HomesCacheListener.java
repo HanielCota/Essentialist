@@ -27,6 +27,9 @@ public final class HomesCacheListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onPreLogin(@NonNull AsyncPlayerPreLoginEvent event) {
+    if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+      return;
+    }
     var uuid = event.getUniqueId();
     try {
       this.repository.loadFor(uuid);
