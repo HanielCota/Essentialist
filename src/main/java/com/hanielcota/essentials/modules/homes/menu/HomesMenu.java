@@ -57,6 +57,7 @@ public final class HomesMenu implements EssentialsMenu {
         .rows(rows)
         .title(menuTitle)
         .pagination(pagination)
+        .allowShiftClick(true)
         .slot(menuSpec.effectiveInfoSlot(), infoTemplate, null)
         .dynamicContent(this::buildSlots)
         .build()

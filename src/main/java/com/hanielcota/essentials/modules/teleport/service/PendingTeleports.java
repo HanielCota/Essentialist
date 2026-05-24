@@ -11,10 +11,6 @@ final class PendingTeleports {
 
   private final Map<UUID, PendingTeleport> pending = new ConcurrentHashMap<>();
 
-  boolean contains(@NonNull UUID player) {
-    return this.pending.containsKey(player);
-  }
-
   void put(@NonNull UUID player, @NonNull Task task, @NonNull DelayedTeleport.Callback callback) {
     this.pending.put(player, new PendingTeleport(task, callback));
   }

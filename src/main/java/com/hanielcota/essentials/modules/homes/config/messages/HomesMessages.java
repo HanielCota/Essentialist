@@ -22,6 +22,10 @@ public record HomesMessages(
         String invalidMaterial,
     @Comment("Shown on /home start when a delay is configured. Placeholders: {name}, {seconds}.")
         String teleporting,
+    @Comment("Clickable suffix appended to the teleporting message that runs /tpcancel.")
+        String cancelButton,
+    @Comment("Tooltip shown when hovering the [Cancel] button of the teleporting message.")
+        String cancelHover,
     @Comment("Shown after /home completes successfully. Placeholders: {name}.") String teleported,
     @Comment("Shown when the delayed teleport is cancelled by damage or disconnect.")
         String cancelled,
@@ -59,6 +63,8 @@ public record HomesMessages(
         "<red>Material inválido: <gold>{material}</gold>.",
         "<yellow>Teleportando para <gold>{name}</gold> em <gold>{seconds}s</gold>. "
             + "Não tome dano.",
+        "<red><u>[Cancel]</u>",
+        "<gray>Click to cancel the teleport.",
         "<green>Você foi teleportado para <gold>{name}</gold>.",
         "<red>Teleporte cancelado.",
         "<red>O teleporte não pôde ser concluído.",
