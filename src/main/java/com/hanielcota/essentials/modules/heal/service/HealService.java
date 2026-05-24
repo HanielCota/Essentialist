@@ -13,6 +13,9 @@ public final class HealService {
     }
 
     double maxHealth = maxHealthAttribute.getValue();
+    if (!Double.isFinite(maxHealth) || maxHealth <= 0) {
+      return false;
+    }
     if (player.getHealth() >= maxHealth) {
       return false;
     }

@@ -33,7 +33,12 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
     }
 
     var title = snap.formatTitle(target.getName());
-    viewer.openInventory(this.service.createView(target, title));
+    var viewOpt = this.service.createView(viewer, target, title);
+    if (viewOpt.isEmpty()) {
+      sender.sendError(snap.alreadyViewed());
+      return;
+    }
+    viewer.openInventory(viewOpt.get());
 
     var openedMsg = snap.formatOpened(target.getName());
     sender.sendSuccess(openedMsg);

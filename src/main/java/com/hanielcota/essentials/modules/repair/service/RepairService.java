@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.Damageable;
 
 public record RepairService(ConfigHandle<RepairConfig> config) {
 
-  private static boolean repair(@NonNull ItemStack item, @NonNull List<Material> blacklist) {
+  private static boolean repair(ItemStack item, @NonNull List<Material> blacklist) {
     if (item == null || item.getType().getMaxDurability() <= 0) {
       return false;
     }

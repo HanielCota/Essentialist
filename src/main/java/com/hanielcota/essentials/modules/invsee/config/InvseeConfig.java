@@ -8,13 +8,16 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public record InvseeConfig(
     @Comment("/invsee menu title. Placeholder: {player}.") String menuTitle,
     @Comment("Shown when /invsee opens an inventory. Placeholder: {player}.") String opened,
-    @Comment("Shown when a player runs /invsee on themselves.") String self) {
+    @Comment("Shown when a player runs /invsee on themselves.") String self,
+    @Comment("Shown when /invsee is denied because another viewer already holds the target.")
+        String alreadyViewed) {
 
   public static InvseeConfig defaults() {
     return new InvseeConfig(
         "<dark_gray>Inventário de {player}",
         "<green>Abrindo o inventário de <gold>{player}</gold>.",
-        "<red>Você não pode ver o próprio inventário.");
+        "<red>Você não pode ver o próprio inventário.",
+        "<red>O inventário desse jogador já está sendo visto por outro staff.");
   }
 
   public String formatTitle(@NonNull String player) {

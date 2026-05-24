@@ -35,15 +35,33 @@ public final class RequestStore {
     return isRequester || isTarget;
   }
 
-  /** Adds a request and indexes it by requester and by target. */
+  /**
+   * Adds a request and indexes it by requester and by target.
+   *
+   * <p>If the requester already had an outgoing request indexed (caller raced or forgot to resolve
+   * it first), the prior request's row is purged from {@link #byId} and {@link #incomingByTarget}
+   * before the new index is installed — otherwise the previous request would stay reachable to the
+   * target's {@code /tpaccept} long after the indexes pointed elsewhere.
+   */
   public void add(@NonNull TeleportRequest request) {
+    var requestId = request.id();
+    var requesterId = request.requester().id();
+    var targetId = request.target().id();
 
-    this.byId.put(request.id(), request);
-    this.outgoingByRequester.put(request.requester().id(), request.id());
-
+    this.byId.put(requestId, request);
     this.incomingByTarget
-        .computeIfAbsent(request.target().id(), key -> ConcurrentHashMap.newKeySet())
-        .add(request.id());
+        .computeIfAbsent(targetId, key -> ConcurrentHashMap.newKeySet())
+        .add(requestId);
+
+    var previousId = this.outgoingByRequester.put(requesterId, requestId);
+    if (previousId == null || previousId.equals(requestId)) {
+      return;
+    }
+
+    var previous = this.byId.remove(previousId);
+    if (previous != null) {
+      detachIncoming(previous.target().id(), previousId);
+    }
   }
 
   /** Removes a request. Returns {@code false} when it was already gone. */

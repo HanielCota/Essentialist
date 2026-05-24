@@ -21,7 +21,7 @@ public final class InvseeModule extends AbstractModule {
     var service = new InvseeService();
     var synchronizer = new InvseeSynchronizer(service(Scheduler.class), service);
     registerListener(new InvseeListener(synchronizer));
-    registerListener(new InvseeProtectionListener());
+    registerListener(new InvseeProtectionListener(service));
     registerCommand(new InvseeCommand(config, service));
   }
 }

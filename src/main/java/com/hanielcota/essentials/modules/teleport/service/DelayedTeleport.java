@@ -29,7 +29,8 @@ public final class DelayedTeleport {
   /**
    * Schedules a teleport to {@code destination} after {@code delay}. A {@link Duration#isZero()
    * zero or negative delay} teleports immediately. Any previous pending teleport for the same
-   * player is cancelled silently first.
+   * player is cancelled and its callback is notified via {@link Callback#onCancelled()} — so the
+   * prior warm-up's prompt is dismissed instead of being left hanging forever.
    */
   public void schedule(
       @NonNull Player player,
@@ -38,7 +39,7 @@ public final class DelayedTeleport {
       @NonNull Callback callback) {
 
     var uuid = player.getUniqueId();
-    cancel(uuid);
+    cancelAndNotify(uuid);
 
     if (delay.isZero() || delay.isNegative()) {
       callback.onScheduled(0);

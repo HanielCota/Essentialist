@@ -20,8 +20,6 @@ import org.jspecify.annotations.Nullable;
 @RequiredArgsConstructor
 public final class SqliteTpaHistory implements TpaHistory {
 
-  private static final int CAPACITY = 10;
-
   private final @NonNull SqlExecutor sqlExecutor;
 
   private static void setNullable(
@@ -82,7 +80,7 @@ public final class SqliteTpaHistory implements TpaHistory {
   @Override
   public List<TpaHistoryEntry> list(@NonNull UUID requester) {
     return this.sqlExecutor.query(
-        TpaHistoryTable.LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
+        TpaHistoryTable.LIST, SqliteTpaHistory::mapRow, requester.toString(), TpaHistory.CAPACITY);
   }
 
   private void insert(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
@@ -118,6 +116,7 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   private void trim(@NonNull Connection conn, @NonNull UUID requester) throws SQLException {
     var requesterId = requester.toString();
-    this.sqlExecutor.execute(conn, TpaHistoryTable.TRIM, requesterId, requesterId, CAPACITY);
+    this.sqlExecutor.execute(
+        conn, TpaHistoryTable.TRIM, requesterId, requesterId, TpaHistory.CAPACITY);
   }
 }
