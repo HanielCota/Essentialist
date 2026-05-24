@@ -70,18 +70,17 @@ public final class HomeService {
 
   public RenameResult rename(
       @NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
+    // Try the atomic rename first — the bucket's own check is the source of
+    // truth. Pre-checking with two finds risked reporting NAME_TAKEN when the
+    // cache was actually empty (or NOT_FOUND when it actually had the entry)
+    // if eviction interleaved between the finds and the rename.
+    if (this.repository.rename(owner, oldName, newName)) {
+      return RenameResult.RENAMED;
+    }
     if (this.repository.find(owner, oldName).isEmpty()) {
       return RenameResult.NOT_FOUND;
     }
-    if (this.repository.find(owner, newName).isPresent()) {
-      return RenameResult.NAME_TAKEN;
-    }
-
-    boolean renamed = this.repository.rename(owner, oldName, newName);
-    if (!renamed) {
-      return RenameResult.NOT_FOUND;
-    }
-    return RenameResult.RENAMED;
+    return RenameResult.NAME_TAKEN;
   }
 
   public boolean setMaterial(

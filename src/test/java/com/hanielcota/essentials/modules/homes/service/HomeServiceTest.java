@@ -53,15 +53,26 @@ class HomeServiceTest {
   }
 
   @Test
-  void renameDoesNotReportSuccessWhenRepositoryRefusesMutation() {
+  void renameReportsNotFoundWhenSourceIsMissing() {
+    var repository = new RefusingRenameRepository(false);
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 1));
+
+    var result = service.rename(UUID.randomUUID(), "base", "main");
+
+    assertEquals(HomeService.RenameResult.NOT_FOUND, result);
+  }
+
+  @Test
+  void renameReportsNameTakenWhenSourceExistsButRepositoryRefuses() {
     var owner = UUID.randomUUID();
     var home = new Home(owner, "base", "world", 0, 64, 0, 0, 0, Material.RED_BED, 1);
-    var repository = new RefusingRenameRepository(home);
+    var repository = new RefusingRenameRepository(true);
+    repository.home = home;
     var service = new HomeService(repository, new HomeLimitResolver(() -> 1));
 
     var result = service.rename(owner, "base", "main");
 
-    assertEquals(HomeService.RenameResult.NOT_FOUND, result);
+    assertEquals(HomeService.RenameResult.NAME_TAKEN, result);
   }
 
   @Test
@@ -86,14 +97,18 @@ class HomeServiceTest {
 
   private static final class RefusingRenameRepository implements HomeRepository {
 
-    private final Home home;
+    private final boolean sourceVisible;
+    private Home home;
 
-    private RefusingRenameRepository(Home home) {
-      this.home = home;
+    private RefusingRenameRepository(boolean sourceVisible) {
+      this.sourceVisible = sourceVisible;
     }
 
     @Override
     public Optional<Home> find(UUID owner, String name) {
+      if (!sourceVisible || home == null) {
+        return Optional.empty();
+      }
       if (home.owner().equals(owner) && home.name().equalsIgnoreCase(name)) {
         return Optional.of(home);
       }
@@ -102,12 +117,12 @@ class HomeServiceTest {
 
     @Override
     public List<Home> list(UUID owner) {
-      return List.of(home);
+      return home == null ? List.of() : List.of(home);
     }
 
     @Override
     public int count(UUID owner) {
-      return 1;
+      return home == null ? 0 : 1;
     }
 
     @Override
