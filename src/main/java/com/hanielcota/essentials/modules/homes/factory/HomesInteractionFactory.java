@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.homes.factory;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.listener.HomeRenameChatListener;
-import com.hanielcota.essentials.modules.homes.listener.HomeTeleportListener;
+import com.hanielcota.essentials.modules.homes.listener.HomesSessionCleanupListener;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.name.DefaultHomeNameValidator;
 import com.hanielcota.essentials.modules.homes.name.HomeNameResolver;
@@ -31,7 +31,7 @@ public final class HomesInteractionFactory {
 
     var nameResolver = new HomeNameResolver(config, nameValidator);
     var teleporter = new HomeTeleporter(config, delayed, framework);
-    var teleportListener = new HomeTeleportListener(actionTarget, renameSessions);
+    var teleportListener = new HomesSessionCleanupListener(actionTarget, renameSessions);
 
     var rename =
         new HomeRenameOrchestrator(config, homeService, scheduler, renameSessions, nameValidator);
@@ -45,7 +45,7 @@ public final class HomesInteractionFactory {
       HomeTeleporter teleporter,
       HomesActionTarget actionTarget,
       HomeNameResolver nameResolver,
-      HomeTeleportListener teleportListener,
+      HomesSessionCleanupListener teleportListener,
       HomeRenameOrchestrator rename,
       HomeRenameChatListener renameListener) {}
 }

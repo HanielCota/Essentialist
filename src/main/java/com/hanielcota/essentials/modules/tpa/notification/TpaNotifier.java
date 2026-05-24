@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.service;
+package com.hanielcota.essentials.modules.tpa.notification;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;

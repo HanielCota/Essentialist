@@ -1,19 +1,11 @@
 package com.hanielcota.essentials.modules.teleport.service;
 
 import com.hanielcota.essentials.scheduler.Scheduler;
-import com.hanielcota.essentials.scheduler.Task;
 import java.time.Duration;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Teleports a player after a configurable delay, cancelling on damage or disconnect.
@@ -22,11 +14,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
  * consistent. Holds the only timer state for pending warm-ups â€” one per player. Callers route
  * messaging through {@link Callback}; this class never sends chat itself.
  */
-@RequiredArgsConstructor
-public final class DelayedTeleport implements Listener {
+public final class DelayedTeleport {
 
   private final Scheduler scheduler;
-  private final Map<UUID, Pending> pending = new ConcurrentHashMap<>();
+  private final PendingTeleports pending;
+  private final TeleportExecutor executor;
+
+  public DelayedTeleport(@NonNull Scheduler scheduler) {
+    this.scheduler = scheduler;
+    this.pending = new PendingTeleports();
+    this.executor = new TeleportExecutor();
+  }
 
   /**
    * Schedules a teleport to {@code destination} after {@code delay}. A {@link Duration#isZero()
@@ -44,73 +42,44 @@ public final class DelayedTeleport implements Listener {
 
     if (delay.isZero() || delay.isNegative()) {
       callback.onScheduled(0);
-      this.scheduler.runOnEntity(player, () -> complete(player, destination, callback));
+      this.scheduler.runOnEntity(
+          player, () -> this.executor.teleport(player, destination, callback));
       return;
     }
 
     callback.onScheduled(Math.max(1, delay.toSeconds()));
-    var completeAction = (Runnable) () -> completePending(player, destination, callback);
-    var onEntityAction = (Runnable) () -> this.scheduler.runOnEntity(player, completeAction);
-    var task = this.scheduler.runLater(onEntityAction, delay);
-    this.pending.put(uuid, new Pending(task, callback));
+    var task = this.scheduler.runLater(() -> finishWarmup(player, destination, callback), delay);
+    this.pending.put(uuid, task, callback);
   }
 
   /** Whether {@code player} has a pending delayed teleport. */
   public boolean isPending(@NonNull UUID player) {
-    return this.pending.containsKey(player);
+    return this.pending.contains(player);
   }
 
   /**
    * Silently drops the pending teleport for {@code player} — no callback fires. Public so
-   * per-module listeners (e.g. {@code HomeTeleportListener}) can own their own cancel rules in
-   * addition to the shared move/damage/quit handling done here.
+   * per-module listeners (e.g. {@code HomesSessionCleanupListener}) can own their own cancel rules
+   * in addition to the shared damage/quit handling done here.
    */
   public void cancel(@NonNull UUID player) {
-    var p = this.pending.remove(player);
-    if (p != null) {
-      p.task.cancel();
-    }
+    this.pending.cancelSilently(player);
   }
 
-  private void complete(
-      @NonNull Player player, @NonNull Location destination, @NonNull Callback callback) {
-    if (!player.isOnline()) {
-      callback.onCancelled();
-      return;
-    }
-    if (!player.teleport(destination)) {
-      callback.onFailed();
-      return;
-    }
-    callback.onSuccess();
-  }
-
-  private void completePending(
+  private void finishWarmup(
       @NonNull Player player, @NonNull Location destination, @NonNull Callback callback) {
     var removed = this.pending.remove(player.getUniqueId());
-    if (removed == null || removed.callback != callback) {
+    if (removed == null || !removed.owns(callback)) {
       return;
     }
-    complete(player, destination, callback);
+    this.scheduler.runOnEntity(player, () -> this.executor.teleport(player, destination, callback));
   }
 
-  @EventHandler
-  public void onDamage(@NonNull EntityDamageEvent event) {
-    if (event.getEntity() instanceof Player player) {
-      fireCancelled(player.getUniqueId());
-    }
-  }
-
-  @EventHandler
-  public void onQuit(@NonNull PlayerQuitEvent event) {
-    cancel(event.getPlayer().getUniqueId());
-  }
-
-  private void fireCancelled(@NonNull UUID player) {
-    var p = this.pending.remove(player);
-    if (p != null) {
-      p.task.cancel();
-      p.callback.onCancelled();
+  public void cancelAndNotify(@NonNull UUID player) {
+    var pendingTeleport = this.pending.remove(player);
+    if (pendingTeleport != null) {
+      pendingTeleport.cancelTask();
+      pendingTeleport.callback().onCancelled();
     }
   }
 
@@ -125,12 +94,10 @@ public final class DelayedTeleport implements Listener {
     /** Called after the teleport succeeded. */
     default void onSuccess() {}
 
-    /** Called when the warm-up was cancelled (damage or disconnect). */
+    /** Called when the warm-up was cancelled by damage or disconnect. */
     default void onCancelled() {}
 
     /** Called when the teleport API call itself returned false. */
     default void onFailed() {}
   }
-
-  private record Pending(Task task, Callback callback) {}
 }

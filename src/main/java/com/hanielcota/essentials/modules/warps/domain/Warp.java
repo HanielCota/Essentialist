@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.warps.service;
+package com.hanielcota.essentials.modules.warps.domain;
 
 import java.util.Optional;
 import java.util.UUID;

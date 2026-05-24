@@ -1,5 +1,6 @@
-package com.hanielcota.essentials.modules.teleport.service;
+package com.hanielcota.essentials.modules.teleport.feedback;
 
+import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import io.github.hanielcota.commandframework.core.CommandActor;
 
 /**

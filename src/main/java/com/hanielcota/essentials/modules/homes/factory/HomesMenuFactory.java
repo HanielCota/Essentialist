@@ -15,6 +15,7 @@ import com.hanielcota.essentials.modules.homes.menu.MaterialCategoryMenu;
 import com.hanielcota.essentials.modules.homes.menu.MaterialPickerClickHandler;
 import com.hanielcota.essentials.modules.homes.menu.MaterialPickerMenu;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategoryIconRegistry;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialPickerPresentation;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
@@ -47,7 +48,8 @@ public final class HomesMenuFactory {
         new MaterialPickerClickHandler(config, homeService, actionTarget, pickerPresentation);
     var deleteClickHandler = new DeleteHomeClickHandler(config, homeService, actionTarget);
 
-    var categoryMenu = new MaterialCategoryMenu(config, categoryClickHandler);
+    var categoryIcons = new MaterialCategoryIconRegistry();
+    var categoryMenu = new MaterialCategoryMenu(config, categoryClickHandler, categoryIcons);
     var pickerMenu = new MaterialPickerMenu(config, actionTarget, iconRegistry, pickerClickHandler);
 
     var dialogs =

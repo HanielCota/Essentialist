@@ -8,6 +8,7 @@ import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
 import com.hanielcota.essentials.modules.teleport.history.SqliteTeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistoryTable;
+import com.hanielcota.essentials.modules.teleport.listener.DelayedTeleportCanceller;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
@@ -30,7 +31,7 @@ public final class TeleportModule extends AbstractModule {
 
     var delayed = new DelayedTeleport(service(Scheduler.class));
     registerService(DelayedTeleport.class, delayed);
-    registerListener(delayed);
+    registerListener(new DelayedTeleportCanceller(delayed));
 
     var framework = service(PaperCommandFramework.class);
     var teleportCommand = new TeleportCommand(config, framework);

@@ -10,7 +10,7 @@ import lombok.NonNull;
  * the player never sends a chat message.
  *
  * <p>Pure POJO state — start (replacing any prior), consume on completion, cancel on demand. Quit
- * cleanup lives in {@code HomeTeleportListener} per SRP.
+ * cleanup lives in {@code HomesSessionCleanupListener} per SRP.
  */
 public final class HomeRenameSessions {
 

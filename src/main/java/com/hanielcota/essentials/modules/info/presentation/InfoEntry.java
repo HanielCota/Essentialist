@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.info.service;
+package com.hanielcota.essentials.modules.info.presentation;
 
 import java.util.List;
 import java.util.UUID;

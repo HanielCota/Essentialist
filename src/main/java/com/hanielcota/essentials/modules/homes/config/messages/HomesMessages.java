@@ -23,7 +23,7 @@ public record HomesMessages(
     @Comment("Shown on /home start when a delay is configured. Placeholders: {name}, {seconds}.")
         String teleporting,
     @Comment("Shown after /home completes successfully. Placeholders: {name}.") String teleported,
-    @Comment("Shown when the delayed teleport is cancelled by movement or damage.")
+    @Comment("Shown when the delayed teleport is cancelled by damage or disconnect.")
         String cancelled,
     @Comment("Shown when the teleport itself fails.") String failed,
     @Comment("Title of the delete-confirmation dialog.") String deleteConfirmTitle,
@@ -58,7 +58,7 @@ public record HomesMessages(
         "<red>O mundo desta home não está carregado.",
         "<red>Material inválido: <gold>{material}</gold>.",
         "<yellow>Teleportando para <gold>{name}</gold> em <gold>{seconds}s</gold>. "
-            + "Não se mova nem tome dano.",
+            + "Não tome dano.",
         "<green>Você foi teleportado para <gold>{name}</gold>.",
         "<red>Teleporte cancelado.",
         "<red>O teleporte não pôde ser concluído.",

@@ -10,7 +10,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
-import com.hanielcota.essentials.modules.info.service.InfoEntry;
+import com.hanielcota.essentials.modules.info.presentation.InfoEntry;
 import com.hanielcota.essentials.modules.info.service.InfoService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;

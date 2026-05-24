@@ -1,5 +1,6 @@
-package com.hanielcota.essentials.user;
+package com.hanielcota.essentials.user.listener;
 
+import com.hanielcota.essentials.user.UserSessionService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
