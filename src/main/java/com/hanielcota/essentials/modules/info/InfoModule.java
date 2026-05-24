@@ -4,7 +4,9 @@ import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.info.command.InfoCommand;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
+import com.hanielcota.essentials.modules.info.listener.InfoMenuCleanupListener;
 import com.hanielcota.essentials.modules.info.menu.InfoMenu;
+import com.hanielcota.essentials.modules.info.menu.InfoMenuState;
 import com.hanielcota.essentials.modules.info.service.InfoService;
 import com.hanielcota.essentials.user.UserSessionService;
 
@@ -20,9 +22,13 @@ public final class InfoModule extends AbstractModule {
     var service = new InfoService(plugin(), service(UserSessionService.class));
     var menus = service(MenuService.class);
 
-    var menu = new InfoMenu(config, service);
+    var menuState = new InfoMenuState();
+    var menu = new InfoMenu(config, service, menuState);
     registerMenu(menu);
-    registerListener(menu);
-    registerCommand(new InfoCommand(menu, menus));
+    var cleanupListener = new InfoMenuCleanupListener(menuState);
+    registerListener(cleanupListener);
+
+    var infoCommand = new InfoCommand(menuState, menus);
+    registerCommand(infoCommand);
   }
 }

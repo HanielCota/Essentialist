@@ -30,17 +30,17 @@ public record NearConfig(
   public String formatEntry(@NonNull String player, int distance) {
     var distanceStr = Integer.toString(distance);
 
-    return entry.replace("{player}", player).replace("{distance}", distanceStr);
+    var withPlayer = entry.replace("{player}", player);
+    return withPlayer.replace("{distance}", distanceStr);
   }
 
   public String formatFound(int radius, int count, @NonNull String players) {
     var radiusStr = Integer.toString(radius);
     var countStr = Integer.toString(count);
 
-    return found
-        .replace("{radius}", radiusStr)
-        .replace("{count}", countStr)
-        .replace("{players}", players);
+    var withRadius = found.replace("{radius}", radiusStr);
+    var withCount = withRadius.replace("{count}", countStr);
+    return withCount.replace("{players}", players);
   }
 
   public String formatNone(int radius) {

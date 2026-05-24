@@ -23,8 +23,12 @@ public final class NearService {
         continue;
       }
       double distanceSquared = origin.distanceSquared(other.getLocation());
+
       if (distanceSquared <= maxDistanceSquared) {
-        result.add(new Nearby(other, (int) Math.round(Math.sqrt(distanceSquared))));
+        var distance = (int) Math.round(Math.sqrt(distanceSquared));
+        var nearby = new Nearby(other, distance);
+
+        result.add(nearby);
       }
     }
 

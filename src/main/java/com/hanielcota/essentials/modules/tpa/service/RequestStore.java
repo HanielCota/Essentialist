@@ -26,7 +26,13 @@ public final class RequestStore {
   private final Map<UUID, Set<RequestId>> incomingByTarget = new ConcurrentHashMap<>();
 
   private static boolean takesPart(@NonNull TeleportRequest request, @NonNull UUID player) {
-    return request.requester().id().equals(player) || request.target().id().equals(player);
+    var requesterId = request.requester().id();
+    var isRequester = requesterId.equals(player);
+
+    var targetId = request.target().id();
+    var isTarget = targetId.equals(player);
+
+    return isRequester || isTarget;
   }
 
   /** Adds a request and indexes it by requester and by target. */
@@ -68,7 +74,13 @@ public final class RequestStore {
       }
     }
 
-    requests.sort(Comparator.comparing((TeleportRequest r) -> r.window().createdAt()).reversed());
+    requests.sort(
+        Comparator.comparing(
+                (TeleportRequest r) -> {
+                  var window = r.window();
+                  return window.createdAt();
+                })
+            .reversed());
     return List.copyOf(requests);
   }
 

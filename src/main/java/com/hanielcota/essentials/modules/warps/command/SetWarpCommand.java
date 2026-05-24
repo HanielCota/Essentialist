@@ -26,8 +26,10 @@ public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @Arg("nome") String name) {
     var sender = actor.unwrap(Player.class);
-    var messages = this.config.value().messages();
-    var existed = this.service.find(name).isPresent();
+    var snap = this.config.value();
+    var messages = snap.messages();
+    var warpOpt = this.service.find(name);
+    var existed = warpOpt.isPresent();
 
     this.service.save(name, sender);
     var template = existed ? messages.warpUpdated() : messages.warpSet();

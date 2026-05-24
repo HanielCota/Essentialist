@@ -1,50 +1,35 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
-import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
-import com.hanielcota.essentials.modules.homes.menu.presentation.MenuContentSlots;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
-public final class HomesMenu implements Menu {
+public final class HomesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.homes";
 
   private static final int MIN_ROWS = 1;
-  private static final int MAX_ROWS = 6;
 
   private final ConfigHandle<HomesConfig> config;
   private final HomeService service;
   private final HomeEntryRenderer renderer;
   private final HomeClickHandler clickHandler;
-
-  // Snapshot pushed by /homes so the first render reuses the list already queried by the command.
-  private final Map<UUID, List<Home>> prefetched = new ConcurrentHashMap<>();
-
-  public void prefetch(@NonNull UUID viewer, @NonNull List<Home> entries) {
-    this.prefetched.put(viewer, List.copyOf(entries));
-  }
-
-  public void clearPrefetched(@NonNull UUID viewer) {
-    this.prefetched.remove(viewer);
-  }
+  private final HomesMenuState state;
 
   @Override
   public @NonNull String id() {
@@ -54,11 +39,15 @@ public final class HomesMenu implements Menu {
   @Override
   public void register(@NonNull MenuService menus) {
     var menuSpec = this.config.value().menu();
-    var rows = Math.clamp(menuSpec.rows(), MIN_ROWS, MAX_ROWS);
+    var rows = menuSpec.effectiveRows();
     var menuTitle = ComponentUtils.mini(menuSpec.title());
-    var contentSlots = MenuContentSlots.allRows(rows);
+    var contentSlots = menuSpec.effectiveContentSlots();
 
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
+    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
+    if (rows > MIN_ROWS) {
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, menuSpec.navigation());
+    }
+    var pagination = paginationBuilder.build();
 
     MenuFramework.builder(ID, menus)
         .rows(rows)
@@ -71,7 +60,7 @@ public final class HomesMenu implements Menu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var uuid = player.getUniqueId();
-    var entries = this.prefetched.remove(uuid);
+    var entries = this.state.consumePrefetch(uuid);
 
     if (entries == null) {
       entries = this.service.list(uuid);
@@ -81,8 +70,7 @@ public final class HomesMenu implements Menu {
 
     for (var i = 0; i < entries.size(); i++) {
       var home = entries.get(i);
-      var humanIndex = i + 1;
-      var template = this.renderer.render(home, humanIndex);
+      var template = this.renderer.render(home);
 
       slots.add(SlotDefinition.of(-1, template, click -> this.clickHandler.handle(click, home)));
     }

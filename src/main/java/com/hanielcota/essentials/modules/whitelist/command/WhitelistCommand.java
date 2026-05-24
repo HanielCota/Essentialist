@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.whitelist.command;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.whitelist.config.WhitelistConfig;
 import com.hanielcota.essentials.modules.whitelist.menu.WhitelistMenu;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
@@ -29,7 +30,7 @@ public record WhitelistCommand(
   @DefaultSubcommand
   @PlayerOnly
   public void open(@NonNull CommandActor actor) {
-    this.menus.open(actor.unwrap(Player.class), WhitelistMenu.ID);
+    MenuOpenings.open(this.menus, actor.unwrap(Player.class), WhitelistMenu.ID, actor);
   }
 
   @Subcommand("add")

@@ -58,6 +58,7 @@ public record HomeCommand(
       return messages.noHomes();
     }
 
-    return messages.unknownHome().replace("{name}", name);
+    var unknownHomeMsg = messages.unknownHome();
+    return unknownHomeMsg.replace("{name}", name);
   }
 }

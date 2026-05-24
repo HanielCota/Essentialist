@@ -1,12 +1,14 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
-import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
@@ -22,18 +24,12 @@ import org.bukkit.entity.Player;
  * and opens the paginated {@link MaterialPickerMenu}.
  */
 @RequiredArgsConstructor
-public final class MaterialCategoryMenu implements Menu {
+public final class MaterialCategoryMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.homes.categories";
 
-  private static final int ROWS = 6;
-  private static final List<Integer> CONTENT_SLOTS =
-      List.of(
-          10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37,
-          38, 39, 40, 41, 42, 43);
-
-  private final MenuService menus;
-  private final HomesActionTarget target;
+  private final ConfigHandle<HomesConfig> config;
+  private final MaterialCategoryClickHandler clickHandler;
 
   @Override
   public @NonNull String id() {
@@ -42,12 +38,15 @@ public final class MaterialCategoryMenu implements Menu {
 
   @Override
   public void register(@NonNull MenuService menusRef) {
-    var title = ComponentUtils.mini("<dark_gray>Escolha uma categoria");
+    var menuSpec = this.config.value().menu();
+    var rows = menuSpec.effectiveCategoryRows();
+    var title = ComponentUtils.mini(menuSpec.categoryTitle());
 
-    var pagination = PaginationConfig.builder().contentSlots(CONTENT_SLOTS).build();
+    var pagination =
+        PaginationConfig.builder().contentSlots(menuSpec.effectiveCategoryContentSlots()).build();
 
     MenuFramework.builder(ID, menusRef)
-        .rows(ROWS)
+        .rows(rows)
         .title(title)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
@@ -64,26 +63,18 @@ public final class MaterialCategoryMenu implements Menu {
         continue;
       }
       var template = representativeItem(category);
-      slots.add(
-          SlotDefinition.of(
-              -1,
-              template,
-              ctx -> {
-                var clicked = ctx.player();
-                var clickedUuid = clicked.getUniqueId();
-                this.target.setCategory(clickedUuid, category);
-                ctx.close();
-                this.menus.open(clicked, MaterialPickerMenu.ID);
-              }));
+      slots.add(SlotDefinition.of(-1, template, ctx -> this.clickHandler.handle(ctx, category)));
     }
 
     return slots;
   }
 
-  private static @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
+  private @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
+    var menuSpec = this.config.value().menu();
     var icon = categoryIcon(category);
-    var name = "<gold>" + category.displayName();
-    var lore = "<gray>Clique para ver os itens";
+    var categoryName = category.displayName();
+    var name = menuSpec.formatCategoryItemName(categoryName);
+    var lore = menuSpec.formatCategoryItemLore(categoryName);
 
     return ItemTemplate.builder(icon).name(name).lore(lore).italic(false).build();
   }

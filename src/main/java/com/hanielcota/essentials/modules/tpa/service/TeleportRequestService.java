@@ -46,12 +46,12 @@ public final class TeleportRequestService {
         .outgoingOf(requester.getUniqueId())
         .ifPresent(previous -> resolve(previous, TeleportRequestStatus.CANCELLED));
 
+    var configSnapshot = this.config.value();
+    var requestExpiryDuration = configSnapshot.requestExpiry();
+
     var request =
         TeleportRequest.open(
-            Participant.of(requester),
-            Participant.of(target),
-            type,
-            this.config.value().requestExpiry());
+            Participant.of(requester), Participant.of(target), type, requestExpiryDuration);
 
     this.store.add(request);
     this.notifier.sendPrompt(target, request);
@@ -77,8 +77,11 @@ public final class TeleportRequestService {
   /** Accepts a request: performs the teleport, then records the outcome. */
   public AcceptResult accept(@NonNull TeleportRequest request) {
 
-    var requester = Bukkit.getPlayer(request.requester().id());
-    var target = Bukkit.getPlayer(request.target().id());
+    var requesterId = request.requester().id();
+    var requester = Bukkit.getPlayer(requesterId);
+
+    var targetId = request.target().id();
+    var target = Bukkit.getPlayer(targetId);
     if (requester == null || target == null) {
       if (this.store.remove(request)) {
         this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
@@ -92,7 +95,9 @@ public final class TeleportRequestService {
 
     boolean toTarget = request.type() == TeleportRequestType.TPA;
     Player mover = toTarget ? requester : target;
-    Location landing = (toTarget ? target : requester).getLocation();
+
+    Player benchmark = toTarget ? target : requester;
+    Location landing = benchmark.getLocation();
 
     if (!this.teleport.teleportTo(mover, landing)) {
       this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));

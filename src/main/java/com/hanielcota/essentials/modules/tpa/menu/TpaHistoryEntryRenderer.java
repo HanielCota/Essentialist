@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
-import com.github.hanielcota.menuframework.api.ItemRenderer;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
@@ -14,8 +13,7 @@ import lombok.NonNull;
 import org.bukkit.Material;
 
 /** Renders one {@link TpaHistoryEntry} as the target player's head in the history menu. */
-public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
-    implements ItemRenderer<TpaHistoryEntry> {
+public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
 
   private static final String UNKNOWN = "—";
 
@@ -39,7 +37,6 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config)
         .replace("{time}", time);
   }
 
-  @Override
   public @NonNull ItemTemplate render(@NonNull TpaHistoryEntry entry, int humanIndex) {
     var settings = this.config.value().menu();
     var target = entry.target();

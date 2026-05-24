@@ -3,9 +3,11 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
 import io.github.hanielcota.commandframework.annotation.Arg;
@@ -31,7 +33,7 @@ public record TpaHistoryCommand(
     ConfigHandle<TpaConfig> config,
     TpaHistory history,
     MenuService menus,
-    TpaHistoryMenu menu,
+    TpaHistoryMenuState state,
     PlayerProvider players) {
 
   private static final String OTHERS_PERMISSION = "essentials.tpa.history.others";
@@ -88,7 +90,7 @@ public record TpaHistoryCommand(
       actor.sendMessage(viewingComponent);
     }
 
-    this.menu.prefetch(viewer.getUniqueId(), entries);
-    this.menus.open(viewer, TpaHistoryMenu.ID);
+    this.state.prefetch(viewer.getUniqueId(), entries);
+    MenuOpenings.open(this.menus, viewer, TpaHistoryMenu.ID, actor);
   }
 }

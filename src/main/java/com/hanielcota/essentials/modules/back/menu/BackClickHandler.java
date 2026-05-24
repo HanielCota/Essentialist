@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.back.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
-import com.github.hanielcota.menuframework.api.ItemClickHandler;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
@@ -11,8 +10,7 @@ import lombok.NonNull;
 import org.bukkit.Bukkit;
 
 public record BackClickHandler(
-    ConfigHandle<BackConfig> config, TeleportHistory history, TeleportService teleport)
-    implements ItemClickHandler<HistoryEntry> {
+    ConfigHandle<BackConfig> config, TeleportHistory history, TeleportService teleport) {
 
   public BackClickHandler(
       @NonNull ConfigHandle<BackConfig> config,
@@ -23,7 +21,6 @@ public record BackClickHandler(
     this.teleport = teleport;
   }
 
-  @Override
   public void handle(@NonNull ClickContext click, @NonNull HistoryEntry entry) {
     var player = click.player();
     var playerId = player.getUniqueId();

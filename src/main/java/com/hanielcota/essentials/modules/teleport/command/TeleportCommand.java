@@ -41,7 +41,8 @@ public record TeleportCommand(
       return;
     }
 
-    if (!this.service.teleportTo(sender, target.getLocation())) {
+    var targetLocation = target.getLocation();
+    if (!this.service.teleportTo(sender, targetLocation)) {
       senderActor.sendError(snap.teleportFailed());
       return;
     }
@@ -67,7 +68,8 @@ public record TeleportCommand(
       return;
     }
 
-    if (!this.service.teleportTo(from, to.getLocation())) {
+    var toLocation = to.getLocation();
+    if (!this.service.teleportTo(from, toLocation)) {
       sender.sendError(snap.teleportFailed());
       return;
     }
@@ -77,7 +79,8 @@ public record TeleportCommand(
 
     if (!Senders.isSelf(sender, from)) {
       var moveNotifyMsg = snap.formatMoveNotify(sender.name());
-      this.framework.actorOf(from).sendSuccess(moveNotifyMsg);
+      var fromActor = this.framework.actorOf(from);
+      fromActor.sendSuccess(moveNotifyMsg);
     }
   }
 
@@ -90,12 +93,15 @@ public record TeleportCommand(
     var snap = this.config.value();
     var senderActor = this.framework.actorOf(sender);
     var world = sender.getWorld();
-    var current = sender.getLocation();
-    var destination = new Location(world, x, y, z, current.getYaw(), current.getPitch());
+    var currentLocation = sender.getLocation();
+    var currentYaw = currentLocation.getYaw();
+    var currentPitch = currentLocation.getPitch();
+    var destination = new Location(world, x, y, z, currentYaw, currentPitch);
 
-    if (y < world.getMinHeight()
-        || y >= world.getMaxHeight()
-        || !world.getWorldBorder().isInside(destination)) {
+    var minHeight = world.getMinHeight();
+    var maxHeight = world.getMaxHeight();
+    var worldBorder = world.getWorldBorder();
+    if (y < minHeight || y >= maxHeight || !worldBorder.isInside(destination)) {
       senderActor.sendError(snap.invalidPosition());
       return;
     }

@@ -33,7 +33,10 @@ public final class TeleportModule extends AbstractModule {
     registerListener(delayed);
 
     var framework = service(PaperCommandFramework.class);
-    registerCommand(new TeleportCommand(config, teleportService, framework));
-    registerCommand(new TeleportHereCommand(config, teleportService, framework));
+    var teleportCommand = new TeleportCommand(config, teleportService, framework);
+    registerCommand(teleportCommand);
+
+    var teleportHereCommand = new TeleportHereCommand(config, teleportService, framework);
+    registerCommand(teleportHereCommand);
   }
 }

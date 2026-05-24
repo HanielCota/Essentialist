@@ -16,11 +16,10 @@ public final class GiveModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = configure("give", GiveConfig.class, GiveConfig::defaults, new GiveService());
-    registerCommand(
-        new GiveCommand(
-            config,
-            service(GiveService.class),
-            service(PlayerProvider.class),
-            service(PaperCommandFramework.class)));
+    var giveService = service(GiveService.class);
+    var playerProvider = service(PlayerProvider.class);
+    var framework = service(PaperCommandFramework.class);
+    var giveCommand = new GiveCommand(config, giveService, playerProvider, framework);
+    registerCommand(giveCommand);
   }
 }

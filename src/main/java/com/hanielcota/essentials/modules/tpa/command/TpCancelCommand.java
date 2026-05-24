@@ -36,7 +36,10 @@ public record TpCancelCommand(ConfigHandle<TpaConfig> config, TeleportRequestSer
     var request = pending.get();
     this.service.cancel(request);
 
-    var cancelledMsg = messages.cancelled().replace("{player}", request.target().name());
+    var cancelledTemplate = messages.cancelled();
+    var targetName = request.target().name();
+
+    var cancelledMsg = cancelledTemplate.replace("{player}", targetName);
     actor.sendSuccess(cancelledMsg);
   }
 }

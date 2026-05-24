@@ -11,6 +11,9 @@ import org.bukkit.Material;
 final class MaterialNames {
 
   static String pretty(@NonNull Material material) {
-    return material.name().toLowerCase(Locale.ROOT).replace('_', ' ');
+    var name = material.name();
+    var lower = name.toLowerCase(Locale.ROOT);
+
+    return lower.replace('_', ' ');
   }
 }

@@ -1,14 +1,10 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
-import com.github.hanielcota.menuframework.api.ItemClickHandler;
-import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenamePrompter;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
-import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import java.time.Duration;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.inventory.ClickType;
@@ -20,18 +16,13 @@ import org.bukkit.event.inventory.ClickType;
  * the opened menu/dialog knows which home to act on.
  */
 @RequiredArgsConstructor
-public final class HomeClickHandler implements ItemClickHandler<Home> {
-
-  private static final Duration SUBMENU_OPEN_DELAY = Duration.ofMillis(150);
+public final class HomeClickHandler {
 
   private final HomeTeleporter teleporter;
   private final PaperCommandFramework framework;
   private final HomesActionTarget target;
   private final HomeRenamePrompter rename;
-  private final Scheduler scheduler;
-  private final MenuService menus;
 
-  @Override
   public void handle(@NonNull ClickContext click, @NonNull Home home) {
     var type = click.clickType();
     var player = click.player();
@@ -49,7 +40,7 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
     }
 
     if (type.isRightClick()) {
-      openSubMenuFor(click, homeName, DeleteHomeDialog.ID, false);
+      openSubMenuFor(click, homeName, DeleteHomeDialog.ID);
       return;
     }
 
@@ -64,28 +55,15 @@ public final class HomeClickHandler implements ItemClickHandler<Home> {
     var uuid = player.getUniqueId();
 
     this.target.set(uuid, homeName);
-    click.close();
-    this.scheduler.runOnEntityLater(
-        player, () -> this.menus.open(player, MaterialCategoryMenu.ID), SUBMENU_OPEN_DELAY);
+    click.switchTo(MaterialCategoryMenu.ID);
   }
 
   private void openSubMenuFor(
-      @NonNull ClickContext click,
-      @NonNull String homeName,
-      @NonNull String menuId,
-      boolean delay) {
+      @NonNull ClickContext click, @NonNull String homeName, @NonNull String menuId) {
     var player = click.player();
     var uuid = player.getUniqueId();
 
     this.target.set(uuid, homeName);
-
-    if (delay) {
-      click.close();
-      this.scheduler.runOnEntityLater(
-          player, () -> this.menus.open(player, menuId), SUBMENU_OPEN_DELAY);
-      return;
-    }
-
-    click.open(menuId);
+    click.switchTo(menuId);
   }
 }

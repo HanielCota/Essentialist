@@ -1,16 +1,14 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
-import com.github.hanielcota.menuframework.api.ItemRenderer;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import lombok.NonNull;
 
-public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) implements ItemRenderer<Home> {
+public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) {
 
-  @Override
-  public @NonNull ItemTemplate render(@NonNull Home home, int humanIndex) {
+  public @NonNull ItemTemplate render(@NonNull Home home) {
     var menu = this.config.value().menu();
 
     var world = home.world();

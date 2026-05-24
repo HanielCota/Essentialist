@@ -8,11 +8,7 @@ import lombok.NonNull;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public record PaperScheduler(JavaPlugin plugin) implements Scheduler {
-
-  public PaperScheduler(@NonNull JavaPlugin plugin) {
-    this.plugin = plugin;
-  }
+public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
 
   private static Consumer<ScheduledTask> adapt(@NonNull Runnable task) {
     return scheduled -> task.run();

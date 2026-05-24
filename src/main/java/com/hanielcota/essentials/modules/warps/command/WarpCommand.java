@@ -28,6 +28,8 @@ import org.bukkit.entity.Player;
 public record WarpCommand(
     ConfigHandle<WarpsConfig> config, WarpService service, DelayedTeleport delayed) {
 
+  private static final String NAME = "{name}";
+
   public WarpCommand(
       @NonNull ConfigHandle<WarpsConfig> config,
       @NonNull WarpService service,
@@ -45,7 +47,8 @@ public record WarpCommand(
 
     var warpOpt = this.service.find(name);
     if (warpOpt.isEmpty()) {
-      var unknownMsg = messages.unknownWarp().replace("{name}", name);
+      var unknownTemplate = messages.unknownWarp();
+      var unknownMsg = unknownTemplate.replace(NAME, name);
       actor.sendError(unknownMsg);
       return;
     }
@@ -54,7 +57,8 @@ public record WarpCommand(
     var resolvedName = warp.name();
 
     if (!this.service.canUse(sender, resolvedName)) {
-      var noPermMsg = messages.noPermission().replace("{name}", resolvedName);
+      var noPermTemplate = messages.noPermission();
+      var noPermMsg = noPermTemplate.replace(NAME, resolvedName);
       actor.sendError(noPermMsg);
       return;
     }
@@ -76,8 +80,10 @@ public record WarpCommand(
       @NonNull CommandActor actor, @NonNull WarpsMessages messages, @NonNull Warp warp) {
 
     var warpName = warp.name();
-    var teleportingMsg = messages.teleporting().replace("{name}", warpName);
-    var teleportedMsg = messages.teleported().replace("{name}", warpName);
+    var teleportingTemplate = messages.teleporting();
+    var teleportingMsg = teleportingTemplate.replace(NAME, warpName);
+    var teleportedTemplate = messages.teleported();
+    var teleportedMsg = teleportedTemplate.replace(NAME, warpName);
     var cancelledMsg = messages.cancelled();
     var failedMsg = messages.failed();
 

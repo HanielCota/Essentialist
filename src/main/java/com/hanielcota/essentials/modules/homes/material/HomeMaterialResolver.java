@@ -7,14 +7,7 @@ import lombok.NonNull;
 import org.bukkit.Material;
 
 public record HomeMaterialResolver(
-    ConfigHandle<HomesConfig> config, Predicate<Material> itemMaterial) {
-
-  // Construtor canônico customizado para incluir validações defensivas automáticas
-  public HomeMaterialResolver(
-      @NonNull ConfigHandle<HomesConfig> config, @NonNull Predicate<Material> itemMaterial) {
-    this.config = config;
-    this.itemMaterial = itemMaterial;
-  }
+    @NonNull ConfigHandle<HomesConfig> config, @NonNull Predicate<Material> itemMaterial) {
 
   public HomeMaterialResolver(@NonNull ConfigHandle<HomesConfig> config) {
     this(config, Material::isItem);

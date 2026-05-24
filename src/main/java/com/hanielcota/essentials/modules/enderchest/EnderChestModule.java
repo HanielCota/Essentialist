@@ -14,6 +14,8 @@ public final class EnderChestModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("enderchest", EnderChestConfig.class, EnderChestConfig::defaults);
-    registerCommand(new EnderChestCommand(config, new EnderChestService()));
+    var enderChestService = new EnderChestService();
+    var enderChestCommand = new EnderChestCommand(config, enderChestService);
+    registerCommand(enderChestCommand);
   }
 }

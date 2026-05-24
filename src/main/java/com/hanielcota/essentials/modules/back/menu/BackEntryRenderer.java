@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.back.menu;
 
-import com.github.hanielcota.menuframework.api.ItemRenderer;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
@@ -11,10 +10,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import lombok.NonNull;
 
-public record BackEntryRenderer(ConfigHandle<BackConfig> config)
-    implements ItemRenderer<HistoryEntry> {
+public record BackEntryRenderer(ConfigHandle<BackConfig> config) {
 
-  @Override
   public @NonNull ItemTemplate render(@NonNull HistoryEntry entry, int humanIndex) {
     var snap = this.config.value();
     var location = entry.location();

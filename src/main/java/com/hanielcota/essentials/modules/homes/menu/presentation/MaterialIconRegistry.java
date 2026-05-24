@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -28,22 +28,20 @@ import org.bukkit.Material;
  */
 public final class MaterialIconRegistry {
 
-  private static final String LORE_PICK = "<gray>Clique para escolher";
-
   private final Map<MaterialCategory, List<MaterialIcon>> iconsByCategory;
   private final List<MaterialIcon> miscIcons;
 
-  public MaterialIconRegistry(@NonNull HomesMessages messages) {
+  public MaterialIconRegistry(@NonNull HomesMenuConfig menu) {
     this.iconsByCategory = new EnumMap<>(MaterialCategory.class);
 
     for (var category : MaterialCategory.browsable()) {
       if (category == MaterialCategory.MISC) {
         continue;
       }
-      this.iconsByCategory.put(category, buildIcons(category, messages));
+      this.iconsByCategory.put(category, buildIcons(category, menu));
     }
 
-    this.miscIcons = buildMiscIcons(messages);
+    this.miscIcons = buildMiscIcons(menu);
   }
 
   /** All pre-built icons for a category. */
@@ -60,14 +58,13 @@ public final class MaterialIconRegistry {
   }
 
   private static @NonNull List<MaterialIcon> buildIcons(
-      @NonNull MaterialCategory category, @NonNull HomesMessages messages) {
+      @NonNull MaterialCategory category, @NonNull HomesMenuConfig menu) {
 
-    var loreTemplate = messages.pickerItemLore();
     var icons = new ArrayList<MaterialIcon>(category.materials().size());
 
     for (var material : category.materials()) {
       if (material.isItem()) {
-        var template = renderTemplate(material, loreTemplate);
+        var template = renderTemplate(material, menu);
         icons.add(new MaterialIcon(material, template));
       }
     }
@@ -75,8 +72,7 @@ public final class MaterialIconRegistry {
     return Collections.unmodifiableList(icons);
   }
 
-  private @NonNull List<MaterialIcon> buildMiscIcons(@NonNull HomesMessages messages) {
-    var loreTemplate = messages.pickerItemLore();
+  private @NonNull List<MaterialIcon> buildMiscIcons(@NonNull HomesMenuConfig menu) {
     var known = new ArrayList<Material>();
 
     for (var category : MaterialCategory.browsable()) {
@@ -88,7 +84,7 @@ public final class MaterialIconRegistry {
     var icons = new ArrayList<MaterialIcon>();
     for (var material : Material.values()) {
       if (material.isItem() && !known.contains(material)) {
-        var template = renderTemplate(material, loreTemplate);
+        var template = renderTemplate(material, menu);
         icons.add(new MaterialIcon(material, template));
       }
     }
@@ -97,13 +93,13 @@ public final class MaterialIconRegistry {
   }
 
   private static @NonNull ItemTemplate renderTemplate(
-      @NonNull Material material, @NonNull String loreTemplate) {
+      @NonNull Material material, @NonNull HomesMenuConfig menu) {
 
     var pretty = MaterialNames.pretty(material);
-    var name = "<gold>" + pretty;
-    var lore = loreTemplate.replace("{material}", pretty);
+    var name = menu.formatPickerItemName(pretty);
+    var lore = menu.formatPickerItemLore(pretty);
 
-    return ItemTemplate.builder(material).name(name).lore(lore, LORE_PICK).italic(false).build();
+    return ItemTemplate.builder(material).name(name).lore(lore).italic(false).build();
   }
 
   /** Pair of material + its pre-built template. */

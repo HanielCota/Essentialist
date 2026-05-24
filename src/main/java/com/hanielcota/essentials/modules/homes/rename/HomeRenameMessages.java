@@ -9,21 +9,24 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class HomeRenameMessages {
 
+  private static final String NAME = "{name}";
+  private static final String SECONDS = "{seconds}";
+
   static String prompt(@NonNull HomesMessages messages, @NonNull String homeName, long seconds) {
     var timeoutText = seconds <= 0 ? "sem limite" : seconds + "s";
     var secondsStr = Long.toString(seconds);
 
     var promptTemplate = messages.renamePrompt();
-    return promptTemplate
-        .replace("{name}", homeName)
-        .replace("{seconds}s", timeoutText)
-        .replace("{seconds}", secondsStr)
-        .replace("{timeout}", timeoutText);
+    var withName = promptTemplate.replace(NAME, homeName);
+    var withSecondsS = withName.replace("{seconds}s", timeoutText);
+    var withSeconds = withSecondsS.replace(SECONDS, secondsStr);
+    return withSeconds.replace("{timeout}", timeoutText);
   }
 
   static String timeout(@NonNull HomesMessages messages, long seconds) {
     var secondsStr = Long.toString(seconds);
-    return messages.renameTimeout().replace("{seconds}", secondsStr);
+    var renameTimeoutMsg = messages.renameTimeout();
+    return renameTimeoutMsg.replace(SECONDS, secondsStr);
   }
 
   static String result(
@@ -33,11 +36,21 @@ final class HomeRenameMessages {
       @NonNull RenameResult result) {
 
     return switch (result) {
-      case RENAMED -> messages.renamed().replace("{old}", oldName).replace("{new}", newName);
+      case RENAMED -> {
+        var renamedMsg = messages.renamed();
+        var withOld = renamedMsg.replace("{old}", oldName);
+        yield withOld.replace("{new}", newName);
+      }
 
-      case NOT_FOUND -> messages.renameLost().replace("{name}", oldName);
+      case NOT_FOUND -> {
+        var renameLostMsg = messages.renameLost();
+        yield renameLostMsg.replace(NAME, oldName);
+      }
 
-      case NAME_TAKEN -> messages.renameTaken().replace("{name}", newName);
+      case NAME_TAKEN -> {
+        var renameTakenMsg = messages.renameTaken();
+        yield renameTakenMsg.replace(NAME, newName);
+      }
 
       default -> throw new IllegalStateException("Resultado de renomeação desconhecido: " + result);
     };

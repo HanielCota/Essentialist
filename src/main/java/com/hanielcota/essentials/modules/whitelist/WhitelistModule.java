@@ -25,6 +25,7 @@ public final class WhitelistModule extends AbstractModule {
     var clickHandler = new WhitelistClickHandler(config, service);
     var menu = new WhitelistMenu(config, service, renderer, clickHandler);
     registerMenu(menu);
-    registerCommand(new WhitelistCommand(config, service, menus));
+    var whitelistCommand = new WhitelistCommand(config, service, menus);
+    registerCommand(whitelistCommand);
   }
 }

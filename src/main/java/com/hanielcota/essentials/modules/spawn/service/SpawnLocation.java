@@ -32,6 +32,7 @@ public record SpawnLocation(String world, double x, double y, double z, float ya
     if (w == null) {
       return Optional.empty();
     }
-    return Optional.of(new Location(w, this.x, this.y, this.z, this.yaw, this.pitch));
+    var location = new Location(w, this.x, this.y, this.z, this.yaw, this.pitch);
+    return Optional.of(location);
   }
 }

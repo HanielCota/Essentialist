@@ -21,8 +21,14 @@ public final class FlyModule extends AbstractModule {
     var config = configure("fly", FlyConfig.class, FlyConfig::defaults, fly);
     var scheduler = service(Scheduler.class);
 
-    registerCommand(new FlyCommand(config, fly, service(PaperCommandFramework.class)));
-    registerListener(new FlyGameModeListener(scheduler, fly));
-    registerListener(new FlyQuitListener(fly));
+    var framework = service(PaperCommandFramework.class);
+    var flyCommand = new FlyCommand(config, fly, framework);
+    registerCommand(flyCommand);
+
+    var gameModeListener = new FlyGameModeListener(scheduler, fly);
+    registerListener(gameModeListener);
+
+    var quitListener = new FlyQuitListener(fly);
+    registerListener(quitListener);
   }
 }

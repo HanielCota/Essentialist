@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 public final class InfoService {
 
   private static final long BYTES_PER_MB = 1024L * 1024L;
+  private static final String GRAY = "<gray>";
 
   private final Plugin plugin;
   private final UserSessionService sessions;
@@ -67,28 +68,33 @@ public final class InfoService {
 
     var worldCount = Bukkit.getWorlds().size();
 
+    var tpsText = GRAY + formattedTps();
+    var versionText = GRAY + Bukkit.getVersion();
+    var uptimeText = GRAY + formattedUptime();
+    var memoryText = GRAY + formattedMemory();
+    var worldText = GRAY + worldCount + " carregado(s)";
+
     return List.of(
-        InfoEntry.of(Material.CLOCK, "<yellow>TPS", "<gray>" + formattedTps()),
-        InfoEntry.of(Material.PLAYER_HEAD, "<yellow>Jogadores online", "<gray>" + playerFormat),
-        InfoEntry.of(Material.NAME_TAG, "<yellow>Versão", "<gray>" + Bukkit.getVersion()),
-        InfoEntry.of(Material.COMPARATOR, "<yellow>Tempo ligado", "<gray>" + formattedUptime()),
-        InfoEntry.of(Material.REDSTONE, "<yellow>Memória", "<gray>" + formattedMemory()),
-        InfoEntry.of(
-            Material.GRASS_BLOCK, "<yellow>Mundos", "<gray>" + worldCount + " carregado(s)"));
+        InfoEntry.of(Material.CLOCK, "<yellow>TPS", tpsText),
+        InfoEntry.of(Material.PLAYER_HEAD, "<yellow>Jogadores online", GRAY + playerFormat),
+        InfoEntry.of(Material.NAME_TAG, "<yellow>Versão", versionText),
+        InfoEntry.of(Material.COMPARATOR, "<yellow>Tempo ligado", uptimeText),
+        InfoEntry.of(Material.REDSTONE, "<yellow>Memória", memoryText),
+        InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Mundos", worldText));
   }
 
   /** How long the player has been connected this session, or a fallback for a fresh join. */
   private String sessionDuration(@NonNull Player player) {
     var uuid = player.getUniqueId();
 
-    return this.sessions
-        .sessionOf(uuid)
-        .map(
+    var sessionOpt = this.sessions.sessionOf(uuid);
+    var formattedOpt =
+        sessionOpt.map(
             session -> {
               var duration = Duration.between(session.connectedAt(), Instant.now());
               return DurationFormatter.format(duration);
-            })
-        .orElse("agora mesmo");
+            });
+    return formattedOpt.orElse("agora mesmo");
   }
 
   /** Live information about a single player. */
@@ -113,17 +119,24 @@ public final class InfoService {
             + ", "
             + Numbers.compact(location.getZ());
 
+    var healthText = GRAY + health + " <red>❤";
+    var foodText = GRAY + food + " <dark_gray>/ <gray>20";
+    var levelText = GRAY + level;
+    var gameModeText = GRAY + gameMode;
+    var worldText = GRAY + worldName;
+    var pingText = GRAY + ping + " ms";
+    var durationText = GRAY + duration;
+
     return List.of(
         InfoEntry.head(uuid, "<yellow>" + name, "<gray>Informações do jogador."),
-        InfoEntry.of(Material.GOLDEN_APPLE, "<yellow>Vida", "<gray>" + health + " <red>❤"),
-        InfoEntry.of(
-            Material.COOKED_BEEF, "<yellow>Fome", "<gray>" + food + " <dark_gray>/ <gray>20"),
-        InfoEntry.of(Material.EXPERIENCE_BOTTLE, "<yellow>Nível", "<gray>" + level),
-        InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Modo de jogo", "<gray>" + gameMode),
-        InfoEntry.of(Material.MAP, "<yellow>Mundo", "<gray>" + worldName),
-        InfoEntry.of(Material.COMPASS, "<yellow>Localização", "<gray>" + coords),
-        InfoEntry.of(Material.FEATHER, "<yellow>Ping", "<gray>" + ping + " ms"),
-        InfoEntry.of(Material.CLOCK, "<yellow>Tempo de sessão", "<gray>" + duration));
+        InfoEntry.of(Material.GOLDEN_APPLE, "<yellow>Vida", healthText),
+        InfoEntry.of(Material.COOKED_BEEF, "<yellow>Fome", foodText),
+        InfoEntry.of(Material.EXPERIENCE_BOTTLE, "<yellow>Nível", levelText),
+        InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Modo de jogo", gameModeText),
+        InfoEntry.of(Material.MAP, "<yellow>Mundo", worldText),
+        InfoEntry.of(Material.COMPASS, "<yellow>Localização", GRAY + coords),
+        InfoEntry.of(Material.FEATHER, "<yellow>Ping", pingText),
+        InfoEntry.of(Material.CLOCK, "<yellow>Tempo de sessão", durationText));
   }
 
   /** Information about the Essentialist plugin itself. */
@@ -134,9 +147,14 @@ public final class InfoService {
     var authorsList = authors(meta.getAuthors());
     var mcVersion = Bukkit.getMinecraftVersion();
 
+    var pluginName = "<yellow>" + name;
+    var versionText = "<gray>Versão <white>" + version;
+    var authorsText = GRAY + authorsList;
+    var mcText = GRAY + mcVersion;
+
     return List.of(
-        InfoEntry.of(Material.NETHER_STAR, "<yellow>" + name, "<gray>Versão <white>" + version),
-        InfoEntry.of(Material.WRITABLE_BOOK, "<yellow>Autor", "<gray>" + authorsList),
-        InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Minecraft", "<gray>" + mcVersion));
+        InfoEntry.of(Material.NETHER_STAR, pluginName, versionText),
+        InfoEntry.of(Material.WRITABLE_BOOK, "<yellow>Autor", authorsText),
+        InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Minecraft", mcText));
   }
 }

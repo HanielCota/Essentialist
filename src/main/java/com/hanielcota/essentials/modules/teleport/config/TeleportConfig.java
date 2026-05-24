@@ -44,7 +44,8 @@ public record TeleportConfig(
   }
 
   public String formatMoveSender(@NonNull String from, @NonNull String to) {
-    return moveSender.replace("{from}", from).replace("{to}", to);
+    var withFrom = moveSender.replace("{from}", from);
+    return withFrom.replace("{to}", to);
   }
 
   public String formatMoveNotify(@NonNull String sender) {
@@ -56,7 +57,9 @@ public record TeleportConfig(
     var compactY = Numbers.compact(y);
     var compactZ = Numbers.compact(z);
 
-    return toPos.replace("{x}", compactX).replace("{y}", compactY).replace("{z}", compactZ);
+    var withX = toPos.replace("{x}", compactX);
+    var withY = withX.replace("{y}", compactY);
+    return withY.replace("{z}", compactZ);
   }
 
   public String formatBroughtPlayer(@NonNull String player) {

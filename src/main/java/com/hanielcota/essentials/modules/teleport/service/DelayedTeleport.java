@@ -51,12 +51,9 @@ public final class DelayedTeleport implements Listener {
     }
 
     callback.onScheduled(Math.max(1, delay.toSeconds()));
-    var task =
-        this.scheduler.runLater(
-            () ->
-                this.scheduler.runOnEntity(
-                    player, () -> completePending(player, destination, callback)),
-            delay);
+    var completeAction = (Runnable) () -> completePending(player, destination, callback);
+    var onEntityAction = (Runnable) () -> this.scheduler.runOnEntity(player, completeAction);
+    var task = this.scheduler.runLater(onEntityAction, delay);
     this.pending.put(uuid, new Pending(task, callback));
   }
 

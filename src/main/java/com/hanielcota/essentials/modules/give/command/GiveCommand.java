@@ -37,10 +37,9 @@ public record GiveCommand(
 
   private static String fill(
       @NonNull String template, @NonNull String item, int amount, int leftover) {
-    return template
-        .replace("{item}", item)
-        .replace("{amount}", Integer.toString(amount))
-        .replace("{leftover}", Integer.toString(leftover));
+    var withItem = template.replace("{item}", item);
+    var withAmount = withItem.replace("{amount}", Integer.toString(amount));
+    return withAmount.replace("{leftover}", Integer.toString(leftover));
   }
 
   @DefaultSubcommand
@@ -74,7 +73,11 @@ public record GiveCommand(
       return;
     }
 
-    var messages = leftover > 0 ? snap.whenPartial() : snap.whenGiven();
+    var messages = snap.whenGiven();
+    if (leftover > 0) {
+      messages = snap.whenPartial();
+    }
+
     var target = this.framework.actorOf(subject);
     var selfMessage = fill(messages.forSender(self, name), itemName, given, leftover);
     var targetMessage = fill(messages.forTarget(name), itemName, given, leftover);
@@ -117,7 +120,10 @@ public record GiveCommand(
       }
 
       count++;
-      var messages = leftover > 0 ? snap.whenPartial() : snap.whenGiven();
+      var messages = snap.whenGiven();
+      if (leftover > 0) {
+        messages = snap.whenPartial();
+      }
       recipient.sendSuccess(fill(messages.forTarget(player.getName()), itemName, given, leftover));
     }
 

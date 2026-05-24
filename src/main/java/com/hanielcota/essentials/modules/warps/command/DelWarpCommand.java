@@ -24,14 +24,17 @@ public record DelWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @Arg("nome") String name) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     if (!this.service.delete(name)) {
-      var unknownMsg = messages.unknownWarp().replace("{name}", name);
+      var unknownTemplate = messages.unknownWarp();
+      var unknownMsg = unknownTemplate.replace("{name}", name);
       actor.sendError(unknownMsg);
       return;
     }
 
-    var deletedMsg = messages.warpDeleted().replace("{name}", name);
+    var deletedTemplate = messages.warpDeleted();
+    var deletedMsg = deletedTemplate.replace("{name}", name);
     actor.sendSuccess(deletedMsg);
   }
 }

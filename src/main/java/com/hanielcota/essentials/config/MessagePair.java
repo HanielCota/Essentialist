@@ -21,7 +21,9 @@ public record MessagePair(String self, String other) {
    * {player}} is replaced with {@code player}.
    */
   public String forSender(boolean selfTarget, @NonNull String player) {
-    return (selfTarget ? this.self : this.other).replace("{player}", player);
+    var template = selfTarget ? this.self : this.other;
+
+    return template.replace("{player}", player);
   }
 
   /**

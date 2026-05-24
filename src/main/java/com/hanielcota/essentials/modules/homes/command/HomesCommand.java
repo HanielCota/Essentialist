@@ -3,8 +3,10 @@ package com.hanielcota.essentials.modules.homes.command;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
+import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -23,7 +25,10 @@ import org.bukkit.entity.Player;
 @Description("Abre o menu de homes com teleporte, deletar, renomear e trocar ícone.")
 @Syntax("/homes")
 public record HomesCommand(
-    ConfigHandle<HomesConfig> config, HomeService service, MenuService menus, HomesMenu menu) {
+    ConfigHandle<HomesConfig> config,
+    HomeService service,
+    MenuService menus,
+    HomesMenuState state) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
@@ -31,11 +36,13 @@ public record HomesCommand(
     var homes = this.service.list(sender.getUniqueId());
 
     if (homes.isEmpty()) {
-      actor.sendError(this.config.value().messages().noHomes());
+      var messages = this.config.value().messages();
+      var noHomesMsg = messages.noHomes();
+      actor.sendError(noHomesMsg);
       return;
     }
 
-    this.menu.prefetch(sender.getUniqueId(), homes);
-    this.menus.open(sender, HomesMenu.ID);
+    this.state.prefetch(sender.getUniqueId(), homes);
+    MenuOpenings.open(this.menus, sender, HomesMenu.ID, actor);
   }
 }

@@ -30,7 +30,6 @@ public record HomesMessages(
     @Comment("Centre item of the delete dialog.") String deleteConfirmPrompt,
     @Comment("Label of the yes button in the delete dialog.") String deleteConfirmYes,
     @Comment("Label of the no button in the delete dialog.") String deleteConfirmNo,
-    @Comment("Lore line of the picker entry. Placeholders: {material}.") String pickerItemLore,
     @Comment("Confirmation after the icon changes. Placeholders: {name}, {material}.")
         String materialUpdated,
     @Comment(
@@ -67,7 +66,6 @@ public record HomesMessages(
         "<red>Excluir esta home?",
         "<green>Sim, excluir",
         "<red>Cancelar",
-        "<gray>Clique para usar <white>{material}",
         "<green>Ícone de <gold>{name}</gold> alterado para <gold>{material}</gold>.",
         "<yellow>Digite no chat o novo nome para <gold>{name}</gold> "
             + "(ou <gold>cancel</gold>). Você tem <gold>{seconds}s</gold>.",

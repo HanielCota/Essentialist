@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.homes.factory.HomesCommandFactory;
 import com.hanielcota.essentials.modules.homes.factory.HomesInteractionFactory;
 import com.hanielcota.essentials.modules.homes.factory.HomesMenuFactory;
 import com.hanielcota.essentials.modules.homes.factory.HomesServiceFactory;
+import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -51,17 +52,17 @@ public final class HomesModule extends AbstractModule {
     registerListener(interactions.renameListener());
 
     // 3. User Interface Layer (Menus & Dialogs)
+    var menuState = new HomesMenuState();
     var menuFactory = new HomesMenuFactory();
     var menus =
         menuFactory.create(
             config,
             homeService,
-            runtime.menus(),
             runtime.framework(),
             interactions.teleporter(),
             interactions.actionTarget(),
             interactions.rename(),
-            runtime.scheduler());
+            menuState);
 
     registerMenu(menus.homesMenu());
     registerListener(menus.cleanupListener());
@@ -75,7 +76,7 @@ public final class HomesModule extends AbstractModule {
             homeService,
             runtime.menus(),
             interactions.teleporter(),
-            menus.homesMenu(),
+            menuState,
             interactions.nameResolver());
 
     commands.forEach(this::registerCommand);
