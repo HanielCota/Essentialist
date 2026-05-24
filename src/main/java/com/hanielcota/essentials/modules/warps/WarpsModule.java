@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.warps;
 
+import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
@@ -9,6 +10,7 @@ import com.hanielcota.essentials.modules.warps.command.SetWarpCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpsCommand;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
+import com.hanielcota.essentials.modules.warps.service.WarpCache;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import com.hanielcota.essentials.modules.warps.service.WarpStore;
 import com.hanielcota.essentials.modules.warps.service.WarpTable;
@@ -17,9 +19,10 @@ import java.util.Set;
 /**
  * Server warps: {@code /warp}, {@code /setwarp}, {@code /delwarp}, {@code /warps}.
  *
- * <p>Persists warps in SQLite via {@link WarpStore} with case-insensitive lookup by name. Per-warp
- * access is gated on the {@code essentials.warp.use.<name>} permission (or the {@code
- * essentials.warp.use.*} wildcard). Warm-up and damage cancel come from the shared {@link
+ * <p>Persists warps in SQLite via {@link WarpStore} with case-insensitive lookup by name. The full
+ * set is loaded into {@link WarpCache} at module enable so {@code /warp} never hits SQL on the main
+ * thread. Per-warp access is gated on the {@code essentials.warp.use.<name>} permission (or the
+ * {@code essentials.warp.use.*} wildcard). Warm-up and damage cancel come from the shared {@link
  * DelayedTeleport} service.
  */
 public final class WarpsModule extends AbstractModule {
@@ -35,21 +38,20 @@ public final class WarpsModule extends AbstractModule {
     WarpTable.install(executor);
 
     var store = new WarpStore(executor);
-    var warpService = new WarpService(store);
+    var cache = new WarpCache();
+    cache.loadAll(store.list());
+
+    var writer = new DefaultAsyncDatabaseWriter("Essentialist-Warps");
+    registerCloseable(writer);
+
+    var warpService = new WarpService(store, cache, writer);
     registerService(WarpService.class, warpService);
 
     var delayed = service(DelayedTeleport.class);
 
-    var setWarpCommand = new SetWarpCommand(config, warpService);
-    registerCommand(setWarpCommand);
-
-    var warpCommand = new WarpCommand(config, warpService, delayed);
-    registerCommand(warpCommand);
-
-    var delWarpCommand = new DelWarpCommand(config, warpService);
-    registerCommand(delWarpCommand);
-
-    var warpsCommand = new WarpsCommand(config, warpService);
-    registerCommand(warpsCommand);
+    registerCommand(new SetWarpCommand(config, warpService));
+    registerCommand(new WarpCommand(config, warpService, delayed));
+    registerCommand(new DelWarpCommand(config, warpService));
+    registerCommand(new WarpsCommand(config, warpService));
   }
 }

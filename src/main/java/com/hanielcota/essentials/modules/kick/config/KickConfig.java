@@ -8,13 +8,20 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public record KickConfig(
     @Comment("Reason used when /kick is run without one.") String defaultReason,
     @Comment("Kick screen shown to the kicked player. Placeholder: {reason}.") String screen,
-    @Comment("Confirmation shown to the sender. Placeholders: {player}, {reason}.") String kicked) {
+    @Comment("Confirmation shown to the sender. Placeholders: {player}, {reason}.") String kicked,
+    @Comment("Shown when the target has essentials.kick.exempt. Placeholder: {player}.")
+        String exempt) {
 
   public static KickConfig defaults() {
     return new KickConfig(
         "Você foi expulso do servidor.",
         "<red>{reason}",
-        "<green>Você expulsou <gold>{player}</gold>.");
+        "<green>Você expulsou <gold>{player}</gold>.",
+        "<red><gold>{player}</gold> não pode ser expulso.");
+  }
+
+  public String formatExempt(@NonNull String player) {
+    return exempt.replace("{player}", player);
   }
 
   /** Returns {@code provided} when it has content, otherwise the configured default reason. */

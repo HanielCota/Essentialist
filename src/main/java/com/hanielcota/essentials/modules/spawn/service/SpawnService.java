@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.spawn.service;
 
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.NonNull;
@@ -9,16 +10,19 @@ import lombok.NonNull;
  * blocks on disk.
  *
  * <p>Sole responsibility: keep the cache and the {@link SpawnStore} in sync. Reads return the
- * cached value; {@link #set} writes through to the store before updating the cache so a failure
- * propagates instead of leaving a dirty in-memory copy.
+ * cached value; {@link #set} writes the cache synchronously (so the next {@code /spawn} sees the
+ * new value immediately) and queues the SQL persist on {@link AsyncDatabaseWriter} so the calling
+ * command does not stall on disk I/O.
  */
 public final class SpawnService {
 
   private final SpawnStore store;
+  private final AsyncDatabaseWriter writer;
   private final AtomicReference<SpawnLocation> cached = new AtomicReference<>();
 
-  public SpawnService(SpawnStore store) {
+  public SpawnService(@NonNull SpawnStore store, @NonNull AsyncDatabaseWriter writer) {
     this.store = store;
+    this.writer = writer;
     store.load().ifPresent(cached::set);
   }
 
@@ -27,9 +31,9 @@ public final class SpawnService {
     return Optional.ofNullable(this.cached.get());
   }
 
-  /** Persists {@code location} as the spawn point and refreshes the cache. */
+  /** Updates the cache immediately and queues a write-through to SQLite on the writer thread. */
   public void set(@NonNull SpawnLocation location) {
-    this.store.save(location);
     this.cached.set(location);
+    this.writer.submit("save spawn", () -> this.store.save(location));
   }
 }
