@@ -2,8 +2,11 @@ package com.hanielcota.essentials.modules.homes.config.menu;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.NavigationButtonsConfig;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
 import com.hanielcota.essentials.util.Numbers;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -30,6 +33,8 @@ public record HomesMenuConfig(
     @Comment("Material category content slots (0-based).") List<Integer> categoryContentSlots,
     @Comment("Material category item name. Placeholder: {category}.") String categoryItemName,
     @Comment("Material category item lore. Placeholder: {category}.") List<String> categoryItemLore,
+    @Comment("Display name of each material category shown in the picker submenu.")
+        Map<MaterialCategory, String> categoryNames,
     @Comment("Slot of the category back button.") int categoryBackSlot,
     @Comment("Material of the category back button.") Material categoryBackMaterial,
     @Comment("Name of the category back button.") String categoryBackName,
@@ -95,6 +100,7 @@ public record HomesMenuConfig(
         List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25),
         "<gold>{category}",
         List.of("<gray>Clique para ver os itens"),
+        defaultCategoryNames(),
         31,
         Material.ARROW,
         "<yellow>Voltar às homes",
@@ -206,6 +212,11 @@ public record HomesMenuConfig(
     return MenuLayouts.sanitizeSlot(deleteNoSlot, effectiveDeleteRows(), 15);
   }
 
+  public String categoryName(@NonNull MaterialCategory category) {
+    var configured = categoryNames.get(category);
+    return configured != null ? configured : category.name();
+  }
+
   public String formatCategoryItemName(@NonNull String category) {
     return categoryItemName.replace("{category}", category);
   }
@@ -228,5 +239,26 @@ public record HomesMenuConfig(
       rendered[i] = pickerItemLore.get(i).replace("{material}", material);
     }
     return rendered;
+  }
+
+  private static Map<MaterialCategory, String> defaultCategoryNames() {
+    var map = new EnumMap<MaterialCategory, String>(MaterialCategory.class);
+    map.put(MaterialCategory.CONSTRUCTION, "Construction");
+    map.put(MaterialCategory.WOOD, "Wood");
+    map.put(MaterialCategory.DECORATION, "Decoration");
+    map.put(MaterialCategory.LIGHTING, "Lighting");
+    map.put(MaterialCategory.COMBAT, "Combat");
+    map.put(MaterialCategory.TOOLS, "Tools");
+    map.put(MaterialCategory.MINERALS, "Minerals");
+    map.put(MaterialCategory.REDSTONE, "Redstone");
+    map.put(MaterialCategory.FOOD, "Food");
+    map.put(MaterialCategory.TRANSPORT, "Transport");
+    map.put(MaterialCategory.STORAGE, "Storage");
+    map.put(MaterialCategory.MAGIC, "Magic");
+    map.put(MaterialCategory.NATURE, "Nature");
+    map.put(MaterialCategory.PLANTS, "Plants");
+    map.put(MaterialCategory.FLOWERS, "Flowers");
+    map.put(MaterialCategory.MISC, "Misc");
+    return map;
   }
 }
