@@ -1,0 +1,59 @@
+package com.hanielcota.essentials.modules.vanish.command;
+
+import com.hanielcota.essentials.command.Senders;
+import com.hanielcota.essentials.command.annotation.EssentialsCommand;
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
+import com.hanielcota.essentials.modules.vanish.service.VanishService;
+import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
+import io.github.hanielcota.commandframework.annotation.Command;
+import io.github.hanielcota.commandframework.annotation.Cooldown;
+import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
+import io.github.hanielcota.commandframework.annotation.Description;
+import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PermissionForOther;
+import io.github.hanielcota.commandframework.annotation.Syntax;
+import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
+import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
+import org.bukkit.entity.Player;
+
+@Command("vanish")
+@EssentialsCommand
+@Permission("essentials.vanish")
+@Cooldown(duration = "1s")
+@Description("Toggles vanish for the sender or another player.")
+@Syntax("/vanish [jogador]")
+public record VanishCommand(
+    ConfigHandle<VanishConfig> config,
+    VanishService service,
+    VanishVisibilityApplier applier,
+    PaperCommandFramework framework) {
+
+  @DefaultSubcommand
+  @PermissionForOther(".others")
+  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+    var snap = this.config.value();
+    var subjectId = subject.getUniqueId();
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
+
+    var newlyVanished = !this.service.isVanished(subjectId);
+    if (newlyVanished) {
+      this.service.enter(subjectId);
+      this.applier.apply(subject);
+    } else {
+      this.service.exit(subjectId);
+      this.applier.unapply(subject);
+    }
+
+    var messages = snap.toggle(newlyVanished);
+    if (self) {
+      sender.sendSuccess(messages.forSender(true, name));
+      return;
+    }
+    var target = this.framework.actorOf(subject);
+    sender.sendDualMessage(target, messages.forSender(false, name), messages.forTarget(name));
+  }
+}

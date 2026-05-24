@@ -9,6 +9,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.function.IntSupplier;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 
@@ -17,11 +18,11 @@ import org.bukkit.Bukkit;
 @Cooldown(duration = "3s")
 @Description("Mostra quantos jogadores estão online.")
 @Syntax("/online")
-public record OnlineCommand(ConfigHandle<OnlineConfig> config) {
+public record OnlineCommand(ConfigHandle<OnlineConfig> config, IntSupplier visibleCount) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    var onlineCount = Bukkit.getOnlinePlayers().size();
+    var onlineCount = this.visibleCount.getAsInt();
     var maxPlayers = Bukkit.getMaxPlayers();
     actor.sendMessage(this.config.value().format(onlineCount, maxPlayers));
   }
