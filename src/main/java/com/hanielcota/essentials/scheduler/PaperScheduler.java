@@ -63,6 +63,9 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var ticksDelay = Ticks.fromDuration(delay);
 
     var handle = scheduler.runDelayed(this.plugin, adaptedTask, ticksDelay);
+    if (handle == null) {
+      return Task.noop();
+    }
     return new ScheduledTaskHandle(handle);
   }
 
@@ -77,6 +80,9 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var ticksPeriod = Ticks.fromDuration(period);
 
     var handle = scheduler.runAtFixedRate(this.plugin, adaptedTask, ticksInitialDelay, ticksPeriod);
+    if (handle == null) {
+      return Task.noop();
+    }
     return new ScheduledTaskHandle(handle);
   }
 
@@ -86,10 +92,15 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var scheduler = server.getAsyncScheduler();
     var adaptedTask = adapt(task);
 
-    var millisDelay = Math.max(0L, delay.toMillis());
+    // Paper's AsyncScheduler.runDelayed rejects delay == 0; clamp to 1ms so a zero-delay caller
+    // gets near-immediate execution instead of an IllegalArgumentException.
+    var millisDelay = Math.max(1L, delay.toMillis());
     var timeUnit = TimeUnit.MILLISECONDS;
 
     var handle = scheduler.runDelayed(this.plugin, adaptedTask, millisDelay, timeUnit);
+    if (handle == null) {
+      return Task.noop();
+    }
     return new ScheduledTaskHandle(handle);
   }
 
@@ -107,6 +118,9 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var handle =
         scheduler.runAtFixedRate(
             this.plugin, adaptedTask, millisInitialDelay, millisPeriod, timeUnit);
+    if (handle == null) {
+      return Task.noop();
+    }
     return new ScheduledTaskHandle(handle);
   }
 }

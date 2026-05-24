@@ -24,7 +24,9 @@ public final class ModuleManager {
 
     if (this.registered.putIfAbsent(moduleId, module) == null) {
       this.states.put(moduleId, ModuleState.REGISTERED);
+      return;
     }
+    LOG.warn("Duplicate module id: {} — keeping the first registration", moduleId);
   }
 
   public void enableAll(@NonNull ModuleContext context) {
@@ -48,9 +50,7 @@ public final class ModuleManager {
   }
 
   public void disableAll() {
-    var reversed = new ArrayList<Module>(this.enableOrder);
-
-    for (var module : reversed.reversed()) {
+    for (var module : this.enableOrder.reversed()) {
       var moduleId = module.id();
       var currentState = this.states.get(moduleId);
 

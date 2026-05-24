@@ -14,10 +14,18 @@ final class TeleportExecutor {
       callback.onCancelled();
       return;
     }
-    if (!player.teleport(destination)) {
-      callback.onFailed();
-      return;
-    }
-    callback.onSuccess();
+    // teleportAsync keeps chunk-load latency off the calling thread and completes the future on
+    // the entity's owning thread, so the callback fires on the same thread the sync teleport would
+    // have used.
+    player
+        .teleportAsync(destination)
+        .thenAccept(
+            success -> {
+              if (Boolean.TRUE.equals(success)) {
+                callback.onSuccess();
+              } else {
+                callback.onFailed();
+              }
+            });
   }
 }

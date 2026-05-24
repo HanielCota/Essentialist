@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 
 public record BackClickHandler(ConfigHandle<BackConfig> config, TeleportHistory history) {
 
@@ -21,31 +20,27 @@ public record BackClickHandler(ConfigHandle<BackConfig> config, TeleportHistory 
 
     click.close();
 
+    // SqliteTeleportHistory.readEntry filters rows whose world is no longer loaded, so
+    // target.getWorld() is normally non-null. Keep one defensive check — if it ever is null the
+    // entry is stale and should be evicted.
     if (world == null) {
       this.history.remove(playerId, entryId);
       click.reply(snap.noBack());
       return;
     }
 
-    var worldName = world.getName();
-    if (Bukkit.getWorld(worldName) == null) {
-      this.history.remove(playerId, entryId);
-      click.reply(snap.noBack());
-      return;
-    }
-
-    if (!player.teleport(target)) {
-      click.reply(snap.noBack());
-      return;
-    }
-
-    this.history.remove(playerId, entryId);
-
-    var x = target.getX();
-    var y = target.getY();
-    var z = target.getZ();
-    var successMessage = snap.formatBack(worldName, x, y, z);
-
-    click.reply(successMessage);
+    player
+        .teleportAsync(target)
+        .thenAccept(
+            success -> {
+              if (!Boolean.TRUE.equals(success)) {
+                click.reply(snap.noBack());
+                return;
+              }
+              this.history.remove(playerId, entryId);
+              var successMessage =
+                  snap.formatBack(world.getName(), target.getX(), target.getY(), target.getZ());
+              click.reply(successMessage);
+            });
   }
 }

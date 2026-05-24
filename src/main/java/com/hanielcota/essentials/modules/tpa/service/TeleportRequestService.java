@@ -12,6 +12,7 @@ import com.hanielcota.essentials.modules.tpa.notification.TpaNotifier;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -43,15 +44,21 @@ public final class TeleportRequestService {
   }
 
   /**
-   * Registers a new request â€” replacing (and recording as cancelled) any request the requester
-   * already had outstanding â€” and prompts the target.
+   * Registers a new request — replacing (and recording as cancelled) any request the requester
+   * already had outstanding — and prompts the target. The previous target, if still online, is
+   * notified that the request was replaced so they don't keep staring at a stale clickable prompt.
    */
   public TeleportRequest create(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
 
     this.store
         .outgoingOf(requester.getUniqueId())
-        .ifPresent(previous -> resolve(previous, TeleportRequestStatus.CANCELLED));
+        .ifPresent(
+            previous -> {
+              resolve(previous, TeleportRequestStatus.CANCELLED);
+              this.notifier.notifyPartnerLeft(
+                  previous, requester.getUniqueId(), requester.getName());
+            });
 
     var configSnapshot = this.config.value();
     var requestExpiryDuration = configSnapshot.requestExpiry();
@@ -81,28 +88,33 @@ public final class TeleportRequestService {
     return this.store.incomingFrom(target, requesterName);
   }
 
-  /** Accepts a request: performs the teleport, then records the outcome. */
-  public AcceptResult accept(@NonNull TeleportRequest request) {
+  /**
+   * Accepts a request: performs the teleport asynchronously, then records the outcome. The future
+   * completes on the moving player's owning thread so callers can safely send chat from {@code
+   * thenAccept}.
+   */
+  public CompletableFuture<AcceptResult> accept(@NonNull TeleportRequest request) {
     if (!this.store.remove(request)) {
-      return AcceptResult.NOT_FOUND;
+      return CompletableFuture.completedFuture(AcceptResult.NOT_FOUND);
     }
 
-    var execution = this.executor.execute(request);
-    if (execution.result() == AcceptResult.REQUESTER_OFFLINE) {
-      this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
-      return execution.result();
-    }
-    if (execution.result() == AcceptResult.TELEPORT_FAILED) {
-      this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
-      return execution.result();
-    }
-
-    this.history.push(
-        TpaHistoryEntry.of(
-            request,
-            TeleportRequestStatus.ACCEPTED,
-            execution.optionalDestination().orElseThrow()));
-    return execution.result();
+    return this.executor
+        .execute(request)
+        .thenApply(
+            execution -> {
+              var result = execution.result();
+              if (result == AcceptResult.REQUESTER_OFFLINE
+                  || result == AcceptResult.TELEPORT_FAILED) {
+                this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
+                return result;
+              }
+              this.history.push(
+                  TpaHistoryEntry.of(
+                      request,
+                      TeleportRequestStatus.ACCEPTED,
+                      execution.optionalDestination().orElseThrow()));
+              return result;
+            });
   }
 
   /** Denies a request. */
