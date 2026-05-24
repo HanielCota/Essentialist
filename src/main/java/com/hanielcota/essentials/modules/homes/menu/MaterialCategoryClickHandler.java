@@ -15,4 +15,9 @@ public final class MaterialCategoryClickHandler {
     this.target.setCategory(player.getUniqueId(), category);
     click.switchTo(MaterialPickerMenu.ID);
   }
+
+  public void back(@NonNull ClickContext click) {
+    this.target.clear(click.player().getUniqueId());
+    click.switchTo(HomesMenu.ID);
+  }
 }
