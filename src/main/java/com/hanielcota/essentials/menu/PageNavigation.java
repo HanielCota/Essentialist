@@ -31,7 +31,8 @@ public final class PageNavigation {
         .navigationSlots(
             List.of(config.effectivePreviousSlot(rows), config.effectiveNextSlot(rows)))
         .previousTemplate(previousId)
-        .nextTemplate(nextId);
+        .nextTemplate(nextId)
+        .hideDisabledNavigation(true);
   }
 
   private static ItemTemplate button(@NonNull Material material, @NonNull String name) {
