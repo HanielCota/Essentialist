@@ -3,6 +3,7 @@ package com.hanielcota.essentials.config;
 import com.hanielcota.essentials.util.Log;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -39,7 +40,7 @@ public final class YamlConfigService implements ConfigService {
             });
 
     var existingType = handle.type();
-    if (!existingType.equals(type)) {
+    if (existingType != type) {
       var configName = handle.name();
       var existingTypeName = existingType.getName();
       var requestedTypeName = type.getName();
@@ -60,8 +61,10 @@ public final class YamlConfigService implements ConfigService {
   public ReloadReport reloadAll() {
     var failures = new LinkedHashMap<String, String>();
 
-    var configHandles = this.handles.values();
-    for (var handle : configHandles) {
+    // Snapshot before iterating: handles is concurrent, and reporting `total` from a post-iteration
+    // size() would skew the count if another thread loads a new config mid-reload.
+    var snapshot = List.copyOf(this.handles.values());
+    for (var handle : snapshot) {
       try {
         handle.refresh();
       } catch (RuntimeException e) {
@@ -80,8 +83,7 @@ public final class YamlConfigService implements ConfigService {
       }
     }
 
-    var totalHandlesCount = this.handles.size();
-    return new ReloadReport(totalHandlesCount, failures);
+    return new ReloadReport(snapshot.size(), failures);
   }
 
   @Override
