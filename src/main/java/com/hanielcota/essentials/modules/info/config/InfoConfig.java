@@ -69,4 +69,21 @@ public record InfoConfig(
     var fallback = MenuLayouts.slotCount(effectiveRows()) - 5;
     return MenuLayouts.sanitizeSlot(backSlot, effectiveRows(), fallback);
   }
+
+  /**
+   * Sanitized category slots. Out-of-range raw values would silently drop the category button
+   * through SlotRenderer.renderDynamicPageSlots and leave the tab unreachable; the fallback keeps
+   * the icon visible even on a misconfig.
+   */
+  public int effectiveServerSlot() {
+    return MenuLayouts.sanitizeSlot(serverSlot, effectiveRows(), 11);
+  }
+
+  public int effectivePlayerSlot() {
+    return MenuLayouts.sanitizeSlot(playerSlot, effectiveRows(), 13);
+  }
+
+  public int effectiveAboutSlot() {
+    return MenuLayouts.sanitizeSlot(aboutSlot, effectiveRows(), 15);
+  }
 }

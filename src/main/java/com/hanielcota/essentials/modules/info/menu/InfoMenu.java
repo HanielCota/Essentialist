@@ -82,19 +82,19 @@ public final class InfoMenu implements EssentialsMenu {
     var snap = this.config.value();
     return List.of(
         category(
-            snap.serverSlot(),
+            snap.effectiveServerSlot(),
             snap.serverMaterial(),
             snap.serverName(),
             snap.serverLore(),
             InfoTab.SERVER),
         category(
-            snap.playerSlot(),
+            snap.effectivePlayerSlot(),
             snap.playerMaterial(),
             snap.playerName(),
             snap.playerLore(),
             InfoTab.PLAYER),
         category(
-            snap.aboutSlot(),
+            snap.effectiveAboutSlot(),
             snap.aboutMaterial(),
             snap.aboutName(),
             snap.aboutLore(),

@@ -27,6 +27,11 @@ public final class PlayerTeleportListener implements Listener {
     if (cause == TeleportCause.EXIT_BED) {
       return;
     }
+    // Staff toggling between players in spectator mode would otherwise pollute
+    // /back history with every spectated point.
+    if (cause == TeleportCause.SPECTATE) {
+      return;
+    }
 
     var player = event.getPlayer();
     var uuid = player.getUniqueId();
