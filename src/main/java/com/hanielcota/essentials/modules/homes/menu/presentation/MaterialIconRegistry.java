@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -31,17 +32,17 @@ public final class MaterialIconRegistry {
   private final Map<MaterialCategory, List<MaterialIcon>> iconsByCategory;
   private final List<MaterialIcon> miscIcons;
 
-  public MaterialIconRegistry(@NonNull HomesMenuConfig menu) {
+  public MaterialIconRegistry(@NonNull HomesMenuConfig menu, @NonNull MaterialNamesConfig names) {
     this.iconsByCategory = new EnumMap<>(MaterialCategory.class);
 
     for (var category : MaterialCategory.browsable()) {
       if (category == MaterialCategory.MISC) {
         continue;
       }
-      this.iconsByCategory.put(category, buildIcons(category, menu));
+      this.iconsByCategory.put(category, buildIcons(category, menu, names));
     }
 
-    this.miscIcons = buildMiscIcons(menu);
+    this.miscIcons = buildMiscIcons(menu, names);
   }
 
   /** All pre-built icons for a category. */
@@ -58,13 +59,15 @@ public final class MaterialIconRegistry {
   }
 
   private static @NonNull List<MaterialIcon> buildIcons(
-      @NonNull MaterialCategory category, @NonNull HomesMenuConfig menu) {
+      @NonNull MaterialCategory category,
+      @NonNull HomesMenuConfig menu,
+      @NonNull MaterialNamesConfig names) {
 
     var icons = new ArrayList<MaterialIcon>(category.materials().size());
 
     for (var material : category.materials()) {
       if (material.isItem()) {
-        var template = renderTemplate(material, menu);
+        var template = renderTemplate(material, menu, names);
         icons.add(new MaterialIcon(material, template));
       }
     }
@@ -72,7 +75,8 @@ public final class MaterialIconRegistry {
     return Collections.unmodifiableList(icons);
   }
 
-  private @NonNull List<MaterialIcon> buildMiscIcons(@NonNull HomesMenuConfig menu) {
+  private @NonNull List<MaterialIcon> buildMiscIcons(
+      @NonNull HomesMenuConfig menu, @NonNull MaterialNamesConfig names) {
     var known = new ArrayList<Material>();
 
     for (var category : MaterialCategory.browsable()) {
@@ -84,7 +88,7 @@ public final class MaterialIconRegistry {
     var icons = new ArrayList<MaterialIcon>();
     for (var material : Material.values()) {
       if (material.isItem() && !known.contains(material)) {
-        var template = renderTemplate(material, menu);
+        var template = renderTemplate(material, menu, names);
         icons.add(new MaterialIcon(material, template));
       }
     }
@@ -93,9 +97,11 @@ public final class MaterialIconRegistry {
   }
 
   private static @NonNull ItemTemplate renderTemplate(
-      @NonNull Material material, @NonNull HomesMenuConfig menu) {
+      @NonNull Material material,
+      @NonNull HomesMenuConfig menu,
+      @NonNull MaterialNamesConfig names) {
 
-    var pretty = MaterialNames.pretty(material);
+    var pretty = names.displayName(material);
     var name = menu.formatPickerItemName(pretty);
     var lore = menu.formatPickerItemLore(pretty);
 

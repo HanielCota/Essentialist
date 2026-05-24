@@ -5,6 +5,7 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
 import com.hanielcota.essentials.modules.homes.factory.HomesCommandFactory;
 import com.hanielcota.essentials.modules.homes.factory.HomesInteractionFactory;
 import com.hanielcota.essentials.modules.homes.factory.HomesMenuFactory;
@@ -32,6 +33,8 @@ public final class HomesModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("homes", HomesConfig.class, HomesConfig::defaults);
+    var materialNames =
+        config("homes/material-names", MaterialNamesConfig.class, MaterialNamesConfig::defaults);
     var runtime = runtimeServices();
 
     // 1. Core Services Layer
@@ -58,6 +61,7 @@ public final class HomesModule extends AbstractModule {
     var menus =
         menuFactory.create(
             config,
+            materialNames,
             homeService,
             runtime.framework(),
             interactions.teleporter(),

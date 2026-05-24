@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.homes.factory;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
 import com.hanielcota.essentials.modules.homes.listener.HomesMenuCleanupListener;
 import com.hanielcota.essentials.modules.homes.menu.DeleteHomeClickHandler;
 import com.hanielcota.essentials.modules.homes.menu.DeleteHomeDialog;
@@ -29,6 +30,7 @@ public final class HomesMenuFactory {
 
   public HomesMenus create(
       @NonNull ConfigHandle<HomesConfig> config,
+      @NonNull ConfigHandle<MaterialNamesConfig> materialNames,
       @NonNull HomeService homeService,
       @NonNull PaperCommandFramework framework,
       @NonNull HomeTeleporter teleporter,
@@ -40,8 +42,8 @@ public final class HomesMenuFactory {
     var clickHandler = new HomeClickHandler(teleporter, framework, actionTarget, rename);
     var homesMenu = new HomesMenu(config, homeService, renderer, clickHandler, menuState);
 
-    var iconRegistry = new MaterialIconRegistry(config.value().menu());
-    var pickerPresentation = new MaterialPickerPresentation();
+    var iconRegistry = new MaterialIconRegistry(config.value().menu(), materialNames.value());
+    var pickerPresentation = new MaterialPickerPresentation(materialNames);
 
     var categoryClickHandler = new MaterialCategoryClickHandler(actionTarget);
     var pickerClickHandler =
