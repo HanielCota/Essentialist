@@ -17,7 +17,7 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Placeholders {
 
-  private static final Pattern TOKEN = Pattern.compile("\\{(\\w+)}");
+  private static final Pattern TOKEN = Pattern.compile("\\{(\\w+)\\}");
 
   public static String format(
       @NonNull String template, @NonNull String key, @NonNull Object value) {

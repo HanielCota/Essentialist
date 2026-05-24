@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 public final class InfoService {
 
   private static final long BYTES_PER_MB = 1024L * 1024L;
+  private static final String GRAY = "<gray>";
 
   private final Plugin plugin;
   private final UserSessionService sessions;
@@ -67,15 +68,15 @@ public final class InfoService {
 
     var worldCount = Bukkit.getWorlds().size();
 
-    var tpsText = "<gray>" + formattedTps();
-    var versionText = "<gray>" + Bukkit.getVersion();
-    var uptimeText = "<gray>" + formattedUptime();
-    var memoryText = "<gray>" + formattedMemory();
-    var worldText = "<gray>" + worldCount + " carregado(s)";
+    var tpsText = GRAY + formattedTps();
+    var versionText = GRAY + Bukkit.getVersion();
+    var uptimeText = GRAY + formattedUptime();
+    var memoryText = GRAY + formattedMemory();
+    var worldText = GRAY + worldCount + " carregado(s)";
 
     return List.of(
         InfoEntry.of(Material.CLOCK, "<yellow>TPS", tpsText),
-        InfoEntry.of(Material.PLAYER_HEAD, "<yellow>Jogadores online", "<gray>" + playerFormat),
+        InfoEntry.of(Material.PLAYER_HEAD, "<yellow>Jogadores online", GRAY + playerFormat),
         InfoEntry.of(Material.NAME_TAG, "<yellow>Versão", versionText),
         InfoEntry.of(Material.COMPARATOR, "<yellow>Tempo ligado", uptimeText),
         InfoEntry.of(Material.REDSTONE, "<yellow>Memória", memoryText),
@@ -118,13 +119,13 @@ public final class InfoService {
             + ", "
             + Numbers.compact(location.getZ());
 
-    var healthText = "<gray>" + health + " <red>❤";
-    var foodText = "<gray>" + food + " <dark_gray>/ <gray>20";
-    var levelText = "<gray>" + level;
-    var gameModeText = "<gray>" + gameMode;
-    var worldText = "<gray>" + worldName;
-    var pingText = "<gray>" + ping + " ms";
-    var durationText = "<gray>" + duration;
+    var healthText = GRAY + health + " <red>❤";
+    var foodText = GRAY + food + " <dark_gray>/ <gray>20";
+    var levelText = GRAY + level;
+    var gameModeText = GRAY + gameMode;
+    var worldText = GRAY + worldName;
+    var pingText = GRAY + ping + " ms";
+    var durationText = GRAY + duration;
 
     return List.of(
         InfoEntry.head(uuid, "<yellow>" + name, "<gray>Informações do jogador."),
@@ -133,7 +134,7 @@ public final class InfoService {
         InfoEntry.of(Material.EXPERIENCE_BOTTLE, "<yellow>Nível", levelText),
         InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Modo de jogo", gameModeText),
         InfoEntry.of(Material.MAP, "<yellow>Mundo", worldText),
-        InfoEntry.of(Material.COMPASS, "<yellow>Localização", "<gray>" + coords),
+        InfoEntry.of(Material.COMPASS, "<yellow>Localização", GRAY + coords),
         InfoEntry.of(Material.FEATHER, "<yellow>Ping", pingText),
         InfoEntry.of(Material.CLOCK, "<yellow>Tempo de sessão", durationText));
   }
@@ -148,8 +149,8 @@ public final class InfoService {
 
     var pluginName = "<yellow>" + name;
     var versionText = "<gray>Versão <white>" + version;
-    var authorsText = "<gray>" + authorsList;
-    var mcText = "<gray>" + mcVersion;
+    var authorsText = GRAY + authorsList;
+    var mcText = GRAY + mcVersion;
 
     return List.of(
         InfoEntry.of(Material.NETHER_STAR, pluginName, versionText),
