@@ -1,0 +1,47 @@
+package com.hanielcota.essentials.bootstrap;
+
+import com.hanielcota.essentials.EssentialsPlugin;
+import com.hanielcota.essentials.config.ConfigService;
+import com.hanielcota.essentials.config.YamlConfigService;
+import com.hanielcota.essentials.paper.AudienceProvider;
+import com.hanielcota.essentials.paper.BukkitPlayerProvider;
+import com.hanielcota.essentials.paper.PaperAudienceProvider;
+import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.scheduler.PaperScheduler;
+import com.hanielcota.essentials.scheduler.Scheduler;
+import com.hanielcota.essentials.service.ServiceRegistry;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+final class CoreServicesBootstrap {
+
+  private final EssentialsPlugin plugin;
+
+  void register(@NonNull ServiceRegistry services) {
+    registerScheduler(services);
+    registerPaperAdapters(services);
+    registerConfigs(services);
+  }
+
+  private void registerScheduler(@NonNull ServiceRegistry services) {
+    var scheduler = new PaperScheduler(this.plugin);
+    services.register(Scheduler.class, scheduler);
+  }
+
+  private void registerPaperAdapters(@NonNull ServiceRegistry services) {
+    var audienceProvider = new PaperAudienceProvider(this.plugin);
+    services.register(AudienceProvider.class, audienceProvider);
+
+    var playerProvider = new BukkitPlayerProvider(this.plugin);
+    services.register(PlayerProvider.class, playerProvider);
+  }
+
+  private void registerConfigs(@NonNull ServiceRegistry services) {
+    var dataFolder = this.plugin.getDataFolder();
+    var configDir = dataFolder.toPath().resolve("modules");
+
+    var configService = new YamlConfigService(configDir);
+    services.register(ConfigService.class, configService);
+  }
+}

@@ -12,6 +12,7 @@ import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
 import com.hanielcota.essentials.util.ComponentUtils;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -81,7 +82,7 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     }
 
     var icons = this.registry.iconsFor(category);
-    var slots = new java.util.ArrayList<SlotDefinition>(icons.size() + 1);
+    var slots = new ArrayList<SlotDefinition>(icons.size() + 1);
 
     for (var icon : icons) {
       var pickedMaterial = icon.material();

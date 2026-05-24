@@ -10,7 +10,7 @@ import lombok.NonNull;
  * material picker, chat-driven rename). The home name is captured when the dispatch click fires, so
  * the sub-flow does not need to look up which home was clicked.
  *
- * <p>Pure POJO state — quit cleanup lives in {@code HomeTeleportListener} per SRP.
+ * <p>Pure POJO state — quit cleanup lives in {@code HomesSessionCleanupListener} per SRP.
  */
 public final class HomesActionTarget {
 

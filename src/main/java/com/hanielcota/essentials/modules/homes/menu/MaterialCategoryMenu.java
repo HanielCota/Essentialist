@@ -10,12 +10,12 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategoryIconRegistry;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
@@ -30,6 +30,7 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
 
   private final ConfigHandle<HomesConfig> config;
   private final MaterialCategoryClickHandler clickHandler;
+  private final MaterialCategoryIconRegistry icons;
 
   @Override
   public @NonNull String id() {
@@ -85,32 +86,11 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
 
   private @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
     var menuSpec = this.config.value().menu();
-    var icon = categoryIcon(category);
+    var icon = this.icons.iconFor(category);
     var categoryName = category.displayName();
     var name = menuSpec.formatCategoryItemName(categoryName);
     var lore = menuSpec.formatCategoryItemLore(categoryName);
 
     return ItemTemplate.builder(icon).name(name).lore(lore).italic(false).build();
-  }
-
-  private static @NonNull Material categoryIcon(@NonNull MaterialCategory category) {
-    return switch (category) {
-      case CONSTRUCTION -> Material.STONE_BRICKS;
-      case WOOD -> Material.OAK_LOG;
-      case DECORATION -> Material.WHITE_WOOL;
-      case LIGHTING -> Material.LANTERN;
-      case COMBAT -> Material.DIAMOND_SWORD;
-      case TOOLS -> Material.IRON_PICKAXE;
-      case MINERALS -> Material.DIAMOND_BLOCK;
-      case REDSTONE -> Material.REDSTONE_BLOCK;
-      case FOOD -> Material.GOLDEN_APPLE;
-      case TRANSPORT -> Material.MINECART;
-      case STORAGE -> Material.ENDER_CHEST;
-      case MAGIC -> Material.ENCHANTING_TABLE;
-      case NATURE -> Material.GRASS_BLOCK;
-      case PLANTS -> Material.OAK_SAPLING;
-      case FLOWERS -> Material.POPPY;
-      case MISC -> Material.BARRIER;
-    };
   }
 }

@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * Server spawn point and the {@code /spawn} / {@code /setspawn} commands.
  *
- * <p>Persists the single spawn point in SQLite via {@link SpawnStore}; warm-up and cancel-on-move
+ * <p>Persists the single spawn point in SQLite via {@link SpawnStore}; warm-up and damage cancel
  * logic comes from the shared {@link DelayedTeleport} service registered by the {@code teleport}
  * module.
  */

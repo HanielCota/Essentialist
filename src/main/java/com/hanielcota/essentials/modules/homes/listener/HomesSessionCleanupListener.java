@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
  * {@link HomesActionTarget} entry and any in-flight {@link HomeRenameSessions} prompt.
  */
 @RequiredArgsConstructor
-public final class HomeTeleportListener implements Listener {
+public final class HomesSessionCleanupListener implements Listener {
 
   private final HomesActionTarget actionTarget;
   private final HomeRenameSessions renameSessions;

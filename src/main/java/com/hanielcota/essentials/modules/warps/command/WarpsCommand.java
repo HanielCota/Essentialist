@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.warps.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
-import com.hanielcota.essentials.modules.warps.service.Warp;
+import com.hanielcota.essentials.modules.warps.domain.Warp;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.Numbers;

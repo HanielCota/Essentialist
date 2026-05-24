@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.listener;
 
+import com.hanielcota.essentials.modules.tpa.notification.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.modules.tpa.service.TpaNotifier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;

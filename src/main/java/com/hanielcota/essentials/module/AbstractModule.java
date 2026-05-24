@@ -7,11 +7,8 @@ import com.hanielcota.essentials.config.ConfigService;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.util.Log;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 import lombok.NonNull;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 public abstract class AbstractModule implements Module {
@@ -19,9 +16,10 @@ public abstract class AbstractModule implements Module {
   private static final Log LOG = Log.of(AbstractModule.class);
 
   private final ModuleMetadata metadata;
-  private final List<Listener> listeners = new ArrayList<>();
-  private final List<AutoCloseable> closeable = new ArrayList<>();
-  private final List<Class<?>> ownedServices = new ArrayList<>();
+  private final ModuleListeners listeners = new ModuleListeners();
+  private final ModuleCloseables closeables = new ModuleCloseables();
+  private final ModuleServices services = new ModuleServices();
+  private final ModuleMenus menus = new ModuleMenus();
   private ModuleContext context;
 
   protected AbstractModule(@NonNull ModuleMetadata metadata) {
@@ -48,37 +46,10 @@ public abstract class AbstractModule implements Module {
     try {
       onDisable();
     } finally {
-      for (var listener : this.listeners) {
-        if (listener == null) {
-          continue;
-        }
-        HandlerList.unregisterAll(listener);
-      }
-      this.listeners.clear();
-
       var moduleId = id();
-      for (var closeable : closeable) {
-        if (closeable == null) {
-          continue;
-        }
-        try {
-          closeable.close();
-        } catch (Exception e) {
-          LOG.warn(e, "Closeable threw during disable of {}", moduleId);
-        }
-      }
-      closeable.clear();
-
-      if (this.context != null) {
-        var services = this.context.services();
-        for (var type : this.ownedServices) {
-          if (type == null) {
-            continue;
-          }
-          services.unregister(type);
-        }
-      }
-      this.ownedServices.clear();
+      this.listeners.unregisterAll();
+      this.closeables.closeAll(moduleId, LOG);
+      this.services.unregisterOwned(this.context);
       this.context = null;
     }
   }
@@ -134,35 +105,21 @@ public abstract class AbstractModule implements Module {
   }
 
   protected final void registerMenu(@NonNull EssentialsMenu menu) {
-    var menus = service(MenuService.class);
-    menu.register(menus);
-
-    var menuId = menu.id();
-    registerCloseable(() -> menus.unregisterDefinition(menuId));
+    var menuService = service(MenuService.class);
+    this.menus.register(menuService, menu, this.closeables);
   }
 
   protected final void registerListener(@NonNull Listener listener) {
     var currentPlugin = plugin();
-    var server = currentPlugin.getServer();
-    var pluginManager = server.getPluginManager();
-
-    pluginManager.registerEvents(listener, currentPlugin);
-    this.listeners.add(listener);
+    this.listeners.register(currentPlugin, listener);
   }
 
   protected final void registerCloseable(@NonNull AutoCloseable closeable) {
-    this.closeable.add(closeable);
+    this.closeables.register(closeable);
   }
 
   protected final <T> void registerService(@NonNull Class<T> type, @NonNull T instance) {
     var activeContext = context();
-    var services = activeContext.services();
-
-    services.unregister(type);
-    services.register(type, instance);
-    this.ownedServices.add(type);
-
-    var commandFrameworkOpt = services.find(PaperCommandFramework.class);
-    commandFrameworkOpt.ifPresent(framework -> framework.registerDependency(type, instance));
+    this.services.register(activeContext, type, instance);
   }
 }

@@ -28,7 +28,7 @@ public record WarpsMessages(
     @Comment("Shown on /warp start when a delay is configured. Placeholders: {name}, {seconds}.")
         String teleporting,
     @Comment("Shown after /warp completes successfully. Placeholders: {name}.") String teleported,
-    @Comment("Shown when the delayed teleport is cancelled by movement or damage.")
+    @Comment("Shown when the delayed teleport is cancelled by damage or disconnect.")
         String cancelled,
     @Comment("Shown when the teleport itself fails.") String failed) {
 
@@ -45,7 +45,7 @@ public record WarpsMessages(
         "<gold>{name}</gold> <gray>— <white>{world} {x}, {y}, {z}",
         "<gray>Clique para ir até <gold>{name}</gold>.",
         "<yellow>Teleportando para <gold>{name}</gold> em <gold>{seconds}s</gold>. "
-            + "Não se mova nem tome dano.",
+            + "Não tome dano.",
         "<green>Você foi teleportado para <gold>{name}</gold>.",
         "<red>Teleporte cancelado.",
         "<red>O teleporte não pôde ser concluído.");

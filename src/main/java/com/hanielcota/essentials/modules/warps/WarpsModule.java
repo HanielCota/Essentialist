@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * <p>Persists warps in SQLite via {@link WarpStore} with case-insensitive lookup by name. Per-warp
  * access is gated on the {@code essentials.warp.use.<name>} permission (or the {@code
- * essentials.warp.use.*} wildcard). Warm-up and cancel-on-move come from the shared {@link
+ * essentials.warp.use.*} wildcard). Warm-up and damage cancel come from the shared {@link
  * DelayedTeleport} service.
  */
 public final class WarpsModule extends AbstractModule {

@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.warps.service;
 
+import com.hanielcota.essentials.modules.warps.domain.Warp;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;

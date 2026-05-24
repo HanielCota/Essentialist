@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.give.command;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.give.config.GiveConfig;
+import com.hanielcota.essentials.modules.give.service.GiveResult;
 import com.hanielcota.essentials.modules.give.service.GiveService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
@@ -63,24 +64,27 @@ public record GiveCommand(
       return;
     }
 
-    var leftover = this.service.give(subject, item, amount);
-    var given = amount - leftover;
+    var result = this.service.giveResult(subject, item, amount);
     var itemName = item.name().toLowerCase(Locale.ROOT);
 
-    if (given == 0) {
+    if (result.noneGiven()) {
       sender.sendError(
-          fill(snap.whenInventoryFull().forSender(self, name), itemName, given, leftover));
+          fill(
+              snap.whenInventoryFull().forSender(self, name),
+              itemName,
+              result.given(),
+              result.leftover()));
       return;
     }
 
     var messages = snap.whenGiven();
-    if (leftover > 0) {
+    if (result.partial()) {
       messages = snap.whenPartial();
     }
 
     var target = this.framework.actorOf(subject);
-    var selfMessage = fill(messages.forSender(self, name), itemName, given, leftover);
-    var targetMessage = fill(messages.forTarget(name), itemName, given, leftover);
+    var selfMessage = format(messages.forSender(self, name), itemName, result);
+    var targetMessage = format(messages.forTarget(name), itemName, result);
 
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }
@@ -109,25 +113,29 @@ public record GiveCommand(
     var count = 0;
 
     for (var player : this.players.all()) {
-      var leftover = this.service.give(player, item, amount);
-      var given = amount - leftover;
+      var result = this.service.giveResult(player, item, amount);
       var recipient = this.framework.actorOf(player);
 
-      if (given == 0) {
+      if (result.noneGiven()) {
         recipient.sendError(
-            fill(snap.whenInventoryFull().forTarget(player.getName()), itemName, given, leftover));
+            format(snap.whenInventoryFull().forTarget(player.getName()), itemName, result));
         continue;
       }
 
       count++;
       var messages = snap.whenGiven();
-      if (leftover > 0) {
+      if (result.partial()) {
         messages = snap.whenPartial();
       }
-      recipient.sendSuccess(fill(messages.forTarget(player.getName()), itemName, given, leftover));
+      recipient.sendSuccess(format(messages.forTarget(player.getName()), itemName, result));
     }
 
     var givenAllMsg = snap.formatGivenAll(itemName, amount, count);
     sender.sendSuccess(givenAllMsg);
+  }
+
+  private static String format(
+      @NonNull String template, @NonNull String item, @NonNull GiveResult result) {
+    return fill(template, item, result.given(), result.leftover());
   }
 }
