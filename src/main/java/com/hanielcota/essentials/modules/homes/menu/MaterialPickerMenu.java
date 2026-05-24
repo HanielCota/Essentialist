@@ -38,6 +38,8 @@ public final class MaterialPickerMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.homes.picker";
 
+  private static final int MIN_ROWS = 1;
+
   private final ConfigHandle<HomesConfig> config;
   private final HomesActionTarget target;
   private final MaterialIconRegistry registry;
@@ -56,7 +58,9 @@ public final class MaterialPickerMenu implements EssentialsMenu {
 
     var paginationBuilder =
         PaginationConfig.builder().contentSlots(menuSpec.effectivePickerContentSlots());
-    PageNavigation.apply(menusRef, paginationBuilder, ID, rows, menuSpec.pickerNavigation());
+    if (rows > MIN_ROWS) {
+      PageNavigation.apply(menusRef, paginationBuilder, ID, rows, menuSpec.pickerNavigation());
+    }
     var pagination = paginationBuilder.build();
 
     MenuFramework.builder(ID, menusRef)

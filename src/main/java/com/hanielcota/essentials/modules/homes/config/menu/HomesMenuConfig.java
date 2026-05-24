@@ -76,7 +76,7 @@ public record HomesMenuConfig(
             38, 39, 40, 41, 42, 43),
         "<gold>{material}",
         List.of("<gray>Clique para usar <white>{material}", "<gray>Clique para escolher"),
-        NavigationButtonsConfig.defaults(48, 50),
+        NavigationButtonsConfig.defaults(45, 53),
         49,
         Material.BARRIER,
         "<red>Voltar às categorias",
