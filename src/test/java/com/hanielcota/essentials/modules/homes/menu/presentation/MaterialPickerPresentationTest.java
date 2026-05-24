@@ -14,10 +14,10 @@ class MaterialPickerPresentationTest {
     var messages = HomesMessages.defaults();
 
     assertEquals(
-        "<green>Ícone de <gold>base</gold> alterado para <gold>red bed</gold>.",
+        "<green>Icon of <gold>base</gold> changed to <gold>red bed</gold>.",
         presentation.reply(messages, "base", Material.RED_BED, true));
     assertEquals(
-        "<red>Você não tem nenhuma home chamada <gold>base</gold>.",
+        "<red>You don't have any home named <gold>base</gold>.",
         presentation.reply(messages, "base", Material.RED_BED, false));
   }
 }

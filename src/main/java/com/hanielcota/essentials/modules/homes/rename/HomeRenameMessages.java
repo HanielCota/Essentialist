@@ -13,7 +13,7 @@ final class HomeRenameMessages {
   private static final String SECONDS = "{seconds}";
 
   static String prompt(@NonNull HomesMessages messages, @NonNull String homeName, long seconds) {
-    var timeoutText = seconds <= 0 ? "sem limite" : seconds + "s";
+    var timeoutText = seconds <= 0 ? "no limit" : seconds + "s";
     var secondsStr = Long.toString(seconds);
 
     var promptTemplate = messages.renamePrompt();
