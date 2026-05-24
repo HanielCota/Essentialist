@@ -92,13 +92,21 @@ public record VanishConfig(
     return MenuLayouts.clampRows(menuRows);
   }
 
+  /** Content slots minus the info slot, so the static info item never collides with a head. */
   public List<Integer> effectiveContentSlots() {
+    var rows = effectiveRows();
+    var info = effectiveInfoSlot();
+    List<Integer> sanitized;
     if (menuContentSlots.isEmpty()) {
-      var rows = effectiveRows();
       var count = rows > MIN_ROWS ? (rows - 1) * 9 : 9;
-      return MenuLayouts.fallbackContentSlots(rows, count);
+      sanitized = MenuLayouts.fallbackContentSlots(rows, count);
+    } else {
+      sanitized = MenuLayouts.sanitizeSlots(menuContentSlots, rows);
     }
-    return MenuLayouts.sanitizeSlots(menuContentSlots, effectiveRows());
+    if (!sanitized.contains(info)) {
+      return sanitized;
+    }
+    return sanitized.stream().filter(slot -> slot != info).toList();
   }
 
   public int effectiveInfoSlot() {

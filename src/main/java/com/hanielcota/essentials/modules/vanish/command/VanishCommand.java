@@ -45,9 +45,8 @@ public record VanishCommand(
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
-    var newlyVanished = !this.service.isVanished(subjectId);
+    var newlyVanished = this.service.enter(subjectId);
     if (newlyVanished) {
-      this.service.enter(subjectId);
       this.applier.apply(subject);
     } else {
       this.service.exit(subjectId);

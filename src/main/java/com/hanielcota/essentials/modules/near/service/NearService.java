@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.near.service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -11,13 +11,19 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public final class NearService {
 
-  /** Default factory: always-visible filter. Use the constructor to inject a vanish-aware one. */
+  /**
+   * Default factory: target is always visible. Use the constructor to inject a vanish-aware one.
+   */
   public static NearService allVisible() {
-    return new NearService(player -> true);
+    return new NearService((viewer, target) -> true);
   }
 
-  /** Filter applied to every candidate before distance check — used to hide vanished players. */
-  private final Predicate<Player> visibilityFilter;
+  /**
+   * Filter applied to every candidate before the distance check. The first argument is the {@code
+   * /near} caller, the second is the candidate — used so a viewer with {@code
+   * essentials.vanish.see} can still see vanished players in results.
+   */
+  private final BiPredicate<Player, Player> visibilityFilter;
 
   /**
    * Returns the players within {@code radius} blocks of {@code center} (same world only), ordered
@@ -25,7 +31,6 @@ public final class NearService {
    * are skipped.
    */
   public List<Nearby> findNearby(@NonNull Player center, int radius) {
-
     var origin = center.getLocation();
     double maxDistanceSquared = (double) radius * radius;
     var result = new ArrayList<Nearby>();
@@ -34,7 +39,7 @@ public final class NearService {
       if (other.equals(center)) {
         continue;
       }
-      if (!this.visibilityFilter.test(other)) {
+      if (!this.visibilityFilter.test(center, other)) {
         continue;
       }
       double distanceSquared = origin.distanceSquared(other.getLocation());

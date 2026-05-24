@@ -3,18 +3,21 @@ package com.hanielcota.essentials.modules.vanish.listener;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 
 /**
- * Stops mobs from acquiring vanished players as targets.
+ * Enforces vanish invariants that {@code hidePlayer} and {@code setInvulnerable} do not cover.
  *
- * <p>{@code Player#hidePlayer} hides the entity from clients and the tab list, but mob AI keeps
- * seeing the vanished player and will walk towards them. {@code setInvulnerable} on the player
- * stops damage but not pursuit. Cancelling the target event severs both the visual giveaway and the
- * AI lock.
+ * <p>Mob AI still sees vanished players, so {@link EntityTargetEvent} is cancelled to sever
+ * pursuit. Outgoing damage from a vanished player would reveal them (a damage indicator from
+ * "nothing" is the classic vanish-PvP exploit), so any damage they deal — melee or via a projectile
+ * they shot — is cancelled.
  */
 @RequiredArgsConstructor
 public final class VanishProtectionListener implements Listener {
@@ -29,5 +32,27 @@ public final class VanishProtectionListener implements Listener {
     if (this.service.isVanished(target.getUniqueId())) {
       event.setCancelled(true);
     }
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onDamage(@NonNull EntityDamageByEntityEvent event) {
+    var attacker = resolveAttacker(event.getDamager());
+    if (attacker == null) {
+      return;
+    }
+    if (this.service.isVanished(attacker.getUniqueId())) {
+      event.setCancelled(true);
+    }
+  }
+
+  private static Player resolveAttacker(@NonNull Entity damager) {
+    if (damager instanceof Player player) {
+      return player;
+    }
+    if (damager instanceof Projectile projectile
+        && projectile.getShooter() instanceof Player shooter) {
+      return shooter;
+    }
+    return null;
   }
 }
