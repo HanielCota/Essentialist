@@ -31,7 +31,7 @@ public final class HomesInteractionFactory {
 
     var nameResolver = new HomeNameResolver(config, nameValidator);
     var teleporter = new HomeTeleporter(config, delayed, framework);
-    var teleportListener = new HomeTeleportListener(delayed, actionTarget, renameSessions);
+    var teleportListener = new HomeTeleportListener(actionTarget, renameSessions);
 
     var rename =
         new HomeRenameOrchestrator(config, homeService, scheduler, renameSessions, nameValidator);
