@@ -4,7 +4,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
 import com.hanielcota.essentials.modules.homes.domain.Home;
-import com.hanielcota.essentials.modules.teleport.feedback.DelayedTeleportPrompt;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
@@ -14,7 +13,7 @@ import org.bukkit.entity.Player;
 
 /**
  * Encapsulates the warm-up teleport flow used by both {@code /home} and the /homes menu: resolve
- * the home's location, build the standard {@link DelayedTeleportPrompt} from the configured chat
+ * the home's location, build the clickable {@link HomeTeleportPrompt} from the configured chat
  * lines, and hand off to {@link DelayedTeleport}. Reports {@code worldGone} to the caller's actor
  * when the home's world is unloaded.
  */
@@ -25,8 +24,11 @@ public final class HomeTeleporter {
   private final DelayedTeleport delayed;
   private final PaperCommandFramework framework;
 
-  private static DelayedTeleportPrompt buildPrompt(
-      @NonNull CommandActor actor, @NonNull HomesMessages messages, @NonNull Home home) {
+  private static HomeTeleportPrompt buildPrompt(
+      @NonNull Player player,
+      @NonNull CommandActor actor,
+      @NonNull HomesMessages messages,
+      @NonNull Home home) {
 
     var homeName = home.name();
     var teleportingMsg = messages.teleporting().replace("{name}", homeName);
@@ -34,7 +36,15 @@ public final class HomeTeleporter {
     var cancelledMsg = messages.cancelled();
     var failedMsg = messages.failed();
 
-    return new DelayedTeleportPrompt(actor, teleportingMsg, teleportedMsg, cancelledMsg, failedMsg);
+    return new HomeTeleportPrompt(
+        actor,
+        player,
+        teleportingMsg,
+        teleportedMsg,
+        cancelledMsg,
+        failedMsg,
+        messages.cancelButton(),
+        messages.cancelHover());
   }
 
   public void teleport(@NonNull Player player, @NonNull Home home, @NonNull CommandActor actor) {
@@ -48,7 +58,7 @@ public final class HomeTeleporter {
     }
 
     var delay = snap.teleportDelay();
-    var prompt = buildPrompt(actor, messages, home);
+    var prompt = buildPrompt(player, actor, messages, home);
 
     this.delayed.schedule(player, resolved, delay, prompt);
   }

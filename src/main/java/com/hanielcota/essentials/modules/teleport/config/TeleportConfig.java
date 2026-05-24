@@ -19,7 +19,9 @@ public record TeleportConfig(
         String broughtBy,
     @Comment("Shown when a teleport could not be completed.") String teleportFailed,
     @Comment("Shown by /tp pos when coordinates are outside the world limits.")
-        String invalidPosition) {
+        String invalidPosition,
+    @Comment("Shown by /tpcancel when the player has no warm-up teleport in progress.")
+        String cancelNoPending) {
 
   public static TeleportConfig defaults() {
     return new TeleportConfig(
@@ -32,7 +34,8 @@ public record TeleportConfig(
         "<green>Brought <gold>{player}</gold> to you.",
         "<yellow>Teleported to <gold>{sender}</gold>.",
         "<red>The teleport could not be completed.",
-        "<red>Those coordinates are outside the world limits.");
+        "<red>Those coordinates are outside the world limits.",
+        "<red>You don't have any teleport in progress.");
   }
 
   public String formatToPlayer(@NonNull String player) {

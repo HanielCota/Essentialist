@@ -52,11 +52,6 @@ public final class DelayedTeleport {
     this.pending.put(uuid, task, callback);
   }
 
-  /** Whether {@code player} has a pending delayed teleport. */
-  public boolean isPending(@NonNull UUID player) {
-    return this.pending.contains(player);
-  }
-
   /**
    * Silently drops the pending teleport for {@code player} — no callback fires. Public so
    * per-module listeners (e.g. {@code HomesSessionCleanupListener}) can own their own cancel rules
@@ -75,12 +70,20 @@ public final class DelayedTeleport {
     this.scheduler.runOnEntity(player, () -> this.executor.teleport(player, destination, callback));
   }
 
-  public void cancelAndNotify(@NonNull UUID player) {
+  /**
+   * Atomically drops the pending teleport for {@code player} and fires {@code onCancelled} on its
+   * callback. Returns {@code true} when a warm-up was actually cancelled, {@code false} when there
+   * was nothing to cancel — callers use the return value to decide which feedback to show without a
+   * separate "is-pending" check (which would race against warm-up completion).
+   */
+  public boolean cancelAndNotify(@NonNull UUID player) {
     var pendingTeleport = this.pending.remove(player);
-    if (pendingTeleport != null) {
-      pendingTeleport.cancelTask();
-      pendingTeleport.callback().onCancelled();
+    if (pendingTeleport == null) {
+      return false;
     }
+    pendingTeleport.cancelTask();
+    pendingTeleport.callback().onCancelled();
+    return true;
   }
 
   /**

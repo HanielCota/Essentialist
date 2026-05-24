@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.teleport;
 
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.modules.teleport.command.TeleportCancelCommand;
 import com.hanielcota.essentials.modules.teleport.command.TeleportCommand;
 import com.hanielcota.essentials.modules.teleport.command.TeleportHereCommand;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
@@ -39,5 +40,8 @@ public final class TeleportModule extends AbstractModule {
 
     var teleportHereCommand = new TeleportHereCommand(config, framework);
     registerCommand(teleportHereCommand);
+
+    var teleportCancelCommand = new TeleportCancelCommand(config, delayed);
+    registerCommand(teleportCancelCommand);
   }
 }
