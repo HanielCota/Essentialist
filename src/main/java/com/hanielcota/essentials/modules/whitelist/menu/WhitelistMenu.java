@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.whitelist.menu;
 import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
+import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
@@ -45,15 +46,25 @@ public final class WhitelistMenu implements EssentialsMenu {
     }
 
     var pagination = paginationBuilder.build();
+    var infoTemplate = buildInfoTemplate(snap);
 
     var menuTitle = ComponentUtils.mini(snap.menuTitle());
     MenuFramework.builder(ID, menus)
         .rows(rows)
         .title(menuTitle)
         .pagination(pagination)
+        .slot(snap.effectiveInfoSlot(), infoTemplate, null)
         .dynamicContent(this::buildSlots)
         .build()
         .register();
+  }
+
+  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull WhitelistConfig snap) {
+    return ItemTemplate.builder(snap.infoMaterial())
+        .name(snap.infoName())
+        .lore(snap.infoLore().toArray(String[]::new))
+        .italic(false)
+        .build();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

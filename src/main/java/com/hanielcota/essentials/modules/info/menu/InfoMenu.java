@@ -105,9 +105,10 @@ public final class InfoMenu implements EssentialsMenu {
     var snap = this.config.value();
     var detailSlots = snap.effectiveDetailSlots();
     var visibleEntries = Math.min(entries.size(), detailSlots.size());
+    var startIdx = (detailSlots.size() - visibleEntries) / 2;
     var slots = new ArrayList<SlotDefinition>(visibleEntries + 1);
     for (var i = 0; i < visibleEntries; i++) {
-      slots.add(entryItem(detailSlots.get(i), entries.get(i)));
+      slots.add(entryItem(detailSlots.get(startIdx + i), entries.get(i)));
     }
     var backBuilder = ItemTemplate.builder(snap.backMaterial());
     backBuilder = backBuilder.name(snap.backName());

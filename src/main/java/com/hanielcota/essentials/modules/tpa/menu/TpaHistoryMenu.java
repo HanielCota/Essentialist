@@ -61,11 +61,25 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     if (entries == null) {
       entries = this.history.list(player.getUniqueId());
     }
+    if (entries.isEmpty()) {
+      return emptyState();
+    }
     var slots = new ArrayList<SlotDefinition>(entries.size());
     for (int i = 0; i < entries.size(); i++) {
       var template = this.renderer.render(entries.get(i), i + 1);
       slots.add(SlotDefinition.of(-1, template, click -> {}));
     }
     return slots;
+  }
+
+  private List<SlotDefinition> emptyState() {
+    var settings = this.config.value().menu();
+    var rows = MenuLayouts.clampRows(settings.rows());
+    var fallbackSize = Math.min(MenuLayouts.slotCount(rows), TpaHistory.CAPACITY);
+    var contentSlots =
+        MenuLayouts.sanitizeSlots(
+            settings.contentSlots(), rows, MenuLayouts.fallbackContentSlots(rows, fallbackSize));
+    var centerSlot = contentSlots.get(contentSlots.size() / 2);
+    return List.of(SlotDefinition.of(centerSlot, this.renderer.renderEmpty(), click -> {}));
   }
 }
