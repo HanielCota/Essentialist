@@ -17,6 +17,11 @@ public record HomesMenuConfig(
     @Comment("/homes content slots (0-based). Leave empty to use every slot except the last row.")
         List<Integer> contentSlots,
     @Comment("/homes previous/next page buttons.") NavigationButtonsConfig navigation,
+    @Comment("Slot of the static info item shown on every /homes page.") int infoSlot,
+    @Comment("Material of the static info item.") Material infoMaterial,
+    @Comment("Name of the static info item.") String infoName,
+    @Comment("Lore of the static info item — explain how /homes works to the player.")
+        List<String> infoLore,
     @Comment("/homes item name. Placeholders: {name}.") String itemName,
     @Comment("/homes item lore. Placeholders: {world}, {x}, {y}, {z}.") List<String> itemLore,
     @Comment("Add an enchant glow to the /homes items.") boolean itemGlow,
@@ -54,8 +59,27 @@ public record HomesMenuConfig(
     return new HomesMenuConfig(
         "<dark_gray>Suas homes",
         6,
-        List.of(),
+        List.of(
+            11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34,
+            36, 37, 38, 39, 40, 41, 42, 43),
         NavigationButtonsConfig.defaults(48, 50),
+        10,
+        Material.BOOK,
+        "<yellow>Como funcionam as homes",
+        List.of(
+            "<gray>Pontos de teleporte pessoais.",
+            "",
+            "<yellow>/sethome <nome> <gray>cria uma home",
+            "<yellow>/home <nome> <gray>teleporta até ela",
+            "<yellow>/homes <gray>abre este menu",
+            "",
+            "<gray>Aqui no menu:",
+            "<yellow>Clique esquerdo <gray>teleporta",
+            "<yellow>Clique direito <gray>deleta",
+            "<yellow>Shift + clique <gray>renomeia",
+            "<yellow>Q (drop) <gray>troca o ícone",
+            "",
+            "<dark_gray>Seu limite depende da sua permissão."),
         "<gold>{name}",
         List.of(
             "<gray>Mundo: <white>{world}",
@@ -148,6 +172,10 @@ public record HomesMenuConfig(
       return MenuLayouts.fallbackContentSlots(effRows, count);
     }
     return MenuLayouts.sanitizeSlots(contentSlots, effectiveRows());
+  }
+
+  public int effectiveInfoSlot() {
+    return MenuLayouts.sanitizeSlot(infoSlot, effectiveRows(), 10);
   }
 
   public List<Integer> effectiveCategoryContentSlots() {
