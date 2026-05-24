@@ -14,6 +14,13 @@ public final class PluginInfoEntries {
 
   private final Plugin plugin;
 
+  private static String authors(@NonNull List<String> authors) {
+    if (authors.isEmpty()) {
+      return "Desconhecido";
+    }
+    return String.join(", ", authors);
+  }
+
   public List<InfoEntry> entries() {
     var meta = this.plugin.getPluginMeta();
     var name = meta.getName();
@@ -25,12 +32,5 @@ public final class PluginInfoEntries {
         InfoEntry.of(Material.NETHER_STAR, "<yellow>" + name, "<gray>Versão <white>" + version),
         InfoEntry.of(Material.WRITABLE_BOOK, "<yellow>Autor", GRAY + authorsList),
         InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Minecraft", GRAY + mcVersion));
-  }
-
-  private static String authors(@NonNull List<String> authors) {
-    if (authors.isEmpty()) {
-      return "Desconhecido";
-    }
-    return String.join(", ", authors);
   }
 }

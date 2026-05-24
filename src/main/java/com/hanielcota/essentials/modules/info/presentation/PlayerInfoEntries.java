@@ -19,6 +19,19 @@ public final class PlayerInfoEntries {
 
   private final UserSessionService sessions;
 
+  private static int roundedHealth(@NonNull Player player) {
+    return (int) Math.round(player.getHealth());
+  }
+
+  private static String gameModeName(@NonNull GameMode mode) {
+    return switch (mode) {
+      case SURVIVAL -> "Sobrevivência";
+      case CREATIVE -> "Criativo";
+      case ADVENTURE -> "Aventura";
+      case SPECTATOR -> "Espectador";
+    };
+  }
+
   public List<InfoEntry> entries(@NonNull Player player) {
     var uuid = player.getUniqueId();
     var name = player.getName();
@@ -60,18 +73,5 @@ public final class PlayerInfoEntries {
               return DurationFormatter.format(duration);
             });
     return formattedOpt.orElse("agora mesmo");
-  }
-
-  private static int roundedHealth(@NonNull Player player) {
-    return (int) Math.round(player.getHealth());
-  }
-
-  private static String gameModeName(@NonNull GameMode mode) {
-    return switch (mode) {
-      case SURVIVAL -> "Sobrevivência";
-      case CREATIVE -> "Criativo";
-      case ADVENTURE -> "Aventura";
-      case SPECTATOR -> "Espectador";
-    };
   }
 }

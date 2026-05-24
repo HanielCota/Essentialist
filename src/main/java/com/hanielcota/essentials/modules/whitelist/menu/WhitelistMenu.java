@@ -30,6 +30,14 @@ public final class WhitelistMenu implements EssentialsMenu {
   private final WhitelistEntryRenderer renderer;
   private final WhitelistClickHandler clickHandler;
 
+  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull WhitelistConfig snap) {
+    return ItemTemplate.builder(snap.infoMaterial())
+        .name(snap.infoName())
+        .lore(snap.infoLore().toArray(String[]::new))
+        .italic(false)
+        .build();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -57,14 +65,6 @@ public final class WhitelistMenu implements EssentialsMenu {
         .dynamicContent(this::buildSlots)
         .build()
         .register();
-  }
-
-  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull WhitelistConfig snap) {
-    return ItemTemplate.builder(snap.infoMaterial())
-        .name(snap.infoName())
-        .lore(snap.infoLore().toArray(String[]::new))
-        .italic(false)
-        .build();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

@@ -45,19 +45,6 @@ public final class MaterialIconRegistry {
     this.miscIcons = buildMiscIcons(menu, names);
   }
 
-  /** All pre-built icons for a category. */
-  public @NonNull List<MaterialIcon> iconsFor(@NonNull MaterialCategory category) {
-    if (category == MaterialCategory.MISC) {
-      return this.miscIcons;
-    }
-    return this.iconsByCategory.getOrDefault(category, List.of());
-  }
-
-  /** Total item count inside a category. */
-  public int sizeOf(@NonNull MaterialCategory category) {
-    return iconsFor(category).size();
-  }
-
   private static @NonNull List<MaterialIcon> buildIcons(
       @NonNull MaterialCategory category,
       @NonNull HomesMenuConfig menu,
@@ -73,6 +60,31 @@ public final class MaterialIconRegistry {
     }
 
     return Collections.unmodifiableList(icons);
+  }
+
+  private static @NonNull ItemTemplate renderTemplate(
+      @NonNull Material material,
+      @NonNull HomesMenuConfig menu,
+      @NonNull MaterialNamesConfig names) {
+
+    var pretty = names.displayName(material);
+    var name = menu.formatPickerItemName(pretty);
+    var lore = menu.formatPickerItemLore(pretty);
+
+    return ItemTemplate.builder(material).name(name).lore(lore).italic(false).build();
+  }
+
+  /** All pre-built icons for a category. */
+  public @NonNull List<MaterialIcon> iconsFor(@NonNull MaterialCategory category) {
+    if (category == MaterialCategory.MISC) {
+      return this.miscIcons;
+    }
+    return this.iconsByCategory.getOrDefault(category, List.of());
+  }
+
+  /** Total item count inside a category. */
+  public int sizeOf(@NonNull MaterialCategory category) {
+    return iconsFor(category).size();
   }
 
   private @NonNull List<MaterialIcon> buildMiscIcons(
@@ -94,18 +106,6 @@ public final class MaterialIconRegistry {
     }
 
     return Collections.unmodifiableList(icons);
-  }
-
-  private static @NonNull ItemTemplate renderTemplate(
-      @NonNull Material material,
-      @NonNull HomesMenuConfig menu,
-      @NonNull MaterialNamesConfig names) {
-
-    var pretty = names.displayName(material);
-    var name = menu.formatPickerItemName(pretty);
-    var lore = menu.formatPickerItemLore(pretty);
-
-    return ItemTemplate.builder(material).name(name).lore(lore).italic(false).build();
   }
 
   /** Pair of material + its pre-built template. */

@@ -30,11 +30,6 @@ public record MaterialNamesConfig(
     return new MaterialNamesConfig(map);
   }
 
-  public String displayName(@NonNull Material material) {
-    var configured = names.get(material);
-    return configured != null ? configured : toDisplayName(material);
-  }
-
   private static String toDisplayName(@NonNull Material material) {
     var raw = material.name().toLowerCase(Locale.ROOT).replace('_', ' ');
     var words = raw.split(" ");
@@ -55,5 +50,10 @@ public record MaterialNamesConfig(
       }
     }
     return sb.toString();
+  }
+
+  public String displayName(@NonNull Material material) {
+    var configured = names.get(material);
+    return configured != null ? configured : toDisplayName(material);
   }
 }
