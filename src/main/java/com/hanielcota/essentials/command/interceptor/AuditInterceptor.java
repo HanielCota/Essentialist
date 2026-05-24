@@ -66,11 +66,23 @@ public final class AuditInterceptor implements RichCommandInterceptor {
       return value.toString();
     }
 
+    // toString() of a record is "Class[a=1, b=2]"; Lombok @ToString is "Class(a=1, b=2)";
+    // older Bukkit/Paper classes use "Class{a=1, b=2}". Pick whichever bracket comes first.
     var fullString = value.toString();
-    var braceIndex = fullString.indexOf('{');
-    var startIndex = (braceIndex != -1) ? braceIndex : 0;
+    var openIndex = firstBracketIndex(fullString);
+    var jsonPart = openIndex >= 0 ? fullString.substring(openIndex) : "";
 
-    var jsonPart = fullString.substring(startIndex);
     return clazz.getSimpleName() + jsonPart;
+  }
+
+  private static int firstBracketIndex(@NonNull String s) {
+    var earliest = -1;
+    for (var bracket : new char[] {'[', '{', '('}) {
+      var idx = s.indexOf(bracket);
+      if (idx >= 0 && (earliest < 0 || idx < earliest)) {
+        earliest = idx;
+      }
+    }
+    return earliest;
   }
 }

@@ -39,7 +39,7 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   }
 
   @Override
-  public void submit(@NonNull String operation, @NonNull Runnable work) {
+  public boolean submit(@NonNull String operation, @NonNull Runnable work) {
     try {
       this.executor.execute(
           () -> {
@@ -49,8 +49,10 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
               LOG.warn(e, "{} async {} failed", this.threadName, operation);
             }
           });
+      return true;
     } catch (RejectedExecutionException _) {
       LOG.warn("{} rejected {} (shutting down?)", this.threadName, operation);
+      return false;
     }
   }
 

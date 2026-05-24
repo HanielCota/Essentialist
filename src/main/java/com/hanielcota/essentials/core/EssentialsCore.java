@@ -8,11 +8,14 @@ import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.module.ModuleContext;
 import com.hanielcota.essentials.module.ModuleManager;
 import com.hanielcota.essentials.service.ServiceRegistry;
+import com.hanielcota.essentials.util.Log;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public final class EssentialsCore implements EssentialsApi {
+
+  private static final Log LOG = Log.of(EssentialsCore.class);
 
   private final EssentialsPlugin plugin;
   private final ServiceRegistry services;
@@ -37,16 +40,26 @@ public final class EssentialsCore implements EssentialsApi {
       var moduleManager = this.services.resolve(ModuleManager.class);
       moduleManager.disableAll();
     } finally {
-      // Shut down MenuService before the database: menu teardown closes open
-      // viewers via InventoryCloseEvent listeners, some of which (e.g. invsee
-      // release, homes session cleanup) may still touch services that hit SQL.
-      var menuServiceOpt = this.services.find(MenuService.class);
-      menuServiceOpt.ifPresent(MenuService::shutdown);
-
-      var databaseProviderOpt = this.services.find(DatabaseProvider.class);
-      databaseProviderOpt.ifPresent(DatabaseProvider::close);
+      // Shut down MenuService before the database: menu teardown closes open viewers via
+      // InventoryCloseEvent listeners, some of which (e.g. invsee release, homes session cleanup)
+      // may still touch services that hit SQL. Both steps are wrapped so a thrown MenuService
+      // shutdown never strands the HikariCP pool / SQLite file open.
+      safelyShutdown(
+          "MenuService",
+          () -> this.services.find(MenuService.class).ifPresent(MenuService::shutdown));
+      safelyShutdown(
+          "DatabaseProvider",
+          () -> this.services.find(DatabaseProvider.class).ifPresent(DatabaseProvider::close));
 
       this.phase = LifecyclePhase.DISABLED;
+    }
+  }
+
+  private static void safelyShutdown(@NonNull String label, @NonNull Runnable step) {
+    try {
+      step.run();
+    } catch (RuntimeException e) {
+      LOG.error(e, "{} shutdown failed", label);
     }
   }
 
