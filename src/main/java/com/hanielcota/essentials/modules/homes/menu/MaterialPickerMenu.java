@@ -1,17 +1,15 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
-import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
-import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialPickerPresentation;
-import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.List;
 import lombok.NonNull;
@@ -35,26 +33,14 @@ import org.bukkit.entity.Player;
  * </ul>
  */
 @RequiredArgsConstructor
-public final class MaterialPickerMenu implements Menu {
+public final class MaterialPickerMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.homes.picker";
 
-  private static final int ROWS = 6;
-
-  /** Interior content slots: excludes the outer border so nav buttons have room. */
-  private static final List<Integer> CONTENT_SLOTS =
-      List.of(
-          10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37,
-          38, 39, 40, 41, 42, 43);
-
-  private static final int BACK_SLOT = 49;
-
   private final ConfigHandle<HomesConfig> config;
-  private final HomeService service;
-  private final MenuService menus;
   private final HomesActionTarget target;
-  private final MaterialPickerPresentation presentation;
   private final MaterialIconRegistry registry;
+  private final MaterialPickerClickHandler clickHandler;
 
   @Override
   public @NonNull String id() {
@@ -66,10 +52,11 @@ public final class MaterialPickerMenu implements Menu {
     var menuSpec = this.config.value().menu();
     var menuTitle = ComponentUtils.mini(menuSpec.staticPickerTitle());
 
-    var pagination = PaginationConfig.builder().contentSlots(CONTENT_SLOTS).build();
+    var pagination =
+        PaginationConfig.builder().contentSlots(menuSpec.effectivePickerContentSlots()).build();
 
     MenuFramework.builder(ID, menusRef)
-        .rows(ROWS)
+        .rows(menuSpec.effectivePickerRows())
         .title(menuTitle)
         .pagination(pagination)
         .dynamicContent(this::buildSlots)
@@ -92,31 +79,7 @@ public final class MaterialPickerMenu implements Menu {
       var pickedMaterial = icon.material();
       slots.add(
           SlotDefinition.of(
-              -1,
-              icon.template(),
-              ctx -> {
-                var clicked = ctx.player();
-                var clickedUuid = clicked.getUniqueId();
-                var homeName = this.target.consume(clickedUuid);
-                this.target.consumeCategory(clickedUuid);
-
-                ctx.close();
-
-                if (homeName == null) {
-                  this.menus.open(clicked, HomesMenu.ID);
-                  return;
-                }
-
-                var messages = this.config.value().messages();
-                var applied = this.service.setMaterial(clickedUuid, homeName, pickedMaterial);
-
-                var replyText =
-                    this.presentation.reply(messages, homeName, pickedMaterial, applied);
-                var replyComponent = ComponentUtils.mini(replyText);
-                clicked.sendMessage(replyComponent);
-
-                this.menus.open(clicked, HomesMenu.ID);
-              }));
+              -1, icon.template(), ctx -> this.clickHandler.pick(ctx, pickedMaterial)));
     }
 
     slots.add(backButtonSlot());
@@ -125,21 +88,14 @@ public final class MaterialPickerMenu implements Menu {
   }
 
   private @NonNull SlotDefinition backButtonSlot() {
+    var menuSpec = this.config.value().menu();
     var back =
-        ItemTemplate.builder(org.bukkit.Material.BARRIER)
-            .name("<red>Voltar às categorias")
+        ItemTemplate.builder(menuSpec.pickerBackMaterial())
+            .name(menuSpec.pickerBackName())
+            .lore(menuSpec.pickerBackLore().toArray(String[]::new))
             .italic(false)
             .build();
 
-    return SlotDefinition.of(
-        BACK_SLOT,
-        back,
-        ctx -> {
-          var clicked = ctx.player();
-          var uuid = clicked.getUniqueId();
-          this.target.consumeCategory(uuid);
-          ctx.close();
-          this.menus.open(clicked, MaterialCategoryMenu.ID);
-        });
+    return SlotDefinition.of(menuSpec.effectivePickerBackSlot(), back, this.clickHandler::back);
   }
 }

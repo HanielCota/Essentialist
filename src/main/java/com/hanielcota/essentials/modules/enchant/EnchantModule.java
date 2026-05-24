@@ -14,6 +14,8 @@ public final class EnchantModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("enchant", EnchantConfig.class, EnchantConfig::defaults);
-    registerCommand(new EnchantCommand(config, new EnchantService()));
+    var enchantService = new EnchantService();
+    var enchantCommand = new EnchantCommand(config, enchantService);
+    registerCommand(enchantCommand);
   }
 }

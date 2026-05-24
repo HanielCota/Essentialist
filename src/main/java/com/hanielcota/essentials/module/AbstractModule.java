@@ -1,10 +1,10 @@
 package com.hanielcota.essentials.module;
 
-import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.config.ConfigService;
+import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.util.Log;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.ArrayList;
@@ -133,9 +133,9 @@ public abstract class AbstractModule implements Module {
     framework.registerAnnotated(handler);
   }
 
-  protected final void registerMenu(@NonNull Menu menu) {
+  protected final void registerMenu(@NonNull EssentialsMenu menu) {
     var menus = service(MenuService.class);
-    menus.register(menu);
+    menu.register(menus);
 
     var menuId = menu.id();
     registerCloseable(() -> menus.unregisterDefinition(menuId));

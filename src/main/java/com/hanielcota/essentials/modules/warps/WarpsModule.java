@@ -39,9 +39,16 @@ public final class WarpsModule extends AbstractModule {
 
     var delayed = service(DelayedTeleport.class);
 
-    registerCommand(new SetWarpCommand(config, warpService));
-    registerCommand(new WarpCommand(config, warpService, delayed));
-    registerCommand(new DelWarpCommand(config, warpService));
-    registerCommand(new WarpsCommand(config, warpService));
+    var setWarpCommand = new SetWarpCommand(config, warpService);
+    registerCommand(setWarpCommand);
+
+    var warpCommand = new WarpCommand(config, warpService, delayed);
+    registerCommand(warpCommand);
+
+    var delWarpCommand = new DelWarpCommand(config, warpService);
+    registerCommand(delWarpCommand);
+
+    var warpsCommand = new WarpsCommand(config, warpService);
+    registerCommand(warpsCommand);
   }
 }

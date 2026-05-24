@@ -17,8 +17,9 @@ public final class GamemodeModule extends AbstractModule {
     var config =
         configure(
             "gamemode", GamemodeConfig.class, GamemodeConfig::defaults, new GamemodeService());
-    registerCommand(
-        new GamemodeCommand(
-            config, service(GamemodeService.class), service(PaperCommandFramework.class)));
+    var gamemodeService = service(GamemodeService.class);
+    var framework = service(PaperCommandFramework.class);
+    var gamemodeCommand = new GamemodeCommand(config, gamemodeService, framework);
+    registerCommand(gamemodeCommand);
   }
 }

@@ -72,6 +72,8 @@ public record SetHomeCommand(
       @NonNull HomesMessages messages, @NonNull String name, @NonNull Player sender) {
     var limit = Integer.toString(this.service.limit(sender));
 
-    return messages.limitReached().replace("{name}", name).replace("{limit}", limit);
+    var limitReachedMsg = messages.limitReached();
+    var withName = limitReachedMsg.replace("{name}", name);
+    return withName.replace("{limit}", limit);
   }
 }

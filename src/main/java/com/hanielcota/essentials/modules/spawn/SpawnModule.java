@@ -39,11 +39,19 @@ public final class SpawnModule extends AbstractModule {
 
     var delayed = service(DelayedTeleport.class);
 
-    registerCommand(new SetSpawnCommand(config, spawnService));
-    registerCommand(new SpawnCommand(config, spawnService, delayed));
+    var setSpawnCommand = new SetSpawnCommand(config, spawnService);
+    registerCommand(setSpawnCommand);
 
-    registerListener(new SpawnJoinListener(spawnService));
-    registerListener(new SpawnRespawnListener(spawnService));
-    registerListener(new SpawnVoidListener(spawnService));
+    var spawnCommand = new SpawnCommand(config, spawnService, delayed);
+    registerCommand(spawnCommand);
+
+    var joinListener = new SpawnJoinListener(spawnService);
+    registerListener(joinListener);
+
+    var respawnListener = new SpawnRespawnListener(spawnService);
+    registerListener(respawnListener);
+
+    var voidListener = new SpawnVoidListener(spawnService);
+    registerListener(voidListener);
   }
 }

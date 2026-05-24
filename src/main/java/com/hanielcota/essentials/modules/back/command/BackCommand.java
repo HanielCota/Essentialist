@@ -3,8 +3,10 @@ package com.hanielcota.essentials.modules.back.command;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.back.menu.BackMenu;
+import com.hanielcota.essentials.modules.back.menu.BackMenuState;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -23,7 +25,10 @@ import org.bukkit.entity.Player;
 @Description("Retorna à localização anterior ou abre o histórico de teleportes.")
 @Syntax("/back")
 public record BackCommand(
-    ConfigHandle<BackConfig> config, TeleportHistory history, MenuService menus, BackMenu menu) {
+    ConfigHandle<BackConfig> config,
+    TeleportHistory history,
+    MenuService menus,
+    BackMenuState state) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
@@ -35,7 +40,7 @@ public record BackCommand(
       return;
     }
 
-    this.menu.prefetch(sender.getUniqueId(), entries);
-    this.menus.open(sender, BackMenu.ID);
+    this.state.prefetch(sender.getUniqueId(), entries);
+    MenuOpenings.open(this.menus, sender, BackMenu.ID, actor);
   }
 }

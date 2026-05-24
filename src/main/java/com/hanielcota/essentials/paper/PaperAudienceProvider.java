@@ -5,11 +5,7 @@ import java.util.UUID;
 import lombok.NonNull;
 import net.kyori.adventure.audience.Audience;
 
-public record PaperAudienceProvider(EssentialsPlugin plugin) implements AudienceProvider {
-
-  public PaperAudienceProvider(@NonNull EssentialsPlugin plugin) {
-    this.plugin = plugin;
-  }
+public record PaperAudienceProvider(@NonNull EssentialsPlugin plugin) implements AudienceProvider {
 
   @Override
   public Audience console() {

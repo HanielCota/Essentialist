@@ -41,12 +41,16 @@ public record TpaHistoryEntry(
       @NonNull TeleportRequest request,
       @NonNull TeleportRequestStatus status,
       @Nullable Destination destination) {
+    var requestWindow = request.window();
+    var createdAtInstant = requestWindow.createdAt();
+    var createdAtMillis = createdAtInstant.toEpochMilli();
+
     return new TpaHistoryEntry(
         request.requester().id(),
         request.target(),
         request.type(),
         status,
-        request.window().createdAt().toEpochMilli(),
+        createdAtMillis,
         System.currentTimeMillis(),
         destination);
   }

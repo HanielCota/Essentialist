@@ -7,14 +7,15 @@ import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /** Shared command helpers — request lookup, sending and replying to the requester. */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TpaRequests {
-
-  private TpaRequests() {}
 
   /**
    * Opens a new request from {@code sender} to {@code target}, refusing self-targets, and replies
@@ -90,7 +91,8 @@ final class TpaRequests {
     }
     var actor = framework.actorOf(requesterPlayer);
 
-    var replyMsg = template.replace("{player}", request.target().name());
+    var replyTargetName = request.target().name();
+    var replyMsg = template.replace("{player}", replyTargetName);
     if (!asSuccess) {
       actor.sendError(replyMsg);
       return;

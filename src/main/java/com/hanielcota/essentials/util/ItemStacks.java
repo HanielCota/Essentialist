@@ -18,6 +18,10 @@ public final class ItemStacks {
       return true;
     }
 
-    return !meta.hasDisplayName() && !meta.hasLore() && !meta.hasEnchants();
+    var noDisplay = !meta.hasDisplayName();
+    var noLore = !meta.hasLore();
+    var noEnchants = !meta.hasEnchants();
+
+    return noDisplay && noLore && noEnchants;
   }
 }

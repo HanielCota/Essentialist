@@ -14,16 +14,16 @@ final class HomeRenameMessages {
     var secondsStr = Long.toString(seconds);
 
     var promptTemplate = messages.renamePrompt();
-    return promptTemplate
-        .replace("{name}", homeName)
-        .replace("{seconds}s", timeoutText)
-        .replace("{seconds}", secondsStr)
-        .replace("{timeout}", timeoutText);
+    var withName = promptTemplate.replace("{name}", homeName);
+    var withSecondsS = withName.replace("{seconds}s", timeoutText);
+    var withSeconds = withSecondsS.replace("{seconds}", secondsStr);
+    return withSeconds.replace("{timeout}", timeoutText);
   }
 
   static String timeout(@NonNull HomesMessages messages, long seconds) {
     var secondsStr = Long.toString(seconds);
-    return messages.renameTimeout().replace("{seconds}", secondsStr);
+    var renameTimeoutMsg = messages.renameTimeout();
+    return renameTimeoutMsg.replace("{seconds}", secondsStr);
   }
 
   static String result(
@@ -33,11 +33,21 @@ final class HomeRenameMessages {
       @NonNull RenameResult result) {
 
     return switch (result) {
-      case RENAMED -> messages.renamed().replace("{old}", oldName).replace("{new}", newName);
+      case RENAMED -> {
+        var renamedMsg = messages.renamed();
+        var withOld = renamedMsg.replace("{old}", oldName);
+        yield withOld.replace("{new}", newName);
+      }
 
-      case NOT_FOUND -> messages.renameLost().replace("{name}", oldName);
+      case NOT_FOUND -> {
+        var renameLostMsg = messages.renameLost();
+        yield renameLostMsg.replace("{name}", oldName);
+      }
 
-      case NAME_TAKEN -> messages.renameTaken().replace("{name}", newName);
+      case NAME_TAKEN -> {
+        var renameTakenMsg = messages.renameTaken();
+        yield renameTakenMsg.replace("{name}", newName);
+      }
 
       default -> throw new IllegalStateException("Resultado de renomeação desconhecido: " + result);
     };

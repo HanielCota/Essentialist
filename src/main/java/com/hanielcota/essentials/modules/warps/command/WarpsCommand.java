@@ -23,30 +23,26 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "3s")
 @Description("Lista as warps que você pode usar, clicáveis para teleporte.")
 @Syntax("/warps")
-public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service) {
-
-  public WarpsCommand(@NonNull ConfigHandle<WarpsConfig> config, @NonNull WarpService service) {
-    this.config = config;
-    this.service = service;
-  }
+public record WarpsCommand(
+    @NonNull ConfigHandle<WarpsConfig> config, @NonNull WarpService service) {
 
   private static String renderEntry(@NonNull Warp warp, @NonNull String template) {
     var compactX = Numbers.compact(warp.x());
     var compactY = Numbers.compact(warp.y());
     var compactZ = Numbers.compact(warp.z());
 
-    return template
-        .replace("{name}", warp.name())
-        .replace("{world}", warp.world())
-        .replace("{x}", compactX)
-        .replace("{y}", compactY)
-        .replace("{z}", compactZ);
+    var withName = template.replace("{name}", warp.name());
+    var withWorld = withName.replace("{world}", warp.world());
+    var withX = withWorld.replace("{x}", compactX);
+    var withY = withX.replace("{y}", compactY);
+    return withY.replace("{z}", compactZ);
   }
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
 
     var warps = this.service.listVisibleTo(sender);
     if (warps.isEmpty()) {
@@ -55,7 +51,8 @@ public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service
     }
 
     var warpsCountStr = Integer.toString(warps.size());
-    var header = messages.listHeader().replace("{count}", warpsCountStr);
+    var headerTemplate = messages.listHeader();
+    var header = headerTemplate.replace("{count}", warpsCountStr);
 
     var message = ClickableMessage.create();
     message.append(header);
@@ -65,9 +62,16 @@ public record WarpsCommand(ConfigHandle<WarpsConfig> config, WarpService service
       var entryText = renderEntry(warp, messages.listEntry());
 
       var command = "/warp " + warpName;
-      var hoverText = messages.listEntryHover().replace("{name}", warpName);
+      var hoverTemplate = messages.listEntryHover();
+      var hoverText = hoverTemplate.replace("{name}", warpName);
 
-      message.newline().append(entryText, slot -> slot.runCommand(command).hover(hoverText));
+      message.newline();
+      message.append(
+          entryText,
+          slot -> {
+            slot.runCommand(command);
+            slot.hover(hoverText);
+          });
     }
 
     message.send(sender);

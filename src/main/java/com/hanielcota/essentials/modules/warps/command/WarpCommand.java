@@ -45,7 +45,8 @@ public record WarpCommand(
 
     var warpOpt = this.service.find(name);
     if (warpOpt.isEmpty()) {
-      var unknownMsg = messages.unknownWarp().replace("{name}", name);
+      var unknownTemplate = messages.unknownWarp();
+      var unknownMsg = unknownTemplate.replace("{name}", name);
       actor.sendError(unknownMsg);
       return;
     }
@@ -54,7 +55,8 @@ public record WarpCommand(
     var resolvedName = warp.name();
 
     if (!this.service.canUse(sender, resolvedName)) {
-      var noPermMsg = messages.noPermission().replace("{name}", resolvedName);
+      var noPermTemplate = messages.noPermission();
+      var noPermMsg = noPermTemplate.replace("{name}", resolvedName);
       actor.sendError(noPermMsg);
       return;
     }
@@ -76,8 +78,10 @@ public record WarpCommand(
       @NonNull CommandActor actor, @NonNull WarpsMessages messages, @NonNull Warp warp) {
 
     var warpName = warp.name();
-    var teleportingMsg = messages.teleporting().replace("{name}", warpName);
-    var teleportedMsg = messages.teleported().replace("{name}", warpName);
+    var teleportingTemplate = messages.teleporting();
+    var teleportingMsg = teleportingTemplate.replace("{name}", warpName);
+    var teleportedTemplate = messages.teleported();
+    var teleportedMsg = teleportedTemplate.replace("{name}", warpName);
     var cancelledMsg = messages.cancelled();
     var failedMsg = messages.failed();
 

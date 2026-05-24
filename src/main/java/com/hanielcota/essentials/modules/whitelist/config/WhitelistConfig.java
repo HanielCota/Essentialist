@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.whitelist.config;
 
+import com.hanielcota.essentials.menu.MenuLayouts;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -10,6 +11,13 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public record WhitelistConfig(
     @Comment("Whitelist menu title.") String menuTitle,
     @Comment("Rows in the whitelist menu (clamped to 1-6).") int menuRows,
+    @Comment("Slots used by whitelist entries. Leave empty to use every row except the last.")
+        List<Integer> menuContentSlots,
+    @Comment("Slot of the previous-page button.") int previousPageSlot,
+    @Comment("Slot of the next-page button.") int nextPageSlot,
+    @Comment("Material of pagination buttons.") Material pageButtonMaterial,
+    @Comment("Name of the previous-page button.") String previousPageName,
+    @Comment("Name of the next-page button.") String nextPageName,
     @Comment("Item name for each whitelisted player. Placeholder: {player}.") String itemName,
     @Comment("Item lore for each whitelisted player. Placeholder: {player}.") List<String> itemLore,
     @Comment("Material of the placeholder shown when the whitelist is empty.")
@@ -34,6 +42,12 @@ public record WhitelistConfig(
     return new WhitelistConfig(
         "<dark_gray>Whitelist",
         6,
+        List.of(),
+        48,
+        50,
+        Material.ARROW,
+        "<yellow>« Página anterior",
+        "<yellow>Próxima página »",
         "<yellow>{player}",
         List.of("<gray>Clique para <red>remover</red> da whitelist."),
         Material.BARRIER,
@@ -60,7 +74,24 @@ public record WhitelistConfig(
 
   /** Configured menu rows clamped to the supported 1-6 range. */
   public int effectiveRows() {
-    return Math.clamp(menuRows, MIN_ROWS, MAX_ROWS);
+    return MenuLayouts.clampRows(menuRows);
+  }
+
+  public List<Integer> effectiveContentSlots() {
+    if (menuContentSlots.isEmpty()) {
+      var rows = effectiveRows();
+      var count = rows > MIN_ROWS ? (rows - 1) * 9 : 9;
+      return MenuLayouts.fallbackContentSlots(rows, count);
+    }
+    return MenuLayouts.sanitizeSlots(menuContentSlots, effectiveRows());
+  }
+
+  public int effectivePreviousPageSlot() {
+    return sanitizeNavigationSlot(previousPageSlot, 3);
+  }
+
+  public int effectiveNextPageSlot() {
+    return sanitizeNavigationSlot(nextPageSlot, 5);
   }
 
   public String formatItemName(@NonNull String player) {
@@ -69,7 +100,9 @@ public record WhitelistConfig(
 
   /** Item lore with {@code {player}} resolved on every line. */
   public List<String> formatLore(@NonNull String player) {
-    return itemLore.stream().map(line -> line.replace("{player}", player)).toList();
+    var replaced = itemLore.stream().map(line -> line.replace("{player}", player));
+
+    return replaced.toList();
   }
 
   public String formatAdded(@NonNull String player) {
@@ -90,5 +123,10 @@ public record WhitelistConfig(
 
   public String formatUnknownPlayer(@NonNull String player) {
     return withPlayer(unknownPlayer, player);
+  }
+
+  private int sanitizeNavigationSlot(int configuredSlot, int fallbackColumn) {
+    var lastRow = (effectiveRows() - 1) * 9;
+    return MenuLayouts.sanitizeSlot(configuredSlot, effectiveRows(), lastRow + fallbackColumn);
   }
 }

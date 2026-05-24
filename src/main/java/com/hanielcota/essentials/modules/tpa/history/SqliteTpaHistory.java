@@ -139,17 +139,29 @@ public final class SqliteTpaHistory implements TpaHistory {
       throws SQLException {
     try (var statement = conn.prepareStatement(INSERT)) {
       var destination = entry.destination();
+
       statement.setString(1, entry.requester().toString());
-      statement.setString(2, entry.target().id().toString());
-      statement.setString(3, entry.target().name());
+
+      var targetParticipant = entry.target();
+      var targetUuid = targetParticipant.id().toString();
+      statement.setString(2, targetUuid);
+      statement.setString(3, targetParticipant.name());
+
       statement.setString(4, entry.type().name());
       statement.setString(5, entry.status().name());
       statement.setLong(6, entry.createdAt());
       statement.setLong(7, entry.resolvedAt());
-      setNullable(statement, 8, destination == null ? null : destination.world(), Types.VARCHAR);
-      setNullable(statement, 9, destination == null ? null : destination.x(), Types.REAL);
-      setNullable(statement, 10, destination == null ? null : destination.y(), Types.REAL);
-      setNullable(statement, 11, destination == null ? null : destination.z(), Types.REAL);
+
+      var worldValue = destination == null ? null : destination.world();
+      var xValue = destination == null ? null : destination.x();
+      var yValue = destination == null ? null : destination.y();
+      var zValue = destination == null ? null : destination.z();
+
+      setNullable(statement, 8, worldValue, Types.VARCHAR);
+      setNullable(statement, 9, xValue, Types.REAL);
+      setNullable(statement, 10, yValue, Types.REAL);
+      setNullable(statement, 11, zValue, Types.REAL);
+
       statement.executeUpdate();
     }
   }

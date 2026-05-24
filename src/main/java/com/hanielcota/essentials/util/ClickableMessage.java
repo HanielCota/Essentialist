@@ -3,6 +3,8 @@ package com.hanielcota.essentials.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -32,11 +34,10 @@ import net.kyori.adventure.text.ComponentLike;
  * <hover>} tags directly in config strings via {@link ComponentUtils#mini(String)}. This builder is
  * meant for messages whose command, URL or tooltip is computed at runtime.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ClickableMessage implements ComponentLike {
 
   private final List<Component> parts = new ArrayList<>();
-
-  private ClickableMessage() {}
 
   /** Creates a new, empty message builder. */
   public static ClickableMessage create() {

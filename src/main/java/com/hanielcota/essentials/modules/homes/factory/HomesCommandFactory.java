@@ -8,7 +8,7 @@ import com.hanielcota.essentials.modules.homes.command.HomesCommand;
 import com.hanielcota.essentials.modules.homes.command.SetHomeCommand;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.material.HomeMaterialResolver;
-import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
+import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
 import com.hanielcota.essentials.modules.homes.name.HomeNameResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
@@ -22,7 +22,7 @@ public final class HomesCommandFactory {
       @NonNull HomeService homeService,
       @NonNull MenuService menus,
       @NonNull HomeTeleporter teleporter,
-      @NonNull HomesMenu menu,
+      @NonNull HomesMenuState menuState,
       @NonNull HomeNameResolver nameResolver) {
 
     var materialResolver = new HomeMaterialResolver(config);
@@ -31,6 +31,6 @@ public final class HomesCommandFactory {
         new SetHomeCommand(config, homeService, nameResolver, materialResolver),
         new HomeCommand(config, homeService, teleporter, nameResolver),
         new DelHomeCommand(config, homeService, nameResolver),
-        new HomesCommand(config, homeService, menus, menu));
+        new HomesCommand(config, homeService, menus, menuState));
   }
 }

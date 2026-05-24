@@ -1,76 +1,32 @@
 package com.hanielcota.essentials.modules.back.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
-import com.github.hanielcota.menuframework.api.Menu;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
-import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 @RequiredArgsConstructor
-public final class BackMenu implements Menu, Listener {
+public final class BackMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.back";
-
-  private static final int MIN_ROWS = 1;
-  private static final int MAX_ROWS = 6;
-  private static final int SLOTS_PER_ROW = 9;
 
   private final ConfigHandle<BackConfig> config;
   private final TeleportHistory history;
   private final BackEntryRenderer renderer;
   private final BackClickHandler clickHandler;
-
-  /**
-   * One-shot history snapshots handed over by {@link
-   * com.hanielcota.essentials.modules.back.command.BackCommand} so the menu's first render reuses
-   * the list the command already queried instead of hitting the database again. Consumed (removed)
-   * on the first {@link #buildSlots} call; later refreshes/pagination re-query for fresh data.
-   */
-  private final Map<UUID, List<HistoryEntry>> prefetched = new ConcurrentHashMap<>();
-
-  // Filters configured slot indices to fit inside `capacity`, dropping
-  // nulls/out-of-range/duplicates.
-  // Falls back to leading slots when nothing usable remains — PaginationConfig rejects empty lists.
-  private static List<Integer> sanitizeContentSlots(
-      @NonNull List<Integer> configured, int capacity) {
-    var valid = new ArrayList<Integer>(configured.size());
-    var seen = new HashSet<Integer>(configured.size());
-
-    for (var slot : configured) {
-      if (slot == null || slot < 0 || slot >= capacity) continue;
-      if (seen.add(slot)) valid.add(slot);
-    }
-    if (!valid.isEmpty()) {
-      return valid;
-    }
-
-    var fallback = Math.min(capacity, TeleportHistory.CAPACITY);
-    var leading = new ArrayList<Integer>(fallback);
-    for (var i = 0; i < fallback; i++) leading.add(i);
-    return leading;
-  }
-
-  public void prefetch(@NonNull UUID viewer, @NonNull List<HistoryEntry> entries) {
-    this.prefetched.put(viewer, List.copyOf(entries));
-  }
+  private final BackMenuState state;
 
   @Override
   public @NonNull String id() {
@@ -80,8 +36,11 @@ public final class BackMenu implements Menu, Listener {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
-    var rows = Math.max(MIN_ROWS, Math.min(MAX_ROWS, snap.menuRows()));
-    var slots = sanitizeContentSlots(snap.menuContentSlots(), rows * SLOTS_PER_ROW);
+    var rows = MenuLayouts.clampRows(snap.menuRows());
+    var fallbackSize = Math.min(MenuLayouts.slotCount(rows), TeleportHistory.CAPACITY);
+    var slots =
+        MenuLayouts.sanitizeSlots(
+            snap.menuContentSlots(), rows, MenuLayouts.fallbackContentSlots(rows, fallbackSize));
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
 
     var menuTitle = ComponentUtils.mini(snap.menuTitle());
@@ -95,7 +54,7 @@ public final class BackMenu implements Menu, Listener {
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
-    var entries = this.prefetched.remove(player.getUniqueId());
+    var entries = this.state.consumePrefetch(player.getUniqueId());
     if (entries == null) {
       entries = this.history.list(player.getUniqueId());
     }
@@ -108,10 +67,5 @@ public final class BackMenu implements Menu, Listener {
     }
 
     return slots;
-  }
-
-  @EventHandler
-  public void onQuit(@NonNull PlayerQuitEvent event) {
-    this.prefetched.remove(event.getPlayer().getUniqueId());
   }
 }

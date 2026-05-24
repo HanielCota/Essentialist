@@ -39,10 +39,9 @@ public final class HomeCache {
   List<Home> listAll() {
     var homeComparator = Comparator.comparing(Home::name);
 
-    return this.homes.values().stream()
-        .flatMap(bucket -> bucket.list().stream())
-        .sorted(homeComparator)
-        .toList();
+    var flattened = this.homes.values().stream().flatMap(bucket -> bucket.list().stream());
+
+    return flattened.sorted(homeComparator).toList();
   }
 
   int count(@NonNull UUID owner) {

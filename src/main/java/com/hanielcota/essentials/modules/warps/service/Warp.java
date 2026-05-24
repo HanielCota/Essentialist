@@ -13,36 +13,15 @@ import org.bukkit.Location;
  * {@link #resolve()} returns empty when the world is no longer available.
  */
 public record Warp(
-    String name,
-    String world,
+    @NonNull String name,
+    @NonNull String world,
     double x,
     double y,
     double z,
     float yaw,
     float pitch,
     long createdAt,
-    UUID createdBy) {
-
-  public Warp(
-      @NonNull String name,
-      @NonNull String world,
-      double x,
-      double y,
-      double z,
-      float yaw,
-      float pitch,
-      long createdAt,
-      @NonNull UUID createdBy) {
-    this.name = name;
-    this.world = world;
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.yaw = yaw;
-    this.pitch = pitch;
-    this.createdAt = createdAt;
-    this.createdBy = createdBy;
-  }
+    @NonNull UUID createdBy) {
 
   /** Captures a Bukkit {@link Location} as a fresh warp. */
   public static Warp of(@NonNull String name, @NonNull Location location, @NonNull UUID createdBy) {

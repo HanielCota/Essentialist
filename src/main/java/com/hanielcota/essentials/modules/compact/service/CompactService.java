@@ -19,7 +19,12 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
     Map<Material, Integer> totals = new EnumMap<>(Material.class);
     for (var slot = 0; slot < inv.getSize(); slot++) {
       var item = inv.getItem(slot);
-      if (item != null && ItemStacks.isPlain(item) && wanted.contains(item.getType())) {
+
+      var notNull = item != null;
+      var plain = ItemStacks.isPlain(item);
+      var isWanted = wanted.contains(item.getType());
+
+      if (notNull && plain && isWanted) {
         totals.merge(item.getType(), item.getAmount(), Integer::sum);
       }
     }
@@ -31,7 +36,12 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
     var remaining = amount;
     for (var slot = 0; slot < inv.getSize() && remaining > 0; slot++) {
       var item = inv.getItem(slot);
-      if (item != null && item.getType() == material && ItemStacks.isPlain(item)) {
+
+      var notNull = item != null;
+      var typeMatches = item.getType() == material;
+      var plain = ItemStacks.isPlain(item);
+
+      if (notNull && typeMatches && plain) {
         var take = Math.min(remaining, item.getAmount());
         var left = item.getAmount() - take;
         remaining -= take;

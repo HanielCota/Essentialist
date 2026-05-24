@@ -9,11 +9,12 @@ public final class GiveService {
 
   /** Gives {@code amount} of {@code material} to the player, returning how many did not fit. */
   public int give(@NonNull Player player, @NonNull Material material, int amount) {
-    var leftovers = player.getInventory().addItem(new ItemStack(material, amount));
+    var stack = new ItemStack(material, amount);
+    var leftovers = player.getInventory().addItem(stack);
 
     var leftover = 0;
-    for (var stack : leftovers.values()) {
-      leftover += stack.getAmount();
+    for (var stackEntry : leftovers.values()) {
+      leftover += stackEntry.getAmount();
     }
     return leftover;
   }

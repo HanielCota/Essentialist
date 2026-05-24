@@ -31,7 +31,9 @@ public record PingCommand(ConfigHandle<PingConfig> config, PingService service) 
 
     var snap = this.config.value();
     String coloredPing = this.service.format(subject.getPing());
-    var message = snap.message().forSender(self, name).replace("{ping}", coloredPing);
+    var messages = snap.message();
+    var base = messages.forSender(self, name);
+    var message = base.replace("{ping}", coloredPing);
 
     sender.sendMessage(message);
   }

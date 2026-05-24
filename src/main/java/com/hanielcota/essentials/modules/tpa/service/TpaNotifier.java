@@ -25,7 +25,8 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
     var requester = request.requester().name();
     var seconds = snap.requestExpiry().toSeconds();
 
-    var requestLine = messages.formatRequestReceived(request.type(), requester, seconds);
+    var requestType = request.type();
+    var requestLine = messages.formatRequestReceived(requestType, requester, seconds);
     var acceptHover = messages.buttonHoverAccept().replace("{player}", requester);
     var denyHover = messages.buttonHoverDeny().replace("{player}", requester);
 
@@ -42,13 +43,16 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
   }
 
   public void notifyExpired(@NonNull TeleportRequest request) {
-    var requester = Bukkit.getPlayer(request.requester().id());
+    var requesterId = request.requester().id();
+    var requester = Bukkit.getPlayer(requesterId);
     if (requester == null) {
       return;
     }
 
     var messages = this.config.value().messages();
-    var expiredMsg = messages.expired().replace("{player}", request.target().name());
+    var targetName = request.target().name();
+    var expiredTemplate = messages.expired();
+    var expiredMsg = expiredTemplate.replace("{player}", targetName);
     var expiredComponent = ComponentUtils.mini(expiredMsg);
     requester.sendMessage(expiredComponent);
   }
@@ -58,7 +62,9 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
   public void notifyPartnerLeft(
       @NonNull TeleportRequest request, @NonNull UUID quitter, @NonNull String quitterName) {
     var requesterId = request.requester().id();
-    var recipient = requesterId.equals(quitter) ? request.target().id() : requesterId;
+
+    var targetId = request.target().id();
+    var recipient = requesterId.equals(quitter) ? targetId : requesterId;
     var online = Bukkit.getPlayer(recipient);
     if (online == null) {
       return;

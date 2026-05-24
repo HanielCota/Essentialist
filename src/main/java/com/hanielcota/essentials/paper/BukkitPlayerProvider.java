@@ -9,11 +9,7 @@ import lombok.NonNull;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-public record BukkitPlayerProvider(EssentialsPlugin plugin) implements PlayerProvider {
-
-  public BukkitPlayerProvider(@NonNull EssentialsPlugin plugin) {
-    this.plugin = plugin;
-  }
+public record BukkitPlayerProvider(@NonNull EssentialsPlugin plugin) implements PlayerProvider {
 
   @Override
   public Optional<Player> online(@NonNull UUID id) {

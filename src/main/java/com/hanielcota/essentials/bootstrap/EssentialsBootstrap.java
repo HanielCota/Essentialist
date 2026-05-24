@@ -89,10 +89,12 @@ public final class EssentialsBootstrap {
 
   private PaperCommandFramework registerCommands(
       @NonNull ServiceRegistry services, @NonNull ModuleManager modules) {
-    var customizers =
-        modules.all().stream()
-            .map(module -> (Consumer<PaperCommandFramework.Builder>) module::customizeCommands)
-            .toList();
+    var modulesList = modules.all();
+    var moduleStream = modulesList.stream();
+    var mappedStream =
+        moduleStream.map(
+            module -> (Consumer<PaperCommandFramework.Builder>) module::customizeCommands);
+    var customizers = mappedStream.toList();
 
     var framework = new CommandBootstrap(this.plugin, customizers).createFramework();
     services.register(PaperCommandFramework.class, framework);
