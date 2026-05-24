@@ -33,6 +33,14 @@ public final class HomesMenu implements EssentialsMenu {
   private final HomeClickHandler clickHandler;
   private final HomesMenuState state;
 
+  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMenuConfig menuSpec) {
+    return ItemTemplate.builder(menuSpec.infoMaterial())
+        .name(menuSpec.infoName())
+        .lore(menuSpec.infoLore().toArray(String[]::new))
+        .italic(false)
+        .build();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -62,14 +70,6 @@ public final class HomesMenu implements EssentialsMenu {
         .dynamicContent(this::buildSlots)
         .build()
         .register();
-  }
-
-  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMenuConfig menuSpec) {
-    return ItemTemplate.builder(menuSpec.infoMaterial())
-        .name(menuSpec.infoName())
-        .lore(menuSpec.infoLore().toArray(String[]::new))
-        .italic(false)
-        .build();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

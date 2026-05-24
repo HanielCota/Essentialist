@@ -645,10 +645,6 @@ public enum MaterialCategory {
     this.materials = List.copyOf(materials);
   }
 
-  public @NonNull List<Material> materials() {
-    return materials;
-  }
-
   /**
    * Returns the category that owns this material, or {@link #MISC} if none of the explicit lists
    * contain it.
@@ -664,5 +660,9 @@ public enum MaterialCategory {
 
   public static @NonNull List<MaterialCategory> browsable() {
     return List.of(values());
+  }
+
+  public @NonNull List<Material> materials() {
+    return materials;
   }
 }

@@ -43,6 +43,11 @@ public record GiveCommand(
     return withAmount.replace("{leftover}", Integer.toString(leftover));
   }
 
+  private static String format(
+      @NonNull String template, @NonNull String item, @NonNull GiveResult result) {
+    return fill(template, item, result.given(), result.leftover());
+  }
+
   /**
    * Gives the caller (self) the item. CommandFramework parameter parsing is positional-strict and
    * does not backtrack: trying to fit both an optional amount and an optional target into the same
@@ -162,10 +167,5 @@ public record GiveCommand(
 
     var givenAllMsg = snap.formatGivenAll(itemName, amount, count);
     sender.sendSuccess(givenAllMsg);
-  }
-
-  private static String format(
-      @NonNull String template, @NonNull String item, @NonNull GiveResult result) {
-    return fill(template, item, result.given(), result.leftover());
   }
 }

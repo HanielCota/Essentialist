@@ -126,6 +126,27 @@ public record HomesMenuConfig(
         Material.RED_WOOL);
   }
 
+  private static Map<MaterialCategory, String> defaultCategoryNames() {
+    var map = new EnumMap<MaterialCategory, String>(MaterialCategory.class);
+    map.put(MaterialCategory.CONSTRUCTION, "Construction");
+    map.put(MaterialCategory.WOOD, "Wood");
+    map.put(MaterialCategory.DECORATION, "Decoration");
+    map.put(MaterialCategory.LIGHTING, "Lighting");
+    map.put(MaterialCategory.COMBAT, "Combat");
+    map.put(MaterialCategory.TOOLS, "Tools");
+    map.put(MaterialCategory.MINERALS, "Minerals");
+    map.put(MaterialCategory.REDSTONE, "Redstone");
+    map.put(MaterialCategory.FOOD, "Food");
+    map.put(MaterialCategory.TRANSPORT, "Transport");
+    map.put(MaterialCategory.STORAGE, "Storage");
+    map.put(MaterialCategory.MAGIC, "Magic");
+    map.put(MaterialCategory.NATURE, "Nature");
+    map.put(MaterialCategory.PLANTS, "Plants");
+    map.put(MaterialCategory.FLOWERS, "Flowers");
+    map.put(MaterialCategory.MISC, "Misc");
+    return map;
+  }
+
   public String formatItemName(@NonNull String name) {
     return itemName.replace("{name}", name);
   }
@@ -239,26 +260,5 @@ public record HomesMenuConfig(
       rendered[i] = pickerItemLore.get(i).replace("{material}", material);
     }
     return rendered;
-  }
-
-  private static Map<MaterialCategory, String> defaultCategoryNames() {
-    var map = new EnumMap<MaterialCategory, String>(MaterialCategory.class);
-    map.put(MaterialCategory.CONSTRUCTION, "Construction");
-    map.put(MaterialCategory.WOOD, "Wood");
-    map.put(MaterialCategory.DECORATION, "Decoration");
-    map.put(MaterialCategory.LIGHTING, "Lighting");
-    map.put(MaterialCategory.COMBAT, "Combat");
-    map.put(MaterialCategory.TOOLS, "Tools");
-    map.put(MaterialCategory.MINERALS, "Minerals");
-    map.put(MaterialCategory.REDSTONE, "Redstone");
-    map.put(MaterialCategory.FOOD, "Food");
-    map.put(MaterialCategory.TRANSPORT, "Transport");
-    map.put(MaterialCategory.STORAGE, "Storage");
-    map.put(MaterialCategory.MAGIC, "Magic");
-    map.put(MaterialCategory.NATURE, "Nature");
-    map.put(MaterialCategory.PLANTS, "Plants");
-    map.put(MaterialCategory.FLOWERS, "Flowers");
-    map.put(MaterialCategory.MISC, "Misc");
-    return map;
   }
 }
