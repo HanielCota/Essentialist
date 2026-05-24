@@ -35,7 +35,7 @@ public final class HomeClickHandler {
     }
 
     if (type == ClickType.DROP || type == ClickType.CONTROL_DROP) {
-      openCategoryMenuFor(click, homeName);
+      openSubMenuFor(click, homeName, MaterialCategoryMenu.ID);
       return;
     }
 
@@ -48,14 +48,6 @@ public final class HomeClickHandler {
 
     var actor = this.framework.actorOf(player);
     this.teleporter.teleport(player, home, actor);
-  }
-
-  private void openCategoryMenuFor(@NonNull ClickContext click, @NonNull String homeName) {
-    var player = click.player();
-    var uuid = player.getUniqueId();
-
-    this.target.set(uuid, homeName);
-    click.switchTo(MaterialCategoryMenu.ID);
   }
 
   private void openSubMenuFor(
