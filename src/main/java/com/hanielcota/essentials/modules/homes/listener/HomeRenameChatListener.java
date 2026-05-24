@@ -16,7 +16,10 @@ public final class HomeRenameChatListener implements Listener {
   private final HomeRenameOrchestrator rename;
   private final HomeRenameSessions sessions;
 
-  @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+  // ignoreCancelled=false so a chat-mute / anti-spam plugin cancelling the message earlier doesn't
+  // strand the rename session waiting for input that will never arrive. The rename flow has to win
+  // the chat regardless of other plugins' decisions; we cancel the event ourselves below.
+  @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
   public void onChat(@NonNull AsyncChatEvent event) {
     var player = event.getPlayer();
     var session = this.sessions.consume(player.getUniqueId());
