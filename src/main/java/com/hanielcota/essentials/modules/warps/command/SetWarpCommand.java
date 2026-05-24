@@ -31,9 +31,13 @@ public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
     var warpOpt = this.service.find(name);
     var existed = warpOpt.isPresent();
 
-    this.service.save(name, sender);
+    // SELECT is COLLATE NOCASE so "/setwarp SPAWN" finds an existing "Spawn".
+    // Reuse the stored name when overwriting so the canonical case (and any
+    // per-warp permission node derived from it) stays stable.
+    var persistedName = existed ? warpOpt.get().name() : name;
+    this.service.save(persistedName, sender);
     var template = existed ? messages.warpUpdated() : messages.warpSet();
-    var successMsg = template.replace("{name}", name);
+    var successMsg = template.replace("{name}", persistedName);
     actor.sendSuccess(successMsg);
   }
 }

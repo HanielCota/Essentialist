@@ -52,7 +52,7 @@ public final class SpawnModule extends AbstractModule {
     var respawnListener = new SpawnRespawnListener(spawnService);
     registerListener(respawnListener);
 
-    var voidListener = new SpawnVoidListener(spawnService);
+    var voidListener = new SpawnVoidListener(spawnService, delayed);
     registerListener(voidListener);
   }
 }

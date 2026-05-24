@@ -37,11 +37,14 @@ public final class EssentialsCore implements EssentialsApi {
       var moduleManager = this.services.resolve(ModuleManager.class);
       moduleManager.disableAll();
     } finally {
-      var databaseProviderOpt = this.services.find(DatabaseProvider.class);
-      databaseProviderOpt.ifPresent(DatabaseProvider::close);
-
+      // Shut down MenuService before the database: menu teardown closes open
+      // viewers via InventoryCloseEvent listeners, some of which (e.g. invsee
+      // release, homes session cleanup) may still touch services that hit SQL.
       var menuServiceOpt = this.services.find(MenuService.class);
       menuServiceOpt.ifPresent(MenuService::shutdown);
+
+      var databaseProviderOpt = this.services.find(DatabaseProvider.class);
+      databaseProviderOpt.ifPresent(DatabaseProvider::close);
 
       this.phase = LifecyclePhase.DISABLED;
     }

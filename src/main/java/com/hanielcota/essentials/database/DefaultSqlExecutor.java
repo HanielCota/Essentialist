@@ -81,35 +81,52 @@ public final class DefaultSqlExecutor implements SqlExecutor {
   public void tx(@NonNull TxBlock work) {
     try (var conn = this.connectionFactory.getConnection()) {
       conn.setAutoCommit(false);
-      SQLException primary = null;
+      SQLException sqlPrimary = null;
+      RuntimeException runtimePrimary = null;
 
       try {
         work.run(conn);
         conn.commit();
       } catch (SQLException e) {
-        primary = e;
-        try {
-          conn.rollback();
-        } catch (SQLException rollbackError) {
-          primary.addSuppressed(rollbackError);
-        }
+        sqlPrimary = e;
+        rollbackQuietly(conn, sqlPrimary);
+      } catch (RuntimeException e) {
+        // Without this catch, an NPE/IllegalStateException/PluginException raised inside
+        // {@code work} would skip the explicit rollback and rely on the connection close to
+        // implicitly roll back — driver-dependent. Roll back explicitly so the contract is the
+        // same as the SQLException path.
+        runtimePrimary = e;
+        rollbackQuietly(conn, runtimePrimary);
       } finally {
         try {
           conn.setAutoCommit(true);
         } catch (SQLException restoreError) {
-          if (primary == null) {
-            primary = restoreError;
-          } else if (primary != restoreError) {
-            primary.addSuppressed(restoreError);
+          if (sqlPrimary != null) {
+            sqlPrimary.addSuppressed(restoreError);
+          } else if (runtimePrimary != null) {
+            runtimePrimary.addSuppressed(restoreError);
+          } else {
+            sqlPrimary = restoreError;
           }
         }
       }
 
-      if (primary != null) {
-        throw primary;
+      if (runtimePrimary != null) {
+        throw runtimePrimary;
+      }
+      if (sqlPrimary != null) {
+        throw sqlPrimary;
       }
     } catch (SQLException e) {
       throw new PluginException("SQL transaction failed", e);
+    }
+  }
+
+  private static void rollbackQuietly(@NonNull Connection conn, @NonNull Throwable primary) {
+    try {
+      conn.rollback();
+    } catch (SQLException rollbackError) {
+      primary.addSuppressed(rollbackError);
     }
   }
 
