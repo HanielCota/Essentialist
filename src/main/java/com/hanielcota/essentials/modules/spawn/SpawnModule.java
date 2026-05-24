@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.spawn;
 
+import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
@@ -18,9 +19,10 @@ import java.util.Set;
 /**
  * Server spawn point and the {@code /spawn} / {@code /setspawn} commands.
  *
- * <p>Persists the single spawn point in SQLite via {@link SpawnStore}; warm-up and damage cancel
- * logic comes from the shared {@link DelayedTeleport} service registered by the {@code teleport}
- * module.
+ * <p>Persists the single spawn point in SQLite via {@link SpawnStore}; the SQL write is queued on
+ * an {@link com.hanielcota.essentials.database.AsyncDatabaseWriter AsyncDatabaseWriter} so {@code
+ * /setspawn} returns immediately. Warm-up and damage cancel logic comes from the shared {@link
+ * DelayedTeleport} service registered by the {@code teleport} module.
  */
 public final class SpawnModule extends AbstractModule {
 
@@ -35,24 +37,18 @@ public final class SpawnModule extends AbstractModule {
     SpawnTable.install(executor);
 
     var store = new SpawnStore(executor);
-    var spawnService = new SpawnService(store);
+    var writer = new DefaultAsyncDatabaseWriter("Essentialist-Spawn");
+    registerCloseable(writer);
+
+    var spawnService = new SpawnService(store, writer);
     registerService(SpawnService.class, spawnService);
 
     var delayed = service(DelayedTeleport.class);
 
-    var setSpawnCommand = new SetSpawnCommand(config, spawnService);
-    registerCommand(setSpawnCommand);
-
-    var spawnCommand = new SpawnCommand(config, spawnService, delayed);
-    registerCommand(spawnCommand);
-
-    var joinListener = new SpawnJoinListener(spawnService);
-    registerListener(joinListener);
-
-    var respawnListener = new SpawnRespawnListener(spawnService);
-    registerListener(respawnListener);
-
-    var voidListener = new SpawnVoidListener(spawnService, delayed);
-    registerListener(voidListener);
+    registerCommand(new SetSpawnCommand(config, spawnService));
+    registerCommand(new SpawnCommand(config, spawnService, delayed));
+    registerListener(new SpawnJoinListener(spawnService));
+    registerListener(new SpawnRespawnListener(spawnService));
+    registerListener(new SpawnVoidListener(spawnService, delayed));
   }
 }
