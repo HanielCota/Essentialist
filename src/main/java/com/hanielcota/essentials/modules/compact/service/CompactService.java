@@ -9,16 +9,24 @@ import java.util.Set;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public record CompactService(ConfigHandle<CompactConfig> config) {
 
+  /**
+   * Counts wanted materials across the 36 storage slots only.
+   *
+   * <p>Iterating {@code inv.getSize()} would also walk armor and the off-hand. Off-hand items would
+   * be removed by {@link #removeFromInventory} but the produced blocks only land in storage via
+   * {@code addItem}, so a player with iron in the off-hand and a full main inventory would see the
+   * produced block dropped at their feet while the off-hand slot was silently emptied.
+   */
   private static Map<Material, Integer> countByMaterial(
-      @NonNull Inventory inv, @NonNull Set<Material> wanted) {
+      @NonNull PlayerInventory inv, @NonNull Set<Material> wanted) {
     Map<Material, Integer> totals = new EnumMap<>(Material.class);
-    for (var slot = 0; slot < inv.getSize(); slot++) {
-      var item = inv.getItem(slot);
+    var storage = inv.getStorageContents();
+    for (var item : storage) {
       if (item == null) continue;
 
       var plain = ItemStacks.isPlain(item);
@@ -32,10 +40,11 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
   }
 
   private static void removeFromInventory(
-      @NonNull Inventory inv, @NonNull Material material, int amount) {
+      @NonNull PlayerInventory inv, @NonNull Material material, int amount) {
     var remaining = amount;
-    for (var slot = 0; slot < inv.getSize() && remaining > 0; slot++) {
-      var item = inv.getItem(slot);
+    var storage = inv.getStorageContents();
+    for (var slot = 0; slot < storage.length && remaining > 0; slot++) {
+      var item = storage[slot];
       if (item == null) continue;
 
       var typeMatches = item.getType() == material;
