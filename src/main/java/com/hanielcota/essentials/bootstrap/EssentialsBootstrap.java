@@ -81,9 +81,9 @@ public final class EssentialsBootstrap {
 
   private void registerConfigs(@NonNull ServiceRegistry services) {
     var dataFolder = this.plugin.getDataFolder();
-    var baseDir = dataFolder.toPath();
+    var configDir = dataFolder.toPath().resolve("modules");
 
-    var configService = new YamlConfigService(baseDir);
+    var configService = new YamlConfigService(configDir);
     services.register(ConfigService.class, configService);
   }
 
@@ -109,7 +109,7 @@ public final class EssentialsBootstrap {
 
   private void registerDatabase(@NonNull ServiceRegistry services) {
     var dataFolder = this.plugin.getDataFolder();
-    var dbPath = dataFolder.toPath().resolve("essentials.db");
+    var dbPath = dataFolder.toPath().resolve("data").resolve("essentials.db");
 
     var parentDir = dbPath.getParent();
     createDirectories(parentDir);
