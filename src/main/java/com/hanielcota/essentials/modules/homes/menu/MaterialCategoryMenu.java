@@ -87,7 +87,7 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
   private @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
     var menuSpec = this.config.value().menu();
     var icon = this.icons.iconFor(category);
-    var categoryName = category.displayName();
+    var categoryName = menuSpec.categoryName(category);
     var name = menuSpec.formatCategoryItemName(categoryName);
     var lore = menuSpec.formatCategoryItemLore(categoryName);
 

@@ -10,7 +10,6 @@ import org.bukkit.Material;
  */
 public enum MaterialCategory {
   CONSTRUCTION(
-      "Construção",
       List.of(
           Material.STONE,
           Material.COBBLESTONE,
@@ -70,7 +69,6 @@ public enum MaterialCategory {
           Material.WAXED_OXIDIZED_CUT_COPPER)),
 
   WOOD(
-      "Madeira",
       List.of(
           Material.OAK_LOG,
           Material.SPRUCE_LOG,
@@ -113,7 +111,6 @@ public enum MaterialCategory {
           Material.BAMBOO_BLOCK)),
 
   DECORATION(
-      "Decoração",
       List.of(
           Material.WHITE_WOOL,
           Material.ORANGE_WOOL,
@@ -215,7 +212,6 @@ public enum MaterialCategory {
           Material.BLACK_STAINED_GLASS)),
 
   LIGHTING(
-      "Iluminação",
       List.of(
           Material.TORCH,
           Material.SOUL_TORCH,
@@ -249,7 +245,6 @@ public enum MaterialCategory {
           Material.BLACK_CANDLE)),
 
   COMBAT(
-      "Combate",
       List.of(
           Material.WOODEN_SWORD,
           Material.STONE_SWORD,
@@ -299,7 +294,6 @@ public enum MaterialCategory {
           Material.WOLF_ARMOR)),
 
   TOOLS(
-      "Ferramentas",
       List.of(
           Material.WOODEN_PICKAXE,
           Material.STONE_PICKAXE,
@@ -336,7 +330,6 @@ public enum MaterialCategory {
           Material.FILLED_MAP)),
 
   MINERALS(
-      "Minerais",
       List.of(
           Material.COAL,
           Material.CHARCOAL,
@@ -374,7 +367,6 @@ public enum MaterialCategory {
           Material.AMETHYST_CLUSTER)),
 
   REDSTONE(
-      "Redstone",
       List.of(
           Material.REDSTONE_BLOCK,
           Material.REDSTONE_TORCH,
@@ -433,7 +425,6 @@ public enum MaterialCategory {
           Material.LIGHTNING_ROD)),
 
   FOOD(
-      "Alimentos",
       List.of(
           Material.APPLE,
           Material.GOLDEN_APPLE,
@@ -457,7 +448,6 @@ public enum MaterialCategory {
           Material.OMINOUS_BOTTLE)),
 
   TRANSPORT(
-      "Transporte",
       List.of(
           Material.MINECART,
           Material.CHEST_MINECART,
@@ -492,7 +482,6 @@ public enum MaterialCategory {
           Material.LEAD)),
 
   STORAGE(
-      "Armazenamento",
       List.of(
           Material.CHEST,
           Material.TRAPPED_CHEST,
@@ -534,7 +523,6 @@ public enum MaterialCategory {
           Material.BLACK_BUNDLE)),
 
   MAGIC(
-      "Magia",
       List.of(
           Material.ENCHANTING_TABLE,
           Material.BREWING_STAND,
@@ -556,7 +544,6 @@ public enum MaterialCategory {
           Material.TOTEM_OF_UNDYING)),
 
   NATURE(
-      "Natureza",
       List.of(
           Material.GRASS_BLOCK,
           Material.DIRT,
@@ -584,7 +571,6 @@ public enum MaterialCategory {
           Material.SCULK_VEIN)),
 
   PLANTS(
-      "Plantas",
       List.of(
           Material.OAK_SAPLING,
           Material.SPRUCE_SAPLING,
@@ -624,7 +610,6 @@ public enum MaterialCategory {
           Material.SMALL_DRIPLEAF)),
 
   FLOWERS(
-      "Flores",
       List.of(
           Material.POPPY,
           Material.BLUE_ORCHID,
@@ -652,18 +637,12 @@ public enum MaterialCategory {
           Material.PINK_PETALS,
           Material.WILDFLOWERS)),
 
-  MISC("Diversos", List.of());
+  MISC(List.of());
 
-  private final String displayName;
   private final List<Material> materials;
 
-  MaterialCategory(@NonNull String displayName, @NonNull List<Material> materials) {
-    this.displayName = displayName;
+  MaterialCategory(@NonNull List<Material> materials) {
     this.materials = List.copyOf(materials);
-  }
-
-  public @NonNull String displayName() {
-    return displayName;
   }
 
   public @NonNull List<Material> materials() {
