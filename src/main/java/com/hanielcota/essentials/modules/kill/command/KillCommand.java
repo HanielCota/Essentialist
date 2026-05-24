@@ -28,11 +28,20 @@ import org.bukkit.entity.Player;
 public record KillCommand(
     ConfigHandle<KillConfig> config, KillService service, PaperCommandFramework framework) {
 
+  private static final String EXEMPT_PERMISSION = "essentials.kill.exempt";
+
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
+
+    // Exempt only applies when killing someone else — a staff member with both essentials.kill and
+    // essentials.kill.exempt can still kill themselves.
+    if (!self && subject.hasPermission(EXEMPT_PERMISSION)) {
+      sender.sendError(snap.formatExempt(name));
+      return;
+    }
 
     if (!this.service.kill(subject)) {
       sender.sendError(snap.whenAlreadyDead().forSender(self, name));
