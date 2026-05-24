@@ -72,6 +72,16 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
         .build();
   }
 
+  /** The placeholder item shown when the history is empty. */
+  public @NonNull ItemTemplate renderEmpty() {
+    var settings = this.config.value().menu();
+    return ItemTemplate.builder(settings.emptyMaterial())
+        .name(settings.emptyName())
+        .lore(settings.emptyLore().toArray(String[]::new))
+        .italic(false)
+        .build();
+  }
+
   private String[] buildLore(
       @NonNull List<String> template,
       @NonNull String targetName,

@@ -15,6 +15,10 @@ public record WhitelistConfig(
     @Comment("Slots used by whitelist entries. Leave empty to use every row except the last.")
         List<Integer> menuContentSlots,
     @Comment("Previous/next page buttons.") NavigationButtonsConfig navigation,
+    @Comment("Slot of the static info item shown on every page.") int infoSlot,
+    @Comment("Material of the static info item.") Material infoMaterial,
+    @Comment("Name of the static info item.") String infoName,
+    @Comment("Lore of the static info item — explain /whitelist usage.") List<String> infoLore,
     @Comment("Item name for each whitelisted player. Placeholder: {player}.") String itemName,
     @Comment("Item lore for each whitelisted player. Placeholder: {player}.") List<String> itemLore,
     @Comment("Material of the placeholder shown when the whitelist is empty.")
@@ -38,8 +42,22 @@ public record WhitelistConfig(
     return new WhitelistConfig(
         "<dark_gray>Whitelist",
         6,
-        List.of(),
+        List.of(
+            11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34,
+            36, 37, 38, 39, 40, 41, 42, 43),
         NavigationButtonsConfig.defaults(48, 50),
+        10,
+        Material.BOOK,
+        "<yellow>Whitelist do servidor",
+        List.of(
+            "<gray>Só jogadores adicionados podem entrar.",
+            "",
+            "<yellow>/whitelist add [jogador] <gray>adiciona",
+            "<yellow>/whitelist remove [jogador] <gray>remove",
+            "<yellow>/whitelist <gray>abre este menu",
+            "",
+            "<gray>Aqui no menu:",
+            "<yellow>Clique <gray>remove o jogador"),
         "<yellow>{player}",
         List.of("<gray>Clique para <red>remover</red> da whitelist."),
         Material.BARRIER,
@@ -76,6 +94,10 @@ public record WhitelistConfig(
       return MenuLayouts.fallbackContentSlots(rows, count);
     }
     return MenuLayouts.sanitizeSlots(menuContentSlots, effectiveRows());
+  }
+
+  public int effectiveInfoSlot() {
+    return MenuLayouts.sanitizeSlot(infoSlot, effectiveRows(), 10);
   }
 
   public String formatItemName(@NonNull String player) {

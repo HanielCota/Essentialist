@@ -5,6 +5,7 @@ import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.NonNull;
+import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -22,6 +23,9 @@ public record TpaMenuConfig(
             "History item lore. Placeholders: {target}, {type}, {status}, {world}, {x}, {y}, "
                 + "{z}, {time}.")
         List<String> itemLore,
+    @Comment("Material of the placeholder shown when the history is empty.") Material emptyMaterial,
+    @Comment("Name of the placeholder shown when the history is empty.") String emptyName,
+    @Comment("Lore of the placeholder shown when the history is empty.") List<String> emptyLore,
     @Comment("Label for an accepted request.") String statusAccepted,
     @Comment("Label for a denied request.") String statusDenied,
     @Comment("Label for an expired request.") String statusExpired,
@@ -46,6 +50,13 @@ public record TpaMenuConfig(
             "<gray>Resultado: {status}",
             "<gray>Local: <white>{world} {x}, {y}, {z}",
             "<gray>Quando: <white>{time}"),
+        Material.BARRIER,
+        "<red>Sem histórico ainda",
+        List.of(
+            "<gray>Nenhum pedido recente.",
+            "",
+            "<yellow>/tpa [jogador] <gray>pede teleporte até alguém",
+            "<yellow>/tpahere [jogador] <gray>chama alguém até você"),
         "<green>Aceito",
         "<red>Recusado",
         "<gray>Expirado",
