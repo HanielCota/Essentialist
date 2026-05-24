@@ -3,12 +3,14 @@ package com.hanielcota.essentials.modules.homes.menu;
 import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
+import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.util.ComponentUtils;
@@ -49,13 +51,24 @@ public final class HomesMenu implements EssentialsMenu {
     }
     var pagination = paginationBuilder.build();
 
+    var infoTemplate = buildInfoTemplate(menuSpec);
+
     MenuFramework.builder(ID, menus)
         .rows(rows)
         .title(menuTitle)
         .pagination(pagination)
+        .slot(menuSpec.effectiveInfoSlot(), infoTemplate, null)
         .dynamicContent(this::buildSlots)
         .build()
         .register();
+  }
+
+  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMenuConfig menuSpec) {
+    return ItemTemplate.builder(menuSpec.infoMaterial())
+        .name(menuSpec.infoName())
+        .lore(menuSpec.infoLore().toArray(String[]::new))
+        .italic(false)
+        .build();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
