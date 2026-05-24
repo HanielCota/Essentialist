@@ -38,24 +38,28 @@ public record TpAcceptCommand(
     }
     var request = resolved.get();
 
-    var result = this.service.accept(request);
-    switch (result) {
-      case SUCCESS -> {
-        var requesterName = request.requester().name();
-        var acceptedSelfTemplate = messages.acceptedSelf();
-        var acceptedMsg = acceptedSelfTemplate.replace("{player}", requesterName);
-        actor.sendSuccess(acceptedMsg);
+    this.service
+        .accept(request)
+        .thenAccept(
+            result -> {
+              switch (result) {
+                case SUCCESS -> {
+                  var requesterName = request.requester().name();
+                  var acceptedSelfTemplate = messages.acceptedSelf();
+                  var acceptedMsg = acceptedSelfTemplate.replace("{player}", requesterName);
+                  actor.sendSuccess(acceptedMsg);
 
-        TpaRequests.replyRequester(this.framework, request, messages.accepted(), true);
-      }
-      case REQUESTER_OFFLINE -> {
-        var requesterName = request.requester().name();
-        var requesterOfflineTemplate = messages.requesterOffline();
-        var offlineMsg = requesterOfflineTemplate.replace("{player}", requesterName);
-        actor.sendError(offlineMsg);
-      }
-      case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
-      case NOT_FOUND -> actor.sendError(messages.noIncoming());
-    }
+                  TpaRequests.replyRequester(this.framework, request, messages.accepted(), true);
+                }
+                case REQUESTER_OFFLINE -> {
+                  var requesterName = request.requester().name();
+                  var requesterOfflineTemplate = messages.requesterOffline();
+                  var offlineMsg = requesterOfflineTemplate.replace("{player}", requesterName);
+                  actor.sendError(offlineMsg);
+                }
+                case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
+                case NOT_FOUND -> actor.sendError(messages.noIncoming());
+              }
+            });
   }
 }
