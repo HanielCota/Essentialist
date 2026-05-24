@@ -1,9 +1,12 @@
 package com.hanielcota.essentials.modules.vanish.command;
 
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
+import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -12,6 +15,8 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PermissionForOther;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
+import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -24,12 +29,13 @@ import org.bukkit.entity.Player;
 @Permission("essentials.vanish")
 @Cooldown(duration = "1s")
 @Description("Toggles vanish for the sender or another player.")
-@Syntax("/vanish [jogador]")
+@Syntax("/vanish [jogador] | /vanish list")
 public record VanishCommand(
     ConfigHandle<VanishConfig> config,
     VanishService service,
     VanishVisibilityApplier applier,
-    PaperCommandFramework framework) {
+    PaperCommandFramework framework,
+    MenuService menus) {
 
   @DefaultSubcommand
   @PermissionForOther(".others")
@@ -39,9 +45,8 @@ public record VanishCommand(
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
-    var newlyVanished = !this.service.isVanished(subjectId);
+    var newlyVanished = this.service.enter(subjectId);
     if (newlyVanished) {
-      this.service.enter(subjectId);
       this.applier.apply(subject);
     } else {
       this.service.exit(subjectId);
@@ -55,5 +60,14 @@ public record VanishCommand(
     }
     var target = this.framework.actorOf(subject);
     sender.sendDualMessage(target, messages.forSender(false, name), messages.forTarget(name));
+  }
+
+  @Subcommand("list")
+  @PlayerOnly
+  @Permission(VanishVisibilityApplier.SEE_PERMISSION)
+  @Description("Opens the menu with every currently vanished player.")
+  @Syntax("/vanish list")
+  public void list(@NonNull CommandActor sender) {
+    MenuOpenings.open(this.menus, sender.unwrap(Player.class), VanishMenu.ID, sender);
   }
 }

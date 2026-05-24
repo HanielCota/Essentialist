@@ -4,7 +4,9 @@ import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.online.command.OnlineCommand;
 import com.hanielcota.essentials.modules.online.config.OnlineConfig;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
-import java.util.function.IntSupplier;
+import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
+import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.function.ToIntFunction;
 import org.bukkit.Bukkit;
 
 public final class OnlineModule extends AbstractModule {
@@ -20,19 +22,21 @@ public final class OnlineModule extends AbstractModule {
   }
 
   /**
-   * Live count of online players excluding vanished ones. Looks up {@link VanishService} on each
-   * call so the wiring is independent of module load order — when the vanish module is disabled,
-   * the lookup returns empty and the raw online count is used.
+   * Counts online players, excluding vanished ones for viewers without {@link
+   * VanishVisibilityApplier#SEE_PERMISSION}. Staff with the see-perm get the true count. Looks up
+   * {@link VanishService} on each call so module load order does not matter — if vanish is disabled
+   * the raw count is returned.
    */
-  private IntSupplier visibleCount() {
+  private ToIntFunction<CommandActor> visibleCount() {
     var registry = context().services();
-    return () -> {
+    return actor -> {
+      var online = Bukkit.getOnlinePlayers();
       var vanish = registry.find(VanishService.class).orElse(null);
-      if (vanish == null) {
-        return Bukkit.getOnlinePlayers().size();
+      if (vanish == null || actor.hasPermission(VanishVisibilityApplier.SEE_PERMISSION)) {
+        return online.size();
       }
       var count = 0;
-      for (var player : Bukkit.getOnlinePlayers()) {
+      for (var player : online) {
         if (!vanish.isVanished(player.getUniqueId())) {
           count++;
         }

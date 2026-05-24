@@ -1,17 +1,14 @@
 package com.hanielcota.essentials.modules.whitelist.menu;
 
-import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
-import com.hanielcota.essentials.menu.PageNavigation;
+import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.whitelist.config.WhitelistConfig;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
-import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -22,8 +19,6 @@ import org.bukkit.entity.Player;
 public final class WhitelistMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.whitelist";
-
-  private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<WhitelistConfig> config;
   private final WhitelistService service;
@@ -46,25 +41,16 @@ public final class WhitelistMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
-    var rows = snap.effectiveRows();
-    var paginationBuilder = PaginationConfig.builder().contentSlots(snap.effectiveContentSlots());
-
-    if (rows > MIN_ROWS) {
-      PageNavigation.apply(menus, paginationBuilder, ID, rows, snap.navigation());
-    }
-
-    var pagination = paginationBuilder.build();
-    var infoTemplate = buildInfoTemplate(snap);
-
-    var menuTitle = ComponentUtils.mini(snap.menuTitle());
-    MenuFramework.builder(ID, menus)
-        .rows(rows)
-        .title(menuTitle)
-        .pagination(pagination)
-        .slot(snap.effectiveInfoSlot(), infoTemplate, null)
-        .dynamicContent(this::buildSlots)
-        .build()
-        .register();
+    PaginatedInfoMenus.register(
+        menus,
+        ID,
+        snap.effectiveRows(),
+        snap.menuTitle(),
+        snap.effectiveContentSlots(),
+        snap.navigation(),
+        snap.effectiveInfoSlot(),
+        buildInfoTemplate(snap),
+        this::buildSlots);
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

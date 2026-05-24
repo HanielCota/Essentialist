@@ -1,16 +1,24 @@
 package com.hanielcota.essentials.modules.vanish;
 
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.vanish.command.VanishCommand;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.listener.VanishJoinListener;
 import com.hanielcota.essentials.modules.vanish.listener.VanishProtectionListener;
 import com.hanielcota.essentials.modules.vanish.listener.VanishQuitListener;
+import com.hanielcota.essentials.modules.vanish.menu.VanishClickHandler;
+import com.hanielcota.essentials.modules.vanish.menu.VanishEntryRenderer;
+import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import org.bukkit.Bukkit;
 
 public final class VanishModule extends AbstractModule {
+
+  private VanishService service;
+  private VanishVisibilityApplier applier;
 
   public VanishModule() {
     super("vanish");
@@ -19,16 +27,38 @@ public final class VanishModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("vanish", VanishConfig.class, VanishConfig::defaults);
-    var service = new VanishService();
-    registerService(VanishService.class, service);
+    this.service = new VanishService();
+    registerService(VanishService.class, this.service);
 
-    var applier = new VanishVisibilityApplier(plugin());
+    this.applier = new VanishVisibilityApplier(plugin());
 
-    registerListener(new VanishJoinListener(service, applier));
-    registerListener(new VanishQuitListener(service));
-    registerListener(new VanishProtectionListener(service));
+    registerListener(new VanishJoinListener(this.service, this.applier));
+    registerListener(new VanishQuitListener(this.service, this.applier));
+    registerListener(new VanishProtectionListener(this.service));
+
+    var renderer = new VanishEntryRenderer(config);
+    var clickHandler = new VanishClickHandler(config, this.service);
+    registerMenu(new VanishMenu(config, this.service, renderer, clickHandler));
 
     var framework = service(PaperCommandFramework.class);
-    registerCommand(new VanishCommand(config, service, applier, framework));
+    var menus = service(MenuService.class);
+    registerCommand(new VanishCommand(config, this.service, this.applier, framework, menus));
+  }
+
+  @Override
+  protected void onDisable() {
+    if (this.service == null || this.applier == null) {
+      return;
+    }
+    // setInvulnerable / setCanPickupItems persist to player NBT — every still-vanished player
+    // must be unapplied or they rejoin permanently invulnerable.
+    for (var id : this.service.vanished()) {
+      var player = Bukkit.getPlayer(id);
+      if (player != null) {
+        this.applier.unapply(player);
+      }
+    }
+    this.service = null;
+    this.applier = null;
   }
 }
