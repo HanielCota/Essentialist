@@ -13,7 +13,6 @@ import com.hanielcota.essentials.modules.back.menu.BackEntryRenderer;
 import com.hanielcota.essentials.modules.back.menu.BackMenu;
 import com.hanielcota.essentials.modules.back.menu.BackMenuState;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
-import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import java.util.Set;
 
 public final class BackModule extends AbstractModule {
@@ -26,11 +25,10 @@ public final class BackModule extends AbstractModule {
   protected void onEnable() {
     var config = config("back", BackConfig.class, BackConfig::defaults);
     var history = service(TeleportHistory.class);
-    var teleport = service(TeleportService.class);
     var menus = service(MenuService.class);
 
     var renderer = new BackEntryRenderer(config);
-    var clickHandler = new BackClickHandler(config, history, teleport);
+    var clickHandler = new BackClickHandler(config, history);
     var menuState = new BackMenuState();
     var menu = new BackMenu(config, history, renderer, clickHandler, menuState);
     registerMenu(menu);
