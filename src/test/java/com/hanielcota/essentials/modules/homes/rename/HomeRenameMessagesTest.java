@@ -22,13 +22,13 @@ class HomeRenameMessagesTest {
     var messages = HomesMessages.defaults();
 
     assertEquals(
-        "<green>Home <gold>old</gold> renomeada para <gold>new</gold>.",
+        "<green>Home <gold>old</gold> renamed to <gold>new</gold>.",
         HomeRenameMessages.result(messages, "old", "new", RenameResult.RENAMED));
     assertEquals(
-        "<red>A home <gold>old</gold> desapareceu antes da renomeação.",
+        "<red>Home <gold>old</gold> disappeared before the rename completed.",
         HomeRenameMessages.result(messages, "old", "new", RenameResult.NOT_FOUND));
     assertEquals(
-        "<red>Você já tem uma home chamada <gold>new</gold>.",
+        "<red>You already have a home named <gold>new</gold>.",
         HomeRenameMessages.result(messages, "old", "new", RenameResult.NAME_TAKEN));
   }
 }
