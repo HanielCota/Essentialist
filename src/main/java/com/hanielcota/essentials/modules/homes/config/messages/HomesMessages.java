@@ -55,7 +55,7 @@ public record HomesMessages(
         "<green>Home <gold>{name}</gold> set.",
         "<green>Home <gold>{name}</gold> updated.",
         "<red>You have reached your home limit (<gold>{limit}</gold>). "
-            + "Use /delhome to free a slot.",
+            + "Couldn't create <gold>{name}</gold>. Use /delhome to free a slot.",
         "<red>You don't have any home named <gold>{name}</gold>.",
         "<red>You don't have any homes yet. Use <gold>/sethome [name]</gold>.",
         "<yellow>Home <gold>{name}</gold> removed.",

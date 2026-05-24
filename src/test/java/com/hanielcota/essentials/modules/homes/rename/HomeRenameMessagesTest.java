@@ -14,7 +14,7 @@ class HomeRenameMessagesTest {
     var line = HomeRenameMessages.prompt(HomesMessages.defaults(), "base", 0);
 
     assertTrue(line.contains("base"));
-    assertTrue(line.contains("sem limite"));
+    assertTrue(line.contains("no limit"));
   }
 
   @Test
