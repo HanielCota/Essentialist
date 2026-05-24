@@ -41,15 +41,22 @@ public record TeleportCommand(
     }
 
     var targetLocation = target.getLocation();
-    if (!sender.teleport(targetLocation)) {
-      senderActor.sendError(snap.teleportFailed());
-      return;
-    }
-
-    var targetActor = this.framework.actorOf(target);
-    var selfMessage = snap.formatToPlayer(target.getName());
-    var otherMessage = snap.formatTeleportedTo(sender.getName());
-    senderActor.sendDualMessage(targetActor, selfMessage, otherMessage);
+    var targetName = target.getName();
+    var senderName = sender.getName();
+    sender
+        .teleportAsync(targetLocation)
+        .thenAccept(
+            success -> {
+              if (!Boolean.TRUE.equals(success)) {
+                senderActor.sendError(snap.teleportFailed());
+                return;
+              }
+              var targetActor = this.framework.actorOf(target);
+              senderActor.sendDualMessage(
+                  targetActor,
+                  snap.formatToPlayer(targetName),
+                  snap.formatTeleportedTo(senderName));
+            });
   }
 
   @Subcommand("move")
@@ -68,19 +75,23 @@ public record TeleportCommand(
     }
 
     var toLocation = to.getLocation();
-    if (!from.teleport(toLocation)) {
-      sender.sendError(snap.teleportFailed());
-      return;
-    }
-
-    var moveSenderMsg = snap.formatMoveSender(from.getName(), to.getName());
-    sender.sendSuccess(moveSenderMsg);
-
-    if (!Senders.isSelf(sender, from)) {
-      var moveNotifyMsg = snap.formatMoveNotify(sender.name());
-      var fromActor = this.framework.actorOf(from);
-      fromActor.sendSuccess(moveNotifyMsg);
-    }
+    var fromName = from.getName();
+    var toName = to.getName();
+    var senderName = sender.name();
+    var selfMove = Senders.isSelf(sender, from);
+    from.teleportAsync(toLocation)
+        .thenAccept(
+            success -> {
+              if (!Boolean.TRUE.equals(success)) {
+                sender.sendError(snap.teleportFailed());
+                return;
+              }
+              sender.sendSuccess(snap.formatMoveSender(fromName, toName));
+              if (!selfMove) {
+                var fromActor = this.framework.actorOf(from);
+                fromActor.sendSuccess(snap.formatMoveNotify(senderName));
+              }
+            });
   }
 
   @Subcommand("pos")
@@ -105,12 +116,15 @@ public record TeleportCommand(
       return;
     }
 
-    if (!sender.teleport(destination)) {
-      senderActor.sendError(snap.teleportFailed());
-      return;
-    }
-
-    var toPosMsg = snap.formatToPos(x, y, z);
-    senderActor.sendSuccess(toPosMsg);
+    sender
+        .teleportAsync(destination)
+        .thenAccept(
+            success -> {
+              if (!Boolean.TRUE.equals(success)) {
+                senderActor.sendError(snap.teleportFailed());
+                return;
+              }
+              senderActor.sendSuccess(snap.formatToPos(x, y, z));
+            });
   }
 }
