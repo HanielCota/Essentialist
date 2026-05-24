@@ -14,6 +14,11 @@ public final class Numbers {
       return Double.toString(n);
     }
     if (n == Math.floor(n)) {
+      // Integer-valued doubles outside the long range overflow the cast and would render as
+      // Long.MAX_VALUE / Long.MIN_VALUE. Fall back to scientific notation for those.
+      if (n < Long.MIN_VALUE || n > Long.MAX_VALUE) {
+        return Double.toString(n);
+      }
       var longValue = (long) n;
       return Long.toString(longValue);
     }

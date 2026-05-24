@@ -15,8 +15,12 @@ public interface AsyncDatabaseWriter extends AutoCloseable {
    *
    * @param operation the name of the operation for logging context
    * @param work the task to run
+   * @return {@code true} if the task was accepted by the executor, {@code false} if it was rejected
+   *     (typically because the writer is shutting down). Callers that need at-least-once semantics
+   *     for writes should check the return value and decide whether to fall back to a synchronous
+   *     write or surface the failure to the user.
    */
-  void submit(@NonNull String operation, @NonNull Runnable work);
+  boolean submit(@NonNull String operation, @NonNull Runnable work);
 
   @Override
   void close();

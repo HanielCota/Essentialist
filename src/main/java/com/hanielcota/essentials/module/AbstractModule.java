@@ -84,7 +84,13 @@ public abstract class AbstractModule implements Module {
     return configService.load(name, type, defaults);
   }
 
-  /** Loads a config, registers the service, and returns the config handle in one call. */
+  /**
+   * Loads a config, registers the service under its concrete runtime class, and returns the config
+   * handle in one call. Convenience overload for the common case where the service has no interface
+   * and callers will look it up as {@code service(ConcreteService.class)}. If the service needs to
+   * be registered under an interface or supertype, prefer {@link #configure(String, Class,
+   * Supplier, Class, Object)}.
+   */
   protected final <C, S> ConfigHandle<C> configure(
       @NonNull String name,
       @NonNull Class<C> configType,
@@ -96,6 +102,21 @@ public abstract class AbstractModule implements Module {
     var serviceType = (Class<S>) service.getClass();
     registerService(serviceType, service);
 
+    return handle;
+  }
+
+  /**
+   * Loads a config and registers the service under the explicit {@code serviceType}. Use this when
+   * the service should be looked up via an interface or supertype rather than its concrete class.
+   */
+  protected final <C, S> ConfigHandle<C> configure(
+      @NonNull String name,
+      @NonNull Class<C> configType,
+      @NonNull Supplier<C> defaults,
+      @NonNull Class<S> serviceType,
+      @NonNull S service) {
+    var handle = config(name, configType, defaults);
+    registerService(serviceType, service);
     return handle;
   }
 
