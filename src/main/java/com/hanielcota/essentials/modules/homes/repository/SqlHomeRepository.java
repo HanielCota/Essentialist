@@ -39,11 +39,6 @@ public final class SqlHomeRepository implements HomeRepository {
   }
 
   @Override
-  public List<Home> listAll() {
-    return this.sqlExecutor.query(SqlHomeTable.SELECT_ALL_HOMES, SqlHomeMapper::read);
-  }
-
-  @Override
   public int count(@NonNull UUID owner) {
     var ownerStr = owner.toString();
     var counts = this.sqlExecutor.query(SqlHomeTable.COUNT, rs -> rs.getInt("total"), ownerStr);

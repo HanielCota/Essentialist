@@ -12,8 +12,10 @@ import org.bukkit.Material;
 /**
  * Runtime cache for homes.
  *
- * <p>The database is loaded once at module startup; command/menu reads are served from memory and
- * mutations are enqueued to the writer thread after the cache changes.
+ * <p>Each player's bucket is loaded on demand via {@link #loadFor} (call from a thread that is safe
+ * to block — typically the AsyncPlayerPreLoginEvent thread) and evicted via {@link #evictFor} on
+ * quit. Mutations write through to the cache synchronously and enqueue the SQL persist to the
+ * writer thread.
  */
 @RequiredArgsConstructor
 public final class CachedHomeRepository implements HomeRepository, AutoCloseable {
@@ -21,6 +23,17 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   private final HomeRepository delegate;
   private final AsyncDatabaseWriter writer;
   private final HomeCache cache;
+
+  /** Loads {@code owner}'s homes from SQL and populates the cache. Blocks the calling thread. */
+  public void loadFor(@NonNull UUID owner) {
+    var homes = this.delegate.list(owner);
+    this.cache.loadFor(owner, homes);
+  }
+
+  /** Drops {@code owner} from the in-memory cache. SQL is untouched. */
+  public void evictFor(@NonNull UUID owner) {
+    this.cache.evictFor(owner);
+  }
 
   @Override
   public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
@@ -30,11 +43,6 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   @Override
   public List<Home> list(@NonNull UUID owner) {
     return this.cache.list(owner);
-  }
-
-  @Override
-  public List<Home> listAll() {
-    return this.cache.listAll();
   }
 
   @Override

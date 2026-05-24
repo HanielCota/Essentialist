@@ -19,8 +19,6 @@ public interface HomeRepository {
 
   List<Home> list(@NonNull UUID owner);
 
-  List<Home> listAll();
-
   int count(@NonNull UUID owner);
 
   void save(@NonNull Home home);
