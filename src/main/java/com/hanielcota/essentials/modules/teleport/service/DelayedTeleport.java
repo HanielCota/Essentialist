@@ -13,11 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
- * Teleports a player after a configurable delay, cancelling on movement or damage.
+ * Teleports a player after a configurable delay, cancelling on damage or disconnect.
  *
  * <p>Used by {@code /spawn}, {@code /home} and {@code /warp} so warm-ups and cancel rules stay
  * consistent. Holds the only timer state for pending warm-ups â€” one per player. Callers route
@@ -97,23 +96,6 @@ public final class DelayedTeleport implements Listener {
   }
 
   @EventHandler
-  public void onMove(@NonNull PlayerMoveEvent event) {
-    var uuid = event.getPlayer().getUniqueId();
-    var p = this.pending.get(uuid);
-    if (p == null) {
-      return;
-    }
-    var from = event.getFrom();
-    var to = event.getTo();
-    if (from.getBlockX() == to.getBlockX()
-        && from.getBlockY() == to.getBlockY()
-        && from.getBlockZ() == to.getBlockZ()) {
-      return;
-    }
-    fireCancelled(uuid);
-  }
-
-  @EventHandler
   public void onDamage(@NonNull EntityDamageEvent event) {
     if (event.getEntity() instanceof Player player) {
       fireCancelled(player.getUniqueId());
@@ -144,7 +126,7 @@ public final class DelayedTeleport implements Listener {
     /** Called after the teleport succeeded. */
     default void onSuccess() {}
 
-    /** Called when the warm-up was cancelled (movement, damage, disconnect). */
+    /** Called when the warm-up was cancelled (damage or disconnect). */
     default void onCancelled() {}
 
     /** Called when the teleport API call itself returned false. */
