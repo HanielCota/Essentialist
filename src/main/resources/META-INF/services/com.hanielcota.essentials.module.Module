@@ -32,3 +32,4 @@ com.hanielcota.essentials.modules.rename.RenameModule
 com.hanielcota.essentials.modules.enderchest.EnderChestModule
 com.hanielcota.essentials.modules.actionbar.ActionBarModule
 com.hanielcota.essentials.modules.essentials.EssentialsModule
+com.hanielcota.essentials.modules.workstations.WorkstationsModule
