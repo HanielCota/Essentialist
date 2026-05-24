@@ -25,6 +25,10 @@ public record HomesMenuConfig(
     @Comment("Material category content slots (0-based).") List<Integer> categoryContentSlots,
     @Comment("Material category item name. Placeholder: {category}.") String categoryItemName,
     @Comment("Material category item lore. Placeholder: {category}.") List<String> categoryItemLore,
+    @Comment("Slot of the category back button.") int categoryBackSlot,
+    @Comment("Material of the category back button.") Material categoryBackMaterial,
+    @Comment("Name of the category back button.") String categoryBackName,
+    @Comment("Lore of the category back button.") List<String> categoryBackLore,
     @Comment("Material picker submenu title. Placeholders: {name}.") String pickerTitle,
     @Comment("Material picker rows (1-6).") int pickerRows,
     @Comment("Material picker content slots (0-based).") List<Integer> pickerContentSlots,
@@ -69,6 +73,10 @@ public record HomesMenuConfig(
             38, 39, 40, 41, 42, 43),
         "<gold>{category}",
         List.of("<gray>Clique para ver os itens"),
+        49,
+        Material.ARROW,
+        "<yellow>Voltar às homes",
+        List.of(),
         "<dark_gray>Escolha o ícone",
         6,
         List.of(
@@ -144,6 +152,11 @@ public record HomesMenuConfig(
 
   public List<Integer> effectiveCategoryContentSlots() {
     return MenuLayouts.sanitizeSlots(categoryContentSlots, effectiveCategoryRows());
+  }
+
+  public int effectiveCategoryBackSlot() {
+    return MenuLayouts.sanitizeSlot(
+        categoryBackSlot, effectiveCategoryRows(), effectiveCategoryRows() * 9 - 5);
   }
 
   public List<Integer> effectivePickerContentSlots() {

@@ -56,7 +56,7 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var categories = MaterialCategory.browsable();
-    var slots = new ArrayList<SlotDefinition>(categories.size());
+    var slots = new ArrayList<SlotDefinition>(categories.size() + 1);
 
     for (var category : categories) {
       if (category == MaterialCategory.MISC) {
@@ -66,7 +66,21 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
       slots.add(SlotDefinition.of(-1, template, ctx -> this.clickHandler.handle(ctx, category)));
     }
 
+    slots.add(backButtonSlot());
+
     return slots;
+  }
+
+  private @NonNull SlotDefinition backButtonSlot() {
+    var menuSpec = this.config.value().menu();
+    var back =
+        ItemTemplate.builder(menuSpec.categoryBackMaterial())
+            .name(menuSpec.categoryBackName())
+            .lore(menuSpec.categoryBackLore().toArray(String[]::new))
+            .italic(false)
+            .build();
+
+    return SlotDefinition.of(menuSpec.effectiveCategoryBackSlot(), back, this.clickHandler::back);
   }
 
   private @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
