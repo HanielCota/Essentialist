@@ -22,58 +22,7 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   private static final int CAPACITY = 10;
 
-  private static final String CREATE_TABLE =
-      """
-      CREATE TABLE IF NOT EXISTS tpa_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        requester_id TEXT NOT NULL,
-        target_id TEXT NOT NULL,
-        target_name TEXT NOT NULL,
-        type TEXT NOT NULL,
-        status TEXT NOT NULL,
-        created_at INTEGER NOT NULL,
-        resolved_at INTEGER NOT NULL,
-        world TEXT,
-        x REAL,
-        y REAL,
-        z REAL
-      )
-      """;
-
-  private static final String CREATE_INDEX =
-      """
-      CREATE INDEX IF NOT EXISTS idx_tpa_history_requester \
-      ON tpa_history (requester_id, created_at DESC)\
-      """;
-
-  private static final String INSERT =
-      """
-      INSERT INTO tpa_history \
-      (requester_id, target_id, target_name, type, status, created_at, resolved_at, world, x, y, z) \
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\
-      """;
-
-  private static final String TRIM =
-      """
-      DELETE FROM tpa_history \
-      WHERE requester_id = ? AND id NOT IN (
-        SELECT id FROM tpa_history \
-        WHERE requester_id = ? ORDER BY created_at DESC LIMIT ?
-      )
-      """;
-
-  private static final String LIST =
-      """
-      SELECT requester_id, target_id, target_name, type, status, created_at, resolved_at, world, x, y, z \
-      FROM tpa_history \
-      WHERE requester_id = ? ORDER BY created_at DESC LIMIT ?\
-      """;
-
   private final @NonNull SqlExecutor sqlExecutor;
-
-  public static void install(@NonNull SqlExecutor sqlExecutor) {
-    sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
-  }
 
   private static void setNullable(
       @NonNull PreparedStatement stmt, int index, @Nullable Object value, int sqlType)
@@ -132,12 +81,13 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   @Override
   public List<TpaHistoryEntry> list(@NonNull UUID requester) {
-    return this.sqlExecutor.query(LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
+    return this.sqlExecutor.query(
+        TpaHistoryTable.LIST, SqliteTpaHistory::mapRow, requester.toString(), CAPACITY);
   }
 
   private void insert(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
       throws SQLException {
-    try (var statement = conn.prepareStatement(INSERT)) {
+    try (var statement = conn.prepareStatement(TpaHistoryTable.INSERT)) {
       var destination = entry.destination();
 
       statement.setString(1, entry.requester().toString());
@@ -168,6 +118,6 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   private void trim(@NonNull Connection conn, @NonNull UUID requester) throws SQLException {
     var requesterId = requester.toString();
-    this.sqlExecutor.execute(conn, TRIM, requesterId, requesterId, CAPACITY);
+    this.sqlExecutor.execute(conn, TpaHistoryTable.TRIM, requesterId, requesterId, CAPACITY);
   }
 }

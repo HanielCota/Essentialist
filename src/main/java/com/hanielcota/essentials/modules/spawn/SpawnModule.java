@@ -11,6 +11,7 @@ import com.hanielcota.essentials.modules.spawn.listener.SpawnRespawnListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnVoidListener;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.spawn.service.SpawnStore;
+import com.hanielcota.essentials.modules.spawn.service.SpawnTable;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public final class SpawnModule extends AbstractModule {
   protected void onEnable() {
     var config = config("spawn", SpawnConfig.class, SpawnConfig::defaults);
     var executor = service(SqlExecutor.class);
-    SpawnStore.install(executor);
+    SpawnTable.install(executor);
 
     var store = new SpawnStore(executor);
     var spawnService = new SpawnService(store);

@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.teleport.command.TeleportHereCommand;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
 import com.hanielcota.essentials.modules.teleport.history.SqliteTeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
+import com.hanielcota.essentials.modules.teleport.history.TeleportHistoryTable;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -21,7 +22,10 @@ public final class TeleportModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("teleport", TeleportConfig.class, TeleportConfig::defaults);
-    var history = new SqliteTeleportHistory(service(SqlExecutor.class));
+    var executor = service(SqlExecutor.class);
+    TeleportHistoryTable.install(executor);
+
+    var history = new SqliteTeleportHistory(executor);
     registerService(TeleportHistory.class, history);
     registerCloseable(history);
 
