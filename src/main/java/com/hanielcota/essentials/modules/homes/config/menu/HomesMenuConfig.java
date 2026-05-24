@@ -62,7 +62,7 @@ public record HomesMenuConfig(
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
-        "<dark_gray>Suas homes",
+        "<dark_gray>Your homes",
         6,
         List.of(
             11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34,
@@ -70,52 +70,52 @@ public record HomesMenuConfig(
         NavigationButtonsConfig.defaults(48, 50),
         10,
         Material.BOOK,
-        "<yellow>Como funcionam as homes",
+        "<yellow>How homes work",
         List.of(
-            "<gray>Pontos de teleporte pessoais.",
+            "<gray>Personal teleport points.",
             "",
-            "<yellow>/sethome <nome> <gray>cria uma home",
-            "<yellow>/home <nome> <gray>teleporta até ela",
-            "<yellow>/homes <gray>abre este menu",
+            "<yellow>/sethome <name> <gray>creates a home",
+            "<yellow>/home <name> <gray>teleports you there",
+            "<yellow>/homes <gray>opens this menu",
             "",
-            "<gray>Aqui no menu:",
-            "<yellow>Clique esquerdo <gray>teleporta",
-            "<yellow>Clique direito <gray>deleta",
-            "<yellow>Shift + clique <gray>renomeia",
-            "<yellow>Q (drop) <gray>troca o ícone",
+            "<gray>In this menu:",
+            "<yellow>Left-click <gray>teleports",
+            "<yellow>Right-click <gray>deletes",
+            "<yellow>Shift + click <gray>renames",
+            "<yellow>Q (drop) <gray>changes the icon",
             "",
-            "<dark_gray>Seu limite depende da sua permissão."),
+            "<dark_gray>Your limit depends on your permission."),
         "<gold>{name}",
         List.of(
-            "<gray>Mundo: <white>{world}",
-            "<gray>Coordenadas: <white>{x}, {y}, {z}",
+            "<gray>World: <white>{world}",
+            "<gray>Coordinates: <white>{x}, {y}, {z}",
             "",
-            "<yellow>Clique esquerdo <gray>para teleportar",
-            "<yellow>Clique direito <gray>para deletar",
-            "<yellow>Shift + clique <gray>para renomear",
-            "<yellow>Q (drop) <gray>para trocar o ícone"),
+            "<yellow>Left-click <gray>to teleport",
+            "<yellow>Right-click <gray>to delete",
+            "<yellow>Shift + click <gray>to rename",
+            "<yellow>Q (drop) <gray>to change the icon"),
         false,
-        "<dark_gray>Escolha uma categoria",
+        "<dark_gray>Pick a category",
         4,
         List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25),
         "<gold>{category}",
-        List.of("<gray>Clique para ver os itens"),
+        List.of("<gray>Click to browse the items"),
         defaultCategoryNames(),
         31,
         Material.ARROW,
-        "<yellow>Voltar às homes",
+        "<yellow>Back to homes",
         List.of(),
-        "<dark_gray>Escolha o ícone",
+        "<dark_gray>Pick an icon",
         6,
         List.of(
             10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37,
             38, 39, 40, 41, 42, 43),
         "<gold>{material}",
-        List.of("<gray>Clique para usar <white>{material}", "<gray>Clique para escolher"),
+        List.of("<gray>Click to use <white>{material}", "<gray>Click to choose"),
         NavigationButtonsConfig.defaults(45, 53),
         49,
         Material.BARRIER,
-        "<red>Voltar às categorias",
+        "<red>Back to categories",
         List.of(),
         3,
         13,
@@ -148,7 +148,7 @@ public record HomesMenuConfig(
 
   public String staticPickerTitle() {
     if (pickerTitle.contains("{name}")) {
-      return "<dark_gray>Escolha o ícone";
+      return "<dark_gray>Pick an icon";
     }
     return pickerTitle;
   }
