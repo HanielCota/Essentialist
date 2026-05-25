@@ -26,7 +26,10 @@ public final class CartographyTableCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
-    player.openInventory(MenuType.CARTOGRAPHY_TABLE.create(player));
+    var player = actor.unwrap(Player.class);
+
+    var menu = MenuType.CARTOGRAPHY_TABLE.create(player);
+
+    player.openInventory(menu);
   }
 }

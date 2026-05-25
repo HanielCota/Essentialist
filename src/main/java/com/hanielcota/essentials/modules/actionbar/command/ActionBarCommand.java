@@ -29,15 +29,20 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
   public void execute(
       @NonNull CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
     var snap = this.config.value();
-
     var message = mensagem.strip();
+
     if (message.isBlank()) {
-      sender.sendError(snap.usage());
+      var usageMsg = snap.usage();
+      sender.sendError(usageMsg);
       return;
     }
 
-    this.service.send(sender.unwrap(Player.class), message);
-    sender.sendSuccess(snap.sent());
+    var player = sender.unwrap(Player.class);
+
+    this.service.send(player, message);
+
+    var sentMsg = snap.sent();
+    sender.sendSuccess(sentMsg);
   }
 
   @Subcommand("broadcast")
@@ -47,15 +52,17 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
   public void broadcast(
       @NonNull CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
     var snap = this.config.value();
-
     var message = mensagem.strip();
+
     if (message.isBlank()) {
-      sender.sendError(snap.usage());
+      var usageMsg = snap.usage();
+      sender.sendError(usageMsg);
       return;
     }
 
     var count = this.service.broadcast(message);
     var broadcastedMsg = snap.formatBroadcasted(count);
+
     sender.sendSuccess(broadcastedMsg);
   }
 }

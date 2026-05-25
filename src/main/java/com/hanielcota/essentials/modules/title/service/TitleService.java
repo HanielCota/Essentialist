@@ -18,8 +18,7 @@ public final class TitleService {
 
   private static Component render(@NonNull String raw) {
     try {
-      var component = ComponentUtils.mini(raw);
-      return component;
+      return ComponentUtils.mini(raw);
     } catch (RuntimeException _) {
       return Component.text(raw);
     }
@@ -30,12 +29,12 @@ public final class TitleService {
   }
 
   public void send(@NonNull Player target, @NonNull String message) {
+    var title = build(message);
 
-    target.showTitle(build(message));
+    target.showTitle(title);
   }
 
   public int broadcast(@NonNull String message) {
-
     var title = build(message);
     var onlinePlayers = Bukkit.getOnlinePlayers();
 
@@ -50,12 +49,14 @@ public final class TitleService {
     var snap = this.config.value();
     var lines = TitleLines.parse(message);
 
-    var times =
-        Title.Times.times(
-            ticksToDuration(snap.fadeInTicks()),
-            ticksToDuration(snap.stayTicks()),
-            ticksToDuration(snap.fadeOutTicks()));
+    var fadeIn = ticksToDuration(snap.fadeInTicks());
+    var stay = ticksToDuration(snap.stayTicks());
+    var fadeOut = ticksToDuration(snap.fadeOutTicks());
+    var times = Title.Times.times(fadeIn, stay, fadeOut);
 
-    return Title.title(render(lines.title()), render(lines.subtitle()), times);
+    var titleComponent = render(lines.title());
+    var subtitleComponent = render(lines.subtitle());
+
+    return Title.title(titleComponent, subtitleComponent, times);
   }
 }
