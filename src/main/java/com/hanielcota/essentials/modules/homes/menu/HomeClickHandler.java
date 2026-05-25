@@ -34,7 +34,8 @@ public final class HomeClickHandler {
       return;
     }
 
-    if (type == ClickType.DROP || type == ClickType.CONTROL_DROP) {
+    var isDrop = type == ClickType.DROP || type == ClickType.CONTROL_DROP;
+    if (isDrop) {
       openSubMenuFor(click, homeName, MaterialCategoryMenu.ID);
       return;
     }

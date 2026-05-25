@@ -35,21 +35,28 @@ public record HomeCommand(
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
     var sender = actor.unwrap(Player.class);
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var name = this.nameResolver.resolve(rawName);
+
     if (name == null) {
-      actor.sendError(messages.invalidName());
+      var invalidNameMsg = messages.invalidName();
+      actor.sendError(invalidNameMsg);
       return;
     }
 
-    var home = this.service.find(sender.getUniqueId(), name);
+    var uuid = sender.getUniqueId();
+    var home = this.service.find(uuid, name);
+
     if (home.isEmpty()) {
-      var missingMsg = missingMessage(messages, sender.getUniqueId(), name);
+      var missingMsg = missingMessage(messages, uuid, name);
       actor.sendError(missingMsg);
       return;
     }
 
-    this.teleporter.teleport(sender, home.get(), actor);
+    var target = home.get();
+
+    this.teleporter.teleport(sender, target, actor);
   }
 
   private String missingMessage(
@@ -59,6 +66,7 @@ public record HomeCommand(
     }
 
     var unknownHomeMsg = messages.unknownHome();
+
     return unknownHomeMsg.replace("{name}", name);
   }
 }

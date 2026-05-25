@@ -61,7 +61,9 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   @Override
   public void save(@NonNull Home home) {
     this.cache.save(home);
-    this.writer.submit("save home", () -> this.delegate.save(home));
+
+    Runnable persist = () -> this.delegate.save(home);
+    this.writer.submit("save home", persist);
   }
 
   @Override
@@ -73,7 +75,10 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
     }
 
     var actualHome = removed.get();
-    this.writer.submit("delete home", () -> this.delegate.delete(owner, actualHome.name()));
+    var actualName = actualHome.name();
+
+    Runnable persist = () -> this.delegate.delete(owner, actualName);
+    this.writer.submit("delete home", persist);
 
     return true;
   }
@@ -86,7 +91,8 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
       return false;
     }
 
-    this.writer.submit("rename home", () -> this.delegate.rename(owner, oldName, newName));
+    Runnable persist = () -> this.delegate.rename(owner, oldName, newName);
+    this.writer.submit("rename home", persist);
 
     return true;
   }
@@ -100,8 +106,8 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
       return false;
     }
 
-    this.writer.submit(
-        "update home material", () -> this.delegate.updateMaterial(owner, name, material));
+    Runnable persist = () -> this.delegate.updateMaterial(owner, name, material);
+    this.writer.submit("update home material", persist);
 
     return true;
   }

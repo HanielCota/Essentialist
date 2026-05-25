@@ -11,6 +11,7 @@ import com.hanielcota.essentials.modules.homes.repository.SqlHomeRepository;
 import com.hanielcota.essentials.modules.homes.repository.SqlHomeTable;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
+import java.util.function.IntSupplier;
 import lombok.NonNull;
 import org.bukkit.event.Listener;
 
@@ -27,11 +28,13 @@ public final class HomesServiceFactory {
     var asyncWriter = new DefaultAsyncDatabaseWriter("Essentialist-Homes");
     var repository = new CachedHomeRepository(sqlRepository, asyncWriter, cache);
 
-    var limits = new HomeLimitResolver(() -> config.value().defaultLimit());
+    IntSupplier defaultLimit = () -> config.value().defaultLimit();
+    var limits = new HomeLimitResolver(defaultLimit);
+
+    var service = new HomeService(repository, limits);
     var cacheListener = new HomesCacheListener(repository);
 
-    return new HomesServiceComponents(
-        new HomeService(repository, limits), repository, cacheListener);
+    return new HomesServiceComponents(service, repository, cacheListener);
   }
 
   public record HomesServiceComponents(

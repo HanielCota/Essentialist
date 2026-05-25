@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -34,11 +35,17 @@ public final class HomesMenu implements EssentialsMenu {
   private final HomesMenuState state;
 
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMenuConfig menuSpec) {
-    return ItemTemplate.builder(menuSpec.infoMaterial())
-        .name(menuSpec.infoName())
-        .lore(menuSpec.infoLore().toArray(String[]::new))
-        .italic(false)
-        .build();
+    var infoMaterial = menuSpec.infoMaterial();
+    var infoName = menuSpec.infoName();
+    var infoLore = menuSpec.infoLore();
+    var loreArray = infoLore.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(infoMaterial);
+    builder.name(infoName);
+    builder.lore(loreArray);
+    builder.italic(false);
+
+    return builder.build();
   }
 
   @Override
@@ -48,45 +55,50 @@ public final class HomesMenu implements EssentialsMenu {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    var menuSpec = this.config.value().menu();
+    var snap = this.config.value();
+    var menuSpec = snap.menu();
+
     var rows = menuSpec.effectiveRows();
-    var menuTitle = ComponentUtils.mini(menuSpec.title());
+    var titleText = menuSpec.title();
+    var menuTitle = ComponentUtils.mini(titleText);
     var contentSlots = menuSpec.effectiveContentSlots();
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
     if (rows > MIN_ROWS) {
-      PageNavigation.apply(menus, paginationBuilder, ID, rows, menuSpec.navigation());
+      var navigation = menuSpec.navigation();
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, navigation);
     }
     var pagination = paginationBuilder.build();
 
     var infoTemplate = buildInfoTemplate(menuSpec);
+    var infoSlot = menuSpec.effectiveInfoSlot();
 
-    MenuFramework.builder(ID, menus)
-        .rows(rows)
-        .title(menuTitle)
-        .pagination(pagination)
-        .allowShiftClick(true)
-        .slot(menuSpec.effectiveInfoSlot(), infoTemplate, null)
-        .dynamicContent(this::buildSlots)
-        .build()
-        .register();
+    var builder = MenuFramework.builder(ID, menus);
+    builder.rows(rows);
+    builder.title(menuTitle);
+    builder.pagination(pagination);
+    builder.allowShiftClick(true);
+    builder.slot(infoSlot, infoTemplate, null);
+    builder.dynamicContent(this::buildSlots);
+
+    var menu = builder.build();
+    menu.register();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var uuid = player.getUniqueId();
-    var entries = this.state.consumePrefetch(uuid);
-
-    if (entries == null) {
-      entries = this.service.list(uuid);
-    }
+    var prefetched = this.state.consumePrefetch(uuid);
+    var entries = prefetched != null ? prefetched : this.service.list(uuid);
 
     var slots = new ArrayList<SlotDefinition>(entries.size());
 
     for (var i = 0; i < entries.size(); i++) {
       var home = entries.get(i);
       var template = this.renderer.render(home);
+      ClickHandler onClick = click -> this.clickHandler.handle(click, home);
+      var slot = SlotDefinition.of(-1, template, onClick);
 
-      slots.add(SlotDefinition.of(-1, template, click -> this.clickHandler.handle(click, home)));
+      slots.add(slot);
     }
 
     return slots;

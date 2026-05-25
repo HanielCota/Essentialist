@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
 import com.hanielcota.essentials.util.ComponentUtils;
+import java.time.Duration;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -33,35 +34,48 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
   @Override
   public void prompt(@NonNull Player player, @NonNull String homeName) {
     var snap = this.config.value();
+    var messages = snap.messages();
     var timeout = snap.renameTimeout();
     var seconds = timeout.toSeconds();
     var uuid = player.getUniqueId();
 
-    var timeoutTask =
-        timeout.isZero() || timeout.isNegative()
-            ? Task.noop()
-            : this.scheduler.runOnEntityLater(
-                player, () -> handleTimeout(player, seconds), timeout);
+    var timeoutTask = scheduleTimeout(player, seconds, timeout);
 
     this.sessions.start(uuid, homeName, timeoutTask);
 
-    var promptMsg = HomeRenameMessages.prompt(snap.messages(), homeName, seconds);
+    var promptMsg = HomeRenameMessages.prompt(messages, homeName, seconds);
     var promptComponent = ComponentUtils.mini(promptMsg);
+
     player.sendMessage(promptComponent);
   }
 
+  private @NonNull Task scheduleTimeout(
+      @NonNull Player player, long seconds, @NonNull Duration timeout) {
+    var disabled = timeout.isZero() || timeout.isNegative();
+    if (disabled) {
+      return Task.noop();
+    }
+
+    Runnable callback = () -> handleTimeout(player, seconds);
+
+    return this.scheduler.runOnEntityLater(player, callback, timeout);
+  }
+
   public void handleInput(@NonNull Player player, @NonNull String oldName, @NonNull String input) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var uuid = player.getUniqueId();
 
     if (isCancel(input)) {
-      var cancelledComponent = ComponentUtils.mini(messages.renameCancelled());
+      var cancelledText = messages.renameCancelled();
+      var cancelledComponent = ComponentUtils.mini(cancelledText);
       player.sendMessage(cancelledComponent);
       return;
     }
 
     if (!this.validator.isValid(input)) {
-      var invalidComponent = ComponentUtils.mini(messages.invalidName());
+      var invalidText = messages.invalidName();
+      var invalidComponent = ComponentUtils.mini(invalidText);
       player.sendMessage(invalidComponent);
       return;
     }
@@ -81,8 +95,11 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
       return;
     }
 
-    var timeoutMsg = HomeRenameMessages.timeout(this.config.value().messages(), seconds);
+    var snap = this.config.value();
+    var messages = snap.messages();
+    var timeoutMsg = HomeRenameMessages.timeout(messages, seconds);
     var timeoutComponent = ComponentUtils.mini(timeoutMsg);
+
     player.sendMessage(timeoutComponent);
   }
 }
