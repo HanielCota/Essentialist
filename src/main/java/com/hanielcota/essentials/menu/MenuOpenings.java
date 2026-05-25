@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.menu;
 
 import com.github.hanielcota.menuframework.api.MenuService;
+import com.github.hanielcota.menuframework.api.MenuSession;
 import com.hanielcota.essentials.util.Log;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.AccessLevel;
@@ -19,13 +20,23 @@ public final class MenuOpenings {
       @NonNull Player player,
       @NonNull String menuId,
       @NonNull CommandActor actor) {
-    menus
-        .open(player, menuId)
-        .exceptionally(
-            error -> {
-              LOG.warn(error, "Menu {} failed to open for {}", menuId, player.getName());
-              actor.sendError(OPEN_FAILURE);
-              return null;
-            });
+    var openFuture = menus.open(player, menuId);
+
+    openFuture.exceptionally(error -> handleOpenFailure(error, menuId, player, actor));
+  }
+
+  // Returns null typed as MenuSession to match the CompletableFuture<MenuSession> contract —
+  // an open failure has no session to recover with, just feedback for the actor.
+  private static MenuSession handleOpenFailure(
+      @NonNull Throwable error,
+      @NonNull String menuId,
+      @NonNull Player player,
+      @NonNull CommandActor actor) {
+    var playerName = player.getName();
+
+    LOG.warn(error, "Menu {} failed to open for {}", menuId, playerName);
+    actor.sendError(OPEN_FAILURE);
+
+    return null;
   }
 }

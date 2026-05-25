@@ -31,12 +31,12 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
   @Override
   public <T> T resolve(@NonNull Class<T> type) {
     var serviceOpt = find(type);
+    if (serviceOpt.isPresent()) {
+      return serviceOpt.get();
+    }
 
-    return serviceOpt.orElseThrow(
-        () -> {
-          var typeName = type.getName();
-          return new IllegalStateException("Service not registered: " + typeName);
-        });
+    var typeName = type.getName();
+    throw new IllegalStateException("Service not registered: " + typeName);
   }
 
   @Override

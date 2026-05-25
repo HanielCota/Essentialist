@@ -33,26 +33,36 @@ public final class SqliteDatabase implements DatabaseProvider {
         return;
       }
 
-      var essentialsHikariLogger = Logger.getLogger("com.hanielcota.essentials.libs.hikari");
-      essentialsHikariLogger.setLevel(Level.WARNING);
+      silenceHikariLoggers();
 
-      var zaxxerHikariLogger = Logger.getLogger("com.zaxxer.hikari");
-      zaxxerHikariLogger.setLevel(Level.WARNING);
-
-      var jdbcUrl = "jdbc:sqlite:" + this.file;
-      var config = new HikariConfig();
-
-      config.setPoolName("Essentialist-SQLite");
-      config.setDriverClassName("org.sqlite.JDBC");
-      config.setJdbcUrl(jdbcUrl);
-      config.setMaximumPoolSize(1);
-      config.setConnectionTestQuery("SELECT 1");
-      config.addDataSourceProperty("foreign_keys", "true");
-      config.addDataSourceProperty("journal_mode", "WAL");
-
+      var config = buildHikariConfig();
       var dataSource = new HikariDataSource(config);
+
       this.sourceRef.set(dataSource);
     }
+  }
+
+  private static void silenceHikariLoggers() {
+    var essentialsHikariLogger = Logger.getLogger("com.hanielcota.essentials.libs.hikari");
+    essentialsHikariLogger.setLevel(Level.WARNING);
+
+    var zaxxerHikariLogger = Logger.getLogger("com.zaxxer.hikari");
+    zaxxerHikariLogger.setLevel(Level.WARNING);
+  }
+
+  private HikariConfig buildHikariConfig() {
+    var jdbcUrl = "jdbc:sqlite:" + this.file;
+
+    var config = new HikariConfig();
+    config.setPoolName("Essentialist-SQLite");
+    config.setDriverClassName("org.sqlite.JDBC");
+    config.setJdbcUrl(jdbcUrl);
+    config.setMaximumPoolSize(1);
+    config.setConnectionTestQuery("SELECT 1");
+    config.addDataSourceProperty("foreign_keys", "true");
+    config.addDataSourceProperty("journal_mode", "WAL");
+
+    return config;
   }
 
   @Override

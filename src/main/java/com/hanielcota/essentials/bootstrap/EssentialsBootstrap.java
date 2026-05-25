@@ -9,6 +9,7 @@ import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.module.ModuleManager;
 import com.hanielcota.essentials.service.DefaultServiceRegistry;
 import com.hanielcota.essentials.service.ServiceRegistry;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -19,17 +20,26 @@ public final class EssentialsBootstrap {
   public EssentialsCore start() {
     var services = new DefaultServiceRegistry();
     EssentialsCore core = null;
-    try {
-      new CoreServicesBootstrap(this.plugin).register(services);
-      new DatabaseBootstrap(this.plugin).register(services);
 
-      var modules = new ModuleDiscovery().discover();
+    try {
+      var coreServices = new CoreServicesBootstrap(this.plugin);
+      coreServices.register(services);
+
+      var database = new DatabaseBootstrap(this.plugin);
+      database.register(services);
+
+      var discovery = new ModuleDiscovery();
+      var modules = discovery.discover();
       services.register(ModuleManager.class, modules);
 
       var commands = new CommandSystemBootstrap(this.plugin);
       var framework = commands.register(services, modules);
-      new MenuBootstrap(this.plugin).register(services);
-      new UserStackBootstrap(this.plugin).register(services);
+
+      var menus = new MenuBootstrap(this.plugin);
+      menus.register(services);
+
+      var userStack = new UserStackBootstrap(this.plugin);
+      userStack.register(services);
 
       core = new EssentialsCore(this.plugin, services);
       services.register(EssentialsApi.class, core);
@@ -50,10 +60,16 @@ public final class EssentialsBootstrap {
       suppressAndRun(cause, core::shutdown);
       return;
     }
+
     // Pre-core failure: close any infra already registered so the JVM doesn't
     // keep the HikariCP pool / MenuService executor alive after onEnable bails.
-    services.find(DatabaseProvider.class).ifPresent(db -> suppressAndRun(cause, db::close));
-    services.find(MenuService.class).ifPresent(menu -> suppressAndRun(cause, menu::shutdown));
+    var databaseHandle = services.find(DatabaseProvider.class);
+    Consumer<DatabaseProvider> closeDatabase = db -> suppressAndRun(cause, db::close);
+    databaseHandle.ifPresent(closeDatabase);
+
+    var menuHandle = services.find(MenuService.class);
+    Consumer<MenuService> shutdownMenu = menu -> suppressAndRun(cause, menu::shutdown);
+    menuHandle.ifPresent(shutdownMenu);
   }
 
   private static void suppressAndRun(RuntimeException primary, Runnable cleanup) {

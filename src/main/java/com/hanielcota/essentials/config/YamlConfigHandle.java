@@ -58,8 +58,11 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
     var file = this.baseDir.resolve(fileName);
     ensureParent(file);
 
-    var loader =
-        YamlConfigurationLoader.builder().path(file).nodeStyle(NodeStyle.BLOCK).indent(2).build();
+    var builder = YamlConfigurationLoader.builder();
+    builder.path(file);
+    builder.nodeStyle(NodeStyle.BLOCK);
+    builder.indent(2);
+    var loader = builder.build();
 
     try {
       var node = loader.load();
@@ -87,7 +90,8 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
       return value;
 
     } catch (ConfigurateException e) {
-      throw new ConfigurationException("Failed to load config: " + this.name, e);
+      var errorMessage = "Failed to load config: " + this.name;
+      throw new ConfigurationException(errorMessage, e);
     }
   }
 
@@ -100,7 +104,8 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
     try {
       Files.createDirectories(parent);
     } catch (IOException e) {
-      throw new ConfigurationException("Failed to create config directory: " + parent, e);
+      var errorMessage = "Failed to create config directory: " + parent;
+      throw new ConfigurationException(errorMessage, e);
     }
   }
 }

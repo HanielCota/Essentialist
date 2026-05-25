@@ -20,13 +20,16 @@ public final class AuditInterceptor implements RichCommandInterceptor {
   @Override
   public @NonNull CommandResult before(
       @NonNull CommandContext context, @NonNull List<ParsedParameter<?>> parameters) {
-    var actor = context.actor().name();
+    var commandActor = context.actor();
+    var actor = commandActor.name();
 
-    var pathTokens = context.route().path();
-    var route = String.join(" ", pathTokens);
+    var route = context.route();
+    var pathTokens = route.path();
+    var routePath = String.join(" ", pathTokens);
 
     if (parameters.isEmpty()) {
-      var messageWithoutArgs = "[CMD] %s executed /%s".formatted(actor, route);
+      var template = "[CMD] %s executed /%s";
+      var messageWithoutArgs = template.formatted(actor, routePath);
       this.logger.info(messageWithoutArgs);
 
       return CommandResult.success();
@@ -41,8 +44,9 @@ public final class AuditInterceptor implements RichCommandInterceptor {
     }
 
     var args = joiner.toString();
-    var messageWithArgs =
-        "[CMD] %s executed /%s with parameters: [%s]".formatted(actor, route, args);
+
+    var template = "[CMD] %s executed /%s with parameters: [%s]";
+    var messageWithArgs = template.formatted(actor, routePath, args);
     this.logger.info(messageWithArgs);
 
     return CommandResult.success();
@@ -70,9 +74,16 @@ public final class AuditInterceptor implements RichCommandInterceptor {
     // older Bukkit/Paper classes use "Class{a=1, b=2}". Pick whichever bracket comes first.
     var fullString = value.toString();
     var openIndex = firstBracketIndex(fullString);
-    var jsonPart = openIndex >= 0 ? fullString.substring(openIndex) : "";
 
-    return clazz.getSimpleName() + jsonPart;
+    String jsonPart;
+    if (openIndex >= 0) {
+      jsonPart = fullString.substring(openIndex);
+    } else {
+      jsonPart = "";
+    }
+
+    var simpleName = clazz.getSimpleName();
+    return simpleName + jsonPart;
   }
 
   private static int firstBracketIndex(@NonNull String s) {

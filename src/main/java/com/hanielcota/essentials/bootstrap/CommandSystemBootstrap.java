@@ -16,12 +16,17 @@ final class CommandSystemBootstrap {
 
   PaperCommandFramework register(
       @NonNull ServiceRegistry services, @NonNull ModuleManager modules) {
+    var allModules = modules.all();
+    var modulesStream = allModules.stream();
+
     var customizers =
-        modules.all().stream()
+        modulesStream
             .map(module -> (Consumer<PaperCommandFramework.Builder>) module::customizeCommands)
             .toList();
 
-    var framework = new CommandBootstrap(this.plugin, customizers).createFramework();
+    var commandBootstrap = new CommandBootstrap(this.plugin, customizers);
+    var framework = commandBootstrap.createFramework();
+
     services.register(PaperCommandFramework.class, framework);
 
     return framework;

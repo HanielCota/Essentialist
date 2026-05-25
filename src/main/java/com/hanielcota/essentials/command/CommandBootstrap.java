@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.command;
 
 import com.hanielcota.essentials.command.interceptor.AuditInterceptor;
+import io.github.hanielcota.commandframework.core.CommandContext;
 import io.github.hanielcota.commandframework.core.CommandResult;
 import io.github.hanielcota.commandframework.core.CommandStatus;
 import io.github.hanielcota.commandframework.core.SuggestionProvider;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -51,10 +53,12 @@ public final class CommandBootstrap {
   public PaperCommandFramework createFramework() {
     var logger = this.plugin.getLogger();
 
-    var builder =
-        PaperCommandFramework.builder(this.plugin)
-            .messageProvider(CommandMessages.portugueseBrazil())
-            .interceptor(new AuditInterceptor(logger));
+    var messageProvider = CommandMessages.portugueseBrazil();
+    var auditInterceptor = new AuditInterceptor(logger);
+
+    var rawBuilder = PaperCommandFramework.builder(this.plugin);
+    var withMessages = rawBuilder.messageProvider(messageProvider);
+    var builder = withMessages.interceptor(auditInterceptor);
 
     builder.enumAlias(GameMode.SURVIVAL, "sobrevivência", "s", "0");
     builder.enumAlias(GameMode.CREATIVE, "criativo", "c", "1");
@@ -64,32 +68,42 @@ public final class CommandBootstrap {
     var enchantmentProvider = enchantmentSuggestions();
     builder.suggestionProvider("enchantments", enchantmentProvider);
 
-    builder.onException(
-        IllegalArgumentException.class,
-        (ctx, ex) -> {
-          var actor = ctx.actor();
-          var errorMessage = ex.getMessage();
-
-          actor.sendError("<red>Erro: " + errorMessage);
-          return CommandResult.failure(CommandStatus.INVALID_USAGE, errorMessage);
-        });
-
-    builder.onException(
-        RuntimeException.class,
-        (ctx, ex) -> {
-          var actor = ctx.actor();
-          actor.sendError("<red>Ocorreu um erro inesperado.");
-
-          var pluginLogger = this.plugin.getLogger();
-          pluginLogger.log(Level.WARNING, ex, () -> "Unhandled command exception");
-
-          return CommandResult.failure(CommandStatus.ERROR, "unexpected");
-        });
+    registerExceptionHandlers(builder);
 
     for (var customizer : this.customizers) {
       customizer.accept(builder);
     }
 
     return builder.build();
+  }
+
+  // The framework's CommandExceptionHandler signature is (CommandContext, RuntimeException),
+  // so each handler method must accept the supertype even when the registered Class<?> picks
+  // a narrower branch — the framework dispatches by the registered class, not by the method
+  // parameter type.
+  private void registerExceptionHandlers(@NonNull PaperCommandFramework.Builder builder) {
+    builder.onException(IllegalArgumentException.class, this::handleIllegalArgument);
+    builder.onException(RuntimeException.class, this::handleUnexpected);
+  }
+
+  private CommandResult handleIllegalArgument(CommandContext ctx, RuntimeException ex) {
+    var actor = ctx.actor();
+    var errorMessage = ex.getMessage();
+
+    var displayMessage = "<red>Erro: " + errorMessage;
+    actor.sendError(displayMessage);
+
+    return CommandResult.failure(CommandStatus.INVALID_USAGE, errorMessage);
+  }
+
+  private CommandResult handleUnexpected(CommandContext ctx, RuntimeException ex) {
+    var actor = ctx.actor();
+    actor.sendError("<red>Ocorreu um erro inesperado.");
+
+    var pluginLogger = this.plugin.getLogger();
+    Supplier<String> messageSupplier = () -> "Unhandled command exception";
+    pluginLogger.log(Level.WARNING, ex, messageSupplier);
+
+    return CommandResult.failure(CommandStatus.ERROR, "unexpected");
   }
 }

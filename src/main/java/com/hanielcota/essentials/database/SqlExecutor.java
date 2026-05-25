@@ -38,14 +38,21 @@ public interface SqlExecutor {
    */
   default <T> List<T> query(
       @NonNull String sql, @NonNull ResultMapper<T> mapper, @NonNull Object... params) {
-    return query(
-        sql,
-        stmt -> {
-          for (var i = 0; i < params.length; i++) {
-            stmt.setObject(i + 1, params[i]);
-          }
-        },
-        mapper);
+    StatementBinder binder = stmt -> bindPositional(stmt, params);
+
+    return query(sql, binder, mapper);
+  }
+
+  private static void bindPositional(@NonNull PreparedStatement stmt, @NonNull Object[] params)
+      throws SQLException {
+    var length = params.length;
+
+    for (var i = 0; i < length; i++) {
+      var paramIndex = i + 1;
+      var paramValue = params[i];
+
+      stmt.setObject(paramIndex, paramValue);
+    }
   }
 
   /**
@@ -83,13 +90,9 @@ public interface SqlExecutor {
    * @return affected row count
    */
   default int updateCount(@NonNull String sql, @NonNull Object... params) {
-    return updateCount(
-        sql,
-        stmt -> {
-          for (var i = 0; i < params.length; i++) {
-            stmt.setObject(i + 1, params[i]);
-          }
-        });
+    StatementBinder binder = stmt -> bindPositional(stmt, params);
+
+    return updateCount(sql, binder);
   }
 
   /**

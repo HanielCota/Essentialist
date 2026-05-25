@@ -4,6 +4,7 @@ import com.hanielcota.essentials.util.Log;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -23,14 +24,7 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   private final ExecutorService executor;
 
   public DefaultAsyncDatabaseWriter(@NonNull String threadName) {
-    this(
-        threadName,
-        Executors.newSingleThreadExecutor(
-            runnable -> {
-              var thread = new Thread(runnable, threadName);
-              thread.setDaemon(true);
-              return thread;
-            }));
+    this(threadName, newDaemonExecutor(threadName));
   }
 
   public static DefaultAsyncDatabaseWriter of(
@@ -38,21 +32,36 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
     return new DefaultAsyncDatabaseWriter(threadName, executor);
   }
 
+  private static ExecutorService newDaemonExecutor(@NonNull String threadName) {
+    ThreadFactory threadFactory = runnable -> createDaemonThread(runnable, threadName);
+    return Executors.newSingleThreadExecutor(threadFactory);
+  }
+
+  private static Thread createDaemonThread(@NonNull Runnable runnable, @NonNull String threadName) {
+    var thread = new Thread(runnable, threadName);
+    thread.setDaemon(true);
+
+    return thread;
+  }
+
   @Override
   public boolean submit(@NonNull String operation, @NonNull Runnable work) {
+    Runnable wrapped = () -> runSafely(operation, work);
+
     try {
-      this.executor.execute(
-          () -> {
-            try {
-              work.run();
-            } catch (RuntimeException e) {
-              LOG.warn(e, "{} async {} failed", this.threadName, operation);
-            }
-          });
+      this.executor.execute(wrapped);
       return true;
     } catch (RejectedExecutionException _) {
       LOG.warn("{} rejected {} (shutting down?)", this.threadName, operation);
       return false;
+    }
+  }
+
+  private void runSafely(@NonNull String operation, @NonNull Runnable work) {
+    try {
+      work.run();
+    } catch (RuntimeException e) {
+      LOG.warn(e, "{} async {} failed", this.threadName, operation);
     }
   }
 
