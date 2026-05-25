@@ -4,6 +4,7 @@ import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.mute.command.MuteCommand;
+import com.hanielcota.essentials.modules.mute.command.MuteNotifier;
 import com.hanielcota.essentials.modules.mute.command.UnmuteCommand;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
 import com.hanielcota.essentials.modules.mute.listener.MuteChatListener;
@@ -38,9 +39,10 @@ public final class MuteModule extends AbstractModule {
     registerService(MuteService.class, service);
 
     var framework = service(PaperCommandFramework.class);
+    var notifier = new MuteNotifier(config, framework);
 
-    registerCommand(new MuteCommand(config, service, framework));
-    registerCommand(new UnmuteCommand(config, service, framework));
+    registerCommand(new MuteCommand(service, notifier));
+    registerCommand(new UnmuteCommand(service, notifier));
 
     registerListener(new MuteChatListener(config, service));
   }

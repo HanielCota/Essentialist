@@ -6,7 +6,9 @@ import com.hanielcota.essentials.modules.msg.command.ReplyCommand;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
 import com.hanielcota.essentials.modules.msg.listener.MsgQuitListener;
 import com.hanielcota.essentials.modules.msg.service.MsgDispatcher;
+import com.hanielcota.essentials.modules.msg.service.MsgNotifier;
 import com.hanielcota.essentials.modules.msg.service.MsgService;
+import com.hanielcota.essentials.modules.msg.service.SocialSpyBridge;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -28,7 +30,9 @@ public final class MsgModule extends AbstractModule {
     var framework = service(PaperCommandFramework.class);
     var players = service(PlayerProvider.class);
     var registry = context().services();
-    var dispatcher = new MsgDispatcher(config, partners, framework, registry);
+    var notifier = new MsgNotifier(config, framework);
+    var spyBridge = new SocialSpyBridge(registry);
+    var dispatcher = new MsgDispatcher(partners, notifier, spyBridge);
     var visibilityFilter = visibilityFilter();
 
     registerCommand(new MsgCommand(config, dispatcher, visibilityFilter));

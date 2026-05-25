@@ -51,6 +51,7 @@ public final class NearService {
       @NonNull Location origin,
       double maxDistanceSquared,
       @NonNull Collection<? extends Player> candidates) {
+
     var matches = new ArrayList<Nearby>();
     for (var other : candidates) {
       if (other.equals(center)) {

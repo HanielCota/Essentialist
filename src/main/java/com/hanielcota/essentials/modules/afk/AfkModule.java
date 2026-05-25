@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.afk.listener.AfkQuitListener;
 import com.hanielcota.essentials.modules.afk.service.AfkAutoChecker;
 import com.hanielcota.essentials.modules.afk.service.AfkBroadcaster;
 import com.hanielcota.essentials.modules.afk.service.AfkService;
+import com.hanielcota.essentials.modules.afk.service.AfkTransitions;
 import com.hanielcota.essentials.paper.AudienceProvider;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -30,13 +31,15 @@ public final class AfkModule extends AbstractModule {
     registerService(AfkService.class, service);
 
     var broadcaster = new AfkBroadcaster(config, audiences);
-    var autoChecker = new AfkAutoChecker(config, service, broadcaster, players, scheduler);
+    var transitions = new AfkTransitions(service, broadcaster);
+
+    var autoChecker = new AfkAutoChecker(config, service, transitions, players, scheduler);
     autoChecker.start();
     registerCloseable(autoChecker::stop);
 
-    registerCommand(new AfkCommand(service, broadcaster));
+    registerCommand(new AfkCommand(service, transitions));
 
-    registerListener(new AfkActivityListener(service, broadcaster));
+    registerListener(new AfkActivityListener(service, transitions));
     registerListener(new AfkJoinListener(service));
     registerListener(new AfkQuitListener(service));
   }

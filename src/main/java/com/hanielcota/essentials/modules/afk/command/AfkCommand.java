@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.afk.command;
 
-import com.hanielcota.essentials.modules.afk.service.AfkBroadcaster;
 import com.hanielcota.essentials.modules.afk.service.AfkService;
+import com.hanielcota.essentials.modules.afk.service.AfkTransitions;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -23,7 +23,7 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "1s")
 @Description("Marca ou remove o seu status AFK.")
 @Syntax("/afk [motivo]")
-public record AfkCommand(AfkService service, AfkBroadcaster broadcaster) {
+public record AfkCommand(AfkService service, AfkTransitions transitions) {
 
   @DefaultSubcommand
   @PlayerOnly
@@ -38,12 +38,10 @@ public record AfkCommand(AfkService service, AfkBroadcaster broadcaster) {
     if (this.service.isAfk(id)) {
       var now = System.currentTimeMillis();
       this.service.recordActivity(id, now);
-      this.service.exit(id);
-      this.broadcaster.broadcastExit(name);
+      this.transitions.exit(id, name);
       return;
     }
 
-    this.service.enter(id, reason);
-    this.broadcaster.broadcastEnter(name, reason);
+    this.transitions.enter(id, name, reason);
   }
 }

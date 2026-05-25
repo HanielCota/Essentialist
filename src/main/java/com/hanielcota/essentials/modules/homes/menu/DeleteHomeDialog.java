@@ -7,6 +7,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.DeleteDialogSection;
 import com.hanielcota.essentials.util.ComponentUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +40,10 @@ public final class DeleteHomeDialog implements EssentialsMenu {
     var yes = yesButton(configSnap);
     var no = noButton(configSnap);
 
-    var rows = menuSpec.effectiveDeleteRows();
-    var promptSlot = menuSpec.effectiveDeletePromptSlot();
-    var yesSlot = menuSpec.effectiveDeleteYesSlot();
-    var noSlot = menuSpec.effectiveDeleteNoSlot();
+    var rows = DeleteDialogSection.rows(menuSpec);
+    var promptSlot = DeleteDialogSection.promptSlot(menuSpec);
+    var yesSlot = DeleteDialogSection.yesSlot(menuSpec);
+    var noSlot = DeleteDialogSection.noSlot(menuSpec);
 
     ClickHandler noopClick = click -> {};
     ClickHandler confirmClick = this.clickHandler::confirm;

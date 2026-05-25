@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.vanish.listener;
 
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
-import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
+import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
@@ -22,7 +22,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public final class VanishQuitListener implements Listener {
 
   private final VanishService service;
-  private final VanishVisibilityApplier applier;
+  private final VanishTransitions transitions;
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onQuit(@NonNull PlayerQuitEvent event) {
@@ -32,8 +32,7 @@ public final class VanishQuitListener implements Listener {
       return;
     }
 
-    this.applier.unapply(player);
-    this.service.exit(id);
+    this.transitions.leave(player);
     event.quitMessage(null);
   }
 }

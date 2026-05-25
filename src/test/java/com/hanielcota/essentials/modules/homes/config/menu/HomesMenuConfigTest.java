@@ -10,6 +10,6 @@ class HomesMenuConfigTest {
   void staticPickerTitleDoesNotRenderUnknownHomePlaceholderAsQuestionMark() {
     var config = HomesMenuConfig.defaults();
 
-    assertEquals("<dark_gray>Pick an icon", config.staticPickerTitle());
+    assertEquals("<dark_gray>Pick an icon", MaterialPickerSection.staticTitle(config));
   }
 }

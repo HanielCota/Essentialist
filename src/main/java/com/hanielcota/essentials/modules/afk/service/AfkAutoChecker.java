@@ -12,7 +12,8 @@ import lombok.RequiredArgsConstructor;
  * Periodically scans online players and flags those that have been idle past the configured
  * threshold. The sweep runs sync — it only reads player presence and AFK state, no entity work.
  *
- * <p>One shared timer sweeps the whole roster; we never schedule per-player tasks.
+ * <p>One shared timer sweeps the whole roster; we never schedule per-player tasks. Transition
+ * dispatch (state + broadcast) is delegated to {@link AfkTransitions}.
  */
 @RequiredArgsConstructor
 public final class AfkAutoChecker {
@@ -21,7 +22,7 @@ public final class AfkAutoChecker {
 
   private final ConfigHandle<AfkConfig> config;
   private final AfkService service;
-  private final AfkBroadcaster broadcaster;
+  private final AfkTransitions transitions;
   private final PlayerProvider players;
   private final Scheduler scheduler;
 
@@ -62,11 +63,8 @@ public final class AfkAutoChecker {
         continue;
       }
 
-      var transitioned = this.service.enter(id, null);
-      if (transitioned) {
-        var name = player.getName();
-        this.broadcaster.broadcastEnter(name, null);
-      }
+      var name = player.getName();
+      this.transitions.enter(id, name, null);
     }
   }
 }

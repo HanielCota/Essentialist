@@ -1,18 +1,21 @@
 package com.hanielcota.essentials.modules.homes.config.menu;
 
-import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
-import com.hanielcota.essentials.util.Numbers;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import lombok.NonNull;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
-/** Visual + layout settings for /homes and the material picker submenu. */
+/**
+ * Visual + layout settings for /homes and the material picker submenu.
+ *
+ * <p>Pure data carrier. Effective row/slot computation and item-formatting helpers live in {@link
+ * HomesMainMenuSection}, {@link MaterialCategorySection}, {@link MaterialPickerSection} and {@link
+ * DeleteDialogSection}.
+ */
 @ConfigSerializable
 public record HomesMenuConfig(
     @Comment("/homes menu title (MiniMessage).") String title,
@@ -57,8 +60,6 @@ public record HomesMenuConfig(
     @Comment("Material of the delete-confirmation yes button.") Material deleteYesMaterial,
     @Comment("Slot of the delete-confirmation no button.") int deleteNoSlot,
     @Comment("Material of the delete-confirmation no button.") Material deleteNoMaterial) {
-
-  private static final int MIN_ROWS = 1;
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
@@ -145,125 +146,5 @@ public record HomesMenuConfig(
     map.put(MaterialCategory.FLOWERS, "Flowers");
     map.put(MaterialCategory.MISC, "Misc");
     return map;
-  }
-
-  public String formatItemName(@NonNull String name) {
-    return itemName.replace("{name}", name);
-  }
-
-  public String[] renderItemLore(@NonNull String world, double x, double y, double z) {
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
-    var rendered = new String[itemLore.size()];
-
-    for (var i = 0; i < itemLore.size(); i++) {
-      var line = itemLore.get(i);
-      var withWorld = line.replace("{world}", world);
-      var withX = withWorld.replace("{x}", xStr);
-      var withY = withX.replace("{y}", yStr);
-      rendered[i] = withY.replace("{z}", zStr);
-    }
-    return rendered;
-  }
-
-  public String staticPickerTitle() {
-    if (pickerTitle.contains("{name}")) {
-      return "<dark_gray>Pick an icon";
-    }
-    return pickerTitle;
-  }
-
-  public int effectiveRows() {
-    return MenuLayouts.clampRows(rows);
-  }
-
-  public int effectiveCategoryRows() {
-    return MenuLayouts.clampRows(categoryRows);
-  }
-
-  public int effectivePickerRows() {
-    return MenuLayouts.clampRows(pickerRows);
-  }
-
-  public int effectiveDeleteRows() {
-    return MenuLayouts.clampRows(deleteRows);
-  }
-
-  public List<Integer> effectiveContentSlots() {
-    if (contentSlots.isEmpty()) {
-      var effRows = effectiveRows();
-      var count = effRows > MIN_ROWS ? (effRows - 1) * 9 : 9;
-      return MenuLayouts.fallbackContentSlots(effRows, count);
-    }
-    return MenuLayouts.sanitizeSlots(contentSlots, effectiveRows());
-  }
-
-  public int effectiveInfoSlot() {
-    return MenuLayouts.sanitizeSlot(infoSlot, effectiveRows(), 10);
-  }
-
-  public List<Integer> effectiveCategoryContentSlots() {
-    return MenuLayouts.sanitizeSlots(categoryContentSlots, effectiveCategoryRows());
-  }
-
-  public int effectiveCategoryBackSlot() {
-    return MenuLayouts.sanitizeSlot(
-        categoryBackSlot, effectiveCategoryRows(), effectiveCategoryRows() * 9 - 5);
-  }
-
-  public List<Integer> effectivePickerContentSlots() {
-    return MenuLayouts.sanitizeSlots(pickerContentSlots, effectivePickerRows());
-  }
-
-  public int effectivePickerBackSlot() {
-    return MenuLayouts.sanitizeSlot(
-        pickerBackSlot, effectivePickerRows(), effectivePickerRows() * 9 - 5);
-  }
-
-  public int effectiveDeletePromptSlot() {
-    return MenuLayouts.sanitizeSlot(deletePromptSlot, effectiveDeleteRows(), 13);
-  }
-
-  public int effectiveDeleteYesSlot() {
-    return MenuLayouts.sanitizeSlot(deleteYesSlot, effectiveDeleteRows(), 11);
-  }
-
-  public int effectiveDeleteNoSlot() {
-    return MenuLayouts.sanitizeSlot(deleteNoSlot, effectiveDeleteRows(), 15);
-  }
-
-  public String categoryName(@NonNull MaterialCategory category) {
-    var configured = categoryNames.get(category);
-
-    if (configured != null) {
-      return configured;
-    }
-
-    return category.name();
-  }
-
-  public String formatCategoryItemName(@NonNull String category) {
-    return categoryItemName.replace("{category}", category);
-  }
-
-  public String[] formatCategoryItemLore(@NonNull String category) {
-    var rendered = new String[categoryItemLore.size()];
-    for (var i = 0; i < categoryItemLore.size(); i++) {
-      rendered[i] = categoryItemLore.get(i).replace("{category}", category);
-    }
-    return rendered;
-  }
-
-  public String formatPickerItemName(@NonNull String material) {
-    return pickerItemName.replace("{material}", material);
-  }
-
-  public String[] formatPickerItemLore(@NonNull String material) {
-    var rendered = new String[pickerItemLore.size()];
-    for (var i = 0; i < pickerItemLore.size(); i++) {
-      rendered[i] = pickerItemLore.get(i).replace("{material}", material);
-    }
-    return rendered;
   }
 }

@@ -4,9 +4,11 @@ import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.nick.command.NickCommand;
+import com.hanielcota.essentials.modules.nick.command.NickNotifier;
 import com.hanielcota.essentials.modules.nick.command.RealNameCommand;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
 import com.hanielcota.essentials.modules.nick.listener.NickJoinListener;
+import com.hanielcota.essentials.modules.nick.service.NickOperationService;
 import com.hanielcota.essentials.modules.nick.service.NickService;
 import com.hanielcota.essentials.modules.nick.service.NickStore;
 import com.hanielcota.essentials.modules.nick.service.NickTable;
@@ -38,7 +40,10 @@ public final class NickModule extends AbstractModule {
     var framework = service(PaperCommandFramework.class);
     var players = service(PlayerProvider.class);
 
-    registerCommand(new NickCommand(config, service, framework));
+    var operations = new NickOperationService(config, service);
+    var notifier = new NickNotifier(config, framework);
+
+    registerCommand(new NickCommand(operations, notifier));
     registerCommand(new RealNameCommand(config, service, players));
 
     registerListener(new NickJoinListener(service));

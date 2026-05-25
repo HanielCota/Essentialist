@@ -11,6 +11,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuSection;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
@@ -58,10 +59,10 @@ public final class HomesMenu implements EssentialsMenu {
     var snap = this.config.value();
     var menuSpec = snap.menu();
 
-    var rows = menuSpec.effectiveRows();
+    var rows = HomesMainMenuSection.rows(menuSpec);
     var titleText = menuSpec.title();
     var menuTitle = ComponentUtils.mini(titleText);
-    var contentSlots = menuSpec.effectiveContentSlots();
+    var contentSlots = HomesMainMenuSection.contentSlots(menuSpec);
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
     if (rows > MIN_ROWS) {
@@ -71,7 +72,7 @@ public final class HomesMenu implements EssentialsMenu {
     var pagination = paginationBuilder.build();
 
     var infoTemplate = buildInfoTemplate(menuSpec);
-    var infoSlot = menuSpec.effectiveInfoSlot();
+    var infoSlot = HomesMainMenuSection.infoSlot(menuSpec);
 
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);

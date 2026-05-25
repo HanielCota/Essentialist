@@ -10,6 +10,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.MaterialCategorySection;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategoryIconRegistry;
 import com.hanielcota.essentials.util.ComponentUtils;
@@ -43,10 +44,10 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
     var snap = this.config.value();
     var menuSpec = snap.menu();
 
-    var rows = menuSpec.effectiveCategoryRows();
+    var rows = MaterialCategorySection.rows(menuSpec);
     var titleText = menuSpec.categoryTitle();
     var title = ComponentUtils.mini(titleText);
-    var contentSlots = menuSpec.effectiveCategoryContentSlots();
+    var contentSlots = MaterialCategorySection.contentSlots(menuSpec);
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
     var pagination = paginationBuilder.build();
@@ -98,7 +99,7 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
     templateBuilder.italic(false);
     var template = templateBuilder.build();
 
-    var slot = menuSpec.effectiveCategoryBackSlot();
+    var slot = MaterialCategorySection.backSlot(menuSpec);
 
     return SlotDefinition.of(slot, template, this.clickHandler::back);
   }
@@ -108,9 +109,9 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
     var menuSpec = snap.menu();
 
     var icon = this.icons.iconFor(category);
-    var categoryName = menuSpec.categoryName(category);
-    var name = menuSpec.formatCategoryItemName(categoryName);
-    var lore = menuSpec.formatCategoryItemLore(categoryName);
+    var categoryName = MaterialCategorySection.displayName(menuSpec, category);
+    var name = MaterialCategorySection.itemName(menuSpec, categoryName);
+    var lore = MaterialCategorySection.itemLore(menuSpec, categoryName);
 
     var builder = ItemTemplate.builder(icon);
     builder.name(name);

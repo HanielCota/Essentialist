@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.afk.listener;
 
-import com.hanielcota.essentials.modules.afk.service.AfkBroadcaster;
 import com.hanielcota.essentials.modules.afk.service.AfkService;
+import com.hanielcota.essentials.modules.afk.service.AfkTransitions;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public final class AfkActivityListener implements Listener {
 
   private final AfkService service;
-  private final AfkBroadcaster broadcaster;
+  private final AfkTransitions transitions;
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onMove(@NonNull PlayerMoveEvent event) {
@@ -51,13 +51,9 @@ public final class AfkActivityListener implements Listener {
   private void record(@NonNull Player player) {
     var id = player.getUniqueId();
     var now = System.currentTimeMillis();
+    var name = player.getName();
 
     this.service.recordActivity(id, now);
-
-    var transitioned = this.service.exit(id);
-    if (transitioned) {
-      var name = player.getName();
-      this.broadcaster.broadcastExit(name);
-    }
+    this.transitions.exit(id, name);
   }
 }

@@ -9,6 +9,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
+import com.hanielcota.essentials.modules.vanish.config.VanishMenuLayout;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -58,7 +59,7 @@ public final class VanishMenu implements EssentialsMenu {
 
     var rows = snap.effectiveRows();
     var title = snap.menuTitle();
-    var contentSlots = snap.effectiveContentSlots();
+    var contentSlots = VanishMenuLayout.contentSlots(snap);
     var navigation = snap.navigation();
     var infoSlot = snap.effectiveInfoSlot();
     var infoTemplate = buildInfoTemplate(snap);
@@ -113,7 +114,7 @@ public final class VanishMenu implements EssentialsMenu {
 
   private List<SlotDefinition> emptyState() {
     var snap = this.config.value();
-    var slots = snap.effectiveContentSlots();
+    var slots = VanishMenuLayout.contentSlots(snap);
     var midIndex = slots.size() / 2;
     var centerSlot = slots.get(midIndex);
 

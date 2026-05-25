@@ -7,7 +7,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
-import com.hanielcota.essentials.modules.vanish.service.VanishService;
+import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -21,7 +21,6 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import java.util.UUID;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -33,8 +32,7 @@ import org.bukkit.entity.Player;
 @Syntax("/vanish [jogador] | /vanish list")
 public record VanishCommand(
     ConfigHandle<VanishConfig> config,
-    VanishService service,
-    VanishVisibilityApplier applier,
+    VanishTransitions transitions,
     PaperCommandFramework framework,
     MenuService menus) {
 
@@ -42,13 +40,10 @@ public record VanishCommand(
   @PermissionForOther(".others")
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
-    var subjectId = subject.getUniqueId();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
-    var newlyVanished = this.service.enter(subjectId);
-    applyToggleEffect(subject, subjectId, newlyVanished);
-
+    var newlyVanished = this.transitions.toggle(subject);
     var messages = snap.toggle(newlyVanished);
 
     if (self) {
@@ -62,16 +57,6 @@ public record VanishCommand(
     var target = this.framework.actorOf(subject);
 
     sender.sendDualMessage(target, senderMsg, targetMsg);
-  }
-
-  private void applyToggleEffect(
-      @NonNull Player subject, @NonNull UUID subjectId, boolean entering) {
-    if (entering) {
-      this.applier.apply(subject);
-      return;
-    }
-    this.service.exit(subjectId);
-    this.applier.unapply(subject);
   }
 
   @Subcommand("list")

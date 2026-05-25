@@ -11,6 +11,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.MaterialPickerSection;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
@@ -57,10 +58,10 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     var snap = this.config.value();
     var menuSpec = snap.menu();
 
-    var titleText = menuSpec.staticPickerTitle();
+    var titleText = MaterialPickerSection.staticTitle(menuSpec);
     var menuTitle = ComponentUtils.mini(titleText);
-    var rows = menuSpec.effectivePickerRows();
-    var contentSlots = menuSpec.effectivePickerContentSlots();
+    var rows = MaterialPickerSection.rows(menuSpec);
+    var contentSlots = MaterialPickerSection.contentSlots(menuSpec);
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
     if (rows > MIN_ROWS) {
@@ -120,7 +121,7 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     templateBuilder.italic(false);
     var template = templateBuilder.build();
 
-    var slot = menuSpec.effectivePickerBackSlot();
+    var slot = MaterialPickerSection.backSlot(menuSpec);
 
     return SlotDefinition.of(slot, template, this.clickHandler::back);
   }
