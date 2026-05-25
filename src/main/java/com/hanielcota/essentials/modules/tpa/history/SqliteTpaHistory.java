@@ -36,19 +36,30 @@ public final class SqliteTpaHistory implements TpaHistory {
    * Reads one row, or {@code null} when a persisted enum no longer exists — dropped from output.
    */
   private static @Nullable TpaHistoryEntry mapRow(@NonNull ResultSet rs) throws SQLException {
-    var type = parseEnum(TeleportRequestType.class, rs.getString("type"));
-    var status = parseEnum(TeleportRequestStatus.class, rs.getString("status"));
+    var typeRaw = rs.getString("type");
+    var type = parseEnum(TeleportRequestType.class, typeRaw);
+
+    var statusRaw = rs.getString("status");
+    var status = parseEnum(TeleportRequestStatus.class, statusRaw);
+
     if (type == null || status == null) {
       return null;
     }
+
+    var requesterRaw = rs.getString("requester_id");
+    var requesterId = UUID.fromString(requesterRaw);
+
+    var targetRaw = rs.getString("target_id");
+    var targetId = UUID.fromString(targetRaw);
+    var targetName = rs.getString("target_name");
+    var target = new Participant(targetId, targetName);
+
+    var createdAt = rs.getLong("created_at");
+    var resolvedAt = rs.getLong("resolved_at");
+    var destination = readDestination(rs);
+
     return new TpaHistoryEntry(
-        UUID.fromString(rs.getString("requester_id")),
-        new Participant(UUID.fromString(rs.getString("target_id")), rs.getString("target_name")),
-        type,
-        status,
-        rs.getLong("created_at"),
-        rs.getLong("resolved_at"),
-        readDestination(rs));
+        requesterId, target, type, status, createdAt, resolvedAt, destination);
   }
 
   private static @Nullable Destination readDestination(@NonNull ResultSet rs) throws SQLException {
@@ -56,7 +67,12 @@ public final class SqliteTpaHistory implements TpaHistory {
     if (world == null) {
       return null;
     }
-    return new Destination(world, rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"));
+
+    var x = rs.getDouble("x");
+    var y = rs.getDouble("y");
+    var z = rs.getDouble("z");
+
+    return new Destination(world, x, y, z);
   }
 
   private static <E extends Enum<E>> @Nullable E parseEnum(
@@ -70,48 +86,72 @@ public final class SqliteTpaHistory implements TpaHistory {
 
   @Override
   public void push(@NonNull TpaHistoryEntry entry) {
-    this.sqlExecutor.tx(
-        conn -> {
-          insert(conn, entry);
-          trim(conn, entry.requester());
-        });
+    this.sqlExecutor.tx(conn -> persist(conn, entry));
   }
 
   @Override
   public List<TpaHistoryEntry> list(@NonNull UUID requester) {
+    var requesterId = requester.toString();
+    var capacity = TpaHistory.CAPACITY;
+
     return this.sqlExecutor.query(
-        TpaHistoryTable.LIST, SqliteTpaHistory::mapRow, requester.toString(), TpaHistory.CAPACITY);
+        TpaHistoryTable.LIST, SqliteTpaHistory::mapRow, requesterId, capacity);
+  }
+
+  private void persist(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
+      throws SQLException {
+    insert(conn, entry);
+    trim(conn, entry.requester());
   }
 
   private void insert(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
       throws SQLException {
     try (var statement = conn.prepareStatement(TpaHistoryTable.INSERT)) {
-      var destination = entry.destination();
-
-      statement.setString(1, entry.requester().toString());
-
-      var targetParticipant = entry.target();
-      var targetUuid = targetParticipant.id().toString();
-      statement.setString(2, targetUuid);
-      statement.setString(3, targetParticipant.name());
-
-      statement.setString(4, entry.type().name());
-      statement.setString(5, entry.status().name());
-      statement.setLong(6, entry.createdAt());
-      statement.setLong(7, entry.resolvedAt());
-
-      var worldValue = destination == null ? null : destination.world();
-      var xValue = destination == null ? null : destination.x();
-      var yValue = destination == null ? null : destination.y();
-      var zValue = destination == null ? null : destination.z();
-
-      setNullable(statement, 8, worldValue, Types.VARCHAR);
-      setNullable(statement, 9, xValue, Types.REAL);
-      setNullable(statement, 10, yValue, Types.REAL);
-      setNullable(statement, 11, zValue, Types.REAL);
+      bindEntry(statement, entry);
+      bindDestination(statement, entry.destination());
 
       statement.executeUpdate();
     }
+  }
+
+  private static void bindEntry(
+      @NonNull PreparedStatement statement, @NonNull TpaHistoryEntry entry) throws SQLException {
+    var requesterId = entry.requester().toString();
+    statement.setString(1, requesterId);
+
+    var targetParticipant = entry.target();
+    var targetUuid = targetParticipant.id().toString();
+    var targetName = targetParticipant.name();
+    statement.setString(2, targetUuid);
+    statement.setString(3, targetName);
+
+    var typeName = entry.type().name();
+    var statusName = entry.status().name();
+    statement.setString(4, typeName);
+    statement.setString(5, statusName);
+
+    statement.setLong(6, entry.createdAt());
+    statement.setLong(7, entry.resolvedAt());
+  }
+
+  private static void bindDestination(
+      @NonNull PreparedStatement statement, @Nullable Destination destination) throws SQLException {
+    String worldValue = null;
+    Double xValue = null;
+    Double yValue = null;
+    Double zValue = null;
+
+    if (destination != null) {
+      worldValue = destination.world();
+      xValue = destination.x();
+      yValue = destination.y();
+      zValue = destination.z();
+    }
+
+    setNullable(statement, 8, worldValue, Types.VARCHAR);
+    setNullable(statement, 9, xValue, Types.REAL);
+    setNullable(statement, 10, yValue, Types.REAL);
+    setNullable(statement, 11, zValue, Types.REAL);
   }
 
   private void trim(@NonNull Connection conn, @NonNull UUID requester) throws SQLException {

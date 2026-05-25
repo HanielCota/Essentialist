@@ -26,13 +26,12 @@ public record TpaHereCommand(ConfigHandle<TpaConfig> config, TeleportRequestServ
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @OnlinePlayer @NonNull Player target) {
-    var messages = this.config.value().messages();
-    TpaRequests.send(
-        this.service,
-        messages,
-        actor,
-        target,
-        TeleportRequestType.TPAHERE,
-        messages.requestSentHere());
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var confirmationTemplate = messages.requestSentHere();
+    var type = TeleportRequestType.TPAHERE;
+
+    TpaRequests.send(this.service, messages, actor, target, type, confirmationTemplate);
   }
 }

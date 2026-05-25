@@ -24,10 +24,13 @@ public record TpCancelCommand(ConfigHandle<TpaConfig> config, TeleportRequestSer
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    var messages = this.config.value().messages();
-    var sender = actor.unwrap(Player.class);
+    var snap = this.config.value();
+    var messages = snap.messages();
 
-    var pending = this.service.outgoing(sender.getUniqueId());
+    var sender = actor.unwrap(Player.class);
+    var senderId = sender.getUniqueId();
+
+    var pending = this.service.outgoing(senderId);
     if (pending.isEmpty()) {
       actor.sendError(messages.noOutgoing());
       return;
@@ -38,8 +41,8 @@ public record TpCancelCommand(ConfigHandle<TpaConfig> config, TeleportRequestSer
 
     var cancelledTemplate = messages.cancelled();
     var targetName = request.target().name();
-
     var cancelledMsg = cancelledTemplate.replace("{player}", targetName);
+
     actor.sendSuccess(cancelledMsg);
   }
 }
