@@ -43,13 +43,17 @@ public final class DelayedTeleport {
 
     if (delay.isZero() || delay.isNegative()) {
       callback.onScheduled(0);
-      this.scheduler.runOnEntity(
-          player, () -> this.executor.teleport(player, destination, callback));
+      runTeleport(player, destination, callback);
       return;
     }
 
-    callback.onScheduled(Math.max(1, delay.toSeconds()));
-    var task = this.scheduler.runLater(() -> finishWarmup(player, destination, callback), delay);
+    var totalSeconds = delay.toSeconds();
+    var announcedSeconds = Math.max(1, totalSeconds);
+    callback.onScheduled(announcedSeconds);
+
+    Runnable onExpiry = () -> finishWarmup(player, destination, callback);
+    var task = this.scheduler.runLater(onExpiry, delay);
+
     this.pending.put(uuid, task, callback);
   }
 
@@ -64,11 +68,19 @@ public final class DelayedTeleport {
 
   private void finishWarmup(
       @NonNull Player player, @NonNull Location destination, @NonNull Callback callback) {
-    var removed = this.pending.remove(player.getUniqueId());
+    var uuid = player.getUniqueId();
+    var removed = this.pending.remove(uuid);
     if (removed == null || !removed.owns(callback)) {
       return;
     }
-    this.scheduler.runOnEntity(player, () -> this.executor.teleport(player, destination, callback));
+
+    runTeleport(player, destination, callback);
+  }
+
+  private void runTeleport(
+      @NonNull Player player, @NonNull Location destination, @NonNull Callback callback) {
+    Runnable teleportTask = () -> this.executor.teleport(player, destination, callback);
+    this.scheduler.runOnEntity(player, teleportTask);
   }
 
   /**
@@ -82,8 +94,11 @@ public final class DelayedTeleport {
     if (pendingTeleport == null) {
       return false;
     }
+
     pendingTeleport.cancelTask();
-    pendingTeleport.callback().onCancelled();
+    var callback = pendingTeleport.callback();
+    callback.onCancelled();
+
     return true;
   }
 

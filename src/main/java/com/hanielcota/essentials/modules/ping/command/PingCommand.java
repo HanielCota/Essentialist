@@ -26,11 +26,13 @@ public record PingCommand(ConfigHandle<PingConfig> config, PingService service) 
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
-
     var snap = this.config.value();
-    String coloredPing = this.service.format(subject.getPing());
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
+
+    var ping = subject.getPing();
+    var coloredPing = this.service.format(ping);
+
     var messages = snap.message();
     var base = messages.forSender(self, name);
     var message = base.replace("{ping}", coloredPing);

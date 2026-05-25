@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 /**
  * Application service for the teleport-request use cases: create, accept, deny, cancel, expire.
  *
- * <p>Sole responsibility: orchestration. It owns no state and renders no messages â€” it delegates
+ * <p>Sole responsibility: orchestration. It owns no state and renders no messages — it delegates
  * storage to {@link RequestStore}, persistence to {@link TpaHistory} and player-facing notices to
  * {@link TpaNotifier}.
  */
@@ -50,25 +50,22 @@ public final class TeleportRequestService {
    */
   public TeleportRequest create(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
+    var requesterId = requester.getUniqueId();
+    var requesterName = requester.getName();
 
-    this.store
-        .outgoingOf(requester.getUniqueId())
-        .ifPresent(
-            previous -> {
-              resolve(previous, TeleportRequestStatus.CANCELLED);
-              this.notifier.notifyPartnerLeft(
-                  previous, requester.getUniqueId(), requester.getName());
-            });
+    var existing = this.store.outgoingOf(requesterId);
+    existing.ifPresent(previous -> replacePrevious(previous, requesterId, requesterName));
 
-    var configSnapshot = this.config.value();
-    var requestExpiryDuration = configSnapshot.requestExpiry();
+    var snap = this.config.value();
+    var lifetime = snap.requestExpiry();
 
-    var request =
-        TeleportRequest.open(
-            Participant.of(requester), Participant.of(target), type, requestExpiryDuration);
+    var requesterParticipant = Participant.of(requester);
+    var targetParticipant = Participant.of(target);
+    var request = TeleportRequest.open(requesterParticipant, targetParticipant, type, lifetime);
 
     this.store.add(request);
     this.notifier.sendPrompt(target, request);
+
     return request;
   }
 
@@ -98,23 +95,8 @@ public final class TeleportRequestService {
       return CompletableFuture.completedFuture(AcceptResult.NOT_FOUND);
     }
 
-    return this.executor
-        .execute(request)
-        .thenApply(
-            execution -> {
-              var result = execution.result();
-              if (result == AcceptResult.REQUESTER_OFFLINE
-                  || result == AcceptResult.TELEPORT_FAILED) {
-                this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED));
-                return result;
-              }
-              this.history.push(
-                  TpaHistoryEntry.of(
-                      request,
-                      TeleportRequestStatus.ACCEPTED,
-                      execution.optionalDestination().orElseThrow()));
-              return result;
-            });
+    var pending = this.executor.execute(request);
+    return pending.thenApply(execution -> recordExecution(request, execution));
   }
 
   /** Denies a request. */
@@ -129,15 +111,19 @@ public final class TeleportRequestService {
 
   /** Expires a request and notifies the requester. Called by {@link TeleportRequestExpiry}. */
   public void expire(@NonNull TeleportRequest request) {
-    if (this.store.remove(request)) {
-      this.history.push(TpaHistoryEntry.of(request, TeleportRequestStatus.EXPIRED));
-      this.notifier.notifyExpired(request);
+    if (!this.store.remove(request)) {
+      return;
     }
+
+    var entry = TpaHistoryEntry.of(request, TeleportRequestStatus.EXPIRED);
+    this.history.push(entry);
+
+    this.notifier.notifyExpired(request);
   }
 
   /**
-   * Cancels every request a player takes part in â€” used when they disconnect â€” and returns them
-   * so the caller can notify the other party.
+   * Cancels every request a player takes part in — used when they disconnect — and returns them so
+   * the caller can notify the other party.
    */
   public List<TeleportRequest> cancelAllOf(@NonNull UUID player) {
     var affected = this.store.involving(player);
@@ -147,10 +133,36 @@ public final class TeleportRequestService {
     return affected;
   }
 
+  private void replacePrevious(
+      @NonNull TeleportRequest previous, @NonNull UUID requesterId, @NonNull String requesterName) {
+    resolve(previous, TeleportRequestStatus.CANCELLED);
+    this.notifier.notifyPartnerLeft(previous, requesterId, requesterName);
+  }
+
+  private AcceptResult recordExecution(
+      @NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
+    var result = execution.result();
+
+    if (result == AcceptResult.REQUESTER_OFFLINE || result == AcceptResult.TELEPORT_FAILED) {
+      var cancelledEntry = TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED);
+      this.history.push(cancelledEntry);
+      return result;
+    }
+
+    var destination = execution.optionalDestination().orElseThrow();
+    var acceptedEntry = TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, destination);
+
+    this.history.push(acceptedEntry);
+    return result;
+  }
+
   /** Removes a request and writes its terminal state to history in one step. */
   private void resolve(@NonNull TeleportRequest request, @NonNull TeleportRequestStatus status) {
-    if (this.store.remove(request)) {
-      this.history.push(TpaHistoryEntry.of(request, status));
+    if (!this.store.remove(request)) {
+      return;
     }
+
+    var entry = TpaHistoryEntry.of(request, status);
+    this.history.push(entry);
   }
 }

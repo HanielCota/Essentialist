@@ -17,13 +17,20 @@ public final class DelayedTeleportCanceller implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onDamage(@NonNull EntityDamageEvent event) {
-    if (event.getEntity() instanceof Player player) {
-      this.delayed.cancelAndNotify(player.getUniqueId());
+    var entity = event.getEntity();
+    if (!(entity instanceof Player player)) {
+      return;
     }
+
+    var playerId = player.getUniqueId();
+    this.delayed.cancelAndNotify(playerId);
   }
 
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
-    this.delayed.cancel(event.getPlayer().getUniqueId());
+    var player = event.getPlayer();
+    var playerId = player.getUniqueId();
+
+    this.delayed.cancel(playerId);
   }
 }

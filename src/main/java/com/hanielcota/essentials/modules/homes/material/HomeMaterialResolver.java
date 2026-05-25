@@ -14,15 +14,21 @@ public record HomeMaterialResolver(
   }
 
   public Material resolve(@NonNull String rawMaterial) {
-    if (rawMaterial == null || rawMaterial.isBlank()) {
-      return this.config.value().defaultMaterial();
+    if (rawMaterial.isBlank()) {
+      var snap = this.config.value();
+      return snap.defaultMaterial();
     }
 
     var material = Material.matchMaterial(rawMaterial);
-    if (material != null && this.itemMaterial.test(material)) {
-      return material;
+
+    if (material == null) {
+      return null;
     }
 
-    return null;
+    if (!this.itemMaterial.test(material)) {
+      return null;
+    }
+
+    return material;
   }
 }

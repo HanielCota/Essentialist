@@ -15,12 +15,14 @@ public final class FeedModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
-    var config = configure("feed", FeedConfig.class, FeedConfig::defaults, new FeedService());
-    registerCommand(
-        new FeedCommand(
-            config,
-            service(FeedService.class),
-            service(PlayerProvider.class),
-            service(PaperCommandFramework.class)));
+    var feed = new FeedService();
+    var config = configure("feed", FeedConfig.class, FeedConfig::defaults, feed);
+
+    var service = service(FeedService.class);
+    var players = service(PlayerProvider.class);
+    var framework = service(PaperCommandFramework.class);
+
+    var command = new FeedCommand(config, service, players, framework);
+    registerCommand(command);
   }
 }

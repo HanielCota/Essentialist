@@ -29,14 +29,19 @@ final class TpaRequests {
       @NonNull TeleportRequestType type,
       @NonNull String confirmationTemplate) {
     var sender = actor.unwrap(Player.class);
-    if (sender.getUniqueId().equals(target.getUniqueId())) {
+    var senderId = sender.getUniqueId();
+    var targetId = target.getUniqueId();
+
+    if (senderId.equals(targetId)) {
       actor.sendError(messages.selfTarget());
       return;
     }
 
     service.create(sender, target, type);
 
-    var confirmationMsg = confirmationTemplate.replace("{player}", target.getName());
+    var targetName = target.getName();
+    var confirmationMsg = confirmationTemplate.replace("{player}", targetName);
+
     actor.sendSuccess(confirmationMsg);
   }
 
@@ -56,15 +61,17 @@ final class TpaRequests {
       @NonNull String requesterName,
       @NonNull TpaMessages messages,
       @NonNull CommandActor actor) {
+    var viewerId = viewer.getUniqueId();
+
     if (!requesterName.isBlank()) {
-      var found = service.incomingFrom(viewer.getUniqueId(), requesterName);
+      var found = service.incomingFrom(viewerId, requesterName);
       if (found.isEmpty()) {
         actor.sendError(messages.noIncoming());
       }
       return found;
     }
 
-    var pending = service.incoming(viewer.getUniqueId());
+    var pending = service.incoming(viewerId);
     if (pending.isEmpty()) {
       actor.sendError(messages.noIncoming());
       return Optional.empty();
@@ -73,7 +80,9 @@ final class TpaRequests {
       actor.sendError(messages.ambiguous());
       return Optional.empty();
     }
-    return Optional.of(pending.getFirst());
+
+    var sole = pending.getFirst();
+    return Optional.of(sole);
   }
 
   /**
@@ -85,14 +94,17 @@ final class TpaRequests {
       @NonNull TeleportRequest request,
       @NonNull String template,
       boolean asSuccess) {
-    var requesterPlayer = Bukkit.getPlayer(request.requester().id());
+    var requesterId = request.requester().id();
+    var requesterPlayer = Bukkit.getPlayer(requesterId);
     if (requesterPlayer == null) {
       return;
     }
+
     var actor = framework.actorOf(requesterPlayer);
 
     var replyTargetName = request.target().name();
     var replyMsg = template.replace("{player}", replyTargetName);
+
     if (!asSuccess) {
       actor.sendError(replyMsg);
       return;

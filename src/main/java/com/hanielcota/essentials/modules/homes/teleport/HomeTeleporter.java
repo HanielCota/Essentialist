@@ -31,10 +31,17 @@ public final class HomeTeleporter {
       @NonNull Home home) {
 
     var homeName = home.name();
-    var teleportingMsg = messages.teleporting().replace("{name}", homeName);
-    var teleportedMsg = messages.teleported().replace("{name}", homeName);
+
+    var teleportingTemplate = messages.teleporting();
+    var teleportedTemplate = messages.teleported();
+
+    var teleportingMsg = teleportingTemplate.replace("{name}", homeName);
+    var teleportedMsg = teleportedTemplate.replace("{name}", homeName);
+
     var cancelledMsg = messages.cancelled();
     var failedMsg = messages.failed();
+    var cancelButton = messages.cancelButton();
+    var cancelHover = messages.cancelHover();
 
     return new HomeTeleportPrompt(
         actor,
@@ -43,8 +50,8 @@ public final class HomeTeleporter {
         teleportedMsg,
         cancelledMsg,
         failedMsg,
-        messages.cancelButton(),
-        messages.cancelHover());
+        cancelButton,
+        cancelHover);
   }
 
   public void teleport(@NonNull Player player, @NonNull Home home, @NonNull CommandActor actor) {
@@ -53,7 +60,8 @@ public final class HomeTeleporter {
     var resolved = home.resolve();
 
     if (resolved == null) {
-      actor.sendError(messages.worldGone());
+      var worldGoneMsg = messages.worldGone();
+      actor.sendError(worldGoneMsg);
       return;
     }
 

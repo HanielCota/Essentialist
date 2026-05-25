@@ -25,9 +25,15 @@ public record TeleportCancelCommand(ConfigHandle<TeleportConfig> config, Delayed
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
+    var senderId = sender.getUniqueId();
 
-    if (!this.delayed.cancelAndNotify(sender.getUniqueId())) {
-      actor.sendError(this.config.value().cancelNoPending());
+    var cancelled = this.delayed.cancelAndNotify(senderId);
+    if (cancelled) {
+      return;
     }
+
+    var snap = this.config.value();
+    var noPendingMsg = snap.cancelNoPending();
+    actor.sendError(noPendingMsg);
   }
 }

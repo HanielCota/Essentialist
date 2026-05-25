@@ -27,10 +27,14 @@ public final class HomesCacheListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onPreLogin(@NonNull AsyncPlayerPreLoginEvent event) {
-    if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
+    var result = event.getLoginResult();
+
+    if (result != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
       return;
     }
+
     var uuid = event.getUniqueId();
+
     try {
       this.repository.loadFor(uuid);
     } catch (RuntimeException e) {
@@ -40,7 +44,9 @@ public final class HomesCacheListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onQuit(@NonNull PlayerQuitEvent event) {
-    var uuid = event.getPlayer().getUniqueId();
+    var player = event.getPlayer();
+    var uuid = player.getUniqueId();
+
     this.repository.evictFor(uuid);
   }
 }

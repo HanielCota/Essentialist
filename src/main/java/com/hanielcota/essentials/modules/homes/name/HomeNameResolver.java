@@ -13,14 +13,15 @@ public record HomeNameResolver(ConfigHandle<HomesConfig> config, HomeNameValidat
   }
 
   public String resolve(@NonNull String rawName) {
-    if (rawName == null || rawName.isBlank()) {
-      return this.config.value().defaultHomeName();
+    if (rawName.isBlank()) {
+      var snap = this.config.value();
+      return snap.defaultHomeName();
     }
 
-    if (this.validator.isValid(rawName)) {
-      return rawName;
+    if (!this.validator.isValid(rawName)) {
+      return null;
     }
 
-    return null;
+    return rawName;
   }
 }

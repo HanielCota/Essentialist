@@ -20,9 +20,14 @@ public final class LightModule extends AbstractModule {
     var light = new LightService(plugin());
     var config = configure("light", LightConfig.class, LightConfig::defaults, light);
     var scheduler = service(Scheduler.class);
+    var framework = service(PaperCommandFramework.class);
 
-    registerCommand(new LightCommand(config, light, service(PaperCommandFramework.class)));
-    registerListener(new LightRespawnListener(scheduler, light));
-    registerListener(new LightMilkListener(scheduler, light));
+    var command = new LightCommand(config, light, framework);
+    var respawnListener = new LightRespawnListener(scheduler, light);
+    var milkListener = new LightMilkListener(scheduler, light);
+
+    registerCommand(command);
+    registerListener(respawnListener);
+    registerListener(milkListener);
   }
 }

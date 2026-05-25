@@ -9,21 +9,27 @@ import lombok.NonNull;
 public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) {
 
   public @NonNull ItemTemplate render(@NonNull Home home) {
-    var menu = this.config.value().menu();
+    var snap = this.config.value();
+    var menu = snap.menu();
 
     var world = home.world();
     var x = home.x();
     var y = home.y();
     var z = home.z();
 
-    var name = menu.formatItemName(home.name());
-    var lore = menu.renderItemLore(world, x, y, z);
+    var homeName = home.name();
+    var material = home.material();
 
-    return ItemTemplate.builder(home.material())
-        .name(name)
-        .lore(lore)
-        .glow(menu.itemGlow())
-        .italic(false)
-        .build();
+    var name = menu.formatItemName(homeName);
+    var lore = menu.renderItemLore(world, x, y, z);
+    var glow = menu.itemGlow();
+
+    var builder = ItemTemplate.builder(material);
+    builder.name(name);
+    builder.lore(lore);
+    builder.glow(glow);
+    builder.italic(false);
+
+    return builder.build();
   }
 }

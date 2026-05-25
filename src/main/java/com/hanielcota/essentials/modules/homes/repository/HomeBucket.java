@@ -28,7 +28,9 @@ final class HomeBucket {
 
   synchronized Optional<Home> find(@NonNull String name) {
     var homeKey = key(name);
-    return Optional.ofNullable(this.homes.get(homeKey));
+    var home = this.homes.get(homeKey);
+
+    return Optional.ofNullable(home);
   }
 
   synchronized List<Home> list() {
@@ -41,13 +43,16 @@ final class HomeBucket {
   }
 
   synchronized void save(@NonNull Home home) {
-    var homeKey = key(home.name());
+    var homeName = home.name();
+    var homeKey = key(homeName);
+
     this.homes.put(homeKey, home);
   }
 
   synchronized Optional<Home> delete(@NonNull String name) {
     var homeKey = key(name);
     var removed = this.homes.remove(homeKey);
+
     return Optional.ofNullable(removed);
   }
 

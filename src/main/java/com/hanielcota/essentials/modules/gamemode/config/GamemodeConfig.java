@@ -35,19 +35,20 @@ public record GamemodeConfig(
 
   public MessagePair whenUpdated(@NonNull GameMode mode) {
     var displayName = nameOf(mode);
-    return new MessagePair(
-        updated.replace("{gamemode}", displayName),
-        updatedOther.replace("{gamemode}", displayName));
+    var selfText = updated.replace("{gamemode}", displayName);
+    var otherText = updatedOther.replace("{gamemode}", displayName);
+    return new MessagePair(selfText, otherText);
   }
 
   public MessagePair whenAlreadyInMode(@NonNull GameMode mode) {
     var displayName = nameOf(mode);
-    return new MessagePair(
-        alreadyInMode.replace("{gamemode}", displayName),
-        alreadyInModeOther.replace("{gamemode}", displayName));
+    var selfText = alreadyInMode.replace("{gamemode}", displayName);
+    var otherText = alreadyInModeOther.replace("{gamemode}", displayName);
+    return new MessagePair(selfText, otherText);
   }
 
   private String nameOf(@NonNull GameMode mode) {
-    return names.getOrDefault(mode, capitalize(mode.name()));
+    var fallback = capitalize(mode.name());
+    return names.getOrDefault(mode, fallback);
   }
 }

@@ -31,7 +31,12 @@ public final class SpawnStore {
   /** Returns the stored spawn, or empty when {@code /setspawn} has not run yet. */
   public Optional<SpawnLocation> load() {
     var rows = this.sqlExecutor.query(SpawnTable.SELECT, SpawnStore::readRow);
-    return rows.isEmpty() ? Optional.empty() : Optional.of(rows.getFirst());
+    if (rows.isEmpty()) {
+      return Optional.empty();
+    }
+
+    var first = rows.getFirst();
+    return Optional.of(first);
   }
 
   /** Overwrites the stored spawn with {@code location}. */

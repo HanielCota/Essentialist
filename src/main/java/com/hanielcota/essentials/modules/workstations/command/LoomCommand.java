@@ -24,7 +24,10 @@ public final class LoomCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
-    player.openInventory(MenuType.LOOM.create(player));
+    var player = actor.unwrap(Player.class);
+
+    var menu = MenuType.LOOM.create(player);
+
+    player.openInventory(menu);
   }
 }

@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -53,24 +54,29 @@ public final class MaterialPickerMenu implements EssentialsMenu {
 
   @Override
   public void register(@NonNull MenuService menusRef) {
-    var menuSpec = this.config.value().menu();
-    var menuTitle = ComponentUtils.mini(menuSpec.staticPickerTitle());
-    var rows = menuSpec.effectivePickerRows();
+    var snap = this.config.value();
+    var menuSpec = snap.menu();
 
-    var paginationBuilder =
-        PaginationConfig.builder().contentSlots(menuSpec.effectivePickerContentSlots());
+    var titleText = menuSpec.staticPickerTitle();
+    var menuTitle = ComponentUtils.mini(titleText);
+    var rows = menuSpec.effectivePickerRows();
+    var contentSlots = menuSpec.effectivePickerContentSlots();
+
+    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
     if (rows > MIN_ROWS) {
-      PageNavigation.apply(menusRef, paginationBuilder, ID, rows, menuSpec.pickerNavigation());
+      var navigation = menuSpec.pickerNavigation();
+      PageNavigation.apply(menusRef, paginationBuilder, ID, rows, navigation);
     }
     var pagination = paginationBuilder.build();
 
-    MenuFramework.builder(ID, menusRef)
-        .rows(rows)
-        .title(menuTitle)
-        .pagination(pagination)
-        .dynamicContent(this::buildSlots)
-        .build()
-        .register();
+    var builder = MenuFramework.builder(ID, menusRef);
+    builder.rows(rows);
+    builder.title(menuTitle);
+    builder.pagination(pagination);
+    builder.dynamicContent(this::buildSlots);
+
+    var menu = builder.build();
+    menu.register();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
@@ -86,25 +92,36 @@ public final class MaterialPickerMenu implements EssentialsMenu {
 
     for (var icon : icons) {
       var pickedMaterial = icon.material();
-      slots.add(
-          SlotDefinition.of(
-              -1, icon.template(), ctx -> this.clickHandler.pick(ctx, pickedMaterial)));
+      var template = icon.template();
+      ClickHandler onPick = ctx -> this.clickHandler.pick(ctx, pickedMaterial);
+      var slot = SlotDefinition.of(-1, template, onPick);
+
+      slots.add(slot);
     }
 
-    slots.add(backButtonSlot());
+    var backSlot = backButtonSlot();
+    slots.add(backSlot);
 
     return slots;
   }
 
   private @NonNull SlotDefinition backButtonSlot() {
-    var menuSpec = this.config.value().menu();
-    var back =
-        ItemTemplate.builder(menuSpec.pickerBackMaterial())
-            .name(menuSpec.pickerBackName())
-            .lore(menuSpec.pickerBackLore().toArray(String[]::new))
-            .italic(false)
-            .build();
+    var snap = this.config.value();
+    var menuSpec = snap.menu();
 
-    return SlotDefinition.of(menuSpec.effectivePickerBackSlot(), back, this.clickHandler::back);
+    var material = menuSpec.pickerBackMaterial();
+    var name = menuSpec.pickerBackName();
+    var lore = menuSpec.pickerBackLore();
+    var loreArray = lore.toArray(String[]::new);
+
+    var templateBuilder = ItemTemplate.builder(material);
+    templateBuilder.name(name);
+    templateBuilder.lore(loreArray);
+    templateBuilder.italic(false);
+    var template = templateBuilder.build();
+
+    var slot = menuSpec.effectivePickerBackSlot();
+
+    return SlotDefinition.of(slot, template, this.clickHandler::back);
   }
 }

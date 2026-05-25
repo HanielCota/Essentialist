@@ -22,24 +22,33 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
   public void sendPrompt(@NonNull Player target, @NonNull TeleportRequest request) {
     var snap = this.config.value();
     var messages = snap.messages();
-    var requester = request.requester().name();
+
+    var requesterName = request.requester().name();
     var seconds = snap.requestExpiry().toSeconds();
 
     var requestType = request.type();
-    var requestLine = messages.formatRequestReceived(requestType, requester, seconds);
-    var acceptHover = messages.buttonHoverAccept().replace("{player}", requester);
-    var denyHover = messages.buttonHoverDeny().replace("{player}", requester);
+    var requestLine = messages.formatRequestReceived(requestType, requesterName, seconds);
 
-    ClickableMessage.create()
-        .append(requestLine)
-        .newline()
-        .append(
-            messages.buttonAccept(),
-            slot -> slot.runCommand("/tpaccept " + requester).hover(acceptHover))
-        .append("  ")
-        .append(
-            messages.buttonDeny(), slot -> slot.runCommand("/tpdeny " + requester).hover(denyHover))
-        .send(target);
+    var acceptHoverTemplate = messages.buttonHoverAccept();
+    var acceptHover = acceptHoverTemplate.replace("{player}", requesterName);
+
+    var denyHoverTemplate = messages.buttonHoverDeny();
+    var denyHover = denyHoverTemplate.replace("{player}", requesterName);
+
+    var acceptCommand = "/tpaccept " + requesterName;
+    var denyCommand = "/tpdeny " + requesterName;
+
+    var acceptLabel = messages.buttonAccept();
+    var denyLabel = messages.buttonDeny();
+
+    var builder = ClickableMessage.create();
+    builder.append(requestLine);
+    builder.newline();
+    builder.append(acceptLabel, slot -> slot.runCommand(acceptCommand).hover(acceptHover));
+    builder.append("  ");
+    builder.append(denyLabel, slot -> slot.runCommand(denyCommand).hover(denyHover));
+
+    builder.send(target);
   }
 
   public void notifyExpired(@NonNull TeleportRequest request) {
@@ -49,11 +58,14 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
       return;
     }
 
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
+
     var targetName = request.target().name();
     var expiredTemplate = messages.expired();
     var expiredMsg = expiredTemplate.replace("{player}", targetName);
     var expiredComponent = ComponentUtils.mini(expiredMsg);
+
     requester.sendMessage(expiredComponent);
   }
 
@@ -62,17 +74,22 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
   public void notifyPartnerLeft(
       @NonNull TeleportRequest request, @NonNull UUID quitter, @NonNull String quitterName) {
     var requesterId = request.requester().id();
-
     var targetId = request.target().id();
+
     var recipient = requesterId.equals(quitter) ? targetId : requesterId;
+
     var online = Bukkit.getPlayer(recipient);
     if (online == null) {
       return;
     }
 
-    var messages = this.config.value().messages();
-    var partnerLeftMsg = messages.partnerLeft().replace("{player}", quitterName);
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var partnerLeftTemplate = messages.partnerLeft();
+    var partnerLeftMsg = partnerLeftTemplate.replace("{player}", quitterName);
     var partnerLeftComponent = ComponentUtils.mini(partnerLeftMsg);
+
     online.sendMessage(partnerLeftComponent);
   }
 }

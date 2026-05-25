@@ -15,6 +15,8 @@ public final class PingModule extends AbstractModule {
   protected void onEnable() {
     var config = config("ping", PingConfig.class, PingConfig::defaults);
     var service = new PingService(config);
-    registerCommand(new PingCommand(config, service));
+
+    var command = new PingCommand(config, service);
+    registerCommand(command);
   }
 }
