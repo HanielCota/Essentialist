@@ -58,16 +58,23 @@ public record InfoConfig(
   }
 
   public List<Integer> effectiveContentSlots() {
-    return MenuLayouts.sanitizeSlots(contentSlots, effectiveRows());
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlots(contentSlots, rows);
   }
 
   public List<Integer> effectiveDetailSlots() {
-    return MenuLayouts.sanitizeSlots(detailSlots, effectiveRows());
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlots(detailSlots, rows);
   }
 
   public int effectiveBackSlot() {
-    var fallback = MenuLayouts.slotCount(effectiveRows()) - 5;
-    return MenuLayouts.sanitizeSlot(backSlot, effectiveRows(), fallback);
+    var rows = effectiveRows();
+    var slotCount = MenuLayouts.slotCount(rows);
+    var fallback = slotCount - 5;
+
+    return MenuLayouts.sanitizeSlot(backSlot, rows, fallback);
   }
 
   /**
@@ -76,14 +83,20 @@ public record InfoConfig(
    * the icon visible even on a misconfig.
    */
   public int effectiveServerSlot() {
-    return MenuLayouts.sanitizeSlot(serverSlot, effectiveRows(), 11);
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlot(serverSlot, rows, 11);
   }
 
   public int effectivePlayerSlot() {
-    return MenuLayouts.sanitizeSlot(playerSlot, effectiveRows(), 13);
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlot(playerSlot, rows, 13);
   }
 
   public int effectiveAboutSlot() {
-    return MenuLayouts.sanitizeSlot(aboutSlot, effectiveRows(), 15);
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlot(aboutSlot, rows, 15);
   }
 }

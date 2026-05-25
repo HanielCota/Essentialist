@@ -22,8 +22,8 @@ import org.bukkit.entity.Player;
 
 /**
  * Single /info menu with category and detail tabs. Switching tabs re-renders this same inventory
- * via {@link ClickContext#refresh()} â€” it never opens a separate menu, which keeps the
- * framework's navigation history and session intact.
+ * via {@link ClickContext#refresh()} — it never opens a separate menu, which keeps the framework's
+ * navigation history and session intact.
  */
 @RequiredArgsConstructor
 public final class InfoMenu implements EssentialsMenu {
@@ -35,15 +35,24 @@ public final class InfoMenu implements EssentialsMenu {
   private final InfoMenuState state;
 
   private static SlotDefinition entryItem(int slot, @NonNull InfoEntry entry) {
-    var builder = ItemTemplate.builder(entry.icon());
-    builder = builder.name(entry.name());
-    builder = builder.lore(entry.lore().toArray(String[]::new));
+    var icon = entry.icon();
+    var name = entry.name();
+    var lore = entry.lore();
+    var loreArray = lore.toArray(String[]::new);
+    var headOwner = entry.headOwner();
+
+    var builder = ItemTemplate.builder(icon);
+    builder = builder.name(name);
+    builder = builder.lore(loreArray);
     builder = builder.italic(false);
 
-    if (entry.headOwner() != null) {
-      builder.head(entry.headOwner());
+    if (headOwner != null) {
+      builder = builder.head(headOwner);
     }
-    return SlotDefinition.of(slot, builder.build(), click -> {});
+
+    var template = builder.build();
+
+    return SlotDefinition.of(slot, template, click -> {});
   }
 
   @Override
@@ -54,51 +63,85 @@ public final class InfoMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
+    var rows = snap.effectiveRows();
+    var contentSlots = snap.effectiveContentSlots();
+
     var pagBuilder = PaginationConfig.builder();
-    pagBuilder = pagBuilder.contentSlots(snap.effectiveContentSlots());
+    pagBuilder = pagBuilder.contentSlots(contentSlots);
     var pagination = pagBuilder.build();
 
-    var menuTitle = ComponentUtils.mini(snap.menuTitle());
+    var rawTitle = snap.menuTitle();
+    var menuTitle = ComponentUtils.mini(rawTitle);
+
     var menuBuilder = MenuFramework.builder(ID, menus);
-    menuBuilder = menuBuilder.rows(snap.effectiveRows());
+    menuBuilder = menuBuilder.rows(rows);
     menuBuilder = menuBuilder.title(menuTitle);
     menuBuilder = menuBuilder.pagination(pagination);
     menuBuilder = menuBuilder.dynamicContent(this::buildSlots);
+
     var menu = menuBuilder.build();
     menu.register();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
-    InfoTab tab = this.state.tab(player.getUniqueId());
+    var viewerId = player.getUniqueId();
+    var tab = this.state.tab(viewerId);
+
     return switch (tab) {
       case CATEGORIES -> categorySlots();
-      case SERVER -> detailSlots(this.service.serverEntries());
-      case PLAYER -> detailSlots(this.service.playerEntries(this.state.resolveTarget(player)));
-      case ABOUT -> detailSlots(this.service.aboutEntries());
+      case SERVER -> serverSlots();
+      case PLAYER -> playerSlots(player);
+      case ABOUT -> aboutSlots();
     };
+  }
+
+  private List<SlotDefinition> serverSlots() {
+    var entries = this.service.serverEntries();
+
+    return detailSlots(entries);
+  }
+
+  private List<SlotDefinition> aboutSlots() {
+    var entries = this.service.aboutEntries();
+
+    return detailSlots(entries);
+  }
+
+  private List<SlotDefinition> playerSlots(@NonNull Player viewer) {
+    var target = this.state.resolveTarget(viewer);
+    var entries = this.service.playerEntries(target);
+
+    return detailSlots(entries);
   }
 
   private List<SlotDefinition> categorySlots() {
     var snap = this.config.value();
-    return List.of(
+
+    var serverSlot =
         category(
             snap.effectiveServerSlot(),
             snap.serverMaterial(),
             snap.serverName(),
             snap.serverLore(),
-            InfoTab.SERVER),
+            InfoTab.SERVER);
+
+    var playerSlot =
         category(
             snap.effectivePlayerSlot(),
             snap.playerMaterial(),
             snap.playerName(),
             snap.playerLore(),
-            InfoTab.PLAYER),
+            InfoTab.PLAYER);
+
+    var aboutSlot =
         category(
             snap.effectiveAboutSlot(),
             snap.aboutMaterial(),
             snap.aboutName(),
             snap.aboutLore(),
-            InfoTab.ABOUT));
+            InfoTab.ABOUT);
+
+    return List.of(serverSlot, playerSlot, aboutSlot);
   }
 
   private List<SlotDefinition> detailSlots(@NonNull List<InfoEntry> entries) {
@@ -106,20 +149,39 @@ public final class InfoMenu implements EssentialsMenu {
     var detailSlots = snap.effectiveDetailSlots();
     var visibleEntries = Math.min(entries.size(), detailSlots.size());
     var startIdx = (detailSlots.size() - visibleEntries) / 2;
+
     var slots = new ArrayList<SlotDefinition>(visibleEntries + 1);
+
     for (var i = 0; i < visibleEntries; i++) {
-      slots.add(entryItem(detailSlots.get(startIdx + i), entries.get(i)));
+      var targetSlot = detailSlots.get(startIdx + i);
+      var entry = entries.get(i);
+      var slotDef = entryItem(targetSlot, entry);
+
+      slots.add(slotDef);
     }
-    var backBuilder = ItemTemplate.builder(snap.backMaterial());
-    backBuilder = backBuilder.name(snap.backName());
-    var backLoreArray = snap.backLore().toArray(String[]::new);
-    backBuilder = backBuilder.lore(backLoreArray);
-    backBuilder = backBuilder.italic(false);
-    var back = backBuilder.build();
-    slots.add(
-        SlotDefinition.of(
-            snap.effectiveBackSlot(), back, click -> switchTab(click, InfoTab.CATEGORIES)));
+
+    var backSlot = snap.effectiveBackSlot();
+    var backTemplate = buildBackTemplate(snap);
+    var backDef =
+        SlotDefinition.of(backSlot, backTemplate, click -> switchTab(click, InfoTab.CATEGORIES));
+
+    slots.add(backDef);
+
     return slots;
+  }
+
+  private static ItemTemplate buildBackTemplate(@NonNull InfoConfig snap) {
+    var material = snap.backMaterial();
+    var name = snap.backName();
+    var lore = snap.backLore();
+    var loreArray = lore.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(material);
+    builder = builder.name(name);
+    builder = builder.lore(loreArray);
+    builder = builder.italic(false);
+
+    return builder.build();
   }
 
   private SlotDefinition category(
@@ -128,16 +190,23 @@ public final class InfoMenu implements EssentialsMenu {
       @NonNull String name,
       @NonNull List<String> lore,
       @NonNull InfoTab target) {
+    var loreArray = lore.toArray(String[]::new);
+
     var templateBuilder = ItemTemplate.builder(icon);
     templateBuilder = templateBuilder.name(name);
-    templateBuilder = templateBuilder.lore(lore.toArray(String[]::new));
+    templateBuilder = templateBuilder.lore(loreArray);
     templateBuilder = templateBuilder.italic(false);
+
     var template = templateBuilder.build();
+
     return SlotDefinition.of(slot, template, click -> switchTab(click, target));
   }
 
   private void switchTab(@NonNull ClickContext click, @NonNull InfoTab tab) {
-    this.state.switchTab(click.player().getUniqueId(), tab);
+    var viewer = click.player();
+    var viewerId = viewer.getUniqueId();
+
+    this.state.switchTab(viewerId, tab);
     click.refresh();
   }
 }

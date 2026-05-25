@@ -52,16 +52,18 @@ public record GiveConfig(
   }
 
   public String formatAmountTooLarge() {
-    return amountTooLarge.replace("{max}", Integer.toString(maxAmount));
+    var maxStr = Integer.toString(maxAmount);
+
+    return amountTooLarge.replace("{max}", maxStr);
   }
 
   public String formatGivenAll(@NonNull String item, int amount, int count) {
     var amountStr = Integer.toString(amount);
     var countStr = Integer.toString(count);
 
-    return givenAll
-        .replace("{amount}", amountStr)
-        .replace("{item}", item)
-        .replace("{count}", countStr);
+    var withAmount = givenAll.replace("{amount}", amountStr);
+    var withItem = withAmount.replace("{item}", item);
+
+    return withItem.replace("{count}", countStr);
   }
 }

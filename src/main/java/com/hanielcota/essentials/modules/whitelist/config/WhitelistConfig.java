@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.whitelist.config;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.NavigationButtonsConfig;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -91,13 +92,19 @@ public record WhitelistConfig(
     if (menuContentSlots.isEmpty()) {
       var rows = effectiveRows();
       var count = rows > MIN_ROWS ? (rows - 1) * 9 : 9;
+
       return MenuLayouts.fallbackContentSlots(rows, count);
     }
-    return MenuLayouts.sanitizeSlots(menuContentSlots, effectiveRows());
+
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlots(menuContentSlots, rows);
   }
 
   public int effectiveInfoSlot() {
-    return MenuLayouts.sanitizeSlot(infoSlot, effectiveRows(), 10);
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlot(infoSlot, rows, 10);
   }
 
   public String formatItemName(@NonNull String player) {
@@ -106,9 +113,14 @@ public record WhitelistConfig(
 
   /** Item lore with {@code {player}} resolved on every line. */
   public List<String> formatLore(@NonNull String player) {
-    var replaced = itemLore.stream().map(line -> line.replace("{player}", player));
+    var formatted = new ArrayList<String>(itemLore.size());
 
-    return replaced.toList();
+    for (var line : itemLore) {
+      var resolved = line.replace("{player}", player);
+      formatted.add(resolved);
+    }
+
+    return List.copyOf(formatted);
   }
 
   public String formatAdded(@NonNull String player) {

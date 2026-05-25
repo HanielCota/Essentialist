@@ -38,14 +38,21 @@ public record GiveCommand(
 
   private static String fill(
       @NonNull String template, @NonNull String item, int amount, int leftover) {
+    var amountStr = Integer.toString(amount);
+    var leftoverStr = Integer.toString(leftover);
+
     var withItem = template.replace("{item}", item);
-    var withAmount = withItem.replace("{amount}", Integer.toString(amount));
-    return withAmount.replace("{leftover}", Integer.toString(leftover));
+    var withAmount = withItem.replace("{amount}", amountStr);
+
+    return withAmount.replace("{leftover}", leftoverStr);
   }
 
   private static String format(
       @NonNull String template, @NonNull String item, @NonNull GiveResult result) {
-    return fill(template, item, result.given(), result.leftover());
+    var given = result.given();
+    var leftover = result.leftover();
+
+    return fill(template, item, given, leftover);
   }
 
   /**
@@ -61,6 +68,7 @@ public record GiveCommand(
       @Arg("item") Material item,
       @DefaultValue("1") @Min(1) @Arg("quantidade") int amount) {
     var subject = sender.unwrap(Player.class);
+
     deliver(sender, subject, item, amount, true);
   }
 
@@ -74,6 +82,7 @@ public record GiveCommand(
       @Arg("item") Material item,
       @DefaultValue("1") @Min(1) @Arg("quantidade") int amount) {
     var self = Senders.isSelf(sender, subject);
+
     deliver(sender, subject, item, amount, self);
   }
 
@@ -87,24 +96,29 @@ public record GiveCommand(
     var name = subject.getName();
 
     if (!item.isItem()) {
-      sender.sendError(snap.invalidItem());
+      var invalidMsg = snap.invalidItem();
+      sender.sendError(invalidMsg);
       return;
     }
+
     if (amount > snap.maxAmount()) {
-      sender.sendError(snap.formatAmountTooLarge());
+      var tooLargeMsg = snap.formatAmountTooLarge();
+      sender.sendError(tooLargeMsg);
       return;
     }
 
     var result = this.service.giveResult(subject, item, amount);
-    var itemName = item.name().toLowerCase(Locale.ROOT);
+    var rawName = item.name();
+    var itemName = rawName.toLowerCase(Locale.ROOT);
 
     if (result.noneGiven()) {
-      sender.sendError(
-          fill(
-              snap.whenInventoryFull().forSender(self, name),
-              itemName,
-              result.given(),
-              result.leftover()));
+      var fullPair = snap.whenInventoryFull();
+      var fullTemplate = fullPair.forSender(self, name);
+      var given = result.given();
+      var leftover = result.leftover();
+      var fullMsg = fill(fullTemplate, itemName, given, leftover);
+
+      sender.sendError(fullMsg);
       return;
     }
 
@@ -114,13 +128,19 @@ public record GiveCommand(
     }
 
     if (self) {
-      sender.sendSuccess(format(messages.forSender(true, name), itemName, result));
+      var selfTemplate = messages.forSender(true, name);
+      var selfMsg = format(selfTemplate, itemName, result);
+
+      sender.sendSuccess(selfMsg);
       return;
     }
 
     var target = this.framework.actorOf(subject);
-    var selfMessage = format(messages.forSender(false, name), itemName, result);
-    var targetMessage = format(messages.forTarget(name), itemName, result);
+    var senderTemplate = messages.forSender(false, name);
+    var targetTemplate = messages.forTarget(name);
+    var selfMessage = format(senderTemplate, itemName, result);
+    var targetMessage = format(targetTemplate, itemName, result);
+
     sender.sendDualMessage(target, selfMessage, targetMessage);
   }
 
@@ -135,37 +155,61 @@ public record GiveCommand(
     var snap = this.config.value();
 
     if (!item.isItem()) {
-      sender.sendError(snap.invalidItem());
+      var invalidMsg = snap.invalidItem();
+      sender.sendError(invalidMsg);
       return;
     }
 
     if (amount > snap.maxAmount()) {
-      sender.sendError(snap.formatAmountTooLarge());
+      var tooLargeMsg = snap.formatAmountTooLarge();
+      sender.sendError(tooLargeMsg);
       return;
     }
 
-    var itemName = item.name().toLowerCase(Locale.ROOT);
+    var rawName = item.name();
+    var itemName = rawName.toLowerCase(Locale.ROOT);
+    var allPlayers = this.players.all();
     var count = 0;
 
-    for (var player : this.players.all()) {
-      var result = this.service.giveResult(player, item, amount);
-      var recipient = this.framework.actorOf(player);
-
-      if (result.noneGiven()) {
-        recipient.sendError(
-            format(snap.whenInventoryFull().forTarget(player.getName()), itemName, result));
-        continue;
+    for (var player : allPlayers) {
+      var delivered = deliverToOne(player, item, amount, itemName, snap);
+      if (delivered) {
+        count++;
       }
-
-      count++;
-      var messages = snap.whenGiven();
-      if (result.partial()) {
-        messages = snap.whenPartial();
-      }
-      recipient.sendSuccess(format(messages.forTarget(player.getName()), itemName, result));
     }
 
     var givenAllMsg = snap.formatGivenAll(itemName, amount, count);
     sender.sendSuccess(givenAllMsg);
+  }
+
+  private boolean deliverToOne(
+      @NonNull Player player,
+      @NonNull Material item,
+      int amount,
+      @NonNull String itemName,
+      @NonNull GiveConfig snap) {
+    var result = this.service.giveResult(player, item, amount);
+    var recipient = this.framework.actorOf(player);
+    var name = player.getName();
+
+    if (result.noneGiven()) {
+      var fullPair = snap.whenInventoryFull();
+      var fullTemplate = fullPair.forTarget(name);
+      var fullMsg = format(fullTemplate, itemName, result);
+
+      recipient.sendError(fullMsg);
+      return false;
+    }
+
+    var messages = snap.whenGiven();
+    if (result.partial()) {
+      messages = snap.whenPartial();
+    }
+
+    var template = messages.forTarget(name);
+    var givenMsg = format(template, itemName, result);
+
+    recipient.sendSuccess(givenMsg);
+    return true;
   }
 }

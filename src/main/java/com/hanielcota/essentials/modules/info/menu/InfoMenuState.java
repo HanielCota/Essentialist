@@ -14,7 +14,10 @@ public final class InfoMenuState {
 
   public void prepare(@NonNull UUID viewer, @NonNull UUID target) {
     this.playerTarget.put(viewer, target);
-    this.openTab.put(viewer, viewer.equals(target) ? InfoTab.CATEGORIES : InfoTab.PLAYER);
+
+    var initialTab = viewer.equals(target) ? InfoTab.CATEGORIES : InfoTab.PLAYER;
+
+    this.openTab.put(viewer, initialTab);
   }
 
   public InfoTab tab(@NonNull UUID viewer) {
@@ -26,9 +29,15 @@ public final class InfoMenuState {
   }
 
   public Player resolveTarget(@NonNull Player viewer) {
-    UUID targetId = this.playerTarget.getOrDefault(viewer.getUniqueId(), viewer.getUniqueId());
-    Player target = Bukkit.getPlayer(targetId);
-    return target != null ? target : viewer;
+    var viewerId = viewer.getUniqueId();
+    var targetId = this.playerTarget.getOrDefault(viewerId, viewerId);
+    var target = Bukkit.getPlayer(targetId);
+
+    if (target != null) {
+      return target;
+    }
+
+    return viewer;
   }
 
   public void clear(@NonNull UUID viewer) {

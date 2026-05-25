@@ -14,37 +14,60 @@ public final class ServerInfoEntries {
   private static final String GRAY = "<gray>";
 
   private static String formattedTps() {
-    var tps = Math.min(20.0, Bukkit.getTPS()[0]);
+    var rawTps = Bukkit.getTPS()[0];
+    var tps = Math.min(20.0, rawTps);
+
     return String.format(Locale.US, "%.2f", tps);
   }
 
   private static String formattedUptime() {
     var runtimeMx = ManagementFactory.getRuntimeMXBean();
-    var uptime = Duration.ofMillis(runtimeMx.getUptime());
+    var uptimeMs = runtimeMx.getUptime();
+    var uptime = Duration.ofMillis(uptimeMs);
+
     return DurationFormatter.format(uptime);
   }
 
   private static String formattedMemory() {
     var runtime = Runtime.getRuntime();
-    var usedMb = (runtime.totalMemory() - runtime.freeMemory()) / BYTES_PER_MB;
-    var maxMb = runtime.maxMemory() / BYTES_PER_MB;
+    var totalBytes = runtime.totalMemory();
+    var freeBytes = runtime.freeMemory();
+    var maxBytes = runtime.maxMemory();
+
+    var usedMb = (totalBytes - freeBytes) / BYTES_PER_MB;
+    var maxMb = maxBytes / BYTES_PER_MB;
 
     return usedMb + " MB <dark_gray>/ <gray>" + maxMb + " MB";
   }
 
   public List<InfoEntry> entries() {
-    var onlineCount = Bukkit.getOnlinePlayers().size();
+    var onlinePlayers = Bukkit.getOnlinePlayers();
+    var onlineCount = onlinePlayers.size();
     var maxPlayers = Bukkit.getMaxPlayers();
     var playerFormat = onlineCount + " <dark_gray>/ <gray>" + maxPlayers;
 
-    var worldCount = Bukkit.getWorlds().size();
+    var worlds = Bukkit.getWorlds();
+    var worldCount = worlds.size();
 
-    return List.of(
-        InfoEntry.of(Material.CLOCK, "<yellow>TPS", GRAY + formattedTps()),
-        InfoEntry.of(Material.PLAYER_HEAD, "<yellow>Jogadores online", GRAY + playerFormat),
-        InfoEntry.of(Material.NAME_TAG, "<yellow>Versão", GRAY + Bukkit.getVersion()),
-        InfoEntry.of(Material.COMPARATOR, "<yellow>Tempo ligado", GRAY + formattedUptime()),
-        InfoEntry.of(Material.REDSTONE, "<yellow>Memória", GRAY + formattedMemory()),
-        InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Mundos", GRAY + worldCount + " carregado(s)"));
+    var version = Bukkit.getVersion();
+    var tps = formattedTps();
+    var uptime = formattedUptime();
+    var memory = formattedMemory();
+
+    var tpsLore = GRAY + tps;
+    var playersLore = GRAY + playerFormat;
+    var versionLore = GRAY + version;
+    var uptimeLore = GRAY + uptime;
+    var memoryLore = GRAY + memory;
+    var worldsLore = GRAY + worldCount + " carregado(s)";
+
+    var tpsEntry = InfoEntry.of(Material.CLOCK, "<yellow>TPS", tpsLore);
+    var playersEntry = InfoEntry.of(Material.PLAYER_HEAD, "<yellow>Jogadores online", playersLore);
+    var versionEntry = InfoEntry.of(Material.NAME_TAG, "<yellow>Versão", versionLore);
+    var uptimeEntry = InfoEntry.of(Material.COMPARATOR, "<yellow>Tempo ligado", uptimeLore);
+    var memoryEntry = InfoEntry.of(Material.REDSTONE, "<yellow>Memória", memoryLore);
+    var worldsEntry = InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Mundos", worldsLore);
+
+    return List.of(tpsEntry, playersEntry, versionEntry, uptimeEntry, memoryEntry, worldsEntry);
   }
 }
