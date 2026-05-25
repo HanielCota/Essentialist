@@ -72,8 +72,8 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     var pitch = location.getPitch();
     var createdAt = System.currentTimeMillis();
 
-    Runnable insertAndTrim = () -> writeEntry(playerId, worldName, x, y, z, yaw, pitch, createdAt);
-    this.writer.submit("push", insertAndTrim);
+    Runnable pushTask = () -> writeEntry(playerId, worldName, x, y, z, yaw, pitch, createdAt);
+    this.writer.submit("push", pushTask);
   }
 
   private void writeEntry(
