@@ -13,7 +13,7 @@ import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnJoinListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnRespawnListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnVoidListener;
-import com.hanielcota.essentials.modules.spawn.repository.SpawnStore;
+import com.hanielcota.essentials.modules.spawn.repository.SpawnRepository;
 import com.hanielcota.essentials.modules.spawn.repository.SpawnTable;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
@@ -23,10 +23,10 @@ import lombok.NonNull;
 /**
  * Server spawn point and the {@code /spawn} / {@code /setspawn} commands.
  *
- * <p>Persists the single spawn point in SQLite via {@link SpawnStore}; the SQL write is queued on
- * an {@link com.hanielcota.essentials.database.AsyncDatabaseWriter AsyncDatabaseWriter} so {@code
- * /setspawn} returns immediately. Warm-up and damage cancel logic comes from the shared {@link
- * DelayedTeleport} service registered by the {@code teleport} module.
+ * <p>Persists the single spawn point in SQLite via {@link SpawnRepository}; the SQL write is queued
+ * on an {@link com.hanielcota.essentials.database.AsyncDatabaseWriter AsyncDatabaseWriter} so
+ * {@code /setspawn} returns immediately. Warm-up and damage cancel logic comes from the shared
+ * {@link DelayedTeleport} service registered by the {@code teleport} module.
  */
 public final class SpawnModule extends AbstractModule {
 
@@ -42,7 +42,7 @@ public final class SpawnModule extends AbstractModule {
     var table = new SpawnTable(dialect);
     table.install(executor);
 
-    var store = new SpawnStore(executor, table);
+    var store = new SpawnRepository(executor, table);
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-Spawn");
     registrar.closeable(writer);
 

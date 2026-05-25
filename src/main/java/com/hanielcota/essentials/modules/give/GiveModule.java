@@ -8,8 +8,8 @@ import com.hanielcota.essentials.modules.give.command.GiveNotifier;
 import com.hanielcota.essentials.modules.give.command.GiveOrchestrator;
 import com.hanielcota.essentials.modules.give.config.GiveConfig;
 import com.hanielcota.essentials.modules.give.service.GiveService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 
 public final class GiveModule extends AbstractModule {
@@ -23,8 +23,8 @@ public final class GiveModule extends AbstractModule {
     var giveService = new GiveService();
     var config = registrar.configure("give", GiveConfig.class, GiveConfig::defaults, giveService);
     var playerProvider = env.service(PlayerProvider.class);
-    var framework = env.service(PaperCommandFramework.class);
-    var notifier = new GiveNotifier(config, framework);
+    var actors = env.service(ActorFactory.class);
+    var notifier = new GiveNotifier(config, actors);
     var orchestrator = new GiveOrchestrator(config, giveService, notifier);
     var giveCommand = new GiveCommand(orchestrator, playerProvider);
     registrar.command(giveCommand);

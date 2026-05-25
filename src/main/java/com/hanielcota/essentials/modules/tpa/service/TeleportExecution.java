@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
-import com.hanielcota.essentials.modules.tpa.model.Destination;
+import com.hanielcota.essentials.modules.tpa.domain.Destination;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 

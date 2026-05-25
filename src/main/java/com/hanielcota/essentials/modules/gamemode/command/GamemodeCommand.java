@@ -4,6 +4,7 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.gamemode.config.GamemodeConfig;
 import com.hanielcota.essentials.modules.gamemode.service.GamemodeService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -15,7 +16,6 @@ import io.github.hanielcota.commandframework.annotation.PermissionTemplate;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 @Description("Altera o modo de jogo do jogador.")
 @Syntax("/gamemode <modo> [jogador]")
 public record GamemodeCommand(
-    ConfigHandle<GamemodeConfig> config, GamemodeService service, PaperCommandFramework framework) {
+    ConfigHandle<GamemodeConfig> config, GamemodeService service, ActorFactory actors) {
 
   @DefaultSubcommand
   public void execute(
@@ -46,7 +46,7 @@ public record GamemodeCommand(
     }
 
     var messages = snap.whenUpdated(mode);
-    var target = this.framework.actorOf(subject);
+    var target = this.actors.actorOf(subject);
     var selfMessage = messages.forSender(self, name);
     var targetMessage = messages.forTarget(name);
 

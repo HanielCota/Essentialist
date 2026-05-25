@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.core.api;
 
 import com.hanielcota.essentials.api.MutesApi;
-import com.hanielcota.essentials.modules.mute.model.Mute;
+import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import java.util.Optional;
 import java.util.UUID;

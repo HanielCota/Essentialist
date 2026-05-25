@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
+import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
 import java.time.Duration;
@@ -10,9 +11,9 @@ import lombok.RequiredArgsConstructor;
  * Drives request expiry.
  *
  * <p>Sole responsibility: once a second, hand every request that has outlived its deadline to
- * {@link TeleportRequestService#expire}. One shared timer sweeps the whole {@link RequestStore} â€”
- * never one delayed task per request â€” so spamming {@code /tpa} cannot pile up scheduler work.
- * Holds no request state of its own.
+ * {@link TeleportRequestService#expire}. One shared timer sweeps the whole {@link
+ * RequestRepository} â€” never one delayed task per request â€” so spamming {@code /tpa} cannot
+ * pile up scheduler work. Holds no request state of its own.
  */
 @RequiredArgsConstructor
 public final class TeleportRequestExpiry {
@@ -20,7 +21,7 @@ public final class TeleportRequestExpiry {
   private static final Duration INTERVAL = Duration.ofSeconds(1);
 
   private final Scheduler scheduler;
-  private final RequestStore store;
+  private final RequestRepository store;
   private final TeleportRequestService service;
 
   private Task task;

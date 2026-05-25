@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.BiPredicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -63,14 +64,18 @@ public final class NearService {
       }
 
       var distance = (int) Math.round(Math.sqrt(distanceSquared));
-      var nearby = new Nearby(other, distance);
+      var nearby = new Nearby(other.getUniqueId(), other.getName(), distance);
       matches.add(nearby);
     }
     return matches;
   }
 
-  /** A nearby player and the rounded block distance from the search center. */
-  public record Nearby(Player player, int distance) {
+  /**
+   * Snapshot of a nearby player. Carries {@link UUID} + name rather than {@link Player} so the
+   * record stays valid past the originating tick — Bukkit's {@code Player} reference goes stale on
+   * disconnect.
+   */
+  public record Nearby(UUID id, String name, int distance) {
     public Nearby {}
   }
 }

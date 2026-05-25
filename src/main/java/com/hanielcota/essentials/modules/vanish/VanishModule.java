@@ -15,9 +15,9 @@ import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 
 public final class VanishModule extends AbstractModule {
@@ -54,9 +54,9 @@ public final class VanishModule extends AbstractModule {
     var menu = new VanishMenu(config, this.service, renderer, clickHandler, this.players);
     registrar.menu(menu);
 
-    var framework = env.service(PaperCommandFramework.class);
+    var actors = env.service(ActorFactory.class);
     var menus = env.service(MenuService.class);
-    var command = new VanishCommand(config, transitions, framework, menus);
+    var command = new VanishCommand(config, transitions, actors, menus);
     registrar.command(command);
   }
 

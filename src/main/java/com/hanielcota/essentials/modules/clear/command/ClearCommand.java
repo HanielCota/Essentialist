@@ -4,6 +4,7 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.clear.config.ClearConfig;
 import com.hanielcota.essentials.modules.clear.service.ClearService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Confirm;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -14,7 +15,6 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 @Description("Limpa o inventário do jogador.")
 @Syntax("/limpar [jogador]")
 public record ClearCommand(
-    ConfigHandle<ClearConfig> config, ClearService service, PaperCommandFramework framework) {
+    ConfigHandle<ClearConfig> config, ClearService service, ActorFactory actors) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
@@ -45,7 +45,7 @@ public record ClearCommand(
 
     var messages = snap.whenCleared();
     var count = Integer.toString(removed);
-    var target = this.framework.actorOf(subject);
+    var target = this.actors.actorOf(subject);
 
     var selfBase = messages.forSender(self, name);
     var selfMessage = selfBase.replace("{count}", count);

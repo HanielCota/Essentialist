@@ -6,7 +6,7 @@ import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.gamemode.command.GamemodeCommand;
 import com.hanielcota.essentials.modules.gamemode.config.GamemodeConfig;
 import com.hanielcota.essentials.modules.gamemode.service.GamemodeService;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import com.hanielcota.essentials.paper.ActorFactory;
 import lombok.NonNull;
 
 public final class GamemodeModule extends AbstractModule {
@@ -22,8 +22,8 @@ public final class GamemodeModule extends AbstractModule {
         registrar.configure(
             "gamemode", GamemodeConfig.class, GamemodeConfig::defaults, gamemodeService);
 
-    var framework = env.service(PaperCommandFramework.class);
-    var gamemodeCommand = new GamemodeCommand(config, gamemodeService, framework);
+    var actors = env.service(ActorFactory.class);
+    var gamemodeCommand = new GamemodeCommand(config, gamemodeService, actors);
 
     registrar.command(gamemodeCommand);
   }

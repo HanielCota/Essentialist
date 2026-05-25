@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.msg.service;
 
+import com.hanielcota.essentials.modules.msg.command.MsgNotifier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;

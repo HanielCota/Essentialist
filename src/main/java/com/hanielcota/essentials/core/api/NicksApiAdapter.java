@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.core.api;
 
 import com.hanielcota.essentials.api.NicksApi;
-import com.hanielcota.essentials.modules.nick.model.NickEntry;
+import com.hanielcota.essentials.modules.nick.domain.NickEntry;
 import com.hanielcota.essentials.modules.nick.service.NickService;
 import java.util.Optional;
 import java.util.UUID;

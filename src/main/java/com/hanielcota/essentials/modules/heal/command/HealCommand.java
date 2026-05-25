@@ -5,6 +5,7 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.heal.config.HealConfig;
 import com.hanielcota.essentials.modules.heal.service.HealService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -16,7 +17,6 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -29,7 +29,7 @@ public record HealCommand(
     ConfigHandle<HealConfig> config,
     HealService service,
     PlayerProvider players,
-    PaperCommandFramework framework) {
+    ActorFactory actors) {
 
   @DefaultSubcommand
   @PermissionForOther(".others")
@@ -53,7 +53,7 @@ public record HealCommand(
     }
 
     var messages = snap.whenHealed();
-    DualReply.send(sender, subject, this.framework, messages);
+    DualReply.send(sender, subject, this.actors, messages);
   }
 
   @Subcommand("todos")

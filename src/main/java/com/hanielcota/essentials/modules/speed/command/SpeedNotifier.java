@@ -2,8 +2,8 @@ package com.hanielcota.essentials.modules.speed.command;
 
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.MessagePair;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -15,13 +15,13 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public final class SpeedNotifier {
 
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
 
   public void announce(
       @NonNull CommandActor sender, @NonNull Player subject, @NonNull MessagePair messages) {
     var name = subject.getName();
     var isSelf = Senders.isSelf(sender, subject);
-    var target = this.framework.actorOf(subject);
+    var target = this.actors.actorOf(subject);
 
     var senderMsg = messages.forSender(isSelf, name);
     var targetMsg = messages.forTarget(name);

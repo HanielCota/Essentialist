@@ -6,8 +6,8 @@ import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.heal.command.HealCommand;
 import com.hanielcota.essentials.modules.heal.config.HealConfig;
 import com.hanielcota.essentials.modules.heal.service.HealService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 
 public final class HealModule extends AbstractModule {
@@ -22,9 +22,9 @@ public final class HealModule extends AbstractModule {
     var config = registrar.configure("heal", HealConfig.class, HealConfig::defaults, heal);
 
     var players = env.service(PlayerProvider.class);
-    var framework = env.service(PaperCommandFramework.class);
+    var actors = env.service(ActorFactory.class);
 
-    var command = new HealCommand(config, heal, players, framework);
+    var command = new HealCommand(config, heal, players, actors);
     registrar.command(command);
   }
 }

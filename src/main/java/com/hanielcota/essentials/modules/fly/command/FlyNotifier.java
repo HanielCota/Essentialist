@@ -4,8 +4,8 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.fly.config.FlyConfig;
 import com.hanielcota.essentials.modules.fly.service.FlyService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 public final class FlyNotifier {
 
   private final ConfigHandle<FlyConfig> config;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
 
   public void announce(
       @NonNull CommandActor sender, @NonNull Player subject, @NonNull FlyService.Result result) {
@@ -35,7 +35,7 @@ public final class FlyNotifier {
 
     var enabled = result == FlyService.Result.ENABLED;
     var messages = snap.toggle(enabled);
-    var target = this.framework.actorOf(subject);
+    var target = this.actors.actorOf(subject);
 
     var senderMsg = messages.forSender(self, name);
     var targetMsg = messages.forTarget(name);

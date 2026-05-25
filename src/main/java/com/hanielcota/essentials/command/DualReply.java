@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.command;
 
 import com.hanielcota.essentials.config.MessagePair;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
  * single action onto two messages (one for the actor, a separate one for the affected player).
  *
  * <p>Resolves the self-target flag through {@link Senders}, formats both messages from {@link
- * MessagePair}, wraps the subject as a {@link CommandActor} and emits in one call. Replaces the
- * four-line copy that was duplicated across every action command.
+ * MessagePair}, wraps the subject as a {@link CommandActor} via {@link ActorFactory} and emits in
+ * one call. Replaces the four-line copy that was duplicated across every action command.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DualReply {
@@ -26,11 +26,11 @@ public final class DualReply {
   public static void send(
       @NonNull CommandActor sender,
       @NonNull Player subject,
-      @NonNull PaperCommandFramework framework,
+      @NonNull ActorFactory actors,
       @NonNull MessagePair messages) {
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
-    var target = framework.actorOf(subject);
+    var target = actors.actorOf(subject);
 
     var senderMsg = messages.forSender(self, name);
     var targetMsg = messages.forTarget(name);

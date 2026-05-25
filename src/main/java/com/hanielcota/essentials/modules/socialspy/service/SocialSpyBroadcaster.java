@@ -2,8 +2,8 @@ package com.hanielcota.essentials.modules.socialspy.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.socialspy.config.SocialSpyConfig;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public final class SocialSpyBroadcaster {
   private final ConfigHandle<SocialSpyConfig> config;
   private final SocialSpyService service;
   private final PlayerProvider players;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
 
   public void broadcast(
       @NonNull UUID senderId,
@@ -44,7 +44,7 @@ public final class SocialSpyBroadcaster {
       if (spy == null) {
         continue;
       }
-      var actor = this.framework.actorOf(spy);
+      var actor = this.actors.actorOf(spy);
       actor.sendMessage(line);
     }
   }

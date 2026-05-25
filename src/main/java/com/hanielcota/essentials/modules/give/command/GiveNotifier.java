@@ -2,9 +2,9 @@ package com.hanielcota.essentials.modules.give.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.give.config.GiveConfig;
-import com.hanielcota.essentials.modules.give.model.GiveResult;
+import com.hanielcota.essentials.modules.give.domain.GiveResult;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Locale;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 public final class GiveNotifier {
 
   private final ConfigHandle<GiveConfig> config;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
 
   private static String displayName(@NonNull Material item) {
     var rawName = item.name();
@@ -90,7 +90,7 @@ public final class GiveNotifier {
     var targetTemplate = messages.forTarget(name);
     var senderMsg = format(senderTemplate, itemName, result);
     var targetMsg = format(targetTemplate, itemName, result);
-    var targetActor = this.framework.actorOf(subject);
+    var targetActor = this.actors.actorOf(subject);
 
     sender.sendDualMessage(targetActor, senderMsg, targetMsg);
   }
@@ -101,7 +101,7 @@ public final class GiveNotifier {
     var snap = this.config.value();
     var itemName = displayName(item);
     var name = recipient.getName();
-    var recipientActor = this.framework.actorOf(recipient);
+    var recipientActor = this.actors.actorOf(recipient);
 
     if (result.noneGiven()) {
       var fullPair = snap.whenInventoryFull();

@@ -6,7 +6,7 @@ import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.clear.command.ClearCommand;
 import com.hanielcota.essentials.modules.clear.config.ClearConfig;
 import com.hanielcota.essentials.modules.clear.service.ClearService;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import com.hanielcota.essentials.paper.ActorFactory;
 import lombok.NonNull;
 
 public final class ClearModule extends AbstractModule {
@@ -23,9 +23,9 @@ public final class ClearModule extends AbstractModule {
     var configHandle =
         registrar.configure("clear", ClearConfig.class, () -> defaultValues, clearService);
 
-    var commandFramework = env.service(PaperCommandFramework.class);
+    var actors = env.service(ActorFactory.class);
 
-    var clearCommand = new ClearCommand(configHandle, clearService, commandFramework);
+    var clearCommand = new ClearCommand(configHandle, clearService, actors);
     registrar.command(clearCommand);
   }
 }

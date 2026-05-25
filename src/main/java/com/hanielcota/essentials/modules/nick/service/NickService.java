@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.nick.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.modules.nick.model.NickEntry;
-import com.hanielcota.essentials.modules.nick.repository.NickStore;
+import com.hanielcota.essentials.modules.nick.domain.NickEntry;
+import com.hanielcota.essentials.modules.nick.repository.NickRepository;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -12,7 +12,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * In-memory registry of nickname assignments backed by {@link NickStore}.
+ * In-memory registry of nickname assignments backed by {@link NickRepository}.
  *
  * <p>Holds two caches: id → entry for forward lookups, and lower-cased nickname → id for /realname
  * reverse lookups. Both are mutated together so they cannot diverge.
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class NickService {
 
-  private final NickStore store;
+  private final NickRepository store;
   private final AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, NickEntry> byId = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, UUID> idByLowerNick = new ConcurrentHashMap<>();

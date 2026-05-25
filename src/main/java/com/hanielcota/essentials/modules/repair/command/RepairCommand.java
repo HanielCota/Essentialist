@@ -5,6 +5,7 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
 import com.hanielcota.essentials.modules.repair.service.RepairService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -15,7 +16,6 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 @Description("Repara o item na mão ou o inventário inteiro.")
 @Syntax("/reparar [jogador] | /reparar tudo [jogador]")
 public record RepairCommand(
-    ConfigHandle<RepairConfig> config, RepairService service, PaperCommandFramework framework) {
+    ConfigHandle<RepairConfig> config, RepairService service, ActorFactory actors) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
@@ -48,7 +48,7 @@ public record RepairCommand(
       }
       case REPAIRED -> {
         var messages = snap.whenHandRepaired();
-        DualReply.send(sender, subject, this.framework, messages);
+        DualReply.send(sender, subject, this.actors, messages);
       }
     }
   }
@@ -69,7 +69,7 @@ public record RepairCommand(
 
     var messages = snap.whenAllRepaired();
     var count = Integer.toString(repaired);
-    var target = this.framework.actorOf(subject);
+    var target = this.actors.actorOf(subject);
     var selfBase = messages.forSender(self, name);
     var selfMessage = selfBase.replace("{count}", count);
     var targetBase = messages.forTarget(name);

@@ -4,7 +4,7 @@ import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import com.hanielcota.essentials.paper.ActorFactory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.inventory.ClickType;
@@ -19,7 +19,7 @@ import org.bukkit.event.inventory.ClickType;
 public final class HomeClickHandler {
 
   private final HomeTeleporter teleporter;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
   private final HomesActionTarget target;
   private final HomeRenameOrchestrator rename;
 
@@ -47,7 +47,7 @@ public final class HomeClickHandler {
 
     click.close();
 
-    var actor = this.framework.actorOf(player);
+    var actor = this.actors.actorOf(player);
     this.teleporter.teleport(player, home, actor);
   }
 

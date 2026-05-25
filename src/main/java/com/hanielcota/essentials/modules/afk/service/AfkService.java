@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.afk.service;
 
-import com.hanielcota.essentials.modules.afk.model.AfkState;
+import com.hanielcota.essentials.modules.afk.domain.AfkState;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

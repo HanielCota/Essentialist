@@ -5,6 +5,7 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.feed.config.FeedConfig;
 import com.hanielcota.essentials.modules.feed.service.FeedService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -16,7 +17,6 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -29,7 +29,7 @@ public record FeedCommand(
     ConfigHandle<FeedConfig> config,
     FeedService service,
     PlayerProvider players,
-    PaperCommandFramework framework) {
+    ActorFactory actors) {
 
   @DefaultSubcommand
   @PermissionForOther(".others")
@@ -46,7 +46,7 @@ public record FeedCommand(
     }
 
     var messages = snap.whenFed();
-    DualReply.send(sender, subject, this.framework, messages);
+    DualReply.send(sender, subject, this.actors, messages);
   }
 
   @Subcommand("todos")

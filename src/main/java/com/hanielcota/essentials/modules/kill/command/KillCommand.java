@@ -4,6 +4,7 @@ import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kill.config.KillConfig;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Confirm;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -14,7 +15,6 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 @Confirm(duration = "3s")
 @Description("Mata o jogador.")
 @Syntax("/matar [jogador]")
-public record KillCommand(ConfigHandle<KillConfig> config, PaperCommandFramework framework) {
+public record KillCommand(ConfigHandle<KillConfig> config, ActorFactory actors) {
 
   private static final String EXEMPT_PERMISSION = "essentials.kill.exempt";
 
@@ -53,6 +53,6 @@ public record KillCommand(ConfigHandle<KillConfig> config, PaperCommandFramework
     subject.setHealth(0);
 
     var messages = snap.whenKilled();
-    DualReply.send(sender, subject, this.framework, messages);
+    DualReply.send(sender, subject, this.actors, messages);
   }
 }

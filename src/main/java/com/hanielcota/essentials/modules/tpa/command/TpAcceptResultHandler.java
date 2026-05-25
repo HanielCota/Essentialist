@@ -3,11 +3,11 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 public final class TpAcceptResultHandler {
 
   private final ConfigHandle<TpaConfig> config;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
   private final PlayerProvider players;
 
   public void handleClaim(
@@ -57,7 +57,7 @@ public final class TpAcceptResultHandler {
     actor.sendSuccess(acceptedMsg);
 
     var acceptedTemplate = messages.accepted();
-    TpaRequests.replyRequester(this.framework, this.players, request, acceptedTemplate, true);
+    TpaRequests.replyRequester(this.actors, this.players, request, acceptedTemplate, true);
   }
 
   private void notifyRequesterOffline(
