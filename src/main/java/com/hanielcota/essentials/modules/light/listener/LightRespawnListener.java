@@ -26,6 +26,8 @@ public final class LightRespawnListener implements Listener {
     if (!this.service.isEnabled(player)) {
       return;
     }
-    this.scheduler.runOnEntity(player, () -> this.service.reapply(player));
+
+    Runnable reapply = () -> this.service.reapply(player);
+    this.scheduler.runOnEntity(player, reapply);
   }
 }

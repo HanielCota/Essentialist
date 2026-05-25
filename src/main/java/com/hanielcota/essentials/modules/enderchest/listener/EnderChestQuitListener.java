@@ -18,9 +18,14 @@ public final class EnderChestQuitListener implements Listener {
 
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
-    var enderChest = event.getPlayer().getEnderChest();
+    var player = event.getPlayer();
+    var enderChest = player.getEnderChest();
+
     // Copy first — closeInventory mutates the viewer list while we iterate.
-    for (var viewer : new ArrayList<>(enderChest.getViewers())) {
+    var liveViewers = enderChest.getViewers();
+    var viewers = new ArrayList<>(liveViewers);
+
+    for (var viewer : viewers) {
       viewer.closeInventory();
     }
   }

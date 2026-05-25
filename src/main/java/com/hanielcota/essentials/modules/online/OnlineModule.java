@@ -7,7 +7,9 @@ import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.function.ToIntFunction;
+import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public final class OnlineModule extends AbstractModule {
 
@@ -18,7 +20,10 @@ public final class OnlineModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("online", OnlineConfig.class, OnlineConfig::defaults);
-    registerCommand(new OnlineCommand(config, visibleCount()));
+    var visibleCount = visibleCount();
+    var command = new OnlineCommand(config, visibleCount);
+
+    registerCommand(command);
   }
 
   /**
@@ -30,18 +35,34 @@ public final class OnlineModule extends AbstractModule {
   private ToIntFunction<CommandActor> visibleCount() {
     var registry = context().services();
     return actor -> {
-      var online = Bukkit.getOnlinePlayers();
       var vanish = registry.find(VanishService.class).orElse(null);
-      if (vanish == null || actor.hasPermission(VanishVisibilityApplier.SEE_PERMISSION)) {
-        return online.size();
-      }
-      var count = 0;
-      for (var player : online) {
-        if (!vanish.isVanished(player.getUniqueId())) {
-          count++;
-        }
-      }
-      return count;
+      return countFor(vanish, actor);
     };
+  }
+
+  private static int countFor(VanishService vanish, @NonNull CommandActor actor) {
+    var online = Bukkit.getOnlinePlayers();
+
+    if (vanish == null) {
+      return online.size();
+    }
+    if (actor.hasPermission(VanishVisibilityApplier.SEE_PERMISSION)) {
+      return online.size();
+    }
+
+    return countVisible(online, vanish);
+  }
+
+  private static int countVisible(
+      @NonNull Iterable<? extends Player> online, @NonNull VanishService vanish) {
+    var count = 0;
+    for (var player : online) {
+      var playerId = player.getUniqueId();
+      if (vanish.isVanished(playerId)) {
+        continue;
+      }
+      count++;
+    }
+    return count;
   }
 }

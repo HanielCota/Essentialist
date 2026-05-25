@@ -23,13 +23,18 @@ public final class LightMilkListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onConsume(@NonNull PlayerItemConsumeEvent event) {
-    if (event.getItem().getType() != Material.MILK_BUCKET) {
+    var item = event.getItem();
+    var type = item.getType();
+    if (type != Material.MILK_BUCKET) {
       return;
     }
+
     var player = event.getPlayer();
     if (!this.service.isEnabled(player)) {
       return;
     }
-    this.scheduler.runOnEntity(player, () -> this.service.reapply(player));
+
+    Runnable reapply = () -> this.service.reapply(player);
+    this.scheduler.runOnEntity(player, reapply);
   }
 }

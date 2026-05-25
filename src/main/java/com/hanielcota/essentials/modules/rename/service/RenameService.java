@@ -8,9 +8,11 @@ import org.jspecify.annotations.Nullable;
 public final class RenameService {
 
   public Result rename(@NonNull Player player, @Nullable Component name) {
+    var inv = player.getInventory();
+    var held = inv.getItemInMainHand();
+    var type = held.getType();
 
-    var held = player.getInventory().getItemInMainHand();
-    if (held.getType().isAir()) {
+    if (type.isAir()) {
       return Result.EMPTY_HAND;
     }
 

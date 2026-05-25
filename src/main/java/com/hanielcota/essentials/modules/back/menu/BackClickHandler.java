@@ -5,6 +5,8 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
+import java.util.UUID;
+import java.util.function.Consumer;
 import lombok.NonNull;
 
 public record BackClickHandler(ConfigHandle<BackConfig> config, TeleportHistory history) {
@@ -25,22 +27,43 @@ public record BackClickHandler(ConfigHandle<BackConfig> config, TeleportHistory 
     // entry is stale and should be evicted.
     if (world == null) {
       this.history.remove(playerId, entryId);
-      click.reply(snap.noBack());
+
+      var noBackMsg = snap.noBack();
+      click.reply(noBackMsg);
       return;
     }
 
-    player
-        .teleportAsync(target)
-        .thenAccept(
-            success -> {
-              if (!Boolean.TRUE.equals(success)) {
-                click.reply(snap.noBack());
-                return;
-              }
-              this.history.remove(playerId, entryId);
-              var successMessage =
-                  snap.formatBack(world.getName(), target.getX(), target.getY(), target.getZ());
-              click.reply(successMessage);
-            });
+    var worldName = world.getName();
+    var x = target.getX();
+    var y = target.getY();
+    var z = target.getZ();
+
+    Consumer<Boolean> onResult =
+        success -> onTeleportResult(success, click, snap, playerId, entryId, worldName, x, y, z);
+
+    var teleportFuture = player.teleportAsync(target);
+    teleportFuture.thenAccept(onResult);
+  }
+
+  private void onTeleportResult(
+      Boolean success,
+      @NonNull ClickContext click,
+      @NonNull BackConfig snap,
+      @NonNull UUID playerId,
+      long entryId,
+      @NonNull String worldName,
+      double x,
+      double y,
+      double z) {
+    if (!Boolean.TRUE.equals(success)) {
+      var noBackMsg = snap.noBack();
+      click.reply(noBackMsg);
+      return;
+    }
+
+    this.history.remove(playerId, entryId);
+
+    var successMessage = snap.formatBack(worldName, x, y, z);
+    click.reply(successMessage);
   }
 }

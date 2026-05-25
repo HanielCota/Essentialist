@@ -26,7 +26,10 @@ public final class WorkbenchCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
-    player.openInventory(MenuType.CRAFTING.create(player));
+    var player = actor.unwrap(Player.class);
+
+    var menu = MenuType.CRAFTING.create(player);
+
+    player.openInventory(menu);
   }
 }

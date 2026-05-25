@@ -24,7 +24,10 @@ public final class AnvilCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
-    player.openInventory(MenuType.ANVIL.create(player));
+    var player = actor.unwrap(Player.class);
+
+    var menu = MenuType.ANVIL.create(player);
+
+    player.openInventory(menu);
   }
 }

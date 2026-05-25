@@ -15,12 +15,14 @@ public final class HealModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
-    var config = configure("heal", HealConfig.class, HealConfig::defaults, new HealService());
-    registerCommand(
-        new HealCommand(
-            config,
-            service(HealService.class),
-            service(PlayerProvider.class),
-            service(PaperCommandFramework.class)));
+    var heal = new HealService();
+    var config = configure("heal", HealConfig.class, HealConfig::defaults, heal);
+
+    var service = service(HealService.class);
+    var players = service(PlayerProvider.class);
+    var framework = service(PaperCommandFramework.class);
+
+    var command = new HealCommand(config, service, players, framework);
+    registerCommand(command);
   }
 }
