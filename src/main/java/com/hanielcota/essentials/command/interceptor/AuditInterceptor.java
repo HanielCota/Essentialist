@@ -74,16 +74,17 @@ public final class AuditInterceptor implements RichCommandInterceptor {
     // older Bukkit/Paper classes use "Class{a=1, b=2}". Pick whichever bracket comes first.
     var fullString = value.toString();
     var openIndex = firstBracketIndex(fullString);
-
-    String jsonPart;
-    if (openIndex >= 0) {
-      jsonPart = fullString.substring(openIndex);
-    } else {
-      jsonPart = "";
-    }
+    var jsonPart = jsonPartOf(fullString, openIndex);
 
     var simpleName = clazz.getSimpleName();
     return simpleName + jsonPart;
+  }
+
+  private static String jsonPartOf(@NonNull String fullString, int openIndex) {
+    if (openIndex < 0) {
+      return "";
+    }
+    return fullString.substring(openIndex);
   }
 
   private static int firstBracketIndex(@NonNull String s) {

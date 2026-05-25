@@ -21,6 +21,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import java.util.UUID;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -46,12 +47,7 @@ public record VanishCommand(
     var self = Senders.isSelf(sender, subject);
 
     var newlyVanished = this.service.enter(subjectId);
-    if (newlyVanished) {
-      this.applier.apply(subject);
-    } else {
-      this.service.exit(subjectId);
-      this.applier.unapply(subject);
-    }
+    applyToggleEffect(subject, subjectId, newlyVanished);
 
     var messages = snap.toggle(newlyVanished);
 
@@ -66,6 +62,16 @@ public record VanishCommand(
     var target = this.framework.actorOf(subject);
 
     sender.sendDualMessage(target, senderMsg, targetMsg);
+  }
+
+  private void applyToggleEffect(
+      @NonNull Player subject, @NonNull UUID subjectId, boolean entering) {
+    if (entering) {
+      this.applier.apply(subject);
+      return;
+    }
+    this.service.exit(subjectId);
+    this.applier.unapply(subject);
   }
 
   @Subcommand("list")
