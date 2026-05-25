@@ -10,7 +10,9 @@ import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.NonNull;
@@ -102,5 +104,16 @@ public final class ListService {
             .thenComparing(PlayerEntry::name, String.CASE_INSENSITIVE_ORDER));
 
     return entries;
+  }
+
+  /** Group counts keyed by group id, used to fill {@code {count_<id>}} in the info template. */
+  public Map<String, Integer> countsByGroupId(@NonNull List<PlayerEntry> roster) {
+    var counts = new HashMap<String, Integer>();
+
+    for (var entry : roster) {
+      counts.merge(entry.groupId(), 1, Integer::sum);
+    }
+
+    return Map.copyOf(counts);
   }
 }
