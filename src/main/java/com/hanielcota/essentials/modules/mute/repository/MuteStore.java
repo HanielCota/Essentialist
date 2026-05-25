@@ -12,13 +12,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * SQLite-backed storage of mute entries. {@code expires_at} is nullable — a {@code NULL} row is a
- * permanent mute, otherwise the value is epoch millis.
+ * Storage of mute entries. {@code expires_at} is nullable — a {@code NULL} row is a permanent mute,
+ * otherwise the value is epoch millis.
  */
 @RequiredArgsConstructor
 public final class MuteStore {
 
   private final SqlExecutor sqlExecutor;
+  private final MuteTable table;
 
   private static Map.Entry<UUID, Mute> readRow(@NonNull ResultSet rs) throws SQLException {
     var idStr = rs.getString("player_id");
@@ -44,7 +45,7 @@ public final class MuteStore {
     var expiresMillis = expiresAt == null ? null : expiresAt.toEpochMilli();
     var createdAt = Instant.now().toEpochMilli();
 
-    this.sqlExecutor.update(MuteTable.UPSERT, idStr, expiresMillis, createdAt);
+    this.sqlExecutor.update(this.table.upsert(), idStr, expiresMillis, createdAt);
   }
 
   /** Deletes the mute. Returns {@code true} when a row was removed. */

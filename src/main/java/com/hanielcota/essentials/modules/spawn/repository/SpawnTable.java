@@ -1,18 +1,10 @@
 package com.hanielcota.essentials.modules.spawn.repository;
 
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpawnTable {
-
-  static final String UPSERT =
-      """
-      INSERT OR REPLACE INTO spawn (singleton, world, x, y, z, yaw, pitch) \
-      VALUES (1, ?, ?, ?, ?, ?, ?)\
-      """;
 
   static final String SELECT =
       """
@@ -32,7 +24,23 @@ public final class SpawnTable {
       )
       """;
 
-  public static void install(@NonNull SqlExecutor executor) {
+  /**
+   * Upsert binds {@code singleton} as a parameter (always {@code 1}) so the SQL stays a pure
+   * dialect-generated INSERT-or-replace template. The table's {@code CHECK (singleton = 1)}
+   * constraint enforces the singleton invariant; callers in {@link SpawnStore} pass {@code 1} for
+   * the first parameter unconditionally.
+   */
+  private final String upsert;
+
+  public SpawnTable(@NonNull SqlDialect dialect) {
+    this.upsert = dialect.upsertInto("spawn", "singleton", "world", "x", "y", "z", "yaw", "pitch");
+  }
+
+  String upsert() {
+    return this.upsert;
+  }
+
+  public void install(@NonNull SqlExecutor executor) {
     executor.ddl(CREATE_TABLE);
   }
 }

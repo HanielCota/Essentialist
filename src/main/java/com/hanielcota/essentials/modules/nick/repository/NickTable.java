@@ -1,24 +1,10 @@
 package com.hanielcota.essentials.modules.nick.repository;
 
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NickTable {
-
-  static final String UPSERT =
-      """
-      INSERT OR REPLACE INTO nicks \
-      (player_id, nickname, real_name, created_at) \
-      VALUES (?, ?, ?, ?)\
-      """;
-
-  static final String DELETE =
-      """
-      DELETE FROM nicks WHERE player_id = ?\
-      """;
 
   static final String SELECT_ALL =
       """
@@ -26,17 +12,34 @@ public final class NickTable {
       FROM nicks\
       """;
 
-  private static final String CREATE_TABLE =
+  static final String DELETE =
       """
-      CREATE TABLE IF NOT EXISTS nicks (
-        player_id TEXT PRIMARY KEY,
-        nickname TEXT NOT NULL COLLATE NOCASE UNIQUE,
-        real_name TEXT NOT NULL,
-        created_at INTEGER NOT NULL
-      )
+      DELETE FROM nicks WHERE player_id = ?\
       """;
 
-  public static void install(@NonNull SqlExecutor executor) {
-    executor.ddl(CREATE_TABLE);
+  private final String upsert;
+  private final String createTable;
+
+  public NickTable(@NonNull SqlDialect dialect) {
+    this.upsert = dialect.upsertInto("nicks", "player_id", "nickname", "real_name", "created_at");
+
+    var caseInsensitive = dialect.caseInsensitiveTextSuffix();
+    this.createTable =
+        "CREATE TABLE IF NOT EXISTS nicks (\n"
+            + "  player_id TEXT PRIMARY KEY,\n"
+            + "  nickname TEXT NOT NULL"
+            + caseInsensitive
+            + " UNIQUE,\n"
+            + "  real_name TEXT NOT NULL,\n"
+            + "  created_at INTEGER NOT NULL\n"
+            + ")";
+  }
+
+  String upsert() {
+    return this.upsert;
+  }
+
+  public void install(@NonNull SqlExecutor executor) {
+    executor.ddl(this.createTable);
   }
 }

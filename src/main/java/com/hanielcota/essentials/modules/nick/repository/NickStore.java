@@ -11,13 +11,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * SQLite-backed storage of nickname assignments. The {@code nickname} column uses {@code COLLATE
- * NOCASE} so /realname lookups and uniqueness checks are case-insensitive.
+ * Storage of nickname assignments. The {@code nickname} column carries the dialect's
+ * case-insensitive collation so {@code /realname} lookups and uniqueness checks ignore case.
  */
 @RequiredArgsConstructor
 public final class NickStore {
 
   private final SqlExecutor sqlExecutor;
+  private final NickTable table;
 
   private static NickEntry readRow(@NonNull ResultSet rs) throws SQLException {
     var idStr = rs.getString("player_id");
@@ -39,7 +40,7 @@ public final class NickStore {
     var realName = entry.realName();
     var createdAt = Instant.now().toEpochMilli();
 
-    this.sqlExecutor.update(NickTable.UPSERT, idStr, nickname, realName, createdAt);
+    this.sqlExecutor.update(this.table.upsert(), idStr, nickname, realName, createdAt);
   }
 
   /** Deletes the entry. Returns {@code true} when a row was removed. */

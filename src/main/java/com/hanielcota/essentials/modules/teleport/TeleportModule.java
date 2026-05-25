@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.teleport;
 
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleEnvironment;
@@ -33,7 +34,9 @@ public final class TeleportModule extends AbstractModule {
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("teleport", TeleportConfig.class, TeleportConfig::defaults);
     var executor = env.service(SqlExecutor.class);
-    TeleportHistoryTable.install(executor);
+    var dialect = env.service(SqlDialect.class);
+    var historyTable = new TeleportHistoryTable(dialect);
+    historyTable.install(executor);
 
     var historyWriter = new DefaultAsyncDatabaseWriter("Essentialist-TeleportHistory");
     registrar.closeable(historyWriter);

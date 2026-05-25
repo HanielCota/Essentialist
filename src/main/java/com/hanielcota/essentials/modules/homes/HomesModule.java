@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleEnvironment;
@@ -78,10 +79,12 @@ public final class HomesModule extends AbstractModule {
     var scheduler = env.service(Scheduler.class);
     var delayed = env.service(DelayedTeleport.class);
     var sqlExecutor = env.service(SqlExecutor.class);
+    var dialect = env.service(SqlDialect.class);
 
     // 1. Storage + service layer.
-    SqlHomeTable.install(sqlExecutor);
-    var sqlRepository = new SqlHomeRepository(sqlExecutor);
+    var homeTable = new SqlHomeTable(dialect);
+    homeTable.install(sqlExecutor);
+    var sqlRepository = new SqlHomeRepository(sqlExecutor, homeTable);
     var cache = new HomeCache();
     var asyncWriter = new DefaultAsyncDatabaseWriter("Essentialist-Homes");
     var repository = new CachedHomeRepository(sqlRepository, asyncWriter, cache);

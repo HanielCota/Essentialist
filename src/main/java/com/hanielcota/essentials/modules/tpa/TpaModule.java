@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.tpa;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleEnvironment;
@@ -71,7 +72,9 @@ public final class TpaModule extends AbstractModule {
   private AsyncTpaHistory history(
       @NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var executor = env.service(SqlExecutor.class);
-    TpaHistoryTable.install(executor);
+    var dialect = env.service(SqlDialect.class);
+    var table = new TpaHistoryTable(dialect);
+    table.install(executor);
 
     var sqliteBacked = new SqliteTpaHistory(executor);
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaHistory");

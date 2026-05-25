@@ -11,15 +11,17 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 
 /**
- * SQLite-backed implementation of {@link HomeRepository}.
+ * Relational implementation of {@link HomeRepository}.
  *
- * <p>Primary key is {@code (player_id, name)} (case-insensitive on the name column) so calls to
- * {@link #save} act as upsert per player+name pair.
+ * <p>Primary key is {@code (player_id, name)} (case-insensitive on the name column via the
+ * configured {@link com.hanielcota.essentials.database.SqlDialect}) so calls to {@link #save} act
+ * as upsert per player+name pair.
  */
 @RequiredArgsConstructor
 public final class SqlHomeRepository implements HomeRepository {
 
   private final SqlExecutor sqlExecutor;
+  private final SqlHomeTable table;
 
   @Override
   public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
@@ -70,7 +72,7 @@ public final class SqlHomeRepository implements HomeRepository {
     var createdAt = home.createdAt();
 
     this.sqlExecutor.update(
-        SqlHomeTable.UPSERT, ownerStr, name, world, x, y, z, yaw, pitch, materialStr, createdAt);
+        this.table.upsert(), ownerStr, name, world, x, y, z, yaw, pitch, materialStr, createdAt);
   }
 
   @Override
