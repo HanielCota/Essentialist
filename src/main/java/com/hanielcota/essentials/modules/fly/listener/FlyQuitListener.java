@@ -15,6 +15,8 @@ public final class FlyQuitListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onQuit(@NonNull PlayerQuitEvent event) {
-    this.service.forget(event.getPlayer().getUniqueId());
+    var player = event.getPlayer();
+    var id = player.getUniqueId();
+    this.service.forget(id);
   }
 }

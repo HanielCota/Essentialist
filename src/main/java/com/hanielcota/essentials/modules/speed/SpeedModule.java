@@ -14,9 +14,13 @@ public final class SpeedModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
-    var config = configure("speed", SpeedConfig.class, SpeedConfig::defaults, new SpeedService());
-    registerCommand(
-        new SpeedCommand(
-            config, service(SpeedService.class), service(PaperCommandFramework.class)));
+    var speed = new SpeedService();
+    var config = configure("speed", SpeedConfig.class, SpeedConfig::defaults, speed);
+
+    var service = service(SpeedService.class);
+    var framework = service(PaperCommandFramework.class);
+
+    var command = new SpeedCommand(config, service, framework);
+    registerCommand(command);
   }
 }

@@ -6,8 +6,10 @@ import com.hanielcota.essentials.modules.ping.config.PingConfig;
 public record PingService(ConfigHandle<PingConfig> config) {
 
   public String format(int ping) {
-    String color = colorFor(ping);
-    return "<" + color + ">" + ping + "ms</" + color + ">";
+    var color = colorFor(ping);
+    var openTag = "<" + color + ">";
+    var closeTag = "</" + color + ">";
+    return openTag + ping + "ms" + closeTag;
   }
 
   private String colorFor(int ping) {

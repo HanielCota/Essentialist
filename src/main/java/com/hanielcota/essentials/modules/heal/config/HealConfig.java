@@ -38,6 +38,7 @@ public record HealConfig(
   }
 
   public String formatHealedAll(int count) {
-    return healedAll.replace("{count}", Integer.toString(count));
+    var countText = Integer.toString(count);
+    return healedAll.replace("{count}", countText);
   }
 }

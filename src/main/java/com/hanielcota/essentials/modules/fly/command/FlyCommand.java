@@ -29,32 +29,42 @@ public record FlyCommand(
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
-    announce(sender, subject, this.service.toggle(subject));
+    var result = this.service.toggle(subject);
+    announce(sender, subject, result);
   }
 
   @Subcommand("on")
   public void on(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
-    announce(sender, subject, this.service.set(subject, true));
+    var result = this.service.set(subject, true);
+    announce(sender, subject, result);
   }
 
   @Subcommand("off")
   public void off(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
-    announce(sender, subject, this.service.set(subject, false));
+    var result = this.service.set(subject, false);
+    announce(sender, subject, result);
   }
 
   private void announce(
       @NonNull CommandActor sender, @NonNull Player subject, @NonNull FlyService.Result result) {
     var snap = this.config.value();
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
     if (result == FlyService.Result.UNSUPPORTED) {
-      sender.sendError(snap.unsupportedGamemode().forSender(self, name));
+      var unsupported = snap.unsupportedGamemode();
+      var unsupportedMsg = unsupported.forSender(self, name);
+      sender.sendError(unsupportedMsg);
       return;
     }
 
-    var messages = snap.toggle(result == FlyService.Result.ENABLED);
+    var enabled = result == FlyService.Result.ENABLED;
+    var messages = snap.toggle(enabled);
     var target = this.framework.actorOf(subject);
-    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
+
+    var senderMsg = messages.forSender(self, name);
+    var targetMsg = messages.forTarget(name);
+
+    sender.sendDualMessage(target, senderMsg, targetMsg);
   }
 }

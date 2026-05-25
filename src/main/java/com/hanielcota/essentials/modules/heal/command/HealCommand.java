@@ -34,22 +34,30 @@ public record HealCommand(
   @PermissionForOther(".others")
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
     if (subject.getHealth() <= 0) {
-      sender.sendError(snap.whenDead().forSender(self, name));
+      var dead = snap.whenDead();
+      var deadMsg = dead.forSender(self, name);
+      sender.sendError(deadMsg);
       return;
     }
 
     if (!this.service.heal(subject)) {
-      sender.sendError(snap.whenAlreadyFull().forSender(self, name));
+      var alreadyFull = snap.whenAlreadyFull();
+      var alreadyFullMsg = alreadyFull.forSender(self, name);
+      sender.sendError(alreadyFullMsg);
       return;
     }
 
     var messages = snap.whenHealed();
     var target = this.framework.actorOf(subject);
-    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
+
+    var senderMsg = messages.forSender(self, name);
+    var targetMsg = messages.forTarget(name);
+
+    sender.sendDualMessage(target, senderMsg, targetMsg);
   }
 
   @Subcommand("todos")
@@ -57,14 +65,18 @@ public record HealCommand(
   @Description("Restaura a vida de todos os jogadores online.")
   @Syntax("/curar todos")
   public void healAll(@NonNull CommandActor sender) {
-    int healed = 0;
-    for (Player player : this.players.all()) {
+    var online = this.players.all();
 
+    var healed = 0;
+    for (Player player : online) {
       if (player.getHealth() > 0 && this.service.heal(player)) {
         healed++;
       }
     }
+
     var snap = this.config.value();
-    sender.sendSuccess(snap.formatHealedAll(healed));
+    var summaryMsg = snap.formatHealedAll(healed);
+
+    sender.sendSuccess(summaryMsg);
   }
 }
