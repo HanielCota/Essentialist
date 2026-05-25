@@ -20,7 +20,10 @@ public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigSer
 
   @DefaultSubcommand
   public void showUsage(@NonNull CommandActor actor) {
-    actor.sendMessage(this.config.value().usage());
+    var snap = this.config.value();
+    var usage = snap.usage();
+
+    actor.sendMessage(usage);
   }
 
   @Subcommand("reload")
@@ -31,13 +34,19 @@ public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigSer
     var snap = this.config.value();
 
     if (report.failures().isEmpty()) {
-      var successMsg = snap.formatSuccess(report.total());
+      var total = report.total();
+      var successMsg = snap.formatSuccess(total);
+
       actor.sendSuccess(successMsg);
       return;
     }
 
-    var failed = String.join(", ", report.failedNames());
-    var failureMsg = snap.formatFailure(report.succeeded(), report.total(), failed);
+    var failedNames = report.failedNames();
+    var failed = String.join(", ", failedNames);
+    var succeeded = report.succeeded();
+    var total = report.total();
+    var failureMsg = snap.formatFailure(succeeded, total, failed);
+
     actor.sendError(failureMsg);
   }
 }

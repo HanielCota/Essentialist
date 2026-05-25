@@ -35,28 +35,41 @@ public record TeleportCommand(
     var snap = this.config.value();
     var senderActor = this.framework.actorOf(sender);
 
-    if (sender.getUniqueId().equals(target.getUniqueId())) {
-      senderActor.sendError(snap.selfTarget());
+    var senderId = sender.getUniqueId();
+    var targetId = target.getUniqueId();
+    if (senderId.equals(targetId)) {
+      var selfTargetMsg = snap.selfTarget();
+      senderActor.sendError(selfTargetMsg);
       return;
     }
 
     var targetLocation = target.getLocation();
     var targetName = target.getName();
     var senderName = sender.getName();
-    sender
-        .teleportAsync(targetLocation)
-        .thenAccept(
-            success -> {
-              if (!Boolean.TRUE.equals(success)) {
-                senderActor.sendError(snap.teleportFailed());
-                return;
-              }
-              var targetActor = this.framework.actorOf(target);
-              senderActor.sendDualMessage(
-                  targetActor,
-                  snap.formatToPlayer(targetName),
-                  snap.formatTeleportedTo(senderName));
-            });
+
+    var teleport = sender.teleportAsync(targetLocation);
+    teleport.thenAccept(
+        success -> onToPlayerComplete(success, snap, senderActor, target, senderName, targetName));
+  }
+
+  private void onToPlayerComplete(
+      Boolean success,
+      TeleportConfig snap,
+      CommandActor senderActor,
+      Player target,
+      String senderName,
+      String targetName) {
+    if (!Boolean.TRUE.equals(success)) {
+      var failedMsg = snap.teleportFailed();
+      senderActor.sendError(failedMsg);
+      return;
+    }
+
+    var targetActor = this.framework.actorOf(target);
+    var senderMsg = snap.formatToPlayer(targetName);
+    var targetMsg = snap.formatTeleportedTo(senderName);
+
+    senderActor.sendDualMessage(targetActor, senderMsg, targetMsg);
   }
 
   @Subcommand("move")
@@ -69,8 +82,11 @@ public record TeleportCommand(
       @OnlinePlayer @NonNull Player to) {
     var snap = this.config.value();
 
-    if (from.getUniqueId().equals(to.getUniqueId())) {
-      sender.sendError(snap.selfTarget());
+    var fromId = from.getUniqueId();
+    var toId = to.getUniqueId();
+    if (fromId.equals(toId)) {
+      var selfTargetMsg = snap.selfTarget();
+      sender.sendError(selfTargetMsg);
       return;
     }
 
@@ -79,19 +95,38 @@ public record TeleportCommand(
     var toName = to.getName();
     var senderName = sender.name();
     var selfMove = Senders.isSelf(sender, from);
-    from.teleportAsync(toLocation)
-        .thenAccept(
-            success -> {
-              if (!Boolean.TRUE.equals(success)) {
-                sender.sendError(snap.teleportFailed());
-                return;
-              }
-              sender.sendSuccess(snap.formatMoveSender(fromName, toName));
-              if (!selfMove) {
-                var fromActor = this.framework.actorOf(from);
-                fromActor.sendSuccess(snap.formatMoveNotify(senderName));
-              }
-            });
+
+    var teleport = from.teleportAsync(toLocation);
+    teleport.thenAccept(
+        success ->
+            onMoveComplete(success, snap, sender, from, fromName, toName, senderName, selfMove));
+  }
+
+  private void onMoveComplete(
+      Boolean success,
+      TeleportConfig snap,
+      CommandActor sender,
+      Player from,
+      String fromName,
+      String toName,
+      String senderName,
+      boolean selfMove) {
+    if (!Boolean.TRUE.equals(success)) {
+      var failedMsg = snap.teleportFailed();
+      sender.sendError(failedMsg);
+      return;
+    }
+
+    var senderMsg = snap.formatMoveSender(fromName, toName);
+    sender.sendSuccess(senderMsg);
+
+    if (selfMove) {
+      return;
+    }
+
+    var fromActor = this.framework.actorOf(from);
+    var notifyMsg = snap.formatMoveNotify(senderName);
+    fromActor.sendSuccess(notifyMsg);
   }
 
   @Subcommand("pos")
@@ -111,20 +146,31 @@ public record TeleportCommand(
     var minHeight = world.getMinHeight();
     var maxHeight = world.getMaxHeight();
     var worldBorder = world.getWorldBorder();
-    if (y < minHeight || y >= maxHeight || !worldBorder.isInside(destination)) {
-      senderActor.sendError(snap.invalidPosition());
+    var insideBorder = worldBorder.isInside(destination);
+    if (y < minHeight || y >= maxHeight || !insideBorder) {
+      var invalidMsg = snap.invalidPosition();
+      senderActor.sendError(invalidMsg);
       return;
     }
 
-    sender
-        .teleportAsync(destination)
-        .thenAccept(
-            success -> {
-              if (!Boolean.TRUE.equals(success)) {
-                senderActor.sendError(snap.teleportFailed());
-                return;
-              }
-              senderActor.sendSuccess(snap.formatToPos(x, y, z));
-            });
+    var teleport = sender.teleportAsync(destination);
+    teleport.thenAccept(success -> onToPosComplete(success, snap, senderActor, x, y, z));
+  }
+
+  private void onToPosComplete(
+      Boolean success,
+      TeleportConfig snap,
+      CommandActor senderActor,
+      double x,
+      double y,
+      double z) {
+    if (!Boolean.TRUE.equals(success)) {
+      var failedMsg = snap.teleportFailed();
+      senderActor.sendError(failedMsg);
+      return;
+    }
+
+    var posMsg = snap.formatToPos(x, y, z);
+    senderActor.sendSuccess(posMsg);
   }
 }

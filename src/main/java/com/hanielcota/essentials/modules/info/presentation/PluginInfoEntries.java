@@ -18,6 +18,7 @@ public final class PluginInfoEntries {
     if (authors.isEmpty()) {
       return "Desconhecido";
     }
+
     return String.join(", ", authors);
   }
 
@@ -25,12 +26,19 @@ public final class PluginInfoEntries {
     var meta = this.plugin.getPluginMeta();
     var name = meta.getName();
     var version = meta.getVersion();
-    var authorsList = authors(meta.getAuthors());
+    var rawAuthors = meta.getAuthors();
+    var authorsList = authors(rawAuthors);
     var mcVersion = Bukkit.getMinecraftVersion();
 
-    return List.of(
-        InfoEntry.of(Material.NETHER_STAR, "<yellow>" + name, "<gray>Versão <white>" + version),
-        InfoEntry.of(Material.WRITABLE_BOOK, "<yellow>Autor", GRAY + authorsList),
-        InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Minecraft", GRAY + mcVersion));
+    var nameTitle = "<yellow>" + name;
+    var versionLore = "<gray>Versão <white>" + version;
+    var authorLore = GRAY + authorsList;
+    var mcLore = GRAY + mcVersion;
+
+    var nameEntry = InfoEntry.of(Material.NETHER_STAR, nameTitle, versionLore);
+    var authorEntry = InfoEntry.of(Material.WRITABLE_BOOK, "<yellow>Autor", authorLore);
+    var mcEntry = InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Minecraft", mcLore);
+
+    return List.of(nameEntry, authorEntry, mcEntry);
   }
 }

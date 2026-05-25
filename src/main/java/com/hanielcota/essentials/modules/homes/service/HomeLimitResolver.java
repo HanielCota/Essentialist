@@ -4,6 +4,7 @@ import java.util.function.IntSupplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 /**
  * Resolves a player's home limit from their {@code essentials.home.limit.N} permission nodes. The
@@ -18,22 +19,14 @@ public final class HomeLimitResolver {
   private final IntSupplier defaultLimit;
 
   public int resolve(@NonNull Permissible player) {
+    var permissions = player.getEffectivePermissions();
     var maxLimit = Integer.MIN_VALUE;
 
-    for (var attachmentInfo : player.getEffectivePermissions()) {
-      var permission = attachmentInfo.getPermission();
-      if (attachmentInfo.getValue() && permission.startsWith(LIMIT_PERMISSION_PREFIX)) {
-        try {
-          var prefixLength = LIMIT_PERMISSION_PREFIX.length();
-          var limitSuffix = permission.substring(prefixLength);
-          var limit = Integer.parseInt(limitSuffix);
+    for (var attachmentInfo : permissions) {
+      var candidate = parseLimit(attachmentInfo);
 
-          if (limit > maxLimit) {
-            maxLimit = limit;
-          }
-        } catch (NumberFormatException _) {
-          // Skip invalid formats
-        }
+      if (candidate > maxLimit) {
+        maxLimit = candidate;
       }
     }
 
@@ -42,6 +35,27 @@ public final class HomeLimitResolver {
     }
 
     return defaultLimit();
+  }
+
+  private static int parseLimit(@NonNull PermissionAttachmentInfo attachmentInfo) {
+    if (!attachmentInfo.getValue()) {
+      return Integer.MIN_VALUE;
+    }
+
+    var permission = attachmentInfo.getPermission();
+
+    if (!permission.startsWith(LIMIT_PERMISSION_PREFIX)) {
+      return Integer.MIN_VALUE;
+    }
+
+    var prefixLength = LIMIT_PERMISSION_PREFIX.length();
+    var limitSuffix = permission.substring(prefixLength);
+
+    try {
+      return Integer.parseInt(limitSuffix);
+    } catch (NumberFormatException _) {
+      return Integer.MIN_VALUE;
+    }
   }
 
   private int defaultLimit() {

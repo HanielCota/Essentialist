@@ -26,11 +26,17 @@ public final class WhitelistMenu implements EssentialsMenu {
   private final WhitelistClickHandler clickHandler;
 
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull WhitelistConfig snap) {
-    return ItemTemplate.builder(snap.infoMaterial())
-        .name(snap.infoName())
-        .lore(snap.infoLore().toArray(String[]::new))
-        .italic(false)
-        .build();
+    var material = snap.infoMaterial();
+    var name = snap.infoName();
+    var lore = snap.infoLore();
+    var loreArray = lore.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(material);
+    builder = builder.name(name);
+    builder = builder.lore(loreArray);
+    builder = builder.italic(false);
+
+    return builder.build();
   }
 
   @Override
@@ -41,16 +47,15 @@ public final class WhitelistMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
+    var rows = snap.effectiveRows();
+    var title = snap.menuTitle();
+    var contentSlots = snap.effectiveContentSlots();
+    var navigation = snap.navigation();
+    var infoSlot = snap.effectiveInfoSlot();
+    var infoTemplate = buildInfoTemplate(snap);
+
     PaginatedInfoMenus.register(
-        menus,
-        ID,
-        snap.effectiveRows(),
-        snap.menuTitle(),
-        snap.effectiveContentSlots(),
-        snap.navigation(),
-        snap.effectiveInfoSlot(),
-        buildInfoTemplate(snap),
-        this::buildSlots);
+        menus, ID, rows, title, contentSlots, navigation, infoSlot, infoTemplate, this::buildSlots);
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
@@ -58,7 +63,9 @@ public final class WhitelistMenu implements EssentialsMenu {
     if (whitelisted.isEmpty()) {
       return emptyState();
     }
+
     var slots = new ArrayList<SlotDefinition>(whitelisted.size());
+
     for (var entry : whitelisted) {
       var template = this.renderer.render(entry);
       var slotDef =
@@ -66,14 +73,19 @@ public final class WhitelistMenu implements EssentialsMenu {
 
       slots.add(slotDef);
     }
+
     return slots;
   }
 
   /** A single placeholder item centred in the content area, shown when the whitelist is empty. */
   private List<SlotDefinition> emptyState() {
-    var slots = this.config.value().effectiveContentSlots();
+    var snap = this.config.value();
+    var slots = snap.effectiveContentSlots();
     var centerSlot = slots.get(slots.size() / 2);
+    var emptyTemplate = this.renderer.renderEmpty();
 
-    return List.of(SlotDefinition.of(centerSlot, this.renderer.renderEmpty(), click -> {}));
+    var slotDef = SlotDefinition.of(centerSlot, emptyTemplate, click -> {});
+
+    return List.of(slotDef);
   }
 }

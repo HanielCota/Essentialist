@@ -30,8 +30,10 @@ public record HomesConfig(
     HomesMessages messages) {
 
   public static HomesConfig defaults() {
-    return new HomesConfig(
-        3, "home", 1, Material.RED_BED, 30, HomesMenuConfig.defaults(), HomesMessages.defaults());
+    var menu = HomesMenuConfig.defaults();
+    var messages = HomesMessages.defaults();
+
+    return new HomesConfig(3, "home", 1, Material.RED_BED, 30, menu, messages);
   }
 
   public Duration teleportDelay() {

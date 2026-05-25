@@ -23,8 +23,12 @@ public record OnlineCommand(
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
+    var snap = this.config.value();
     var onlineCount = this.visibleCount.applyAsInt(actor);
     var maxPlayers = Bukkit.getMaxPlayers();
-    actor.sendMessage(this.config.value().format(onlineCount, maxPlayers));
+
+    var message = snap.format(onlineCount, maxPlayers);
+
+    actor.sendMessage(message);
   }
 }

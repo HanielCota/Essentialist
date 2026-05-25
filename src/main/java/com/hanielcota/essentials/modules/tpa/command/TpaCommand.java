@@ -26,8 +26,12 @@ public record TpaCommand(ConfigHandle<TpaConfig> config, TeleportRequestService 
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @OnlinePlayer @NonNull Player target) {
-    var messages = this.config.value().messages();
-    TpaRequests.send(
-        this.service, messages, actor, target, TeleportRequestType.TPA, messages.requestSent());
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var confirmationTemplate = messages.requestSent();
+    var type = TeleportRequestType.TPA;
+
+    TpaRequests.send(this.service, messages, actor, target, type, confirmationTemplate);
   }
 }

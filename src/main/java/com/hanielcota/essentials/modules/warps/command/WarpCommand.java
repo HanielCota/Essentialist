@@ -65,7 +65,8 @@ public record WarpCommand(
 
     var locationOpt = warp.resolve();
     if (locationOpt.isEmpty()) {
-      actor.sendError(messages.worldGone());
+      var worldGoneMsg = messages.worldGone();
+      actor.sendError(worldGoneMsg);
       return;
     }
 
@@ -78,12 +79,14 @@ public record WarpCommand(
 
   private DelayedTeleportPrompt prompt(
       @NonNull CommandActor actor, @NonNull WarpsMessages messages, @NonNull Warp warp) {
-
     var warpName = warp.name();
+
     var teleportingTemplate = messages.teleporting();
     var teleportingMsg = teleportingTemplate.replace(NAME, warpName);
+
     var teleportedTemplate = messages.teleported();
     var teleportedMsg = teleportedTemplate.replace(NAME, warpName);
+
     var cancelledMsg = messages.cancelled();
     var failedMsg = messages.failed();
 

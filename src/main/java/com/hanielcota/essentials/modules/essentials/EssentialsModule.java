@@ -14,6 +14,9 @@ public final class EssentialsModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("essentials", EssentialsConfig.class, EssentialsConfig::defaults);
-    registerCommand(new EssentialsCommand(config, service(ConfigService.class)));
+    var configs = service(ConfigService.class);
+    var essentialsCommand = new EssentialsCommand(config, configs);
+
+    registerCommand(essentialsCommand);
   }
 }

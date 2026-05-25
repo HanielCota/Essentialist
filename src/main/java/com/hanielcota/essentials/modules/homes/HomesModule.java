@@ -88,11 +88,12 @@ public final class HomesModule extends AbstractModule {
   }
 
   private HomesRuntime runtimeServices() {
-    return new HomesRuntime(
-        service(MenuService.class),
-        service(PaperCommandFramework.class),
-        service(Scheduler.class),
-        service(DelayedTeleport.class));
+    var menus = service(MenuService.class);
+    var framework = service(PaperCommandFramework.class);
+    var scheduler = service(Scheduler.class);
+    var delayed = service(DelayedTeleport.class);
+
+    return new HomesRuntime(menus, framework, scheduler, delayed);
   }
 
   private record HomesRuntime(

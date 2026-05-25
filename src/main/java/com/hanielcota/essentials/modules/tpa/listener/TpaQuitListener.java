@@ -21,10 +21,13 @@ public final class TpaQuitListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onQuit(@NonNull PlayerQuitEvent event) {
-    var quitter = event.getPlayer().getUniqueId();
-    var quitterName = event.getPlayer().getName();
-    for (var request : this.service.cancelAllOf(quitter)) {
-      this.notifier.notifyPartnerLeft(request, quitter, quitterName);
+    var player = event.getPlayer();
+    var quitterId = player.getUniqueId();
+    var quitterName = player.getName();
+
+    var affected = this.service.cancelAllOf(quitterId);
+    for (var request : affected) {
+      this.notifier.notifyPartnerLeft(request, quitterId, quitterName);
     }
   }
 }

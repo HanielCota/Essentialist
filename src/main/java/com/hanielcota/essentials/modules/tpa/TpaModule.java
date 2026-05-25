@@ -63,7 +63,9 @@ public final class TpaModule extends AbstractModule {
     var executor = service(SqlExecutor.class);
     TpaHistoryTable.install(executor);
 
-    var history = new AsyncTpaHistory(new SqliteTpaHistory(executor));
+    var sqliteBacked = new SqliteTpaHistory(executor);
+    var history = new AsyncTpaHistory(sqliteBacked);
+
     registerCloseable(history);
     return history;
   }

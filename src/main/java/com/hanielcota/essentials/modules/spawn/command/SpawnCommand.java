@@ -32,26 +32,31 @@ public record SpawnCommand(
 
     var current = this.service.current();
     if (current.isEmpty()) {
-      actor.sendError(messages.noSpawn());
+      var noSpawnMsg = messages.noSpawn();
+      actor.sendError(noSpawnMsg);
       return;
     }
 
-    var resolved = current.get().resolve();
+    var spawnLocation = current.get();
+    var resolved = spawnLocation.resolve();
     if (resolved.isEmpty()) {
-      actor.sendError(messages.worldGone());
+      var worldGoneMsg = messages.worldGone();
+      actor.sendError(worldGoneMsg);
       return;
     }
 
-    Player sender = actor.unwrap(Player.class);
-    this.delayed.schedule(
-        sender,
-        resolved.get(),
-        snap.teleportDelay(),
-        new DelayedTeleportPrompt(
-            actor,
-            messages.teleporting(),
-            messages.teleported(),
-            messages.cancelled(),
-            messages.failed()));
+    var sender = actor.unwrap(Player.class);
+    var destination = resolved.get();
+    var delay = snap.teleportDelay();
+
+    var teleportingMsg = messages.teleporting();
+    var teleportedMsg = messages.teleported();
+    var cancelledMsg = messages.cancelled();
+    var failedMsg = messages.failed();
+
+    var prompt =
+        new DelayedTeleportPrompt(actor, teleportingMsg, teleportedMsg, cancelledMsg, failedMsg);
+
+    this.delayed.schedule(sender, destination, delay, prompt);
   }
 }

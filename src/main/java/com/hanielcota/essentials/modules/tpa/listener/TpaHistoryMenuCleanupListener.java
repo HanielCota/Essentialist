@@ -14,6 +14,9 @@ public final class TpaHistoryMenuCleanupListener implements Listener {
 
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
-    this.state.clear(event.getPlayer().getUniqueId());
+    var player = event.getPlayer();
+    var viewerId = player.getUniqueId();
+
+    this.state.clear(viewerId);
   }
 }

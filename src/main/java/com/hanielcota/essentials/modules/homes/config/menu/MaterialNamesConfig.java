@@ -54,6 +54,11 @@ public record MaterialNamesConfig(
 
   public String displayName(@NonNull Material material) {
     var configured = names.get(material);
-    return configured != null ? configured : toDisplayName(material);
+
+    if (configured != null) {
+      return configured;
+    }
+
+    return toDisplayName(material);
   }
 }

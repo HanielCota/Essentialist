@@ -30,17 +30,17 @@ public record Home(
       @NonNull Location location,
       @NonNull Material material) {
     var world = location.getWorld();
-    return new Home(
-        owner,
-        name,
-        world.getName(),
-        location.getX(),
-        location.getY(),
-        location.getZ(),
-        location.getYaw(),
-        location.getPitch(),
-        material,
-        System.currentTimeMillis());
+    var worldName = world.getName();
+
+    var x = location.getX();
+    var y = location.getY();
+    var z = location.getZ();
+    var yaw = location.getYaw();
+    var pitch = location.getPitch();
+
+    var createdAt = System.currentTimeMillis();
+
+    return new Home(owner, name, worldName, x, y, z, yaw, pitch, material, createdAt);
   }
 
   public Home withName(@NonNull String newName) {
@@ -72,7 +72,12 @@ public record Home(
   }
 
   public Location resolve() {
-    var w = Bukkit.getWorld(this.world);
-    return w != null ? new Location(w, this.x, this.y, this.z, this.yaw, this.pitch) : null;
+    var resolvedWorld = Bukkit.getWorld(this.world);
+
+    if (resolvedWorld == null) {
+      return null;
+    }
+
+    return new Location(resolvedWorld, this.x, this.y, this.z, this.yaw, this.pitch);
   }
 }

@@ -26,14 +26,17 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       @NonNull PlayerInventory inv, @NonNull Set<Material> wanted) {
     Map<Material, Integer> totals = new EnumMap<>(Material.class);
     var storage = inv.getStorageContents();
+
     for (var item : storage) {
       if (item == null) continue;
 
       var plain = ItemStacks.isPlain(item);
-      var isWanted = wanted.contains(item.getType());
+      var type = item.getType();
+      var isWanted = wanted.contains(type);
 
       if (plain && isWanted) {
-        totals.merge(item.getType(), item.getAmount(), Integer::sum);
+        var amount = item.getAmount();
+        totals.merge(type, amount, Integer::sum);
       }
     }
     return totals;
@@ -43,6 +46,7 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       @NonNull PlayerInventory inv, @NonNull Material material, int amount) {
     var remaining = amount;
     var storage = inv.getStorageContents();
+
     for (var slot = 0; slot < storage.length && remaining > 0; slot++) {
       var item = storage[slot];
       if (item == null) continue;
@@ -51,8 +55,9 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       var plain = ItemStacks.isPlain(item);
 
       if (typeMatches && plain) {
-        var take = Math.min(remaining, item.getAmount());
-        var left = item.getAmount() - take;
+        var currentAmount = item.getAmount();
+        var take = Math.min(remaining, currentAmount);
+        var left = currentAmount - take;
         remaining -= take;
 
         if (left == 0) {
@@ -66,9 +71,11 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
   }
 
   public int compact(@NonNull Player player) {
-    var recipes = this.config.value().recipes();
+    var snap = this.config.value();
+    var recipes = snap.recipes();
     var inv = player.getInventory();
-    var totals = countByMaterial(inv, recipes.keySet());
+    var wanted = recipes.keySet();
+    var totals = countByMaterial(inv, wanted);
 
     var blocksCompacted = 0;
     for (var entry : totals.entrySet()) {
@@ -78,17 +85,31 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       var unit = recipe.amount();
       var blocks = unit > 0 ? total / unit : 0;
 
-      if (blocks > 0) {
-        removeFromInventory(inv, ingredient, blocks * unit);
-        var produced = new ItemStack(recipe.block(), blocks);
-        var overflow = inv.addItem(produced);
+      if (blocks <= 0) continue;
 
-        for (var drop : overflow.values()) {
-          player.getWorld().dropItem(player.getLocation(), drop);
-        }
-        blocksCompacted += blocks;
-      }
+      var toRemove = blocks * unit;
+      removeFromInventory(inv, ingredient, toRemove);
+
+      var producedType = recipe.block();
+      var produced = new ItemStack(producedType, blocks);
+      var overflow = inv.addItem(produced);
+
+      dropOverflow(player, overflow);
+      blocksCompacted += blocks;
     }
     return blocksCompacted;
+  }
+
+  private static void dropOverflow(
+      @NonNull Player player, @NonNull Map<Integer, ItemStack> overflow) {
+    if (overflow.isEmpty()) {
+      return;
+    }
+    var world = player.getWorld();
+    var location = player.getLocation();
+
+    for (var drop : overflow.values()) {
+      world.dropItem(location, drop);
+    }
   }
 }

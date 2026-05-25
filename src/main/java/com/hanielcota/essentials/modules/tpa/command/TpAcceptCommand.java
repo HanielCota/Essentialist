@@ -3,6 +3,9 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
+import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
+import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -29,37 +32,57 @@ public record TpAcceptCommand(
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
+
     var sender = actor.unwrap(Player.class);
 
     var resolved = TpaRequests.resolveIncoming(this.service, sender, requester, messages, actor);
     if (resolved.isEmpty()) {
       return;
     }
+
     var request = resolved.get();
+    var pending = this.service.accept(request);
 
-    this.service
-        .accept(request)
-        .thenAccept(
-            result -> {
-              switch (result) {
-                case SUCCESS -> {
-                  var requesterName = request.requester().name();
-                  var acceptedSelfTemplate = messages.acceptedSelf();
-                  var acceptedMsg = acceptedSelfTemplate.replace("{player}", requesterName);
-                  actor.sendSuccess(acceptedMsg);
+    pending.thenAccept(result -> handleResult(result, request, messages, actor));
+  }
 
-                  TpaRequests.replyRequester(this.framework, request, messages.accepted(), true);
-                }
-                case REQUESTER_OFFLINE -> {
-                  var requesterName = request.requester().name();
-                  var requesterOfflineTemplate = messages.requesterOffline();
-                  var offlineMsg = requesterOfflineTemplate.replace("{player}", requesterName);
-                  actor.sendError(offlineMsg);
-                }
-                case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
-                case NOT_FOUND -> actor.sendError(messages.noIncoming());
-              }
-            });
+  private void handleResult(
+      @NonNull AcceptResult result,
+      @NonNull TeleportRequest request,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor) {
+    switch (result) {
+      case SUCCESS -> handleSuccess(request, messages, actor);
+      case REQUESTER_OFFLINE -> handleRequesterOffline(request, messages, actor);
+      case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
+      case NOT_FOUND -> actor.sendError(messages.noIncoming());
+    }
+  }
+
+  private void handleSuccess(
+      @NonNull TeleportRequest request,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor) {
+    var requesterName = request.requester().name();
+    var acceptedSelfTemplate = messages.acceptedSelf();
+    var acceptedMsg = acceptedSelfTemplate.replace("{player}", requesterName);
+
+    actor.sendSuccess(acceptedMsg);
+
+    var acceptedTemplate = messages.accepted();
+    TpaRequests.replyRequester(this.framework, request, acceptedTemplate, true);
+  }
+
+  private void handleRequesterOffline(
+      @NonNull TeleportRequest request,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor) {
+    var requesterName = request.requester().name();
+    var requesterOfflineTemplate = messages.requesterOffline();
+    var offlineMsg = requesterOfflineTemplate.replace("{player}", requesterName);
+
+    actor.sendError(offlineMsg);
   }
 }

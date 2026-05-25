@@ -29,20 +29,27 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
   public void execute(@NonNull CommandActor sender, @OnlinePlayer @NonNull Player target) {
     var viewer = sender.unwrap(Player.class);
     var snap = this.config.value();
+
     if (target.equals(viewer)) {
-      sender.sendError(snap.self());
+      var selfMsg = snap.self();
+      sender.sendError(selfMsg);
       return;
     }
 
-    var title = snap.formatTitle(target.getName());
+    var targetName = target.getName();
+    var title = snap.formatTitle(targetName);
     var viewOpt = this.service.createView(viewer, target, title);
+
     if (viewOpt.isEmpty()) {
-      sender.sendError(snap.alreadyViewed());
+      var alreadyViewedMsg = snap.alreadyViewed();
+      sender.sendError(alreadyViewedMsg);
       return;
     }
-    viewer.openInventory(viewOpt.get());
 
-    var openedMsg = snap.formatOpened(target.getName());
+    var view = viewOpt.get();
+    viewer.openInventory(view);
+
+    var openedMsg = snap.formatOpened(targetName);
     sender.sendSuccess(openedMsg);
   }
 }

@@ -43,27 +43,35 @@ public record TpaHistoryCommand(
       @NonNull CommandActor actor, @DefaultValue("") @Arg("jogador") String targetName) {
     var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
+    var messages = snap.messages();
 
     if (targetName.isEmpty()) {
-      openFor(actor, sender, sender.getUniqueId(), /* self */ true, sender.getName());
+      var senderId = sender.getUniqueId();
+      var senderName = sender.getName();
+      openFor(actor, sender, senderId, /* self */ true, senderName);
       return;
     }
 
     if (!actor.hasPermission(OTHERS_PERMISSION)) {
-      actor.sendError(snap.messages().noPermissionOther());
+      actor.sendError(messages.noPermissionOther());
       return;
     }
 
     var resolved = this.players.offlineByName(targetName);
     if (resolved.isEmpty()) {
-      var notFoundMsg = snap.messages().playerNotFound().replace("{player}", targetName);
+      var notFoundTemplate = messages.playerNotFound();
+      var notFoundMsg = notFoundTemplate.replace("{player}", targetName);
       actor.sendError(notFoundMsg);
       return;
     }
 
     var target = resolved.get();
-    var resolvedName = target.getName() != null ? target.getName() : targetName;
-    openFor(actor, sender, target.getUniqueId(), /* self */ false, resolvedName);
+    var targetId = target.getUniqueId();
+
+    var resolvedRawName = target.getName();
+    var resolvedName = resolvedRawName != null ? resolvedRawName : targetName;
+
+    openFor(actor, sender, targetId, /* self */ false, resolvedName);
   }
 
   private void openFor(
@@ -73,24 +81,39 @@ public record TpaHistoryCommand(
       boolean self,
       @NonNull String subjectName) {
     var snap = this.config.value();
-    var entries = this.history.list(subject);
+    var messages = snap.messages();
 
+    var entries = this.history.list(subject);
     if (entries.isEmpty()) {
-      var emptyMsg =
-          self
-              ? snap.messages().noHistory()
-              : snap.messages().noHistoryOther().replace("{player}", subjectName);
+      var selfTemplate = messages.noHistory();
+      var otherTemplate = messages.noHistoryOther();
+
+      var emptyMsg = renderEmptyMessage(self, subjectName, selfTemplate, otherTemplate);
       actor.sendError(emptyMsg);
       return;
     }
 
     if (!self) {
-      var viewingMsg = snap.messages().viewingOther().replace("{player}", subjectName);
+      var viewingTemplate = messages.viewingOther();
+      var viewingMsg = viewingTemplate.replace("{player}", subjectName);
       var viewingComponent = ComponentUtils.mini(viewingMsg);
       actor.sendMessage(viewingComponent);
     }
 
-    this.state.prefetch(viewer.getUniqueId(), entries);
+    var viewerId = viewer.getUniqueId();
+    this.state.prefetch(viewerId, entries);
+
     MenuOpenings.open(this.menus, viewer, TpaHistoryMenu.ID, actor);
+  }
+
+  private static String renderEmptyMessage(
+      boolean self,
+      @NonNull String subjectName,
+      @NonNull String selfTemplate,
+      @NonNull String otherTemplate) {
+    if (self) {
+      return selfTemplate;
+    }
+    return otherTemplate.replace("{player}", subjectName);
   }
 }

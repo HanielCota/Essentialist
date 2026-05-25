@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
@@ -31,19 +32,30 @@ public final class DeleteHomeDialog implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var configSnap = this.config.value();
     var menuSpec = configSnap.menu();
+
     var title = title(configSnap);
     var prompt = promptItem(configSnap);
     var yes = yesButton(configSnap);
     var no = noButton(configSnap);
 
-    MenuFramework.builder(ID, menus)
-        .rows(menuSpec.effectiveDeleteRows())
-        .title(title)
-        .slot(menuSpec.effectiveDeletePromptSlot(), prompt, click -> {})
-        .slot(menuSpec.effectiveDeleteYesSlot(), yes, this.clickHandler::confirm)
-        .slot(menuSpec.effectiveDeleteNoSlot(), no, this.clickHandler::cancel)
-        .build()
-        .register();
+    var rows = menuSpec.effectiveDeleteRows();
+    var promptSlot = menuSpec.effectiveDeletePromptSlot();
+    var yesSlot = menuSpec.effectiveDeleteYesSlot();
+    var noSlot = menuSpec.effectiveDeleteNoSlot();
+
+    ClickHandler noopClick = click -> {};
+    ClickHandler confirmClick = this.clickHandler::confirm;
+    ClickHandler cancelClick = this.clickHandler::cancel;
+
+    var builder = MenuFramework.builder(ID, menus);
+    builder.rows(rows);
+    builder.title(title);
+    builder.slot(promptSlot, prompt, noopClick);
+    builder.slot(yesSlot, yes, confirmClick);
+    builder.slot(noSlot, no, cancelClick);
+
+    var menu = builder.build();
+    menu.register();
   }
 
   private @NonNull net.kyori.adventure.text.Component title(@NonNull HomesConfig configSnap) {
@@ -55,27 +67,39 @@ public final class DeleteHomeDialog implements EssentialsMenu {
   private @NonNull ItemTemplate promptItem(@NonNull HomesConfig configSnap) {
     var menuSpec = configSnap.menu();
     var messages = configSnap.messages();
+    var material = menuSpec.deletePromptMaterial();
     var promptName = messages.deleteConfirmPrompt();
 
-    return ItemTemplate.builder(menuSpec.deletePromptMaterial())
-        .name(promptName)
-        .italic(false)
-        .build();
+    var builder = ItemTemplate.builder(material);
+    builder.name(promptName);
+    builder.italic(false);
+
+    return builder.build();
   }
 
   private @NonNull ItemTemplate yesButton(@NonNull HomesConfig configSnap) {
     var menuSpec = configSnap.menu();
     var messages = configSnap.messages();
+    var material = menuSpec.deleteYesMaterial();
     var yesName = messages.deleteConfirmYes();
 
-    return ItemTemplate.builder(menuSpec.deleteYesMaterial()).name(yesName).italic(false).build();
+    var builder = ItemTemplate.builder(material);
+    builder.name(yesName);
+    builder.italic(false);
+
+    return builder.build();
   }
 
   private @NonNull ItemTemplate noButton(@NonNull HomesConfig configSnap) {
     var menuSpec = configSnap.menu();
     var messages = configSnap.messages();
+    var material = menuSpec.deleteNoMaterial();
     var noName = messages.deleteConfirmNo();
 
-    return ItemTemplate.builder(menuSpec.deleteNoMaterial()).name(noName).italic(false).build();
+    var builder = ItemTemplate.builder(material);
+    builder.name(noName);
+    builder.italic(false);
+
+    return builder.build();
   }
 }

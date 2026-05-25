@@ -71,7 +71,12 @@ public final class MaterialIconRegistry {
     var name = menu.formatPickerItemName(pretty);
     var lore = menu.formatPickerItemLore(pretty);
 
-    return ItemTemplate.builder(material).name(name).lore(lore).italic(false).build();
+    var builder = ItemTemplate.builder(material);
+    builder.name(name);
+    builder.lore(lore);
+    builder.italic(false);
+
+    return builder.build();
   }
 
   /** All pre-built icons for a category. */

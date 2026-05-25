@@ -19,11 +19,16 @@ public final class MaterialPickerPresentation {
       boolean applied) {
 
     if (!applied) {
-      return messages.unknownHome().replace("{name}", homeName);
+      var unknownHomeMsg = messages.unknownHome();
+      return unknownHomeMsg.replace("{name}", homeName);
     }
 
-    var pretty = this.materialNames.value().displayName(material);
+    var snap = this.materialNames.value();
+    var pretty = snap.displayName(material);
 
-    return messages.materialUpdated().replace("{name}", homeName).replace("{material}", pretty);
+    var materialUpdatedMsg = messages.materialUpdated();
+    var withName = materialUpdatedMsg.replace("{name}", homeName);
+
+    return withName.replace("{material}", pretty);
   }
 }

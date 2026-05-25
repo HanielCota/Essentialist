@@ -24,7 +24,10 @@ public final class StonecutterCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
-    player.openInventory(MenuType.STONECUTTER.create(player));
+    var player = actor.unwrap(Player.class);
+
+    var menu = MenuType.STONECUTTER.create(player);
+
+    player.openInventory(menu);
   }
 }

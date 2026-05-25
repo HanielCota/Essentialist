@@ -2,7 +2,9 @@ package com.hanielcota.essentials.modules.homes.teleport;
 
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.util.ClickableMessage;
+import com.hanielcota.essentials.util.ClickableMessageSegment;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
@@ -31,13 +33,19 @@ public final class HomeTeleportPrompt implements DelayedTeleport.Callback {
       return;
     }
 
-    var countdownMsg = this.teleporting.replace("{seconds}", Long.toString(seconds));
+    var secondsStr = Long.toString(seconds);
+    var countdownMsg = this.teleporting.replace("{seconds}", secondsStr);
 
-    ClickableMessage.create()
-        .append(countdownMsg)
-        .space()
-        .append(this.cancelButton, s -> s.runCommand(CANCEL_COMMAND).hover(this.cancelHover))
-        .send(this.player);
+    var hover = this.cancelHover;
+    Consumer<ClickableMessageSegment> cancelSegment =
+        segment -> segment.runCommand(CANCEL_COMMAND).hover(hover);
+
+    var message = ClickableMessage.create();
+    message.append(countdownMsg);
+    message.space();
+    message.append(this.cancelButton, cancelSegment);
+
+    message.send(this.player);
   }
 
   @Override

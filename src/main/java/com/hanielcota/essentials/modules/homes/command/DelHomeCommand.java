@@ -29,21 +29,28 @@ public record DelHomeCommand(
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
     var sender = actor.unwrap(Player.class);
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var name = this.nameResolver.resolve(rawName);
 
     if (name == null) {
-      actor.sendError(messages.invalidName());
+      var invalidNameMsg = messages.invalidName();
+      actor.sendError(invalidNameMsg);
       return;
     }
 
-    if (!this.service.delete(sender.getUniqueId(), name)) {
-      var unknownMsg = messages.unknownHome().replace("{name}", name);
+    var uuid = sender.getUniqueId();
+
+    if (!this.service.delete(uuid, name)) {
+      var unknownHomeMsg = messages.unknownHome();
+      var unknownMsg = unknownHomeMsg.replace("{name}", name);
       actor.sendError(unknownMsg);
       return;
     }
 
-    var deletedMsg = messages.homeDeleted().replace("{name}", name);
+    var homeDeletedMsg = messages.homeDeleted();
+    var deletedMsg = homeDeletedMsg.replace("{name}", name);
+
     actor.sendSuccess(deletedMsg);
   }
 }
