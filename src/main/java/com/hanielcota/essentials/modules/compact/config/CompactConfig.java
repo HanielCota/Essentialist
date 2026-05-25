@@ -38,7 +38,8 @@ public record CompactConfig(
   }
 
   public String formatSuccess(int count) {
-    return success.replace("{count}", Integer.toString(count));
+    var countText = Integer.toString(count);
+    return success.replace("{count}", countText);
   }
 
   @ConfigSerializable

@@ -14,12 +14,13 @@ public final class GamemodeModule extends AbstractModule {
 
   @Override
   protected void onEnable() {
+    var gamemodeService = new GamemodeService();
     var config =
-        configure(
-            "gamemode", GamemodeConfig.class, GamemodeConfig::defaults, new GamemodeService());
-    var gamemodeService = service(GamemodeService.class);
+        configure("gamemode", GamemodeConfig.class, GamemodeConfig::defaults, gamemodeService);
+
     var framework = service(PaperCommandFramework.class);
     var gamemodeCommand = new GamemodeCommand(config, gamemodeService, framework);
+
     registerCommand(gamemodeCommand);
   }
 }

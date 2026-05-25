@@ -10,25 +10,35 @@ import org.bukkit.inventory.ItemStack;
 public record SmeltService(ConfigHandle<SmeltConfig> config) {
 
   public int smelt(@NonNull Player player) {
-    var mappings = this.config.value().mappings();
+    var snap = this.config.value();
+    var mappings = snap.mappings();
     var inv = player.getInventory();
-    int count = 0;
+    var size = inv.getSize();
 
-    for (int slot = 0; slot < inv.getSize(); slot++) {
+    int count = 0;
+    for (int slot = 0; slot < size; slot++) {
       var item = inv.getItem(slot);
       if (item == null || !ItemStacks.isPlain(item)) {
         continue;
       }
-      var result = mappings.get(item.getType());
-      if (result != null) {
-        // Clamp to the result's max stack size: a misconfigured mapping to a low-stack
-        // material would otherwise produce an oversized ItemStack (dupe/visual issues).
-        int amount = Math.min(item.getAmount(), result.getMaxStackSize());
-        var resultStack = new ItemStack(result, amount);
-        inv.setItem(slot, resultStack);
-        count += amount;
+
+      var type = item.getType();
+      var result = mappings.get(type);
+      if (result == null) {
+        continue;
       }
+
+      // Clamp to the result's max stack size: a misconfigured mapping to a low-stack
+      // material would otherwise produce an oversized ItemStack (dupe/visual issues).
+      var current = item.getAmount();
+      var max = result.getMaxStackSize();
+      var amount = Math.min(current, max);
+      var resultStack = new ItemStack(result, amount);
+
+      inv.setItem(slot, resultStack);
+      count += amount;
     }
+
     return count;
   }
 }

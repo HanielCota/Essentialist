@@ -11,11 +11,12 @@ public final class HatService {
   public Result equip(@NonNull Player player, @NonNull HatConfig snap) {
     var inv = player.getInventory();
     var held = inv.getItemInMainHand();
+    var heldType = held.getType();
 
-    if (held.getType().isAir()) {
+    if (heldType.isAir()) {
       return Result.EMPTY_HAND;
     }
-    if (!snap.isAllowed(held.getType())) {
+    if (!snap.isAllowed(heldType)) {
       return Result.NOT_ALLOWED;
     }
 
@@ -26,7 +27,8 @@ public final class HatService {
     var newHelmet = held.clone();
     newHelmet.setAmount(1);
 
-    if (held.getAmount() == 1) {
+    var heldAmount = held.getAmount();
+    if (heldAmount == 1) {
       // Plain swap: the held slot is freed for the previous helmet.
       inv.setHelmet(newHelmet);
       inv.setItemInMainHand(previousHelmet);
@@ -40,8 +42,9 @@ public final class HatService {
     }
 
     inv.setHelmet(newHelmet);
-    held.setAmount(held.getAmount() - 1);
+    held.setAmount(heldAmount - 1);
     inv.setItemInMainHand(held);
+
     if (hasPreviousHelmet) {
       inv.addItem(previousHelmet);
     }
@@ -52,19 +55,30 @@ public final class HatService {
   private static boolean hasRoomFor(@NonNull PlayerInventory inv, @NonNull ItemStack item) {
     var contents = inv.getStorageContents();
     var needed = item.getAmount();
+
     for (var slot : contents) {
-      if (slot == null || slot.getType().isAir()) {
+      if (slot == null) {
         return true;
       }
-      if (slot.isSimilar(item)) {
-        var capacity = slot.getMaxStackSize() - slot.getAmount();
-        if (capacity >= needed) {
-          return true;
-        }
-        needed -= capacity;
-        if (needed <= 0) {
-          return true;
-        }
+
+      var slotType = slot.getType();
+      if (slotType.isAir()) {
+        return true;
+      }
+      if (!slot.isSimilar(item)) {
+        continue;
+      }
+
+      var maxStack = slot.getMaxStackSize();
+      var currentAmount = slot.getAmount();
+      var capacity = maxStack - currentAmount;
+
+      if (capacity >= needed) {
+        return true;
+      }
+      needed -= capacity;
+      if (needed <= 0) {
+        return true;
       }
     }
     return false;
