@@ -39,19 +39,23 @@ public record KillCommand(
     // Exempt only applies when killing someone else — a staff member with both essentials.kill and
     // essentials.kill.exempt can still kill themselves.
     if (!self && subject.hasPermission(EXEMPT_PERMISSION)) {
-      sender.sendError(snap.formatExempt(name));
+      var exemptMsg = snap.formatExempt(name);
+      sender.sendError(exemptMsg);
       return;
     }
 
     if (!this.service.kill(subject)) {
-      sender.sendError(snap.whenAlreadyDead().forSender(self, name));
+      var alreadyDead = snap.whenAlreadyDead();
+      var alreadyDeadMsg = alreadyDead.forSender(self, name);
+      sender.sendError(alreadyDeadMsg);
       return;
     }
 
     var messages = snap.whenKilled();
     var target = this.framework.actorOf(subject);
-    var selfMessage = messages.forSender(self, name);
+    var selfMsg = messages.forSender(self, name);
+    var targetMsg = messages.forTarget(name);
 
-    sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
+    sender.sendDualMessage(target, selfMsg, targetMsg);
   }
 }

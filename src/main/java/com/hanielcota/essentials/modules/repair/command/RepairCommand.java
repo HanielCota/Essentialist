@@ -30,18 +30,27 @@ public record RepairCommand(
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
     var result = this.service.repairHand(subject);
     switch (result) {
-      case EMPTY_HAND -> sender.sendError(snap.whenEmptyHand().forSender(self, name));
-      case NOTHING_TO_REPAIR -> sender.sendError(snap.whenNothingHand().forSender(self, name));
+      case EMPTY_HAND -> {
+        var emptyMessages = snap.whenEmptyHand();
+        var emptyMsg = emptyMessages.forSender(self, name);
+        sender.sendError(emptyMsg);
+      }
+      case NOTHING_TO_REPAIR -> {
+        var nothingMessages = snap.whenNothingHand();
+        var nothingMsg = nothingMessages.forSender(self, name);
+        sender.sendError(nothingMsg);
+      }
       case REPAIRED -> {
         var messages = snap.whenHandRepaired();
         var target = this.framework.actorOf(subject);
         var selfMessage = messages.forSender(self, name);
-        sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
+        var targetMessage = messages.forTarget(name);
+        sender.sendDualMessage(target, selfMessage, targetMessage);
       }
     }
   }
@@ -49,12 +58,14 @@ public record RepairCommand(
   @Subcommand({"tudo", "all"})
   public void all(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
 
-    int repaired = this.service.repairAll(subject);
+    var repaired = this.service.repairAll(subject);
     if (repaired == 0) {
-      sender.sendError(snap.whenNothingAll().forSender(self, name));
+      var nothingMessages = snap.whenNothingAll();
+      var nothingMsg = nothingMessages.forSender(self, name);
+      sender.sendError(nothingMsg);
       return;
     }
 

@@ -27,9 +27,9 @@ public record EnchantConfig(
   }
 
   public String formatApplied(@NonNull String enchantment, int level) {
-    return applied
-        .replace("{enchantment}", enchantment)
-        .replace("{level}", Integer.toString(level));
+    var levelText = Integer.toString(level);
+    var withEnchant = applied.replace("{enchantment}", enchantment);
+    return withEnchant.replace("{level}", levelText);
   }
 
   public String formatRemoved(@NonNull String enchantment) {
@@ -41,6 +41,7 @@ public record EnchantConfig(
   }
 
   public String formatCleared(int count) {
-    return cleared.replace("{count}", Integer.toString(count));
+    var countText = Integer.toString(count);
+    return cleared.replace("{count}", countText);
   }
 }

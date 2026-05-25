@@ -16,10 +16,11 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.Optional;
 import lombok.NonNull;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 @Command("rename")
 @EssentialsCommand
@@ -37,13 +38,7 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
     var player = sender.unwrap(Player.class);
     var trimmed = nome.strip();
 
-    var nameComponent =
-        Optional.of(trimmed)
-            .filter(str -> !str.isEmpty())
-            .map(ComponentUtils::mini)
-            .map(component -> component.decoration(TextDecoration.ITALIC, false))
-            .orElse(null);
-
+    var nameComponent = renderName(trimmed);
     var result = this.service.rename(player, nameComponent);
 
     switch (result) {
@@ -51,8 +46,23 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
         var renamedMsg = snap.formatRenamed(trimmed);
         sender.sendSuccess(renamedMsg);
       }
-      case CLEARED -> sender.sendSuccess(snap.cleared());
-      case EMPTY_HAND -> sender.sendError(snap.emptyHand());
+      case CLEARED -> {
+        var clearedMsg = snap.cleared();
+        sender.sendSuccess(clearedMsg);
+      }
+      case EMPTY_HAND -> {
+        var emptyHandMsg = snap.emptyHand();
+        sender.sendError(emptyHandMsg);
+      }
     }
+  }
+
+  private static @Nullable Component renderName(@NonNull String trimmed) {
+    if (trimmed.isEmpty()) {
+      return null;
+    }
+
+    var base = ComponentUtils.mini(trimmed);
+    return base.decoration(TextDecoration.ITALIC, false);
   }
 }

@@ -16,8 +16,10 @@ public final class RepairModule extends AbstractModule {
   protected void onEnable() {
     var config = config("repair", RepairConfig.class, RepairConfig::defaults);
     var repairService = new RepairService(config);
-
     var framework = service(PaperCommandFramework.class);
-    registerCommand(new RepairCommand(config, repairService, framework));
+
+    var command = new RepairCommand(config, repairService, framework);
+
+    registerCommand(command);
   }
 }

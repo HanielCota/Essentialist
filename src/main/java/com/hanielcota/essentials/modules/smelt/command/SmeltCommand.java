@@ -26,14 +26,16 @@ public record SmeltCommand(ConfigHandle<SmeltConfig> config, SmeltService servic
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player sender = actor.unwrap(Player.class);
-    int count = this.service.smelt(sender);
+    var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
+    var count = this.service.smelt(sender);
 
     if (count == 0) {
-      actor.sendError(snap.nothing());
+      var nothingMsg = snap.nothing();
+      actor.sendError(nothingMsg);
       return;
     }
+
     var successMsg = snap.formatSuccess(count);
     actor.sendSuccess(successMsg);
   }

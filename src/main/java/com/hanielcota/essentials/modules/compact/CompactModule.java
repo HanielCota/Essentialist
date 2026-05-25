@@ -15,6 +15,8 @@ public final class CompactModule extends AbstractModule {
   protected void onEnable() {
     var config = config("compact", CompactConfig.class, CompactConfig::defaults);
     var service = new CompactService(config);
-    registerCommand(new CompactCommand(config, service));
+    var command = new CompactCommand(config, service);
+
+    registerCommand(command);
   }
 }
