@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.give;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.give.command.GiveCommand;
 import com.hanielcota.essentials.modules.give.command.GiveNotifier;
+import com.hanielcota.essentials.modules.give.command.GiveOrchestrator;
 import com.hanielcota.essentials.modules.give.config.GiveConfig;
 import com.hanielcota.essentials.modules.give.service.GiveService;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -21,7 +22,8 @@ public final class GiveModule extends AbstractModule {
     var playerProvider = service(PlayerProvider.class);
     var framework = service(PaperCommandFramework.class);
     var notifier = new GiveNotifier(config, framework);
-    var giveCommand = new GiveCommand(config, giveService, notifier, playerProvider);
+    var orchestrator = new GiveOrchestrator(config, giveService, notifier);
+    var giveCommand = new GiveCommand(orchestrator, playerProvider);
     registerCommand(giveCommand);
   }
 }

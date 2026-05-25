@@ -10,9 +10,9 @@ import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnJoinListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnRespawnListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnVoidListener;
+import com.hanielcota.essentials.modules.spawn.repository.SpawnStore;
+import com.hanielcota.essentials.modules.spawn.repository.SpawnTable;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
-import com.hanielcota.essentials.modules.spawn.service.SpawnStore;
-import com.hanielcota.essentials.modules.spawn.service.SpawnTable;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import java.util.Set;
 

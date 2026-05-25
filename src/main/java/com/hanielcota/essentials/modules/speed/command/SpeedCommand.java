@@ -1,8 +1,6 @@
 package com.hanielcota.essentials.modules.speed.command;
 
-import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.config.MessagePair;
 import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
 import com.hanielcota.essentials.modules.speed.service.SpeedService;
 import io.github.hanielcota.commandframework.annotation.Arg;
@@ -17,7 +15,6 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,7 +24,7 @@ import org.bukkit.entity.Player;
 @Description("Ajusta a velocidade de andar ou voar do jogador.")
 @Syntax("/speed walk <valor> [jogador] | /speed fly <valor> [jogador] | /speed reset [jogador]")
 public record SpeedCommand(
-    ConfigHandle<SpeedConfig> config, SpeedService service, PaperCommandFramework framework) {
+    ConfigHandle<SpeedConfig> config, SpeedService service, SpeedNotifier notifier) {
 
   @DefaultSubcommand
   public void showUsage(@NonNull CommandActor sender) {
@@ -51,7 +48,7 @@ public record SpeedCommand(
     }
 
     var messages = snap.whenWalkSet(valor);
-    announce(sender, subject, messages);
+    this.notifier.announce(sender, subject, messages);
   }
 
   @Subcommand("fly")
@@ -69,7 +66,7 @@ public record SpeedCommand(
     }
 
     var messages = snap.whenFlySet(valor);
-    announce(sender, subject, messages);
+    this.notifier.announce(sender, subject, messages);
   }
 
   @Subcommand({"reset", "resetar"})
@@ -79,18 +76,6 @@ public record SpeedCommand(
     this.service.reset(subject);
 
     var messages = snap.whenReset();
-    announce(sender, subject, messages);
-  }
-
-  private void announce(
-      @NonNull CommandActor sender, @NonNull Player subject, @NonNull MessagePair messages) {
-    var name = subject.getName();
-    var isSelf = Senders.isSelf(sender, subject);
-    var target = this.framework.actorOf(subject);
-
-    var senderMsg = messages.forSender(isSelf, name);
-    var targetMsg = messages.forTarget(name);
-
-    sender.sendDualMessage(target, senderMsg, targetMsg);
+    this.notifier.announce(sender, subject, messages);
   }
 }

@@ -14,14 +14,6 @@ import org.bukkit.entity.Player;
 public final class NearService {
 
   /**
-   * Default factory: target is always visible. Use the constructor to inject a vanish-aware one.
-   */
-  public static NearService allVisible() {
-    BiPredicate<Player, Player> alwaysVisible = (viewer, target) -> true;
-    return new NearService(alwaysVisible);
-  }
-
-  /**
    * Filter applied to every candidate before the distance check. The first argument is the {@code
    * /near} caller, the second is the candidate — used so a viewer with {@code
    * essentials.vanish.see} can still see vanished players in results.

@@ -52,7 +52,6 @@ public record TitleCommand(
   }
 
   @Subcommand("broadcast")
-  @Alias("bc")
   @Permission("essentials.title.broadcast")
   @Description("Envia um título para todos os jogadores online.")
   @Syntax("/title broadcast \"título\" [\"subtítulo\"]")

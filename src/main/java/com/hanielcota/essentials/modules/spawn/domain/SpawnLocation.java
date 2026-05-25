@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.spawn.service;
+package com.hanielcota.essentials.modules.spawn.domain;
 
 import java.util.Optional;
 import lombok.NonNull;

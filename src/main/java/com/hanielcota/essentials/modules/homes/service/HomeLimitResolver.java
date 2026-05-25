@@ -18,25 +18,6 @@ public final class HomeLimitResolver {
 
   private final IntSupplier defaultLimit;
 
-  public int resolve(@NonNull Permissible player) {
-    var permissions = player.getEffectivePermissions();
-    var maxLimit = Integer.MIN_VALUE;
-
-    for (var attachmentInfo : permissions) {
-      var candidate = parseLimit(attachmentInfo);
-
-      if (candidate > maxLimit) {
-        maxLimit = candidate;
-      }
-    }
-
-    if (maxLimit != Integer.MIN_VALUE) {
-      return maxLimit;
-    }
-
-    return defaultLimit();
-  }
-
   private static int parseLimit(@NonNull PermissionAttachmentInfo attachmentInfo) {
     if (!attachmentInfo.getValue()) {
       return Integer.MIN_VALUE;
@@ -56,6 +37,25 @@ public final class HomeLimitResolver {
     } catch (NumberFormatException _) {
       return Integer.MIN_VALUE;
     }
+  }
+
+  public int resolve(@NonNull Permissible player) {
+    var permissions = player.getEffectivePermissions();
+    var maxLimit = Integer.MIN_VALUE;
+
+    for (var attachmentInfo : permissions) {
+      var candidate = parseLimit(attachmentInfo);
+
+      if (candidate > maxLimit) {
+        maxLimit = candidate;
+      }
+    }
+
+    if (maxLimit != Integer.MIN_VALUE) {
+      return maxLimit;
+    }
+
+    return defaultLimit();
   }
 
   private int defaultLimit() {

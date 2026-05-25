@@ -40,6 +40,19 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
     return withZ.replace("{time}", time);
   }
 
+  private static Coordinates resolveCoordinates(@Nullable Destination destination) {
+    if (destination == null) {
+      return new Coordinates(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
+    }
+
+    var world = destination.world();
+    var x = Numbers.compact(destination.x());
+    var y = Numbers.compact(destination.y());
+    var z = Numbers.compact(destination.z());
+
+    return new Coordinates(world, x, y, z);
+  }
+
   public @NonNull ItemTemplate render(@NonNull TpaHistoryEntry entry, int humanIndex) {
     var snap = this.config.value();
     var settings = snap.menu();
@@ -101,19 +114,6 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
     builder.italic(false);
 
     return builder.build();
-  }
-
-  private static Coordinates resolveCoordinates(@Nullable Destination destination) {
-    if (destination == null) {
-      return new Coordinates(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
-    }
-
-    var world = destination.world();
-    var x = Numbers.compact(destination.x());
-    var y = Numbers.compact(destination.y());
-    var z = Numbers.compact(destination.z());
-
-    return new Coordinates(world, x, y, z);
   }
 
   private String[] buildLore(

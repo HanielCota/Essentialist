@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.nick.service;
+package com.hanielcota.essentials.modules.nick.repository;
 
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.modules.nick.model.NickEntry;

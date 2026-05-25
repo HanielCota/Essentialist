@@ -17,43 +17,6 @@ public final class EssentialsBootstrap {
 
   private final EssentialsPlugin plugin;
 
-  public EssentialsCore start() {
-    var services = new DefaultServiceRegistry();
-    EssentialsCore core = null;
-
-    try {
-      var coreServices = new CoreServicesBootstrap(this.plugin);
-      coreServices.register(services);
-
-      var database = new DatabaseBootstrap(this.plugin);
-      database.register(services);
-
-      var discovery = new ModuleDiscovery();
-      var modules = discovery.discover();
-      services.register(ModuleManager.class, modules);
-
-      var commands = new CommandSystemBootstrap(this.plugin);
-      var framework = commands.register(services, modules);
-
-      var menus = new MenuBootstrap(this.plugin);
-      menus.register(services);
-
-      var userStack = new UserStackBootstrap(this.plugin);
-      userStack.register(services);
-
-      core = new EssentialsCore(this.plugin, services);
-      services.register(EssentialsApi.class, core);
-
-      commands.mirrorServicesToCommands(framework, services);
-
-      core.advance(LifecyclePhase.ENABLED);
-      return core;
-    } catch (RuntimeException e) {
-      rollback(services, core, e);
-      throw e;
-    }
-  }
-
   private static void rollback(
       ServiceRegistry services, EssentialsCore core, RuntimeException cause) {
     if (core != null) {
@@ -77,6 +40,44 @@ public final class EssentialsBootstrap {
       cleanup.run();
     } catch (RuntimeException e) {
       primary.addSuppressed(e);
+    }
+  }
+
+  public EssentialsCore start() {
+    var services = new DefaultServiceRegistry();
+    EssentialsCore core = null;
+
+    try {
+      var coreServices = new CoreServicesBootstrap(this.plugin);
+      coreServices.register(services);
+
+      var database = new DatabaseBootstrap(this.plugin);
+      database.register(services);
+
+      var dataFolder = this.plugin.getDataFolder().toPath();
+      var discovery = new ModuleDiscovery(dataFolder);
+      var modules = discovery.discover();
+      services.register(ModuleManager.class, modules);
+
+      var commands = new CommandSystemBootstrap(this.plugin);
+      var framework = commands.register(services, modules);
+
+      var menus = new MenuBootstrap(this.plugin);
+      menus.register(services);
+
+      var userStack = new UserStackBootstrap(this.plugin);
+      userStack.register(services);
+
+      core = new EssentialsCore(this.plugin, services);
+      services.register(EssentialsApi.class, core);
+
+      commands.mirrorServicesToCommands(framework, services);
+
+      core.advance(LifecyclePhase.ENABLED);
+      return core;
+    } catch (RuntimeException e) {
+      rollback(services, core, e);
+      throw e;
     }
   }
 }

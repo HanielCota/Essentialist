@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.list.service;
+package com.hanielcota.essentials.modules.list.model;
 
 import java.util.UUID;
 import lombok.NonNull;

@@ -39,8 +39,10 @@ import com.hanielcota.essentials.modules.homes.repository.CachedHomeRepository;
 import com.hanielcota.essentials.modules.homes.repository.HomeCache;
 import com.hanielcota.essentials.modules.homes.repository.SqlHomeRepository;
 import com.hanielcota.essentials.modules.homes.repository.SqlHomeTable;
+import com.hanielcota.essentials.modules.homes.service.HomeLimitReachedMessageResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
+import com.hanielcota.essentials.modules.homes.service.MissingHomeMessageResolver;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -126,8 +128,13 @@ public final class HomesModule extends AbstractModule {
 
     // 4. Commands.
     var materialResolver = new HomeMaterialResolver(config);
-    registerCommand(new SetHomeCommand(config, homeService, nameResolver, materialResolver));
-    registerCommand(new HomeCommand(config, homeService, teleporter, nameResolver));
+    var missingResolver = new MissingHomeMessageResolver(config, homeService);
+    var limitReachedResolver = new HomeLimitReachedMessageResolver(config, homeService);
+    registerCommand(
+        new SetHomeCommand(
+            config, homeService, nameResolver, materialResolver, limitReachedResolver));
+    registerCommand(
+        new HomeCommand(config, homeService, teleporter, nameResolver, missingResolver));
     registerCommand(new DelHomeCommand(config, homeService, nameResolver));
     registerCommand(new HomesCommand(config, homeService, menus, menuState));
   }

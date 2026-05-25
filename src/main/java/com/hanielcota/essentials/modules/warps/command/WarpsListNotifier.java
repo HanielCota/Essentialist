@@ -23,36 +23,6 @@ public final class WarpsListNotifier {
 
   private final ConfigHandle<WarpsConfig> config;
 
-  public void sendEmpty(@NonNull CommandActor actor) {
-    var snap = this.config.value();
-    var messages = snap.messages();
-    var noWarpsMsg = messages.noWarps();
-
-    actor.sendError(noWarpsMsg);
-  }
-
-  public void sendList(@NonNull Player viewer, @NonNull List<Warp> warps) {
-    var snap = this.config.value();
-    var messages = snap.messages();
-
-    var warpsCount = warps.size();
-    var warpsCountStr = Integer.toString(warpsCount);
-    var headerTemplate = messages.listHeader();
-    var headerMsg = headerTemplate.replace("{count}", warpsCountStr);
-
-    var entryTemplate = messages.listEntry();
-    var hoverTemplate = messages.listEntryHover();
-
-    var message = ClickableMessage.create();
-    message.append(headerMsg);
-
-    for (var warp : warps) {
-      appendEntry(message, warp, entryTemplate, hoverTemplate);
-    }
-
-    message.send(viewer);
-  }
-
   private static void appendEntry(
       @NonNull ClickableMessage message,
       @NonNull Warp warp,
@@ -88,5 +58,35 @@ public final class WarpsListNotifier {
     var withY = withX.replace("{y}", compactY);
 
     return withY.replace("{z}", compactZ);
+  }
+
+  public void sendEmpty(@NonNull CommandActor actor) {
+    var snap = this.config.value();
+    var messages = snap.messages();
+    var noWarpsMsg = messages.noWarps();
+
+    actor.sendError(noWarpsMsg);
+  }
+
+  public void sendList(@NonNull Player viewer, @NonNull List<Warp> warps) {
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var warpsCount = warps.size();
+    var warpsCountStr = Integer.toString(warpsCount);
+    var headerTemplate = messages.listHeader();
+    var headerMsg = headerTemplate.replace("{count}", warpsCountStr);
+
+    var entryTemplate = messages.listEntry();
+    var hoverTemplate = messages.listEntryHover();
+
+    var message = ClickableMessage.create();
+    message.append(headerMsg);
+
+    for (var warp : warps) {
+      appendEntry(message, warp, entryTemplate, hoverTemplate);
+    }
+
+    message.send(viewer);
   }
 }

@@ -22,6 +22,14 @@ public final class EssentialsCore implements EssentialsApi {
 
   private volatile LifecyclePhase phase = LifecyclePhase.BOOTING;
 
+  private static void safelyShutdown(@NonNull String label, @NonNull Runnable step) {
+    try {
+      step.run();
+    } catch (RuntimeException e) {
+      LOG.error(e, "{} shutdown failed", label);
+    }
+  }
+
   public void advance(@NonNull LifecyclePhase next) {
     this.phase = next;
 
@@ -59,14 +67,6 @@ public final class EssentialsCore implements EssentialsApi {
   private void shutdownDatabase() {
     var databaseHandle = this.services.find(DatabaseProvider.class);
     databaseHandle.ifPresent(DatabaseProvider::close);
-  }
-
-  private static void safelyShutdown(@NonNull String label, @NonNull Runnable step) {
-    try {
-      step.run();
-    } catch (RuntimeException e) {
-      LOG.error(e, "{} shutdown failed", label);
-    }
   }
 
   public LifecyclePhase phase() {

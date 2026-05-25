@@ -19,18 +19,6 @@ public final class OnlineModule extends AbstractModule {
     super("online");
   }
 
-  @Override
-  protected void onEnable() {
-    var config = config("online", OnlineConfig.class, OnlineConfig::defaults);
-    var players = service(PlayerProvider.class);
-    var registry = context().services();
-    Supplier<Optional<VanishService>> vanishService = () -> registry.find(VanishService.class);
-    var visibleCount = visibleCount(players, vanishService);
-    var command = new OnlineCommand(config, players, visibleCount);
-
-    registerCommand(command);
-  }
-
   /**
    * Counts online players, excluding vanished ones for viewers without {@link
    * VanishVisibilityApplier#SEE_PERMISSION}. Staff with the see-perm get the true count. The vanish
@@ -71,5 +59,17 @@ public final class OnlineModule extends AbstractModule {
     }
 
     return count;
+  }
+
+  @Override
+  protected void onEnable() {
+    var config = config("online", OnlineConfig.class, OnlineConfig::defaults);
+    var players = service(PlayerProvider.class);
+    var registry = context().services();
+    Supplier<Optional<VanishService>> vanishService = () -> registry.find(VanishService.class);
+    var visibleCount = visibleCount(players, vanishService);
+    var command = new OnlineCommand(config, players, visibleCount);
+
+    registerCommand(command);
   }
 }

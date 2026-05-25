@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.warps.service;
+package com.hanielcota.essentials.modules.warps.repository;
 
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.modules.warps.domain.Warp;

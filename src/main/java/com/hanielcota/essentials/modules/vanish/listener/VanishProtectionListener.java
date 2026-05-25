@@ -24,6 +24,17 @@ public final class VanishProtectionListener implements Listener {
 
   private final VanishService service;
 
+  private static Player resolveAttacker(@NonNull Entity damager) {
+    if (damager instanceof Player player) {
+      return player;
+    }
+    if (damager instanceof Projectile projectile
+        && projectile.getShooter() instanceof Player shooter) {
+      return shooter;
+    }
+    return null;
+  }
+
   @EventHandler(ignoreCancelled = true)
   public void onTarget(@NonNull EntityTargetEvent event) {
     if (!(event.getTarget() instanceof Player target)) {
@@ -52,16 +63,5 @@ public final class VanishProtectionListener implements Listener {
     }
 
     event.setCancelled(true);
-  }
-
-  private static Player resolveAttacker(@NonNull Entity damager) {
-    if (damager instanceof Player player) {
-      return player;
-    }
-    if (damager instanceof Projectile projectile
-        && projectile.getShooter() instanceof Player shooter) {
-      return shooter;
-    }
-    return null;
   }
 }

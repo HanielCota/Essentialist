@@ -4,14 +4,18 @@ import com.hanielcota.essentials.modules.tpa.model.Destination;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
-record TeleportExecution(AcceptResult result, @Nullable Destination destination) {
+record TeleportExecution(@Nullable Destination destination) {
 
-  static TeleportExecution failed(AcceptResult result) {
-    return new TeleportExecution(result, null);
+  static TeleportExecution failed() {
+    return new TeleportExecution(null);
   }
 
   static TeleportExecution success(Destination destination) {
-    return new TeleportExecution(AcceptResult.SUCCESS, destination);
+    return new TeleportExecution(destination);
+  }
+
+  boolean succeeded() {
+    return this.destination != null;
   }
 
   Optional<Destination> optionalDestination() {

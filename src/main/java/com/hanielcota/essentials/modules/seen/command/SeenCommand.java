@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.seen.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.seen.config.SeenConfig;
-import com.hanielcota.essentials.modules.seen.service.SeenLine;
 import com.hanielcota.essentials.modules.seen.service.SeenService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -35,14 +34,7 @@ public record SeenCommand(ConfigHandle<SeenConfig> config, SeenService service) 
       return;
     }
 
-    var message = format(snap, line);
+    var message = snap.formatLine(line);
     sender.sendMessage(message);
-  }
-
-  private static String format(@NonNull SeenConfig snap, @NonNull SeenLine line) {
-    return switch (line.kind()) {
-      case ONLINE -> snap.formatOnline(line.displayName(), line.duration());
-      case OFFLINE -> snap.formatOffline(line.displayName(), line.duration());
-    };
   }
 }

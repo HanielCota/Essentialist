@@ -7,6 +7,18 @@ import lombok.NonNull;
 /** Write-side SQL surface: {@code INSERT}, {@code UPDATE}, {@code DELETE} statements. */
 public interface SqlWriter {
 
+  private static void bindPositional(@NonNull PreparedStatement stmt, @NonNull Object[] params)
+      throws SQLException {
+    var length = params.length;
+
+    for (var i = 0; i < length; i++) {
+      var paramIndex = i + 1;
+      var paramValue = params[i];
+
+      stmt.setObject(paramIndex, paramValue);
+    }
+  }
+
   /** Executes an update (INSERT, UPDATE, DELETE) with an explicit binder. */
   void update(@NonNull String sql, @NonNull StatementBinder binder);
 
@@ -23,17 +35,5 @@ public interface SqlWriter {
     StatementBinder binder = stmt -> bindPositional(stmt, params);
 
     return updateCount(sql, binder);
-  }
-
-  private static void bindPositional(@NonNull PreparedStatement stmt, @NonNull Object[] params)
-      throws SQLException {
-    var length = params.length;
-
-    for (var i = 0; i < length; i++) {
-      var paramIndex = i + 1;
-      var paramValue = params[i];
-
-      stmt.setObject(paramIndex, paramValue);
-    }
   }
 }

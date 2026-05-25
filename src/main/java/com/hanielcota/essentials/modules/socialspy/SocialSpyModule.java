@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.socialspy;
 
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.socialspy.command.SocialSpyCommand;
+import com.hanielcota.essentials.modules.socialspy.command.SocialSpyNotifier;
 import com.hanielcota.essentials.modules.socialspy.config.SocialSpyConfig;
 import com.hanielcota.essentials.modules.socialspy.listener.SocialSpyQuitListener;
 import com.hanielcota.essentials.modules.socialspy.service.SocialSpyBroadcaster;
@@ -27,7 +28,8 @@ public final class SocialSpyModule extends AbstractModule {
 
     registerService(SocialSpyBroadcaster.class, broadcaster);
 
-    registerCommand(new SocialSpyCommand(config, service));
+    var notifier = new SocialSpyNotifier(config);
+    registerCommand(new SocialSpyCommand(service, notifier));
     registerListener(new SocialSpyQuitListener(service));
   }
 }

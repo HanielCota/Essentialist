@@ -5,6 +5,7 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.teleport.command.TeleportCancelCommand;
 import com.hanielcota.essentials.modules.teleport.command.TeleportCommand;
+import com.hanielcota.essentials.modules.teleport.command.TeleportDispatcher;
 import com.hanielcota.essentials.modules.teleport.command.TeleportHereCommand;
 import com.hanielcota.essentials.modules.teleport.command.TeleportNotifier;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
@@ -13,6 +14,7 @@ import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistoryTable;
 import com.hanielcota.essentials.modules.teleport.listener.DelayedTeleportCanceller;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 
@@ -39,8 +41,10 @@ public final class TeleportModule extends AbstractModule {
 
     var framework = service(PaperCommandFramework.class);
     var notifier = new TeleportNotifier(config, framework);
+    var players = service(PlayerProvider.class);
+    var dispatcher = new TeleportDispatcher(config, players, notifier);
 
-    registerCommand(new TeleportCommand(framework, notifier));
+    registerCommand(new TeleportCommand(dispatcher));
     registerCommand(new TeleportHereCommand(framework, notifier));
     registerCommand(new TeleportCancelCommand(config, delayed));
   }

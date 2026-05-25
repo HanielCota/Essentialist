@@ -3,6 +3,8 @@ package com.hanielcota.essentials.modules.list.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.list.config.GroupDefinition;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
+import com.hanielcota.essentials.modules.list.model.PlayerEntry;
+import com.hanielcota.essentials.modules.list.model.Resolved;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -32,46 +34,6 @@ public final class ListService {
   private final ConfigHandle<ListConfig> config;
   private final PlayerProvider players;
   private final Supplier<Optional<VanishService>> vanishService;
-
-  /** Visible roster sorted by group priority desc, then name asc. */
-  public List<PlayerEntry> roster(@NonNull Player viewer) {
-    var snap = this.config.value();
-    var vanish = this.vanishService.get().orElse(null);
-    var seeVanish = viewer.hasPermission(VanishVisibilityApplier.SEE_PERMISSION);
-
-    var sortedGroups = sortedGroups(snap);
-    var defaultGroup = defaultResolved(snap);
-    var entries = new ArrayList<PlayerEntry>();
-
-    for (var player : this.players.all()) {
-      if (!isVisibleTo(player, vanish, seeVanish)) {
-        continue;
-      }
-
-      var group = resolveGroup(player, sortedGroups, defaultGroup);
-      var entry = PlayerEntry.of(player.getUniqueId(), player.getName(), group);
-
-      entries.add(entry);
-    }
-
-    entries.sort(
-        Comparator.comparingInt(PlayerEntry::groupPriority)
-            .reversed()
-            .thenComparing(PlayerEntry::name, String.CASE_INSENSITIVE_ORDER));
-
-    return entries;
-  }
-
-  /** Group counts keyed by group id, used to fill {@code {count_<id>}} in the info template. */
-  public Map<String, Integer> countsByGroupId(@NonNull List<PlayerEntry> roster) {
-    var counts = new HashMap<String, Integer>();
-
-    for (var entry : roster) {
-      counts.merge(entry.groupId(), 1, Integer::sum);
-    }
-
-    return Map.copyOf(counts);
-  }
 
   private static boolean isVisibleTo(
       @NonNull Player player, @Nullable VanishService vanish, boolean seeVanish) {
@@ -113,5 +75,45 @@ public final class ListService {
     }
 
     return fallback;
+  }
+
+  /** Visible roster sorted by group priority desc, then name asc. */
+  public List<PlayerEntry> roster(@NonNull Player viewer) {
+    var snap = this.config.value();
+    var vanish = this.vanishService.get().orElse(null);
+    var seeVanish = viewer.hasPermission(VanishVisibilityApplier.SEE_PERMISSION);
+
+    var sortedGroups = sortedGroups(snap);
+    var defaultGroup = defaultResolved(snap);
+    var entries = new ArrayList<PlayerEntry>();
+
+    for (var player : this.players.all()) {
+      if (!isVisibleTo(player, vanish, seeVanish)) {
+        continue;
+      }
+
+      var group = resolveGroup(player, sortedGroups, defaultGroup);
+      var entry = PlayerEntry.of(player.getUniqueId(), player.getName(), group);
+
+      entries.add(entry);
+    }
+
+    entries.sort(
+        Comparator.comparingInt(PlayerEntry::groupPriority)
+            .reversed()
+            .thenComparing(PlayerEntry::name, String.CASE_INSENSITIVE_ORDER));
+
+    return entries;
+  }
+
+  /** Group counts keyed by group id, used to fill {@code {count_<id>}} in the info template. */
+  public Map<String, Integer> countsByGroupId(@NonNull List<PlayerEntry> roster) {
+    var counts = new HashMap<String, Integer>();
+
+    for (var entry : roster) {
+      counts.merge(entry.groupId(), 1, Integer::sum);
+    }
+
+    return Map.copyOf(counts);
   }
 }

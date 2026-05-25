@@ -8,13 +8,14 @@ import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.modules.warps.command.DelWarpCommand;
 import com.hanielcota.essentials.modules.warps.command.SetWarpCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpCommand;
+import com.hanielcota.essentials.modules.warps.command.WarpPromptFactory;
 import com.hanielcota.essentials.modules.warps.command.WarpsCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpsListNotifier;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
-import com.hanielcota.essentials.modules.warps.service.WarpCache;
+import com.hanielcota.essentials.modules.warps.repository.WarpCache;
+import com.hanielcota.essentials.modules.warps.repository.WarpStore;
+import com.hanielcota.essentials.modules.warps.repository.WarpTable;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
-import com.hanielcota.essentials.modules.warps.service.WarpStore;
-import com.hanielcota.essentials.modules.warps.service.WarpTable;
 import java.util.Set;
 
 /**
@@ -53,7 +54,8 @@ public final class WarpsModule extends AbstractModule {
     var delayed = service(DelayedTeleport.class);
 
     var setWarpCommand = new SetWarpCommand(config, warpService);
-    var warpCommand = new WarpCommand(config, warpService, delayed);
+    var promptFactory = new WarpPromptFactory();
+    var warpCommand = new WarpCommand(config, warpService, delayed, promptFactory);
     var delWarpCommand = new DelWarpCommand(config, warpService);
     var warpsNotifier = new WarpsListNotifier(config);
     var warpsCommand = new WarpsCommand(warpService, warpsNotifier);

@@ -30,6 +30,7 @@ public final class TeleportRequestService {
   private final RequestStore store;
   private final TpaHistory history;
   private final TpaNotifier notifier;
+  private final PlayerProvider players;
   private final TeleportRequestExecutor executor;
 
   public TeleportRequestService(
@@ -42,6 +43,7 @@ public final class TeleportRequestService {
     this.store = store;
     this.history = history;
     this.notifier = notifier;
+    this.players = players;
     this.executor = new TeleportRequestExecutor(players);
   }
 
@@ -88,15 +90,36 @@ public final class TeleportRequestService {
   }
 
   /**
-   * Accepts a request: performs the teleport asynchronously, then records the outcome. The future
-   * completes on the moving player's owning thread so callers can safely send chat from {@code
-   * thenAccept}.
+   * Claims the accept synchronously: removes the request from the store and verifies both parties
+   * are still online. Returns {@link AcceptResult#ACCEPTED} when the caller may proceed to {@link
+   * #dispatchTeleport(TeleportRequest)}; the caller is expected to notify the accepter and
+   * requester immediately on {@code ACCEPTED} so the chat reply does not wait for the async
+   * teleport to finish.
    */
-  public CompletableFuture<AcceptResult> accept(@NonNull TeleportRequest request) {
+  public AcceptResult tryAccept(@NonNull TeleportRequest request) {
     if (!this.store.remove(request)) {
-      return CompletableFuture.completedFuture(AcceptResult.NOT_FOUND);
+      return AcceptResult.NOT_FOUND;
     }
 
+    var requesterId = request.requester().id();
+    var requesterOnline = this.players.online(requesterId).isPresent();
+    var targetId = request.target().id();
+    var targetOnline = this.players.online(targetId).isPresent();
+
+    if (!requesterOnline || !targetOnline) {
+      var cancelled = TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED);
+      this.history.push(cancelled);
+      return AcceptResult.REQUESTER_OFFLINE;
+    }
+
+    return AcceptResult.ACCEPTED;
+  }
+
+  /**
+   * Performs the async teleport for an already-claimed request and records the terminal status in
+   * history. Resolves to {@code true} on success, {@code false} on teleport failure.
+   */
+  public CompletableFuture<Boolean> dispatchTeleport(@NonNull TeleportRequest request) {
     var pending = this.executor.execute(request);
     return pending.thenApply(execution -> recordExecution(request, execution));
   }
@@ -141,21 +164,19 @@ public final class TeleportRequestService {
     this.notifier.notifyPartnerLeft(previous, requesterId, requesterName);
   }
 
-  private AcceptResult recordExecution(
+  private boolean recordExecution(
       @NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
-    var result = execution.result();
-
-    if (result == AcceptResult.REQUESTER_OFFLINE || result == AcceptResult.TELEPORT_FAILED) {
+    if (!execution.succeeded()) {
       var cancelledEntry = TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED);
       this.history.push(cancelledEntry);
-      return result;
+      return false;
     }
 
     var destination = execution.optionalDestination().orElseThrow();
     var acceptedEntry = TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, destination);
 
     this.history.push(acceptedEntry);
-    return result;
+    return true;
   }
 
   /** Removes a request and writes its terminal state to history in one step. */

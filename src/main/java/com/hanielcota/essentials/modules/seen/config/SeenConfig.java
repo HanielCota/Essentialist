@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.seen.config;
 
+import com.hanielcota.essentials.modules.seen.model.SeenLine;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -32,5 +33,15 @@ public record SeenConfig(
 
   public String formatNeverSeen(@NonNull String player) {
     return neverSeen.replace("{player}", player);
+  }
+
+  public String formatLine(@NonNull SeenLine line) {
+    var name = line.displayName();
+    var duration = line.duration();
+
+    return switch (line.kind()) {
+      case ONLINE -> formatOnline(name, duration);
+      case OFFLINE -> formatOffline(name, duration);
+    };
   }
 }

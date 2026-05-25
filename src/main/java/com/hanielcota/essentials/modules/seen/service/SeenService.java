@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.seen.service;
 
 import com.hanielcota.essentials.modules.nick.service.NickService;
+import com.hanielcota.essentials.modules.seen.model.SeenLine;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.DurationFormatter;
 import java.time.Duration;
@@ -23,6 +24,23 @@ public final class SeenService {
 
   private final Supplier<Optional<NickService>> nickService;
   private final PlayerProvider players;
+
+  private static String sinceMillis(long sourceMillis, @NonNull Instant now) {
+    if (sourceMillis <= 0L) {
+      return DurationFormatter.format(Duration.ZERO);
+    }
+
+    var source = Instant.ofEpochMilli(sourceMillis);
+    var elapsed = Duration.between(source, now);
+
+    return DurationFormatter.format(elapsed);
+  }
+
+  private static String resolveName(@NonNull OfflinePlayer target, @NonNull String fallback) {
+    var stored = target.getName();
+
+    return stored != null ? stored : fallback;
+  }
 
   public Optional<OfflinePlayer> findPlayer(@NonNull String query) {
     var fromNick = lookupViaNick(query);
@@ -73,22 +91,5 @@ public final class SeenService {
     var offline = this.players.offline(id);
 
     return Optional.of(offline);
-  }
-
-  private static String sinceMillis(long sourceMillis, @NonNull Instant now) {
-    if (sourceMillis <= 0L) {
-      return DurationFormatter.format(Duration.ZERO);
-    }
-
-    var source = Instant.ofEpochMilli(sourceMillis);
-    var elapsed = Duration.between(source, now);
-
-    return DurationFormatter.format(elapsed);
-  }
-
-  private static String resolveName(@NonNull OfflinePlayer target, @NonNull String fallback) {
-    var stored = target.getName();
-
-    return stored != null ? stored : fallback;
   }
 }

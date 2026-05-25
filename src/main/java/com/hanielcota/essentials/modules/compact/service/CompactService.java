@@ -70,6 +70,19 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
     }
   }
 
+  private static void dropOverflow(
+      @NonNull Player player, @NonNull Map<Integer, ItemStack> overflow) {
+    if (overflow.isEmpty()) {
+      return;
+    }
+    var world = player.getWorld();
+    var location = player.getLocation();
+
+    for (var drop : overflow.values()) {
+      world.dropItem(location, drop);
+    }
+  }
+
   public int compact(@NonNull Player player) {
     var snap = this.config.value();
     var recipes = snap.recipes();
@@ -98,18 +111,5 @@ public record CompactService(ConfigHandle<CompactConfig> config) {
       blocksCompacted += blocks;
     }
     return blocksCompacted;
-  }
-
-  private static void dropOverflow(
-      @NonNull Player player, @NonNull Map<Integer, ItemStack> overflow) {
-    if (overflow.isEmpty()) {
-      return;
-    }
-    var world = player.getWorld();
-    var location = player.getLocation();
-
-    for (var drop : overflow.values()) {
-      world.dropItem(location, drop);
-    }
   }
 }

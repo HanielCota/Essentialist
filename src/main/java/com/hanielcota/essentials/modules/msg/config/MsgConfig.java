@@ -29,6 +29,17 @@ public record MsgConfig(
         "<red>O jogador <gold>{player}</gold> não está mais online.");
   }
 
+  private static String fill(
+      @NonNull String template,
+      @NonNull String sender,
+      @NonNull String target,
+      @NonNull String body) {
+    var withSender = template.replace("{sender}", sender);
+    var withTarget = withSender.replace("{target}", target);
+
+    return withTarget.replace("{message}", body);
+  }
+
   public String formatOutgoing(
       @NonNull String sender, @NonNull String target, @NonNull String body) {
     return fill(outgoingFormat, sender, target, body);
@@ -45,16 +56,5 @@ public record MsgConfig(
 
   public String formatReplyPartnerUnavailable(@NonNull String player) {
     return replyPartnerUnavailable.replace("{player}", player);
-  }
-
-  private static String fill(
-      @NonNull String template,
-      @NonNull String sender,
-      @NonNull String target,
-      @NonNull String body) {
-    var withSender = template.replace("{sender}", sender);
-    var withTarget = withSender.replace("{target}", target);
-
-    return withTarget.replace("{message}", body);
   }
 }

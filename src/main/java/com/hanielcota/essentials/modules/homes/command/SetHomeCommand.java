@@ -3,9 +3,9 @@ package com.hanielcota.essentials.modules.homes.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
 import com.hanielcota.essentials.modules.homes.material.HomeMaterialResolver;
 import com.hanielcota.essentials.modules.homes.name.HomeNameResolver;
+import com.hanielcota.essentials.modules.homes.service.HomeLimitReachedMessageResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -29,7 +29,8 @@ public record SetHomeCommand(
     ConfigHandle<HomesConfig> config,
     HomeService service,
     HomeNameResolver nameResolver,
-    HomeMaterialResolver materialResolver) {
+    HomeMaterialResolver materialResolver,
+    HomeLimitReachedMessageResolver limitReachedResolver) {
 
   @DefaultSubcommand
   public void execute(
@@ -70,20 +71,9 @@ public record SetHomeCommand(
         actor.sendSuccess(homeUpdatedMsg);
       }
       case LIMIT_REACHED -> {
-        var limitReachedMsg = limitReachedMessage(messages, name, sender);
+        var limitReachedMsg = this.limitReachedResolver.resolve(name, sender);
         actor.sendError(limitReachedMsg);
       }
     }
-  }
-
-  private String limitReachedMessage(
-      @NonNull HomesMessages messages, @NonNull String name, @NonNull Player sender) {
-    var limitValue = this.service.limit(sender);
-    var limit = Integer.toString(limitValue);
-
-    var limitReachedMsg = messages.limitReached();
-    var withName = limitReachedMsg.replace("{name}", name);
-
-    return withName.replace("{limit}", limit);
   }
 }

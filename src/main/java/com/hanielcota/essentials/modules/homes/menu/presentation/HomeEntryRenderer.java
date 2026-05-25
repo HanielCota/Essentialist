@@ -17,12 +17,15 @@ public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) {
     var x = home.x();
     var y = home.y();
     var z = home.z();
+    var yaw = home.yaw();
+    var createdAt = home.createdAt();
 
     var homeName = home.name();
     var material = home.material();
 
     var name = HomesMainMenuSection.itemName(menu, homeName);
-    var lore = HomesMainMenuSection.itemLore(menu, world, x, y, z);
+    var placeholders = HomeMenuPlaceholders.of(world, x, y, z, yaw, createdAt, menu);
+    var lore = HomesMainMenuSection.itemLore(menu, placeholders);
     var glow = menu.itemGlow();
 
     var builder = ItemTemplate.builder(material);

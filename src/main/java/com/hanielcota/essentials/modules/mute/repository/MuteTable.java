@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.mute.service;
+package com.hanielcota.essentials.modules.mute.repository;
 
 import com.hanielcota.essentials.database.SqlExecutor;
 import lombok.AccessLevel;
