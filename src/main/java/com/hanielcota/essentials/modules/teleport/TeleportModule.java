@@ -18,10 +18,10 @@ import com.hanielcota.essentials.modules.teleport.history.TeleportHistoryTable;
 import com.hanielcota.essentials.modules.teleport.listener.DelayedTeleportCanceller;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.scheduler.Scheduler;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 
 public final class TeleportModule extends AbstractModule {
@@ -50,14 +50,14 @@ public final class TeleportModule extends AbstractModule {
     var teleportService = new TeleportService();
     registrar.provide(TeleportService.class, teleportService);
 
-    var framework = env.service(PaperCommandFramework.class);
-    var notifier = new TeleportNotifier(config, framework);
+    var actors = env.service(ActorFactory.class);
+    var notifier = new TeleportNotifier(config, actors);
     var players = env.service(PlayerProvider.class);
     var callbacks = env.service(MainThreadCallbacks.class);
     var dispatcher = new TeleportDispatcher(config, players, notifier, teleportService, callbacks);
 
     registrar.command(new TeleportCommand(dispatcher));
-    registrar.command(new TeleportHereCommand(framework, notifier, teleportService, callbacks));
+    registrar.command(new TeleportHereCommand(actors, notifier, teleportService, callbacks));
     registrar.command(new TeleportCancelCommand(config, delayed));
   }
 }

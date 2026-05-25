@@ -25,16 +25,17 @@ public record TitleCommand(
     var input = texto.strip();
     var request = TitleRequest.from(self, input, this.players);
 
-    var target = request.target();
+    var targetId = request.targetId();
+    var targetName = request.targetName();
     var message = request.message();
 
-    if (target == null || message.isBlank()) {
+    if (targetId == null || targetName == null || message.isBlank()) {
       var usageMsg = snap.usage();
       sender.sendError(usageMsg);
       return;
     }
 
-    var toSelf = target.equals(self);
+    var toSelf = self != null && targetId.equals(self.getUniqueId());
 
     if (!toSelf && !sender.hasPermission("essentials.title.others")) {
       var noPermissionMsg = snap.noPermissionOther();
@@ -42,9 +43,16 @@ public record TitleCommand(
       return;
     }
 
-    this.service.send(target, message);
+    // Re-resolve from the snapshot UUID — the parsed target could have disconnected between the
+    // command parse and dispatch on a busy tick.
+    var liveTarget = this.players.online(targetId).orElse(null);
+    if (liveTarget == null) {
+      sender.sendError(snap.formatTargetOffline(targetName));
+      return;
+    }
 
-    var targetName = target.getName();
+    this.service.send(liveTarget, message);
+
     var messages = snap.whenSent();
     var sentMsg = messages.forSender(toSelf, targetName);
 

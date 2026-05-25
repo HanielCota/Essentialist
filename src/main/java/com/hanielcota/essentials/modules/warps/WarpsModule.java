@@ -16,7 +16,7 @@ import com.hanielcota.essentials.modules.warps.command.WarpsCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpsListNotifier;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.repository.WarpCache;
-import com.hanielcota.essentials.modules.warps.repository.WarpStore;
+import com.hanielcota.essentials.modules.warps.repository.WarpRepository;
 import com.hanielcota.essentials.modules.warps.repository.WarpTable;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import java.util.Set;
@@ -25,11 +25,11 @@ import lombok.NonNull;
 /**
  * Server warps: {@code /warp}, {@code /setwarp}, {@code /delwarp}, {@code /warps}.
  *
- * <p>Persists warps in SQLite via {@link WarpStore} with case-insensitive lookup by name. The full
- * set is loaded into {@link WarpCache} at module enable so {@code /warp} never hits SQL on the main
- * thread. Per-warp access is gated on the {@code essentials.warp.use.<name>} permission (or the
- * {@code essentials.warp.use.*} wildcard). Warm-up and damage cancel come from the shared {@link
- * DelayedTeleport} service.
+ * <p>Persists warps in SQLite via {@link WarpRepository} with case-insensitive lookup by name. The
+ * full set is loaded into {@link WarpCache} at module enable so {@code /warp} never hits SQL on the
+ * main thread. Per-warp access is gated on the {@code essentials.warp.use.<name>} permission (or
+ * the {@code essentials.warp.use.*} wildcard). Warm-up and damage cancel come from the shared
+ * {@link DelayedTeleport} service.
  */
 public final class WarpsModule extends AbstractModule {
 
@@ -45,7 +45,7 @@ public final class WarpsModule extends AbstractModule {
     var table = new WarpTable(dialect);
     table.install(executor);
 
-    var store = new WarpStore(executor, table);
+    var store = new WarpRepository(executor, table);
     var cache = new WarpCache();
 
     var existingWarps = store.list();

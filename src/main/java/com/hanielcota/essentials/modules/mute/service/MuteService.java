@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.mute.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.modules.mute.model.Mute;
-import com.hanielcota.essentials.modules.mute.repository.MuteStore;
+import com.hanielcota.essentials.modules.mute.domain.Mute;
+import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import io.github.hanielcota.commandframework.core.util.TimeParser;
 import java.time.Duration;
 import java.time.Instant;
@@ -17,9 +17,9 @@ import org.bukkit.entity.Player;
 import org.jspecify.annotations.Nullable;
 
 /**
- * In-memory cache of active mutes backed by {@link MuteStore}. Reads come from the cache (no SQL on
- * the hot path — the chat listener calls {@link #activeMute(UUID)} on every chat message). Writes
- * update the cache synchronously and queue the SQL persist on {@link AsyncDatabaseWriter}.
+ * In-memory cache of active mutes backed by {@link MuteRepository}. Reads come from the cache (no
+ * SQL on the hot path — the chat listener calls {@link #activeMute(UUID)} on every chat message).
+ * Writes update the cache synchronously and queue the SQL persist on {@link AsyncDatabaseWriter}.
  *
  * <p>Expired timed mutes are evicted lazily by {@link #activeMute(UUID)} so callers never see a
  * stale mute, and a {@code DELETE} is queued so the table doesn't keep stale rows between restarts.
@@ -32,7 +32,7 @@ public final class MuteService {
 
   public static final String EXEMPT_PERMISSION = "essentials.mute.exempt";
 
-  private final MuteStore store;
+  private final MuteRepository store;
   private final AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, Mute> cache = new ConcurrentHashMap<>();
 

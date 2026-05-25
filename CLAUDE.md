@@ -165,6 +165,53 @@ good wrapping for chains; defend against it by exploding before it has to.
 - **`.replace("{token}", value)`** over Placeholders / MiniMessage TagResolver
   when the substitution is a fixed-name token.
 
+## Module package layout
+
+Each feature module under `modules/<name>/` follows a flat set of conventional
+sub-packages. Pick the right one when adding a class — the
+`ArchitecturePackageTest` enforces a few of these rules at build time:
+
+- **`command/`** — `@Command`-annotated handlers, their `*Notifier`,
+  `*Dispatcher`, `*Orchestrator`, `*ResultHandler`, `*Presenter`. UI/user-facing
+  glue lives here, including notifiers that format messages.
+- **`service/`** — application services (orchestration, in-memory state).
+  Pure-behaviour services (`HealService`) and stateful services (`AfkService`)
+  both live here. Persistence types are NOT allowed here — use `repository/`.
+- **`repository/`** — relational persistence, with `*Repository` for CRUD,
+  `*Table` for DDL/SQL constants, `*Cache` for in-memory mirrors. `*Store` is
+  deprecated naming; new code uses `*Repository`. Repositories must not
+  import Bukkit beyond `Material` / `Location`.
+- **`domain/`** — domain records and enums (`Home`, `Mute`, `TeleportRequest`).
+  `model/` is deprecated; new code uses `domain/`. Cross-module imports are
+  only allowed against `domain/`, `service/`, `history/`.
+- **`listener/`** — Bukkit `Listener` implementations. Thin — delegate to
+  services.
+- **`menu/`** — `EssentialsMenu` subclasses and their `*ClickHandler`,
+  `*EntryRenderer`, `*MenuState`. `menu/presentation/` for menu-specific
+  rendering helpers when the count justifies it.
+- **`config/`** — `*Config` records, `*Messages`, `MessagePair` factories. One
+  config per module is the norm; nest when the config gets large.
+- **`history/`** — append-only persistence specific to histories (teleport,
+  tpa). Distinct from `repository/` because the access pattern is different
+  (push-only + tail-read).
+
+### Naming conventions for orchestration
+
+- **`*Dispatcher`** — routes one entry point onto one of several handlers
+  (`TeleportDispatcher` picks tp-to-player vs tp-to-pos by arg shape).
+- **`*Orchestrator`** — sequences multiple steps (validate → service →
+  notifier) for one logical operation (`GiveOrchestrator`,
+  `HomeRenameOrchestrator`).
+- **`*Executor`** — runs one focused async/heavy step
+  (`TeleportRequestExecutor` calls `teleportAsync`).
+- **`*Resolver`** — input → canonical value mapping (`HomeNameResolver`,
+  `RealNameResolver`).
+- **`*Notifier`** — formats and sends user-facing messages.
+
+When in doubt, prefer the simplest one that fits — a class can be just
+`<Module>Service` if it has only one job. Renaming an existing class is
+cheaper than adding an unjustified second one.
+
 ## Architectural rules
 
 - **CommandFramework v3.2.1** (artifact

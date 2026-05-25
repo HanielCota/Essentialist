@@ -17,7 +17,7 @@ public final class NearResultFormatter {
     var first = true;
 
     for (var found : nearby) {
-      var name = found.player().getName();
+      var name = found.name();
       var distance = found.distance();
       var entryMsg = snap.formatEntry(name, distance);
 

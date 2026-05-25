@@ -1,12 +1,12 @@
 package com.hanielcota.essentials.modules.tpa.command;
 
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -90,7 +90,7 @@ final class TpaRequests {
    * success / error channel. No-ops when the requester has logged out.
    */
   static void replyRequester(
-      @NonNull PaperCommandFramework framework,
+      @NonNull ActorFactory actors,
       @NonNull PlayerProvider players,
       @NonNull TeleportRequest request,
       @NonNull String template,
@@ -101,7 +101,7 @@ final class TpaRequests {
       return;
     }
 
-    var actor = framework.actorOf(requesterPlayer);
+    var actor = actors.actorOf(requesterPlayer);
 
     var replyTargetName = request.target().name();
     var replyMsg = template.replace("{player}", replyTargetName);

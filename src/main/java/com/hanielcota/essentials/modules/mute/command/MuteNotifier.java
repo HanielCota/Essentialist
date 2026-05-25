@@ -2,10 +2,10 @@ package com.hanielcota.essentials.modules.mute.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
-import com.hanielcota.essentials.modules.mute.model.Mute;
+import com.hanielcota.essentials.modules.mute.domain.Mute;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.util.DurationFormatter;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.NonNull;
@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 public final class MuteNotifier {
 
   private final ConfigHandle<MuteConfig> config;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
 
   private static Duration remainingFrom(@NonNull Mute mute) {
     var expiresAt = mute.expiresAt();
@@ -65,7 +65,7 @@ public final class MuteNotifier {
   public void sendMuted(@NonNull CommandActor sender, @NonNull Player target, @NonNull Mute mute) {
     var snap = this.config.value();
     var name = target.getName();
-    var targetActor = this.framework.actorOf(target);
+    var targetActor = this.actors.actorOf(target);
 
     if (mute.isPermanent()) {
       var senderMsg = snap.formatMutedSender(name);
@@ -90,7 +90,7 @@ public final class MuteNotifier {
     var name = target.getName();
     var senderMsg = snap.formatUnmutedSender(name);
     var targetMsg = snap.unmutedTarget();
-    var targetActor = this.framework.actorOf(target);
+    var targetActor = this.actors.actorOf(target);
 
     sender.sendMessage(senderMsg);
     targetActor.sendMessage(targetMsg);

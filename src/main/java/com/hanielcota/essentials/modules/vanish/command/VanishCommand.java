@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
 import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -20,7 +21,6 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -33,7 +33,7 @@ import org.bukkit.entity.Player;
 public record VanishCommand(
     ConfigHandle<VanishConfig> config,
     VanishTransitions transitions,
-    PaperCommandFramework framework,
+    ActorFactory actors,
     MenuService menus) {
 
   @DefaultSubcommand
@@ -54,7 +54,7 @@ public record VanishCommand(
 
     var senderMsg = messages.forSender(false, name);
     var targetMsg = messages.forTarget(name);
-    var target = this.framework.actorOf(subject);
+    var target = this.actors.actorOf(subject);
 
     sender.sendDualMessage(target, senderMsg, targetMsg);
   }

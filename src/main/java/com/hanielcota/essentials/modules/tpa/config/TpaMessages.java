@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.config;
 
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;

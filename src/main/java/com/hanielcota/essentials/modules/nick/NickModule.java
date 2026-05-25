@@ -11,13 +11,13 @@ import com.hanielcota.essentials.modules.nick.command.NickNotifier;
 import com.hanielcota.essentials.modules.nick.command.RealNameCommand;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
 import com.hanielcota.essentials.modules.nick.listener.NickJoinListener;
-import com.hanielcota.essentials.modules.nick.repository.NickStore;
+import com.hanielcota.essentials.modules.nick.repository.NickRepository;
 import com.hanielcota.essentials.modules.nick.repository.NickTable;
 import com.hanielcota.essentials.modules.nick.service.NickOperationService;
 import com.hanielcota.essentials.modules.nick.service.NickService;
 import com.hanielcota.essentials.modules.nick.service.RealNameResolver;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 
 public final class NickModule extends AbstractModule {
@@ -34,7 +34,7 @@ public final class NickModule extends AbstractModule {
     var table = new NickTable(dialect);
     table.install(executor);
 
-    var store = new NickStore(executor, table);
+    var store = new NickRepository(executor, table);
     var existing = store.list();
 
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-Nicks");
@@ -44,11 +44,11 @@ public final class NickModule extends AbstractModule {
     service.loadAll(existing);
     registrar.provide(NickService.class, service);
 
-    var framework = env.service(PaperCommandFramework.class);
+    var actors = env.service(ActorFactory.class);
     var players = env.service(PlayerProvider.class);
 
     var operations = new NickOperationService(config, service);
-    var notifier = new NickNotifier(config, framework);
+    var notifier = new NickNotifier(config, actors);
 
     var realNameResolver = new RealNameResolver(service, players);
 

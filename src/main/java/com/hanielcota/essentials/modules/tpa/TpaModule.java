@@ -28,13 +28,13 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
-import com.hanielcota.essentials.modules.tpa.service.RequestStore;
+import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExpiry;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.scheduler.Scheduler;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
 import lombok.NonNull;
 
@@ -43,9 +43,9 @@ import lombok.NonNull;
  * {@code /tpacancel} and a configurable {@code /tpahistory} menu. Depends on the {@code teleport}
  * module for the shared {@link TeleportService}.
  *
- * <p>This class only wires collaborators together; each does one job — see {@link RequestStore}
- * (state), {@link TeleportRequestService} (orchestration), {@link TeleportRequestExpiry} (timing)
- * and {@link TpaNotifier} (out-of-band messages).
+ * <p>This class only wires collaborators together; each does one job — see {@link
+ * RequestRepository} (state), {@link TeleportRequestService} (orchestration), {@link
+ * TeleportRequestExpiry} (timing) and {@link TpaNotifier} (out-of-band messages).
  */
 public final class TpaModule extends AbstractModule {
 
@@ -88,7 +88,7 @@ public final class TpaModule extends AbstractModule {
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
       AsyncTpaHistory history) {
-    var store = new RequestStore();
+    var store = new RequestRepository();
     var players = env.service(PlayerProvider.class);
     var notifier = new TpaNotifier(config, players);
     var requestService = new TeleportRequestService(config, store, history, notifier, players);
@@ -128,7 +128,7 @@ public final class TpaModule extends AbstractModule {
       AsyncTpaHistory history,
       TeleportRequestService requestService,
       TpaHistoryMenuState menuState) {
-    var framework = env.service(PaperCommandFramework.class);
+    var actors = env.service(ActorFactory.class);
     var playerProvider = env.service(PlayerProvider.class);
     var menus = env.service(MenuService.class);
 
@@ -138,13 +138,13 @@ public final class TpaModule extends AbstractModule {
     var tpaHereCommand = new TpaHereCommand(config, requestService);
     registrar.command(tpaHereCommand);
 
-    var acceptResultHandler = new TpAcceptResultHandler(config, framework, playerProvider);
+    var acceptResultHandler = new TpAcceptResultHandler(config, actors, playerProvider);
     var callbacks = env.service(MainThreadCallbacks.class);
     var tpAcceptCommand =
         new TpAcceptCommand(config, requestService, acceptResultHandler, callbacks);
     registrar.command(tpAcceptCommand);
 
-    var tpDenyCommand = new TpDenyCommand(config, requestService, framework, playerProvider);
+    var tpDenyCommand = new TpDenyCommand(config, requestService, actors, playerProvider);
     registrar.command(tpDenyCommand);
 
     var tpCancelCommand = new TpCancelCommand(config, requestService);

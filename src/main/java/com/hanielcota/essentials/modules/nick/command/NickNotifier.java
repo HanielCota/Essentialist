@@ -4,8 +4,8 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
 import com.hanielcota.essentials.modules.nick.service.NickResetOutcome;
 import com.hanielcota.essentials.modules.nick.service.NickSetOutcome;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 public final class NickNotifier {
 
   private final ConfigHandle<NickConfig> config;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
 
   public void sendSetOutcome(
       @NonNull CommandActor sender,
@@ -63,7 +63,7 @@ public final class NickNotifier {
 
     var senderMsg = snap.formatNickSetOther(realName, nickname);
     var targetMsg = snap.formatNickSetByOther(nickname);
-    var subjectActor = this.framework.actorOf(subject);
+    var subjectActor = this.actors.actorOf(subject);
 
     sender.sendMessage(senderMsg);
     subjectActor.sendMessage(targetMsg);
@@ -83,7 +83,7 @@ public final class NickNotifier {
     var subjectName = subject.getName();
     var senderMsg = snap.formatNickResetOther(subjectName);
     var targetMsg = snap.nickResetByOther();
-    var subjectActor = this.framework.actorOf(subject);
+    var subjectActor = this.actors.actorOf(subject);
 
     sender.sendMessage(senderMsg);
     subjectActor.sendMessage(targetMsg);

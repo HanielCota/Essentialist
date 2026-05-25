@@ -6,8 +6,8 @@ import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.feed.command.FeedCommand;
 import com.hanielcota.essentials.modules.feed.config.FeedConfig;
 import com.hanielcota.essentials.modules.feed.service.FeedService;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 
 public final class FeedModule extends AbstractModule {
@@ -22,9 +22,9 @@ public final class FeedModule extends AbstractModule {
     var config = registrar.configure("feed", FeedConfig.class, FeedConfig::defaults, feed);
 
     var players = env.service(PlayerProvider.class);
-    var framework = env.service(PaperCommandFramework.class);
+    var actors = env.service(ActorFactory.class);
 
-    var command = new FeedCommand(config, feed, players, framework);
+    var command = new FeedCommand(config, feed, players, actors);
     registrar.command(command);
   }
 }

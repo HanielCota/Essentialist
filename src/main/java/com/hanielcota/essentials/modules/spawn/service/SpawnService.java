@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.spawn.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.spawn.domain.SpawnLocation;
-import com.hanielcota.essentials.modules.spawn.repository.SpawnStore;
+import com.hanielcota.essentials.modules.spawn.repository.SpawnRepository;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.NonNull;
@@ -11,18 +11,18 @@ import lombok.NonNull;
  * Reads and writes the server spawn, with the latest value cached in memory so {@code /spawn} never
  * blocks on disk.
  *
- * <p>Sole responsibility: keep the cache and the {@link SpawnStore} in sync. Reads return the
+ * <p>Sole responsibility: keep the cache and the {@link SpawnRepository} in sync. Reads return the
  * cached value; {@link #set} writes the cache synchronously (so the next {@code /spawn} sees the
  * new value immediately) and queues the SQL persist on {@link AsyncDatabaseWriter} so the calling
  * command does not stall on disk I/O.
  */
 public final class SpawnService {
 
-  private final SpawnStore store;
+  private final SpawnRepository store;
   private final AsyncDatabaseWriter writer;
   private final AtomicReference<SpawnLocation> cached = new AtomicReference<>();
 
-  public SpawnService(@NonNull SpawnStore store, @NonNull AsyncDatabaseWriter writer) {
+  public SpawnService(@NonNull SpawnRepository store, @NonNull AsyncDatabaseWriter writer) {
     this.store = store;
     this.writer = writer;
     store.load().ifPresent(cached::set);

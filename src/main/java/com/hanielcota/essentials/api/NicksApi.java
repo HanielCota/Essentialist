@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.api;
 
-import com.hanielcota.essentials.modules.nick.model.NickEntry;
+import com.hanielcota.essentials.modules.nick.domain.NickEntry;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;

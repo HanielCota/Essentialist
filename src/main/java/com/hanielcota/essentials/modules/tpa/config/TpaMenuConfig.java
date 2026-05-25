@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.config;
 
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.NonNull;

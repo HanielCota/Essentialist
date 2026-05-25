@@ -3,6 +3,8 @@ package com.hanielcota.essentials.bootstrap;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.command.CommandBootstrap;
 import com.hanielcota.essentials.module.ModuleManager;
+import com.hanielcota.essentials.paper.ActorFactory;
+import com.hanielcota.essentials.paper.FrameworkActorFactory;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.function.Consumer;
 import lombok.NonNull;
@@ -41,5 +43,6 @@ final class CommandSystemBootstrap implements BootstrapStage {
     var framework = commandBootstrap.createFramework();
 
     services.register(PaperCommandFramework.class, framework);
+    services.register(ActorFactory.class, new FrameworkActorFactory(framework));
   }
 }

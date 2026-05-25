@@ -3,8 +3,8 @@ package com.hanielcota.essentials.modules.teleport.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
 import com.hanielcota.essentials.modules.teleport.service.TeleportOutcome;
+import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 public final class TeleportNotifier {
 
   private final ConfigHandle<TeleportConfig> config;
-  private final PaperCommandFramework framework;
+  private final ActorFactory actors;
 
   public void notifyToPlayer(
       @NonNull CommandActor senderActor,
@@ -34,7 +34,7 @@ public final class TeleportNotifier {
       case INVALID_POSITION -> senderActor.sendError(snap.invalidPosition());
       case FAILED -> senderActor.sendError(snap.teleportFailed());
       case SUCCESS -> {
-        var targetActor = this.framework.actorOf(target);
+        var targetActor = this.actors.actorOf(target);
         var senderMsg = snap.formatToPlayer(targetName);
         var targetMsg = snap.formatTeleportedTo(senderName);
         senderActor.sendDualMessage(targetActor, senderMsg, targetMsg);
@@ -63,7 +63,7 @@ public final class TeleportNotifier {
           return;
         }
 
-        var fromActor = this.framework.actorOf(from);
+        var fromActor = this.actors.actorOf(from);
         var notifyMsg = snap.formatMoveNotify(senderName);
         fromActor.sendSuccess(notifyMsg);
       }
@@ -100,7 +100,7 @@ public final class TeleportNotifier {
       case INVALID_POSITION -> senderActor.sendError(snap.invalidPosition());
       case FAILED -> senderActor.sendError(snap.teleportFailed());
       case SUCCESS -> {
-        var targetActor = this.framework.actorOf(target);
+        var targetActor = this.actors.actorOf(target);
         var senderMsg = snap.formatBroughtPlayer(targetName);
         var targetMsg = snap.formatBroughtBy(senderName);
         senderActor.sendDualMessage(targetActor, senderMsg, targetMsg);

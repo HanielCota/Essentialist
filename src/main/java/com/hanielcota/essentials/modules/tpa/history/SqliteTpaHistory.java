@@ -1,10 +1,10 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
 import com.hanielcota.essentials.database.SqlExecutor;
-import com.hanielcota.essentials.modules.tpa.model.Destination;
-import com.hanielcota.essentials.modules.tpa.model.Participant;
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
-import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.Destination;
+import com.hanielcota.essentials.modules.tpa.domain.Participant;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

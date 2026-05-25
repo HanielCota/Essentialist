@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.api;
 
-import com.hanielcota.essentials.modules.mute.model.Mute;
+import com.hanielcota.essentials.modules.mute.domain.Mute;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;

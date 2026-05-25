@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
-import com.hanielcota.essentials.modules.list.model.PlayerEntry;
+import com.hanielcota.essentials.modules.list.domain.PlayerEntry;
 import java.util.Arrays;
 import java.util.UUID;
 import org.bukkit.Material;

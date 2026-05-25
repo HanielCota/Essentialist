@@ -19,15 +19,16 @@ class ArchitecturePackageTest {
 
   private static final Set<String> PERSISTENCE_TYPES =
       Set.of(
-          "WarpStore",
+          "WarpRepository",
           "WarpTable",
           "WarpCache",
-          "SpawnStore",
+          "SpawnRepository",
           "SpawnTable",
-          "MuteStore",
+          "MuteRepository",
           "MuteTable",
-          "NickStore",
-          "NickTable");
+          "NickRepository",
+          "NickTable",
+          "RequestRepository");
 
   // Pattern: `import com.hanielcota.essentials.modules.<module>.` — captures the imported module.
   private static final Pattern CROSS_MODULE_IMPORT =
@@ -191,7 +192,6 @@ class ArchitecturePackageTest {
   private static boolean isPermittedCrossModuleImport(String importLine) {
     return importLine.contains(".service.")
         || importLine.contains(".domain.")
-        || importLine.contains(".model.")
         || importLine.contains(".history.");
   }
 

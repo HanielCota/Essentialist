@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.list.menu;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
-import com.hanielcota.essentials.modules.list.model.PlayerEntry;
+import com.hanielcota.essentials.modules.list.domain.PlayerEntry;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;

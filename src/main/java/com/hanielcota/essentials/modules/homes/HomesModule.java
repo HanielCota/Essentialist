@@ -48,8 +48,8 @@ import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.MissingHomeMessageResolver;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
+import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.Scheduler;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
 import java.util.function.IntSupplier;
 import lombok.NonNull;
@@ -75,7 +75,7 @@ public final class HomesModule extends AbstractModule {
             "homes/material-names", MaterialNamesConfig.class, MaterialNamesConfig::defaults);
 
     var menus = env.service(MenuService.class);
-    var framework = env.service(PaperCommandFramework.class);
+    var actors = env.service(ActorFactory.class);
     var scheduler = env.service(Scheduler.class);
     var delayed = env.service(DelayedTeleport.class);
     var sqlExecutor = env.service(SqlExecutor.class);
@@ -114,7 +114,7 @@ public final class HomesModule extends AbstractModule {
     // 3. Menus + dialogs.
     var menuState = new HomesMenuState();
     var renderer = new HomeEntryRenderer(config);
-    var clickHandler = new HomeClickHandler(teleporter, framework, actionTarget, rename);
+    var clickHandler = new HomeClickHandler(teleporter, actors, actionTarget, rename);
     registrar.menu(new HomesMenu(config, homeService, renderer, clickHandler, menuState));
 
     var configSnap = config.value();

@@ -11,10 +11,10 @@ import com.hanielcota.essentials.modules.mute.command.MuteNotifier;
 import com.hanielcota.essentials.modules.mute.command.UnmuteCommand;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
 import com.hanielcota.essentials.modules.mute.listener.MuteChatListener;
-import com.hanielcota.essentials.modules.mute.repository.MuteStore;
+import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import com.hanielcota.essentials.modules.mute.repository.MuteTable;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import com.hanielcota.essentials.paper.ActorFactory;
 import java.time.Instant;
 import lombok.NonNull;
 
@@ -32,7 +32,7 @@ public final class MuteModule extends AbstractModule {
     var table = new MuteTable(dialect);
     table.install(executor);
 
-    var store = new MuteStore(executor, table);
+    var store = new MuteRepository(executor, table);
     var now = Instant.now();
     store.deleteExpired(now);
     var existing = store.listActive(now);
@@ -44,8 +44,8 @@ public final class MuteModule extends AbstractModule {
     service.loadAll(existing);
     registrar.provide(MuteService.class, service);
 
-    var framework = env.service(PaperCommandFramework.class);
-    var notifier = new MuteNotifier(config, framework);
+    var actors = env.service(ActorFactory.class);
+    var notifier = new MuteNotifier(config, actors);
 
     registrar.command(new MuteCommand(service, notifier));
     registrar.command(new UnmuteCommand(service, notifier));

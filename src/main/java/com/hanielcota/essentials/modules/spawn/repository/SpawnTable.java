@@ -27,8 +27,8 @@ public final class SpawnTable {
   /**
    * Upsert binds {@code singleton} as a parameter (always {@code 1}) so the SQL stays a pure
    * dialect-generated INSERT-or-replace template. The table's {@code CHECK (singleton = 1)}
-   * constraint enforces the singleton invariant; callers in {@link SpawnStore} pass {@code 1} for
-   * the first parameter unconditionally.
+   * constraint enforces the singleton invariant; callers in {@link SpawnRepository} pass {@code 1}
+   * for the first parameter unconditionally.
    */
   private final String upsert;
 
