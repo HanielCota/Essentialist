@@ -69,7 +69,7 @@ public final class VanishMenu implements EssentialsMenu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player viewer, @NonNull MenuSession session) {
     var vanishedIds = this.service.vanished();
-    var players = collectOnline(vanishedIds);
+    var players = collectOnline(vanishedIds, vanishedIds.size());
 
     if (players.isEmpty()) {
       return emptyState();
@@ -86,8 +86,8 @@ public final class VanishMenu implements EssentialsMenu {
     return slots;
   }
 
-  private static List<Player> collectOnline(@NonNull Iterable<UUID> ids) {
-    var players = new ArrayList<Player>();
+  private static List<Player> collectOnline(@NonNull Iterable<UUID> ids, int expectedSize) {
+    var players = new ArrayList<Player>(expectedSize);
     for (var id : ids) {
       var player = Bukkit.getPlayer(id);
       if (player == null) {
