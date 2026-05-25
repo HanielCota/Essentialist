@@ -5,6 +5,7 @@ import com.hanielcota.essentials.modules.warps.domain.Warp;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -37,7 +38,10 @@ public final class WarpService {
   }
 
   public List<Warp> listVisibleTo(@NonNull Permissible permissible) {
-    return this.cache.list().stream().filter(warp -> canUse(permissible, warp.name())).toList();
+    var allWarps = this.cache.list();
+    Predicate<Warp> usableByPermissible = warp -> canUse(permissible, warp.name());
+
+    return allWarps.stream().filter(usableByPermissible).toList();
   }
 
   public void save(@NonNull String name, @NonNull Player creator) {
@@ -46,7 +50,9 @@ public final class WarpService {
     var warp = Warp.of(name, location, uniqueId);
 
     this.cache.put(warp);
-    this.writer.submit("save warp", () -> this.store.save(warp));
+
+    Runnable persist = () -> this.store.save(warp);
+    this.writer.submit("save warp", persist);
   }
 
   public boolean delete(@NonNull String name) {
@@ -54,8 +60,12 @@ public final class WarpService {
     if (removed.isEmpty()) {
       return false;
     }
+
     var canonicalName = removed.get().name();
-    this.writer.submit("delete warp", () -> this.store.delete(canonicalName));
+
+    Runnable persist = () -> this.store.delete(canonicalName);
+    this.writer.submit("delete warp", persist);
+
     return true;
   }
 
