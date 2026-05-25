@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.scheduler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -42,16 +42,16 @@ class MainThreadCallbacksTest {
     var scheduler = new SynchronousScheduler();
     var callbacks = new MainThreadCallbacks(scheduler);
     var future = new CompletableFuture<String>();
-    var captured = new AtomicReference<String>();
+    var consumerInvoked = new CountDownLatch(1);
 
-    callbacks.hop(future, captured::set, "test");
+    callbacks.hop(future, value -> consumerInvoked.countDown(), "test");
 
     future.completeExceptionally(new IllegalStateException("boom"));
 
-    // Give the exceptionally chain a moment — but since the consumer is never invoked, captured
-    // must remain null. Wait briefly to expose any accidental wiring.
-    Thread.sleep(50);
-    assertNull(captured.get());
+    // Latch never released = consumer never ran. The await is expected to time out (return
+    // false), not to race the consumer.
+    var released = consumerInvoked.await(100, TimeUnit.MILLISECONDS);
+    assertFalse(released, "consumer must not be invoked when the future fails");
   }
 
   @Test
@@ -59,12 +59,15 @@ class MainThreadCallbacksTest {
     var scheduler = new SynchronousScheduler();
     var callbacks = new MainThreadCallbacks(scheduler);
     var future = new CompletableFuture<String>();
-    var captured = new AtomicReference<String>();
+    var consumerInvoked = new CountDownLatch(1);
 
-    callbacks.hop(future, captured::set, Duration.ofMillis(50), "test");
+    callbacks.hop(future, value -> consumerInvoked.countDown(), Duration.ofMillis(50), "test");
 
-    Thread.sleep(150);
-    assertNull(captured.get());
+    // The configured 50ms orTimeout fires → exceptionally branch runs → consumer never invoked.
+    // Awaiting longer than the configured timeout (with a grace window) lets us assert the latch
+    // never releases without relying on Thread.sleep timing.
+    var released = consumerInvoked.await(250, TimeUnit.MILLISECONDS);
+    assertFalse(released, "consumer must not be invoked when the future times out");
   }
 
   private static final class SynchronousScheduler implements Scheduler {

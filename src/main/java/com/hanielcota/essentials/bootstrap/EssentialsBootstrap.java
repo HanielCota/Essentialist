@@ -66,9 +66,22 @@ public class EssentialsBootstrap {
       }
       return context.services().resolve(EssentialsCore.class);
     } catch (RuntimeException e) {
+      attachStageBreadcrumb(e, completed, stages);
       rollback(context, e);
       throw e;
     }
+  }
+
+  private static void attachStageBreadcrumb(
+      RuntimeException cause, List<BootstrapStage> completed, List<BootstrapStage> stages) {
+    var completedNames = completed.stream().map(BootstrapStage::name).toList();
+    var failedIndex = completed.size();
+    var failedName = failedIndex < stages.size() ? stages.get(failedIndex).name() : "<unknown>";
+
+    var breadcrumb =
+        new IllegalStateException(
+            "Bootstrap failed at stage '" + failedName + "'; completed: " + completedNames);
+    cause.addSuppressed(breadcrumb);
   }
 
   private static void rollback(StageContext context, RuntimeException cause) {
