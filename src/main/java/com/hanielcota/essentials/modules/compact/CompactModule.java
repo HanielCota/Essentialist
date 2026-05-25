@@ -1,9 +1,12 @@
 package com.hanielcota.essentials.modules.compact;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.compact.command.CompactCommand;
 import com.hanielcota.essentials.modules.compact.config.CompactConfig;
 import com.hanielcota.essentials.modules.compact.service.CompactService;
+import lombok.NonNull;
 
 public final class CompactModule extends AbstractModule {
 
@@ -12,11 +15,11 @@ public final class CompactModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("compact", CompactConfig.class, CompactConfig::defaults);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("compact", CompactConfig.class, CompactConfig::defaults);
     var service = new CompactService(config);
     var command = new CompactCommand(config, service);
 
-    registerCommand(command);
+    registrar.command(command);
   }
 }

@@ -1,6 +1,8 @@
 package com.hanielcota.essentials.modules.online;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.online.command.OnlineCommand;
 import com.hanielcota.essentials.modules.online.config.OnlineConfig;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
@@ -62,14 +64,13 @@ public final class OnlineModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("online", OnlineConfig.class, OnlineConfig::defaults);
-    var players = service(PlayerProvider.class);
-    var registry = context().services();
-    Supplier<Optional<VanishService>> vanishService = () -> registry.find(VanishService.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("online", OnlineConfig.class, OnlineConfig::defaults);
+    var players = env.service(PlayerProvider.class);
+    Supplier<Optional<VanishService>> vanishService = () -> env.findService(VanishService.class);
     var visibleCount = visibleCount(players, vanishService);
     var command = new OnlineCommand(config, players, visibleCount);
 
-    registerCommand(command);
+    registrar.command(command);
   }
 }

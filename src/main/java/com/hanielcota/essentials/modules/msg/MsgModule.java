@@ -1,6 +1,8 @@
 package com.hanielcota.essentials.modules.msg;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.msg.command.MsgCommand;
 import com.hanielcota.essentials.modules.msg.command.ReplyCommand;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
@@ -38,21 +40,20 @@ public final class MsgModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = configure("msg", MsgConfig.class, MsgConfig::defaults, new MsgService());
-    var partners = service(MsgService.class);
-    var framework = service(PaperCommandFramework.class);
-    var players = service(PlayerProvider.class);
-    var registry = context().services();
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var msgService = new MsgService();
+    var config = registrar.configure("msg", MsgConfig.class, MsgConfig::defaults, msgService);
+    var framework = env.service(PaperCommandFramework.class);
+    var players = env.service(PlayerProvider.class);
     var notifier = new MsgNotifier(config, framework);
-    var spyBridge = new SocialSpyBridge(() -> registry.find(SocialSpyBroadcaster.class));
-    var dispatcher = new MsgDispatcher(partners, notifier, spyBridge);
-    var visibilityFilter = visibilityFilter();
+    var spyBridge = new SocialSpyBridge(() -> env.findService(SocialSpyBroadcaster.class));
+    var dispatcher = new MsgDispatcher(msgService, notifier, spyBridge);
+    var visibilityFilter = visibilityFilter(env);
 
-    registerCommand(new MsgCommand(config, dispatcher, visibilityFilter));
-    registerCommand(new ReplyCommand(config, partners, dispatcher, players, visibilityFilter));
+    registrar.command(new MsgCommand(config, dispatcher, visibilityFilter));
+    registrar.command(new ReplyCommand(config, msgService, dispatcher, players, visibilityFilter));
 
-    registerListener(new MsgQuitListener(partners));
+    registrar.listener(new MsgQuitListener(msgService));
   }
 
   /**
@@ -61,10 +62,9 @@ public final class MsgModule extends AbstractModule {
    * load order between vanish and msg does not matter; when vanish is disabled every player is
    * visible.
    */
-  private BiPredicate<Player, Player> visibilityFilter() {
-    var registry = context().services();
+  private BiPredicate<Player, Player> visibilityFilter(@NonNull ModuleEnvironment env) {
     return (viewer, target) -> {
-      var vanish = registry.find(VanishService.class).orElse(null);
+      var vanish = env.findService(VanishService.class).orElse(null);
       return canSee(vanish, viewer, target);
     };
   }

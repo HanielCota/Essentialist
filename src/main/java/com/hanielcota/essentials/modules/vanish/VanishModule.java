@@ -2,6 +2,8 @@ package com.hanielcota.essentials.modules.vanish;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.vanish.command.VanishCommand;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.listener.VanishJoinListener;
@@ -16,6 +18,7 @@ import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 
 public final class VanishModule extends AbstractModule {
 
@@ -28,33 +31,33 @@ public final class VanishModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("vanish", VanishConfig.class, VanishConfig::defaults);
-    this.players = service(PlayerProvider.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("vanish", VanishConfig.class, VanishConfig::defaults);
+    this.players = env.service(PlayerProvider.class);
 
     this.service = new VanishService();
-    registerService(VanishService.class, this.service);
+    registrar.provide(VanishService.class, this.service);
 
-    this.applier = new VanishVisibilityApplier(plugin(), this.players);
+    this.applier = new VanishVisibilityApplier(env.plugin(), this.players);
     var transitions = new VanishTransitions(this.service, this.applier);
 
     var joinListener = new VanishJoinListener(this.service, this.applier);
     var quitListener = new VanishQuitListener(this.service, transitions);
     var protectionListener = new VanishProtectionListener(this.service);
-    registerListener(joinListener);
-    registerListener(quitListener);
-    registerListener(protectionListener);
+    registrar.listener(joinListener);
+    registrar.listener(quitListener);
+    registrar.listener(protectionListener);
 
     var renderer = new VanishEntryRenderer(config);
-    var callbacks = service(MainThreadCallbacks.class);
+    var callbacks = env.service(MainThreadCallbacks.class);
     var clickHandler = new VanishClickHandler(config, this.service, this.players, callbacks);
     var menu = new VanishMenu(config, this.service, renderer, clickHandler, this.players);
-    registerMenu(menu);
+    registrar.menu(menu);
 
-    var framework = service(PaperCommandFramework.class);
-    var menus = service(MenuService.class);
+    var framework = env.service(PaperCommandFramework.class);
+    var menus = env.service(MenuService.class);
     var command = new VanishCommand(config, transitions, framework, menus);
-    registerCommand(command);
+    registrar.command(command);
   }
 
   @Override

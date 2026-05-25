@@ -1,10 +1,13 @@
 package com.hanielcota.essentials.modules.title;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.title.command.TitleCommand;
 import com.hanielcota.essentials.modules.title.config.TitleConfig;
 import com.hanielcota.essentials.modules.title.service.TitleService;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import lombok.NonNull;
 
 public final class TitleModule extends AbstractModule {
 
@@ -13,10 +16,10 @@ public final class TitleModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("title", TitleConfig.class, TitleConfig::defaults);
-    var players = service(PlayerProvider.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("title", TitleConfig.class, TitleConfig::defaults);
+    var players = env.service(PlayerProvider.class);
     var service = new TitleService(config, players);
-    registerCommand(new TitleCommand(config, service, players));
+    registrar.command(new TitleCommand(config, service, players));
   }
 }

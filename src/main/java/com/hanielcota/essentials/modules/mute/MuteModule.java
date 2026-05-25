@@ -3,6 +3,8 @@ package com.hanielcota.essentials.modules.mute;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.mute.command.MuteCommand;
 import com.hanielcota.essentials.modules.mute.command.MuteNotifier;
 import com.hanielcota.essentials.modules.mute.command.UnmuteCommand;
@@ -13,6 +15,7 @@ import com.hanielcota.essentials.modules.mute.repository.MuteTable;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.time.Instant;
+import lombok.NonNull;
 
 public final class MuteModule extends AbstractModule {
 
@@ -21,9 +24,9 @@ public final class MuteModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("mute", MuteConfig.class, MuteConfig::defaults);
-    var executor = service(SqlExecutor.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("mute", MuteConfig.class, MuteConfig::defaults);
+    var executor = env.service(SqlExecutor.class);
     MuteTable.install(executor);
 
     var store = new MuteStore(executor);
@@ -32,18 +35,18 @@ public final class MuteModule extends AbstractModule {
     var existing = store.listActive(now);
 
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-Mutes");
-    registerCloseable(writer);
+    registrar.closeable(writer);
 
     var service = new MuteService(store, writer);
     service.loadAll(existing);
-    registerService(MuteService.class, service);
+    registrar.provide(MuteService.class, service);
 
-    var framework = service(PaperCommandFramework.class);
+    var framework = env.service(PaperCommandFramework.class);
     var notifier = new MuteNotifier(config, framework);
 
-    registerCommand(new MuteCommand(service, notifier));
-    registerCommand(new UnmuteCommand(service, notifier));
+    registrar.command(new MuteCommand(service, notifier));
+    registrar.command(new UnmuteCommand(service, notifier));
 
-    registerListener(new MuteChatListener(config, service));
+    registrar.listener(new MuteChatListener(config, service));
   }
 }

@@ -1,10 +1,13 @@
 package com.hanielcota.essentials.modules.actionbar;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.actionbar.command.ActionBarCommand;
 import com.hanielcota.essentials.modules.actionbar.config.ActionBarConfig;
 import com.hanielcota.essentials.modules.actionbar.service.ActionBarService;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import lombok.NonNull;
 
 public final class ActionBarModule extends AbstractModule {
 
@@ -13,9 +16,9 @@ public final class ActionBarModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("actionbar", ActionBarConfig.class, ActionBarConfig::defaults);
-    var players = service(PlayerProvider.class);
-    registerCommand(new ActionBarCommand(config, new ActionBarService(players)));
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("actionbar", ActionBarConfig.class, ActionBarConfig::defaults);
+    var players = env.service(PlayerProvider.class);
+    registrar.command(new ActionBarCommand(config, new ActionBarService(players)));
   }
 }

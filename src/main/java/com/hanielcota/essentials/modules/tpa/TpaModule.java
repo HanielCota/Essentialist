@@ -5,7 +5,9 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
 import com.hanielcota.essentials.module.ModuleMetadata;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpCancelCommand;
@@ -33,6 +35,7 @@ import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
+import lombok.NonNull;
 
 /**
  * {@code /tpa} request system: {@code /tpa}, {@code /tpahere}, {@code /tpaccept}, {@code /tpdeny},
@@ -52,93 +55,101 @@ public final class TpaModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("tpa", TpaConfig.class, TpaConfig::defaults);
-    var history = history();
-    var runtime = requestRuntime(config, history);
-    var menuState = registerHistoryMenu(config, history);
-    registerHelpMenu(config);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("tpa", TpaConfig.class, TpaConfig::defaults);
+    var history = history(env, registrar);
+    var runtime = requestRuntime(env, registrar, config, history);
+    var menuState = registerHistoryMenu(registrar, config, history);
+    registerHelpMenu(registrar, config);
 
-    registerCommands(config, history, runtime.requestService(), menuState);
+    registerCommands(env, registrar, config, history, runtime.requestService(), menuState);
 
     var quitListener = new TpaQuitListener(runtime.requestService(), runtime.notifier());
-    registerListener(quitListener);
+    registrar.listener(quitListener);
   }
 
-  private AsyncTpaHistory history() {
-    var executor = service(SqlExecutor.class);
+  private AsyncTpaHistory history(
+      @NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var executor = env.service(SqlExecutor.class);
     TpaHistoryTable.install(executor);
 
     var sqliteBacked = new SqliteTpaHistory(executor);
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaHistory");
-    registerCloseable(writer);
+    registrar.closeable(writer);
 
     return new AsyncTpaHistory(sqliteBacked, writer);
   }
 
-  private TpaRuntime requestRuntime(ConfigHandle<TpaConfig> config, AsyncTpaHistory history) {
+  private TpaRuntime requestRuntime(
+      @NonNull ModuleEnvironment env,
+      @NonNull ModuleRegistrar registrar,
+      ConfigHandle<TpaConfig> config,
+      AsyncTpaHistory history) {
     var store = new RequestStore();
-    var players = service(PlayerProvider.class);
+    var players = env.service(PlayerProvider.class);
     var notifier = new TpaNotifier(config, players);
     var requestService = new TeleportRequestService(config, store, history, notifier, players);
 
-    var expiry = new TeleportRequestExpiry(service(Scheduler.class), store, requestService);
+    var expiry = new TeleportRequestExpiry(env.service(Scheduler.class), store, requestService);
     expiry.start();
-    registerCloseable(expiry::stop);
+    registrar.closeable(expiry::stop);
 
     return new TpaRuntime(requestService, notifier);
   }
 
-  private void registerHelpMenu(ConfigHandle<TpaConfig> config) {
+  private void registerHelpMenu(
+      @NonNull ModuleRegistrar registrar, ConfigHandle<TpaConfig> config) {
     var menu = new TpaHelpMenu(config);
 
-    registerMenu(menu);
+    registrar.menu(menu);
   }
 
   private TpaHistoryMenuState registerHistoryMenu(
-      ConfigHandle<TpaConfig> config, AsyncTpaHistory history) {
+      @NonNull ModuleRegistrar registrar, ConfigHandle<TpaConfig> config, AsyncTpaHistory history) {
     var menuState = new TpaHistoryMenuState();
     var entryRenderer = new TpaHistoryEntryRenderer(config);
     var menu = new TpaHistoryMenu(config, history, entryRenderer, menuState);
 
-    registerMenu(menu);
+    registrar.menu(menu);
 
     var cleanupListener = new TpaHistoryMenuCleanupListener(menuState);
-    registerListener(cleanupListener);
+    registrar.listener(cleanupListener);
 
     return menuState;
   }
 
   private void registerCommands(
+      @NonNull ModuleEnvironment env,
+      @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
       AsyncTpaHistory history,
       TeleportRequestService requestService,
       TpaHistoryMenuState menuState) {
-    var framework = service(PaperCommandFramework.class);
-    var playerProvider = service(PlayerProvider.class);
-    var menus = service(MenuService.class);
+    var framework = env.service(PaperCommandFramework.class);
+    var playerProvider = env.service(PlayerProvider.class);
+    var menus = env.service(MenuService.class);
 
     var tpaCommand = new TpaCommand(config, requestService, playerProvider, menus);
-    registerCommand(tpaCommand);
+    registrar.command(tpaCommand);
 
     var tpaHereCommand = new TpaHereCommand(config, requestService);
-    registerCommand(tpaHereCommand);
+    registrar.command(tpaHereCommand);
 
     var acceptResultHandler = new TpAcceptResultHandler(config, framework, playerProvider);
-    var callbacks = service(MainThreadCallbacks.class);
+    var callbacks = env.service(MainThreadCallbacks.class);
     var tpAcceptCommand =
         new TpAcceptCommand(config, requestService, acceptResultHandler, callbacks);
-    registerCommand(tpAcceptCommand);
+    registrar.command(tpAcceptCommand);
 
     var tpDenyCommand = new TpDenyCommand(config, requestService, framework, playerProvider);
-    registerCommand(tpDenyCommand);
+    registrar.command(tpDenyCommand);
 
     var tpCancelCommand = new TpCancelCommand(config, requestService);
-    registerCommand(tpCancelCommand);
+    registrar.command(tpCancelCommand);
 
     var historyPresenter = new TpaHistoryPresenter(config, history, menus, menuState);
     var tpaHistoryCommand = new TpaHistoryCommand(config, playerProvider, historyPresenter);
-    registerCommand(tpaHistoryCommand);
+    registrar.command(tpaHistoryCommand);
   }
 
   private record TpaRuntime(TeleportRequestService requestService, TpaNotifier notifier) {}

@@ -3,7 +3,9 @@ package com.hanielcota.essentials.modules.spawn;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
 import com.hanielcota.essentials.module.ModuleMetadata;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.spawn.command.SetSpawnCommand;
 import com.hanielcota.essentials.modules.spawn.command.SpawnCommand;
 import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
@@ -15,6 +17,7 @@ import com.hanielcota.essentials.modules.spawn.repository.SpawnTable;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import java.util.Set;
+import lombok.NonNull;
 
 /**
  * Server spawn point and the {@code /spawn} / {@code /setspawn} commands.
@@ -31,30 +34,30 @@ public final class SpawnModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("spawn", SpawnConfig.class, SpawnConfig::defaults);
-    var executor = service(SqlExecutor.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("spawn", SpawnConfig.class, SpawnConfig::defaults);
+    var executor = env.service(SqlExecutor.class);
     SpawnTable.install(executor);
 
     var store = new SpawnStore(executor);
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-Spawn");
-    registerCloseable(writer);
+    registrar.closeable(writer);
 
     var spawnService = new SpawnService(store, writer);
-    registerService(SpawnService.class, spawnService);
+    registrar.provide(SpawnService.class, spawnService);
 
-    var delayed = service(DelayedTeleport.class);
+    var delayed = env.service(DelayedTeleport.class);
 
     var setSpawnCommand = new SetSpawnCommand(config, spawnService);
     var spawnCommand = new SpawnCommand(config, spawnService, delayed);
-    registerCommand(setSpawnCommand);
-    registerCommand(spawnCommand);
+    registrar.command(setSpawnCommand);
+    registrar.command(spawnCommand);
 
     var joinListener = new SpawnJoinListener(spawnService);
     var respawnListener = new SpawnRespawnListener(spawnService);
     var voidListener = new SpawnVoidListener(spawnService, delayed);
-    registerListener(joinListener);
-    registerListener(respawnListener);
-    registerListener(voidListener);
+    registrar.listener(joinListener);
+    registrar.listener(respawnListener);
+    registrar.listener(voidListener);
   }
 }

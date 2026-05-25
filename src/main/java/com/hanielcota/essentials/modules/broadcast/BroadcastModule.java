@@ -1,10 +1,13 @@
 package com.hanielcota.essentials.modules.broadcast;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.broadcast.command.BroadcastCommand;
 import com.hanielcota.essentials.modules.broadcast.config.BroadcastConfig;
 import com.hanielcota.essentials.modules.broadcast.service.BroadcastService;
 import com.hanielcota.essentials.paper.AudienceProvider;
+import lombok.NonNull;
 
 public final class BroadcastModule extends AbstractModule {
 
@@ -13,11 +16,11 @@ public final class BroadcastModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("broadcast", BroadcastConfig.class, BroadcastConfig::defaults);
-    var audiences = service(AudienceProvider.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("broadcast", BroadcastConfig.class, BroadcastConfig::defaults);
+    var audiences = env.service(AudienceProvider.class);
     var service = new BroadcastService(config, audiences);
 
-    registerCommand(new BroadcastCommand(config, service));
+    registrar.command(new BroadcastCommand(config, service));
   }
 }

@@ -1,10 +1,13 @@
 package com.hanielcota.essentials.modules.gamemode;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.gamemode.command.GamemodeCommand;
 import com.hanielcota.essentials.modules.gamemode.config.GamemodeConfig;
 import com.hanielcota.essentials.modules.gamemode.service.GamemodeService;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 
 public final class GamemodeModule extends AbstractModule {
 
@@ -13,14 +16,15 @@ public final class GamemodeModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var gamemodeService = new GamemodeService();
     var config =
-        configure("gamemode", GamemodeConfig.class, GamemodeConfig::defaults, gamemodeService);
+        registrar.configure(
+            "gamemode", GamemodeConfig.class, GamemodeConfig::defaults, gamemodeService);
 
-    var framework = service(PaperCommandFramework.class);
+    var framework = env.service(PaperCommandFramework.class);
     var gamemodeCommand = new GamemodeCommand(config, gamemodeService, framework);
 
-    registerCommand(gamemodeCommand);
+    registrar.command(gamemodeCommand);
   }
 }

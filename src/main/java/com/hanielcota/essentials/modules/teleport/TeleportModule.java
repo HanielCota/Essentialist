@@ -3,6 +3,8 @@ package com.hanielcota.essentials.modules.teleport;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.teleport.command.TeleportCancelCommand;
 import com.hanielcota.essentials.modules.teleport.command.TeleportCommand;
 import com.hanielcota.essentials.modules.teleport.command.TeleportDispatcher;
@@ -19,6 +21,7 @@ import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 
 public final class TeleportModule extends AbstractModule {
 
@@ -27,31 +30,31 @@ public final class TeleportModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("teleport", TeleportConfig.class, TeleportConfig::defaults);
-    var executor = service(SqlExecutor.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("teleport", TeleportConfig.class, TeleportConfig::defaults);
+    var executor = env.service(SqlExecutor.class);
     TeleportHistoryTable.install(executor);
 
     var historyWriter = new DefaultAsyncDatabaseWriter("Essentialist-TeleportHistory");
-    registerCloseable(historyWriter);
+    registrar.closeable(historyWriter);
     var history = new SqliteTeleportHistory(executor, historyWriter);
-    registerService(TeleportHistory.class, history);
+    registrar.provide(TeleportHistory.class, history);
 
-    var delayed = new DelayedTeleport(service(Scheduler.class));
-    registerService(DelayedTeleport.class, delayed);
-    registerListener(new DelayedTeleportCanceller(delayed));
+    var delayed = new DelayedTeleport(env.service(Scheduler.class));
+    registrar.provide(DelayedTeleport.class, delayed);
+    registrar.listener(new DelayedTeleportCanceller(delayed));
 
     var teleportService = new TeleportService();
-    registerService(TeleportService.class, teleportService);
+    registrar.provide(TeleportService.class, teleportService);
 
-    var framework = service(PaperCommandFramework.class);
+    var framework = env.service(PaperCommandFramework.class);
     var notifier = new TeleportNotifier(config, framework);
-    var players = service(PlayerProvider.class);
-    var callbacks = service(MainThreadCallbacks.class);
+    var players = env.service(PlayerProvider.class);
+    var callbacks = env.service(MainThreadCallbacks.class);
     var dispatcher = new TeleportDispatcher(config, players, notifier, teleportService, callbacks);
 
-    registerCommand(new TeleportCommand(dispatcher));
-    registerCommand(new TeleportHereCommand(framework, notifier, teleportService, callbacks));
-    registerCommand(new TeleportCancelCommand(config, delayed));
+    registrar.command(new TeleportCommand(dispatcher));
+    registrar.command(new TeleportHereCommand(framework, notifier, teleportService, callbacks));
+    registrar.command(new TeleportCancelCommand(config, delayed));
   }
 }

@@ -1,16 +1,18 @@
 package com.hanielcota.essentials.module;
 
-import com.github.hanielcota.menuframework.api.MenuService;
-import com.hanielcota.essentials.EssentialsPlugin;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.config.ConfigService;
-import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.util.Log;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import java.util.function.Supplier;
 import lombok.NonNull;
-import org.bukkit.event.Listener;
 
+/**
+ * Base for every feature module. The single hook subclasses implement is {@link
+ * #onEnable(ModuleEnvironment, ModuleRegistrar)} — the environment exposes services and configs,
+ * the registrar publishes listeners / commands / menus / services. Both go out of scope as soon as
+ * enable returns, which keeps the lifecycle obvious: modules do not have a long-lived handle to the
+ * plugin or registry.
+ *
+ * <p>The {@link #disable()} hook tears down everything the registrar collected, in registration
+ * order, then runs the subclass's {@link #onDisable()} (which usually has nothing to clean up).
+ */
 public abstract class AbstractModule implements Module {
 
   private static final Log LOG = Log.of(AbstractModule.class);
@@ -38,7 +40,13 @@ public abstract class AbstractModule implements Module {
   @Override
   public final void enable(@NonNull ModuleContext context) {
     this.context = context;
-    onEnable();
+
+    var env = new DefaultModuleEnvironment(context);
+    var registrar =
+        new DefaultModuleRegistrar(
+            context, env, this.listeners, this.closeables, this.services, this.menus);
+
+    onEnable(env, registrar);
   }
 
   @Override
@@ -54,93 +62,18 @@ public abstract class AbstractModule implements Module {
     }
   }
 
-  protected abstract void onEnable();
+  /**
+   * Wire collaborators here. {@code env} reads services / configs / the plugin; {@code registrar}
+   * publishes listeners, commands, menus, services and closeables. Neither reference should be
+   * stored as a field — the registrar's writes are only valid during this call, and the env is
+   * cheap to receive as a parameter when a private helper needs it.
+   */
+  protected abstract void onEnable(
+      @NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar);
 
+  /**
+   * Optional teardown hook. Most modules leave this empty — the registrar's closeables already
+   * cover listeners, services, menus and any explicit {@code closeable(...)} registrations.
+   */
   protected void onDisable() {}
-
-  protected final ModuleContext context() {
-    if (this.context == null) {
-      var moduleId = id();
-      throw new IllegalStateException("Module not enabled: " + moduleId);
-    }
-    return this.context;
-  }
-
-  protected final EssentialsPlugin plugin() {
-    var activeContext = context();
-    return activeContext.plugin();
-  }
-
-  protected final <T> T service(@NonNull Class<T> type) {
-    var activeContext = context();
-    var services = activeContext.services();
-
-    return services.resolve(type);
-  }
-
-  protected final <T> ConfigHandle<T> config(
-      @NonNull String name, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {
-    var configService = service(ConfigService.class);
-    return configService.load(name, type, defaults);
-  }
-
-  /**
-   * Loads a config, registers the service under its concrete runtime class, and returns the config
-   * handle in one call. Convenience overload for the common case where the service has no interface
-   * and callers will look it up as {@code service(ConcreteService.class)}. If the service needs to
-   * be registered under an interface or supertype, prefer {@link #configure(String, Class,
-   * Supplier, Class, Object)}.
-   */
-  protected final <C, S> ConfigHandle<C> configure(
-      @NonNull String name,
-      @NonNull Class<C> configType,
-      @NonNull Supplier<C> defaults,
-      @NonNull S service) {
-    var handle = config(name, configType, defaults);
-
-    @SuppressWarnings("unchecked")
-    var serviceType = (Class<S>) service.getClass();
-    registerService(serviceType, service);
-
-    return handle;
-  }
-
-  /**
-   * Loads a config and registers the service under the explicit {@code serviceType}. Use this when
-   * the service should be looked up via an interface or supertype rather than its concrete class.
-   */
-  protected final <C, S> ConfigHandle<C> configure(
-      @NonNull String name,
-      @NonNull Class<C> configType,
-      @NonNull Supplier<C> defaults,
-      @NonNull Class<S> serviceType,
-      @NonNull S service) {
-    var handle = config(name, configType, defaults);
-    registerService(serviceType, service);
-    return handle;
-  }
-
-  protected final void registerCommand(@NonNull Object handler) {
-    var framework = service(PaperCommandFramework.class);
-    framework.registerAnnotated(handler);
-  }
-
-  protected final void registerMenu(@NonNull EssentialsMenu menu) {
-    var menuService = service(MenuService.class);
-    this.menus.register(menuService, menu, this.closeables);
-  }
-
-  protected final void registerListener(@NonNull Listener listener) {
-    var currentPlugin = plugin();
-    this.listeners.register(currentPlugin, listener);
-  }
-
-  protected final void registerCloseable(@NonNull AutoCloseable closeable) {
-    this.closeables.register(closeable);
-  }
-
-  protected final <T> void registerService(@NonNull Class<T> type, @NonNull T instance) {
-    var activeContext = context();
-    this.services.register(activeContext, type, instance);
-  }
 }
