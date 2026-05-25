@@ -8,6 +8,7 @@ import com.hanielcota.essentials.modules.whitelist.menu.WhitelistClickHandler;
 import com.hanielcota.essentials.modules.whitelist.menu.WhitelistEntryRenderer;
 import com.hanielcota.essentials.modules.whitelist.menu.WhitelistMenu;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
+import com.hanielcota.essentials.paper.PlayerProvider;
 
 public final class WhitelistModule extends AbstractModule {
 
@@ -18,7 +19,8 @@ public final class WhitelistModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("whitelist", WhitelistConfig.class, WhitelistConfig::defaults);
-    var service = new WhitelistService();
+    var players = service(PlayerProvider.class);
+    var service = new WhitelistService(players);
     var menus = service(MenuService.class);
 
     var renderer = new WhitelistEntryRenderer(config);

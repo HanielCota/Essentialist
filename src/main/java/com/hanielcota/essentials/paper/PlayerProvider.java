@@ -19,4 +19,10 @@ public interface PlayerProvider {
   Optional<OfflinePlayer> offlineByName(@NonNull String name);
 
   Collection<Player> all();
+
+  /** Slot capacity of the server (the configured {@code server.properties} {@code max-players}). */
+  int maxPlayers();
+
+  /** Snapshot of all whitelisted players (online + offline). */
+  Collection<OfflinePlayer> whitelisted();
 }

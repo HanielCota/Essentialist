@@ -1,5 +1,7 @@
 package com.hanielcota.essentials.modules.info.presentation;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.user.UserSessionService;
 import com.hanielcota.essentials.util.DurationFormatter;
 import com.hanielcota.essentials.util.Numbers;
@@ -19,18 +21,10 @@ public final class PlayerInfoEntries {
   private static final String GRAY = "<gray>";
 
   private final UserSessionService sessions;
+  private final ConfigHandle<InfoConfig> config;
 
   private static int roundedHealth(@NonNull Player player) {
     return (int) Math.round(player.getHealth());
-  }
-
-  private static String gameModeName(@NonNull GameMode mode) {
-    return switch (mode) {
-      case SURVIVAL -> "Sobrevivência";
-      case CREATIVE -> "Criativo";
-      case ADVENTURE -> "Aventura";
-      case SPECTATOR -> "Espectador";
-    };
   }
 
   private static String formatCoords(@NonNull Location location) {
@@ -52,7 +46,7 @@ public final class PlayerInfoEntries {
     var foodLevel = player.getFoodLevel();
     var level = player.getLevel();
     var gameMode = player.getGameMode();
-    var gameModeLabel = gameModeName(gameMode);
+    var gameModeLabel = labelFor(gameMode);
     var ping = player.getPing();
     var coords = formatCoords(location);
     var sessionTime = sessionDuration(player);
@@ -88,6 +82,12 @@ public final class PlayerInfoEntries {
         locationEntry,
         pingEntry,
         sessionEntry);
+  }
+
+  private String labelFor(@NonNull GameMode mode) {
+    var snap = this.config.value();
+
+    return snap.gameModeLabel(mode);
   }
 
   private String sessionDuration(@NonNull Player player) {

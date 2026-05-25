@@ -2,19 +2,20 @@ package com.hanielcota.essentials.modules.title.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.title.config.TitleConfig;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.time.Duration;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
 public final class TitleService {
 
   private final ConfigHandle<TitleConfig> config;
+  private final PlayerProvider players;
 
   private static Component render(@NonNull String raw) {
     try {
@@ -36,7 +37,7 @@ public final class TitleService {
 
   public int broadcast(@NonNull String message) {
     var title = build(message);
-    var onlinePlayers = Bukkit.getOnlinePlayers();
+    var onlinePlayers = this.players.all();
 
     for (var player : onlinePlayers) {
       player.showTitle(title);

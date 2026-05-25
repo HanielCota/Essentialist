@@ -13,13 +13,14 @@ import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import org.bukkit.Bukkit;
 
 public final class VanishModule extends AbstractModule {
 
   private VanishService service;
   private VanishVisibilityApplier applier;
+  private PlayerProvider players;
 
   public VanishModule() {
     super("vanish");
@@ -28,11 +29,12 @@ public final class VanishModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("vanish", VanishConfig.class, VanishConfig::defaults);
+    this.players = service(PlayerProvider.class);
 
     this.service = new VanishService();
     registerService(VanishService.class, this.service);
 
-    this.applier = new VanishVisibilityApplier(plugin());
+    this.applier = new VanishVisibilityApplier(plugin(), this.players);
     var transitions = new VanishTransitions(this.service, this.applier);
 
     var joinListener = new VanishJoinListener(this.service, this.applier);
@@ -43,8 +45,8 @@ public final class VanishModule extends AbstractModule {
     registerListener(protectionListener);
 
     var renderer = new VanishEntryRenderer(config);
-    var clickHandler = new VanishClickHandler(config, this.service);
-    var menu = new VanishMenu(config, this.service, renderer, clickHandler);
+    var clickHandler = new VanishClickHandler(config, this.service, this.players);
+    var menu = new VanishMenu(config, this.service, renderer, clickHandler, this.players);
     registerMenu(menu);
 
     var framework = service(PaperCommandFramework.class);
@@ -63,7 +65,7 @@ public final class VanishModule extends AbstractModule {
     // must be unapplied or they rejoin permanently invulnerable.
     var vanishedIds = this.service.vanished();
     for (var id : vanishedIds) {
-      var player = Bukkit.getPlayer(id);
+      var player = this.players.online(id).orElse(null);
       if (player == null) {
         continue;
       }
@@ -72,5 +74,6 @@ public final class VanishModule extends AbstractModule {
 
     this.service = null;
     this.applier = null;
+    this.players = null;
   }
 }

@@ -53,8 +53,6 @@ final class HomeRenameMessages {
         var renameTakenMsg = messages.renameTaken();
         yield renameTakenMsg.replace(NAME, newName);
       }
-
-      default -> throw new IllegalStateException("Resultado de renomeação desconhecido: " + result);
     };
   }
 }

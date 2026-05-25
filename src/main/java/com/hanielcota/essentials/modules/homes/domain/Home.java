@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.homes.domain;
 
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
@@ -10,7 +11,7 @@ import org.bukkit.Material;
  * One persisted home of a player.
  *
  * <p>Stores the world name (not a live {@code World}) so the record stays valid across reloads and
- * world unloads. {@link #resolve()} returns null when the world is no longer available.
+ * world unloads. {@link #resolve()} returns empty when the world is no longer available.
  */
 public record Home(
     UUID owner,
@@ -71,13 +72,14 @@ public record Home(
         this.createdAt);
   }
 
-  public Location resolve() {
+  public Optional<Location> resolve() {
     var resolvedWorld = Bukkit.getWorld(this.world);
-
     if (resolvedWorld == null) {
-      return null;
+      return Optional.empty();
     }
 
-    return new Location(resolvedWorld, this.x, this.y, this.z, this.yaw, this.pitch);
+    var location = new Location(resolvedWorld, this.x, this.y, this.z, this.yaw, this.pitch);
+
+    return Optional.of(location);
   }
 }

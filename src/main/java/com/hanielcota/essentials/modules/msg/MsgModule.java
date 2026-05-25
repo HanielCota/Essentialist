@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.msg.service.MsgDispatcher;
 import com.hanielcota.essentials.modules.msg.service.MsgNotifier;
 import com.hanielcota.essentials.modules.msg.service.MsgService;
 import com.hanielcota.essentials.modules.msg.service.SocialSpyBridge;
+import com.hanielcota.essentials.modules.socialspy.service.SocialSpyBroadcaster;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -31,7 +32,7 @@ public final class MsgModule extends AbstractModule {
     var players = service(PlayerProvider.class);
     var registry = context().services();
     var notifier = new MsgNotifier(config, framework);
-    var spyBridge = new SocialSpyBridge(registry);
+    var spyBridge = new SocialSpyBridge(() -> registry.find(SocialSpyBroadcaster.class));
     var dispatcher = new MsgDispatcher(partners, notifier, spyBridge);
     var visibilityFilter = visibilityFilter();
 

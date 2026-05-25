@@ -1,10 +1,10 @@
 package com.hanielcota.essentials.modules.vanish.service;
 
 import com.hanielcota.essentials.EssentialsPlugin;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /**
@@ -23,10 +23,11 @@ public final class VanishVisibilityApplier {
   public static final String SEE_PERMISSION = "essentials.vanish.see";
 
   private final EssentialsPlugin plugin;
+  private final PlayerProvider players;
 
   /** Hides {@code target} from every viewer without {@link #SEE_PERMISSION} and enables guards. */
   public void apply(@NonNull Player target) {
-    var viewers = Bukkit.getOnlinePlayers();
+    var viewers = this.players.all();
 
     for (var viewer : viewers) {
       if (viewer.equals(target)) {
@@ -44,7 +45,7 @@ public final class VanishVisibilityApplier {
 
   /** Reveals {@code target} to every viewer and clears the protection flags. */
   public void unapply(@NonNull Player target) {
-    var viewers = Bukkit.getOnlinePlayers();
+    var viewers = this.players.all();
 
     for (var viewer : viewers) {
       if (viewer.equals(target)) {
@@ -67,7 +68,7 @@ public final class VanishVisibilityApplier {
     }
 
     for (var id : vanishedIds) {
-      var target = Bukkit.getPlayer(id);
+      var target = this.players.online(id).orElse(null);
       if (target == null) {
         continue;
       }

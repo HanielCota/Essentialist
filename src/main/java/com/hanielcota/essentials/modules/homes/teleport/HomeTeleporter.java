@@ -57,8 +57,7 @@ public final class HomeTeleporter {
   public void teleport(@NonNull Player player, @NonNull Home home, @NonNull CommandActor actor) {
     var snap = this.config.value();
     var messages = snap.messages();
-    var resolved = home.resolve();
-
+    var resolved = home.resolve().orElse(null);
     if (resolved == null) {
       var worldGoneMsg = messages.worldGone();
       actor.sendError(worldGoneMsg);

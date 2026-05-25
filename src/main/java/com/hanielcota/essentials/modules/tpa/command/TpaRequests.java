@@ -4,13 +4,13 @@ import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /** Shared command helpers — request lookup, sending and replying to the requester. */
@@ -91,11 +91,12 @@ final class TpaRequests {
    */
   static void replyRequester(
       @NonNull PaperCommandFramework framework,
+      @NonNull PlayerProvider players,
       @NonNull TeleportRequest request,
       @NonNull String template,
       boolean asSuccess) {
     var requesterId = request.requester().id();
-    var requesterPlayer = Bukkit.getPlayer(requesterId);
+    var requesterPlayer = players.online(requesterId).orElse(null);
     if (requesterPlayer == null) {
       return;
     }

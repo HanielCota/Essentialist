@@ -37,7 +37,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
     var player = sender.unwrap(Player.class);
     var result = this.service.apply(player, enchantment, level);
 
-    if (result == EnchantService.Result.EMPTY_HAND) {
+    if (result == EnchantService.ApplyResult.EMPTY_HAND) {
       sender.sendError(snap.emptyHand());
       return;
     }
@@ -68,7 +68,6 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
         var removedMsg = snap.formatRemoved(label);
         sender.sendSuccess(removedMsg);
       }
-      case APPLIED -> throw new IllegalStateException("Unexpected enchant result: APPLIED");
     }
   }
 

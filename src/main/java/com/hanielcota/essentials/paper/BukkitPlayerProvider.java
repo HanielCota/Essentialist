@@ -53,4 +53,19 @@ public record BukkitPlayerProvider(@NonNull EssentialsPlugin plugin) implements 
 
     return List.copyOf(onlinePlayers);
   }
+
+  @Override
+  public int maxPlayers() {
+    var server = this.plugin.getServer();
+
+    return server.getMaxPlayers();
+  }
+
+  @Override
+  public Collection<OfflinePlayer> whitelisted() {
+    var server = this.plugin.getServer();
+    var snapshot = server.getWhitelistedPlayers();
+
+    return List.copyOf(snapshot);
+  }
 }

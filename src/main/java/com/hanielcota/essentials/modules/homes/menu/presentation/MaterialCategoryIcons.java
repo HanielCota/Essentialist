@@ -1,11 +1,18 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Material;
 
-public final class MaterialCategoryIconRegistry {
+/**
+ * Static mapping of {@link MaterialCategory} to its representative icon. The mapping is closed and
+ * lives with the enum — not a runtime registry, just a typed switch behind a stable API.
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class MaterialCategoryIcons {
 
-  public @NonNull Material iconFor(@NonNull MaterialCategory category) {
+  public static @NonNull Material iconFor(@NonNull MaterialCategory category) {
     return switch (category) {
       case CONSTRUCTION -> Material.STONE_BRICKS;
       case WOOD -> Material.OAK_LOG;

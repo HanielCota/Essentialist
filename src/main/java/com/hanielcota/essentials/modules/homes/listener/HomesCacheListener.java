@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.homes.listener;
 
-import com.hanielcota.essentials.modules.homes.repository.CachedHomeRepository;
+import com.hanielcota.essentials.modules.homes.repository.HomeCacheLifecycle;
 import com.hanielcota.essentials.util.Log;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public final class HomesCacheListener implements Listener {
 
   private static final Log LOG = Log.of(HomesCacheListener.class);
 
-  private final CachedHomeRepository repository;
+  private final HomeCacheLifecycle repository;
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onPreLogin(@NonNull AsyncPlayerPreLoginEvent event) {

@@ -11,13 +11,13 @@ import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.config.VanishMenuLayout;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
@@ -33,6 +33,7 @@ public final class VanishMenu implements EssentialsMenu {
   private final VanishService service;
   private final VanishEntryRenderer renderer;
   private final VanishClickHandler clickHandler;
+  private final PlayerProvider players;
 
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull VanishConfig snap) {
     var material = snap.infoMaterial();
@@ -70,33 +71,34 @@ public final class VanishMenu implements EssentialsMenu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player viewer, @NonNull MenuSession session) {
     var vanishedIds = this.service.vanished();
-    var players = collectOnline(vanishedIds, vanishedIds.size());
+    var roster = collectOnline(vanishedIds, vanishedIds.size());
 
-    if (players.isEmpty()) {
+    if (roster.isEmpty()) {
       return emptyState();
     }
 
     var nameOrder = Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER);
-    players.sort(nameOrder);
+    roster.sort(nameOrder);
 
-    var slots = new ArrayList<SlotDefinition>(players.size());
-    for (var player : players) {
+    var slots = new ArrayList<SlotDefinition>(roster.size());
+    for (var player : roster) {
       var slot = buildEntrySlot(player);
       slots.add(slot);
     }
     return slots;
   }
 
-  private static List<Player> collectOnline(@NonNull Iterable<UUID> ids, int expectedSize) {
-    var players = new ArrayList<Player>(expectedSize);
+  private List<Player> collectOnline(@NonNull Iterable<UUID> ids, int expectedSize) {
+    var roster = new ArrayList<Player>(expectedSize);
     for (var id : ids) {
-      var player = Bukkit.getPlayer(id);
+      var player = this.players.online(id).orElse(null);
       if (player == null) {
         continue;
       }
-      players.add(player);
+      roster.add(player);
     }
-    return players;
+
+    return roster;
   }
 
   private SlotDefinition buildEntrySlot(@NonNull Player player) {

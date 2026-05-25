@@ -27,6 +27,11 @@ public final class HomeCache {
     this.homes.remove(owner);
   }
 
+  /** Whether {@code owner}'s bucket is currently populated in memory. */
+  boolean isLoaded(@NonNull UUID owner) {
+    return this.homes.containsKey(owner);
+  }
+
   Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
     var bucket = this.homes.get(owner);
 

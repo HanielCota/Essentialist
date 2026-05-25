@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.notification.TpaNotifier;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,12 +36,13 @@ public final class TeleportRequestService {
       @NonNull ConfigHandle<TpaConfig> config,
       @NonNull RequestStore store,
       @NonNull TpaHistory history,
-      @NonNull TpaNotifier notifier) {
+      @NonNull TpaNotifier notifier,
+      @NonNull PlayerProvider players) {
     this.config = config;
     this.store = store;
     this.history = history;
     this.notifier = notifier;
-    this.executor = new TeleportRequestExecutor();
+    this.executor = new TeleportRequestExecutor(players);
   }
 
   /**

@@ -1,11 +1,15 @@
 package com.hanielcota.essentials.modules.actionbar.service;
 
+import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public final class ActionBarService {
+
+  private final PlayerProvider players;
 
   public void send(@NonNull Player player, @NonNull String message) {
     var bar = ComponentUtils.mini(message);
@@ -14,11 +18,12 @@ public final class ActionBarService {
 
   public int broadcast(@NonNull String message) {
     var bar = ComponentUtils.mini(message);
-    var players = Bukkit.getOnlinePlayers();
+    var roster = this.players.all();
 
-    for (var player : players) {
+    for (var player : roster) {
       player.sendActionBar(bar);
     }
-    return players.size();
+
+    return roster.size();
   }
 }

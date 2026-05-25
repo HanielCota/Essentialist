@@ -3,11 +3,11 @@ package com.hanielcota.essentials.modules.tpa.notification;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.UUID;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /**
@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
  * <p>Sole responsibility: present these out-of-band TPA events to players. Direct command replies
  * stay in the command classes.
  */
-public record TpaNotifier(ConfigHandle<TpaConfig> config) {
+public record TpaNotifier(ConfigHandle<TpaConfig> config, PlayerProvider players) {
 
   public void sendPrompt(@NonNull Player target, @NonNull TeleportRequest request) {
     var snap = this.config.value();
@@ -53,7 +53,7 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
 
   public void notifyExpired(@NonNull TeleportRequest request) {
     var requesterId = request.requester().id();
-    var requester = Bukkit.getPlayer(requesterId);
+    var requester = this.players.online(requesterId).orElse(null);
     if (requester == null) {
       return;
     }
@@ -78,7 +78,7 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config) {
 
     var recipient = requesterId.equals(quitter) ? targetId : requesterId;
 
-    var online = Bukkit.getPlayer(recipient);
+    var online = this.players.online(recipient).orElse(null);
     if (online == null) {
       return;
     }

@@ -5,10 +5,10 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.config.VanishMessages;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -17,12 +17,13 @@ import org.bukkit.entity.Player;
  * click time so a head that lingers in the rendered slot after the target retoggles never sends the
  * viewer to a now-visible player.
  */
-public record VanishClickHandler(ConfigHandle<VanishConfig> config, VanishService service) {
+public record VanishClickHandler(
+    ConfigHandle<VanishConfig> config, VanishService service, PlayerProvider players) {
 
   public void handle(
       @NonNull ClickContext click, @NonNull UUID targetId, @NonNull String targetName) {
     var snap = this.config.value();
-    var target = Bukkit.getPlayer(targetId);
+    var target = this.players.online(targetId).orElse(null);
 
     if (target == null || !this.service.isVanished(targetId)) {
       var goneMsg = VanishMessages.teleportTargetGone(snap, targetName);
