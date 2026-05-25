@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.warps;
 
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleEnvironment;
@@ -40,9 +41,11 @@ public final class WarpsModule extends AbstractModule {
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("warps", WarpsConfig.class, WarpsConfig::defaults);
     var executor = env.service(SqlExecutor.class);
-    WarpTable.install(executor);
+    var dialect = env.service(SqlDialect.class);
+    var table = new WarpTable(dialect);
+    table.install(executor);
 
-    var store = new WarpStore(executor);
+    var store = new WarpStore(executor, table);
     var cache = new WarpCache();
 
     var existingWarps = store.list();

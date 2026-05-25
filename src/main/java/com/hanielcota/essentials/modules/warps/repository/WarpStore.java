@@ -11,15 +11,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * SQLite-backed storage of server warps.
+ * Storage of server warps.
  *
- * <p>Primary key is {@code name} with {@code COLLATE NOCASE} so {@code /warp Spawn} and {@code
- * /warp SPAWN} hit the same row.
+ * <p>Primary key is {@code name} with the dialect's case-insensitive collation so {@code /warp
+ * Spawn} and {@code /warp SPAWN} hit the same row.
  */
 @RequiredArgsConstructor
 public final class WarpStore {
 
   private final SqlExecutor sqlExecutor;
+  private final WarpTable table;
 
   private static Warp readRow(@NonNull ResultSet rs) throws SQLException {
     var name = rs.getString("name");
@@ -68,7 +69,7 @@ public final class WarpStore {
     var creatorIdStr = warp.createdBy().toString();
 
     this.sqlExecutor.update(
-        WarpTable.UPSERT, name, world, x, y, z, yaw, pitch, createdAt, creatorIdStr);
+        this.table.upsert(), name, world, x, y, z, yaw, pitch, createdAt, creatorIdStr);
   }
 
   /** Deletes the warp. Returns {@code true} when a row was removed. */

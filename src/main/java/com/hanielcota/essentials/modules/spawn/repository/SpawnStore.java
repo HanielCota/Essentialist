@@ -9,15 +9,18 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * SQLite-backed singleton storage of the server spawn.
+ * Singleton storage of the server spawn.
  *
- * <p>The table has at most one row (enforced by {@code CHECK (singleton = 1)}); {@link #save} uses
- * {@code INSERT OR REPLACE} so the spawn is overwritten in place.
+ * <p>The table has at most one row (enforced by {@code CHECK (singleton = 1)}); {@link #save}
+ * upserts the single row by binding {@code singleton = 1} explicitly.
  */
 @RequiredArgsConstructor
 public final class SpawnStore {
 
+  private static final int SINGLETON_KEY = 1;
+
   private final @NonNull SqlExecutor sqlExecutor;
+  private final @NonNull SpawnTable table;
 
   private static SpawnLocation readRow(@NonNull ResultSet rs) throws SQLException {
     return new SpawnLocation(
@@ -43,7 +46,8 @@ public final class SpawnStore {
   /** Overwrites the stored spawn with {@code location}. */
   public void save(@NonNull SpawnLocation location) {
     this.sqlExecutor.update(
-        SpawnTable.UPSERT,
+        this.table.upsert(),
+        SINGLETON_KEY,
         location.world(),
         location.x(),
         location.y(),

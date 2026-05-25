@@ -4,8 +4,10 @@ import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.database.DefaultSqlExecutor;
 import com.hanielcota.essentials.database.SqlConnectionFactory;
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.database.SqliteDatabase;
+import com.hanielcota.essentials.database.SqliteDialect;
 import com.hanielcota.essentials.exception.PluginException;
 import com.hanielcota.essentials.service.ServiceRegistry;
 import java.io.IOException;
@@ -40,5 +42,7 @@ final class DatabaseBootstrap {
 
     var sqlExecutor = new DefaultSqlExecutor(database);
     services.register(SqlExecutor.class, sqlExecutor);
+
+    services.register(SqlDialect.class, new SqliteDialect());
   }
 }

@@ -3,12 +3,31 @@ package com.hanielcota.essentials.core;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.api.EssentialsApi;
+import com.hanielcota.essentials.api.HomesApi;
+import com.hanielcota.essentials.api.MutesApi;
+import com.hanielcota.essentials.api.NicksApi;
+import com.hanielcota.essentials.api.TeleportsApi;
+import com.hanielcota.essentials.api.VanishApi;
+import com.hanielcota.essentials.api.WarpsApi;
+import com.hanielcota.essentials.core.api.HomesApiAdapter;
+import com.hanielcota.essentials.core.api.MutesApiAdapter;
+import com.hanielcota.essentials.core.api.NicksApiAdapter;
+import com.hanielcota.essentials.core.api.TeleportsApiAdapter;
+import com.hanielcota.essentials.core.api.VanishApiAdapter;
+import com.hanielcota.essentials.core.api.WarpsApiAdapter;
 import com.hanielcota.essentials.core.lifecycle.LifecyclePhase;
 import com.hanielcota.essentials.database.DatabaseProvider;
 import com.hanielcota.essentials.module.ModuleContext;
 import com.hanielcota.essentials.module.ModuleManager;
+import com.hanielcota.essentials.modules.homes.service.HomeService;
+import com.hanielcota.essentials.modules.mute.service.MuteService;
+import com.hanielcota.essentials.modules.nick.service.NickService;
+import com.hanielcota.essentials.modules.teleport.service.TeleportService;
+import com.hanielcota.essentials.modules.vanish.service.VanishService;
+import com.hanielcota.essentials.modules.warps.service.WarpService;
 import com.hanielcota.essentials.service.ServiceRegistry;
 import com.hanielcota.essentials.util.Log;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -74,11 +93,43 @@ public final class EssentialsCore implements EssentialsApi {
   }
 
   @Override
+  public Optional<HomesApi> homes() {
+    return this.services.find(HomeService.class).map(HomesApiAdapter::new);
+  }
+
+  @Override
+  public Optional<WarpsApi> warps() {
+    return this.services.find(WarpService.class).map(WarpsApiAdapter::new);
+  }
+
+  @Override
+  public Optional<MutesApi> mutes() {
+    return this.services.find(MuteService.class).map(MutesApiAdapter::new);
+  }
+
+  @Override
+  public Optional<NicksApi> nicks() {
+    return this.services.find(NickService.class).map(NicksApiAdapter::new);
+  }
+
+  @Override
+  public Optional<VanishApi> vanish() {
+    return this.services.find(VanishService.class).map(VanishApiAdapter::new);
+  }
+
+  @Override
+  public Optional<TeleportsApi> teleports() {
+    return this.services.find(TeleportService.class).map(TeleportsApiAdapter::new);
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
   public EssentialsPlugin plugin() {
     return this.plugin;
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public ServiceRegistry services() {
     return this.services;
   }

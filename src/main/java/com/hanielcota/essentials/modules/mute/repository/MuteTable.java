@@ -1,19 +1,10 @@
 package com.hanielcota.essentials.modules.mute.repository;
 
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MuteTable {
-
-  static final String UPSERT =
-      """
-      INSERT OR REPLACE INTO mutes \
-      (player_id, expires_at, created_at) \
-      VALUES (?, ?, ?)\
-      """;
 
   static final String DELETE =
       """
@@ -41,7 +32,17 @@ public final class MuteTable {
       )
       """;
 
-  public static void install(@NonNull SqlExecutor executor) {
+  private final String upsert;
+
+  public MuteTable(@NonNull SqlDialect dialect) {
+    this.upsert = dialect.upsertInto("mutes", "player_id", "expires_at", "created_at");
+  }
+
+  String upsert() {
+    return this.upsert;
+  }
+
+  public void install(@NonNull SqlExecutor executor) {
     executor.ddl(CREATE_TABLE);
   }
 }

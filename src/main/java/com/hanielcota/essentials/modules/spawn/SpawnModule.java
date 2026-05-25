@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.spawn;
 
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleEnvironment;
@@ -37,9 +38,11 @@ public final class SpawnModule extends AbstractModule {
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("spawn", SpawnConfig.class, SpawnConfig::defaults);
     var executor = env.service(SqlExecutor.class);
-    SpawnTable.install(executor);
+    var dialect = env.service(SqlDialect.class);
+    var table = new SpawnTable(dialect);
+    table.install(executor);
 
-    var store = new SpawnStore(executor);
+    var store = new SpawnStore(executor, table);
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-Spawn");
     registrar.closeable(writer);
 
