@@ -18,7 +18,6 @@ import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.UUID;
 import java.util.function.BiPredicate;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Command(value = "r", aliases = "reply")
@@ -67,12 +66,12 @@ public record ReplyCommand(
     this.dispatcher.send(from, target, body);
   }
 
-  private static String resolvePartnerName(@NonNull UUID id, Player onlinePartner) {
+  private String resolvePartnerName(@NonNull UUID id, Player onlinePartner) {
     if (onlinePartner != null) {
       return onlinePartner.getName();
     }
 
-    var offline = Bukkit.getOfflinePlayer(id);
+    var offline = this.players.offline(id);
     var stored = offline.getName();
 
     return stored != null ? stored : id.toString();

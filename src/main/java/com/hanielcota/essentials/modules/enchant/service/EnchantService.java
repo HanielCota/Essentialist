@@ -8,31 +8,31 @@ import org.bukkit.entity.Player;
 public final class EnchantService {
 
   /** Adds an enchantment to the held item at any level — unsafe, no vanilla checks. */
-  public Result apply(@NonNull Player player, @NonNull Enchantment enchantment, int level) {
-
+  public ApplyResult apply(@NonNull Player player, @NonNull Enchantment enchantment, int level) {
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
-      return Result.EMPTY_HAND;
+      return ApplyResult.EMPTY_HAND;
     }
 
     held.addUnsafeEnchantment(enchantment, level);
-    return Result.APPLIED;
+
+    return ApplyResult.APPLIED;
   }
 
   /** Removes one enchantment from the held item. */
-  public Result remove(@NonNull Player player, @NonNull Enchantment enchantment) {
-
+  public RemoveResult remove(@NonNull Player player, @NonNull Enchantment enchantment) {
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
-      return Result.EMPTY_HAND;
+      return RemoveResult.EMPTY_HAND;
     }
 
     if (!held.containsEnchantment(enchantment)) {
-      return Result.NOT_ENCHANTED;
+      return RemoveResult.NOT_ENCHANTED;
     }
 
     held.removeEnchantment(enchantment);
-    return Result.REMOVED;
+
+    return RemoveResult.REMOVED;
   }
 
   /**
@@ -41,7 +41,6 @@ public final class EnchantService {
    * @return the number of enchantments removed, or {@code -1} when the hand is empty
    */
   public int clearAll(@NonNull Player player) {
-
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
       return -1;
@@ -61,8 +60,12 @@ public final class EnchantService {
     return enchantments.size();
   }
 
-  public enum Result {
+  public enum ApplyResult {
     APPLIED,
+    EMPTY_HAND
+  }
+
+  public enum RemoveResult {
     REMOVED,
     NOT_ENCHANTED,
     EMPTY_HAND

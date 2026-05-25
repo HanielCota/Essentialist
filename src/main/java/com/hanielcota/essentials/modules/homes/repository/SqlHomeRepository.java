@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.homes.repository;
 
+import com.hanielcota.essentials.database.ResultMapper;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.List;
@@ -42,7 +43,7 @@ public final class SqlHomeRepository implements HomeRepository {
   public int count(@NonNull UUID owner) {
     var ownerStr = owner.toString();
 
-    SqlExecutor.ResultMapper<Integer> totalMapper = rs -> rs.getInt("total");
+    ResultMapper<Integer> totalMapper = rs -> rs.getInt("total");
     var counts = this.sqlExecutor.query(SqlHomeTable.COUNT, totalMapper, ownerStr);
 
     if (counts.isEmpty()) {

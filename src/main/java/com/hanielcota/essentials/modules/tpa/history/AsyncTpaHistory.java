@@ -1,10 +1,10 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * {@link TpaHistory} decorator that moves writes off the calling thread.
@@ -13,17 +13,13 @@ import lombok.NonNull;
  * deny / disconnect / expiry) and the underlying SQLite INSERT must never block the main thread on
  * disk I/O, so {@link #push} is handed to a single background thread. Reads ({@link #list}) stay
  * synchronous — they only happen on the rare {@code /tpahistory} command. All persistence is
- * delegated to the wrapped {@link TpaHistory}.
+ * delegated to the wrapped {@link TpaHistory}. Writer lifecycle is owned by the module.
  */
-public final class AsyncTpaHistory implements TpaHistory, AutoCloseable {
+@RequiredArgsConstructor
+public final class AsyncTpaHistory implements TpaHistory {
 
   private final TpaHistory delegate;
   private final AsyncDatabaseWriter writer;
-
-  public AsyncTpaHistory(TpaHistory delegate) {
-    this.delegate = delegate;
-    this.writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaHistory");
-  }
 
   @Override
   public void push(@NonNull TpaHistoryEntry entry) {
@@ -33,10 +29,5 @@ public final class AsyncTpaHistory implements TpaHistory, AutoCloseable {
   @Override
   public List<TpaHistoryEntry> list(@NonNull UUID requester) {
     return this.delegate.list(requester);
-  }
-
-  @Override
-  public void close() {
-    this.writer.close();
   }
 }

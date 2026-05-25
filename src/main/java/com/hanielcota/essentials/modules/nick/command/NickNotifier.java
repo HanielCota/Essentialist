@@ -2,7 +2,8 @@ package com.hanielcota.essentials.modules.nick.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
-import com.hanielcota.essentials.modules.nick.service.NickOutcome;
+import com.hanielcota.essentials.modules.nick.service.NickResetOutcome;
+import com.hanielcota.essentials.modules.nick.service.NickSetOutcome;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
@@ -11,8 +12,8 @@ import org.bukkit.entity.Player;
 
 /**
  * Owns every user-visible message emitted by {@code /nick}: validation errors, taken-nick errors
- * and the dual sender/target success messaging for both set and reset. Keeping these here lets the
- * command stay a thin dispatcher and the operation service stay a pure orchestrator.
+ * and the dual sender/target success messaging for both set and reset. Two narrow outcome types
+ * keep both switches exhaustive without {@code default} arms.
  */
 @RequiredArgsConstructor
 public final class NickNotifier {
@@ -24,17 +25,13 @@ public final class NickNotifier {
       @NonNull CommandActor sender,
       @NonNull Player subject,
       boolean self,
-      @NonNull NickOutcome outcome) {
+      @NonNull NickSetOutcome outcome) {
     var snap = this.config.value();
     switch (outcome) {
-      case NickOutcome.InvalidLength ignored -> {
-        var msg = snap.formatInvalidLength();
-        sender.sendError(msg);
-      }
-      case NickOutcome.InvalidChars ignored -> sender.sendError(snap.invalidChars());
-      case NickOutcome.Taken ignored -> sender.sendError(snap.nickTaken());
-      case NickOutcome.SetOk ok -> sendSetOk(sender, subject, self, ok.nickname(), ok.realName());
-      default -> throw new IllegalStateException("unexpected outcome for set: " + outcome);
+      case NickSetOutcome.InvalidLength ignored -> sender.sendError(snap.formatInvalidLength());
+      case NickSetOutcome.InvalidChars ignored -> sender.sendError(snap.invalidChars());
+      case NickSetOutcome.Taken ignored -> sender.sendError(snap.nickTaken());
+      case NickSetOutcome.Ok ok -> sendSetOk(sender, subject, self, ok.nickname(), ok.realName());
     }
   }
 
@@ -42,12 +39,11 @@ public final class NickNotifier {
       @NonNull CommandActor sender,
       @NonNull Player subject,
       boolean self,
-      @NonNull NickOutcome outcome) {
+      @NonNull NickResetOutcome outcome) {
     var snap = this.config.value();
     switch (outcome) {
-      case NickOutcome.AlreadyHasNoNick ignored -> sender.sendError(snap.alreadyHasNoNick());
-      case NickOutcome.ResetOk ignored -> sendResetOk(sender, subject, self, snap);
-      default -> throw new IllegalStateException("unexpected outcome for reset: " + outcome);
+      case NickResetOutcome.AlreadyHasNoNick ignored -> sender.sendError(snap.alreadyHasNoNick());
+      case NickResetOutcome.Ok ignored -> sendResetOk(sender, subject, self, snap);
     }
   }
 

@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -28,7 +29,8 @@ import org.bukkit.entity.Player;
 public record TpAcceptCommand(
     ConfigHandle<TpaConfig> config,
     TeleportRequestService service,
-    PaperCommandFramework framework) {
+    PaperCommandFramework framework,
+    PlayerProvider players) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
@@ -72,7 +74,7 @@ public record TpAcceptCommand(
     actor.sendSuccess(acceptedMsg);
 
     var acceptedTemplate = messages.accepted();
-    TpaRequests.replyRequester(this.framework, request, acceptedTemplate, true);
+    TpaRequests.replyRequester(this.framework, this.players, request, acceptedTemplate, true);
   }
 
   private void handleRequesterOffline(

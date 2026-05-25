@@ -16,15 +16,21 @@ import org.bukkit.Material;
  * to block — typically the AsyncPlayerPreLoginEvent thread) and evicted via {@link #evictFor} on
  * quit. Mutations write through to the cache synchronously and enqueue the SQL persist to the
  * writer thread.
+ *
+ * <p>Reads ({@link #find}/{@link #list}/{@link #count}) fall back to the delegate (SQL) when the
+ * bucket isn't loaded — happens at most once per owner per session and keeps the {@link
+ * HomeRepository} contract honest (no silent empty returns when the bucket is missing).
  */
 @RequiredArgsConstructor
-public final class CachedHomeRepository implements HomeRepository, AutoCloseable {
+public final class CachedHomeRepository
+    implements HomeRepository, HomeCacheLifecycle, AutoCloseable {
 
   private final HomeRepository delegate;
   private final AsyncDatabaseWriter writer;
   private final HomeCache cache;
 
   /** Loads {@code owner}'s homes from SQL and populates the cache. Blocks the calling thread. */
+  @Override
   public void loadFor(@NonNull UUID owner) {
     var homes = this.delegate.list(owner);
     this.cache.loadFor(owner, homes);
@@ -39,22 +45,29 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
    * eviction does not need to wait for the writer to drain. Deferring it through the writer queue
    * would race a fresh {@link #loadFor} from a quick reconnect and wipe the freshly loaded bucket.
    */
+  @Override
   public void evictFor(@NonNull UUID owner) {
     this.cache.evictFor(owner);
   }
 
   @Override
   public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
+    ensureLoaded(owner);
+
     return this.cache.find(owner, name);
   }
 
   @Override
   public List<Home> list(@NonNull UUID owner) {
+    ensureLoaded(owner);
+
     return this.cache.list(owner);
   }
 
   @Override
   public int count(@NonNull UUID owner) {
+    ensureLoaded(owner);
+
     return this.cache.count(owner);
   }
 
@@ -115,5 +128,13 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   @Override
   public void close() {
     this.writer.close();
+  }
+
+  private void ensureLoaded(@NonNull UUID owner) {
+    if (this.cache.isLoaded(owner)) {
+      return;
+    }
+
+    loadFor(owner);
   }
 }

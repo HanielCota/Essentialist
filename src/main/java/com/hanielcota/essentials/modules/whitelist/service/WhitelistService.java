@@ -1,13 +1,17 @@
 package com.hanielcota.essentials.modules.whitelist.service;
 
+import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.OfflinePlayer;
 
+@RequiredArgsConstructor
 public final class WhitelistService {
+
+  private final PlayerProvider players;
 
   // Player name; falls back to UUID when the server has never resolved the name.
   public static String nameOf(@NonNull OfflinePlayer player) {
@@ -20,17 +24,12 @@ public final class WhitelistService {
   }
 
   // Online or cached player for `name`; null when the server has never seen it.
-  private static OfflinePlayer resolveKnown(@NonNull String name) {
-    var online = Bukkit.getPlayerExact(name);
-    if (online != null) {
-      return online;
-    }
-
-    return Bukkit.getOfflinePlayerIfCached(name);
+  private OfflinePlayer resolveKnown(@NonNull String name) {
+    return this.players.offlineByName(name).orElse(null);
   }
 
-  private static OfflinePlayer findWhitelisted(@NonNull String name) {
-    var whitelisted = Bukkit.getWhitelistedPlayers();
+  private OfflinePlayer findWhitelisted(@NonNull String name) {
+    var whitelisted = this.players.whitelisted();
 
     for (var player : whitelisted) {
       var playerName = player.getName();
@@ -44,7 +43,7 @@ public final class WhitelistService {
 
   // Whitelisted players, sorted by name (case-insensitive).
   public List<OfflinePlayer> list() {
-    var whitelisted = Bukkit.getWhitelistedPlayers();
+    var whitelisted = this.players.whitelisted();
     var sorted = new ArrayList<OfflinePlayer>(whitelisted);
     var byName = Comparator.comparing(WhitelistService::nameOf, String.CASE_INSENSITIVE_ORDER);
 

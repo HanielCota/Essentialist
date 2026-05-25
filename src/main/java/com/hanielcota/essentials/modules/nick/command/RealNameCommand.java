@@ -14,7 +14,6 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.UUID;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 
 @Command("realname")
 @Permission("essentials.realname")
@@ -54,7 +53,7 @@ public record RealNameCommand(
       return entry.realName();
     }
 
-    var offline = Bukkit.getOfflinePlayer(id);
+    var offline = this.players.offline(id);
     var stored = offline.getName();
 
     return stored != null ? stored : id.toString();

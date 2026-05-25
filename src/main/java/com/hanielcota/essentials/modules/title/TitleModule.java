@@ -4,6 +4,7 @@ import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.title.command.TitleCommand;
 import com.hanielcota.essentials.modules.title.config.TitleConfig;
 import com.hanielcota.essentials.modules.title.service.TitleService;
+import com.hanielcota.essentials.paper.PlayerProvider;
 
 public final class TitleModule extends AbstractModule {
 
@@ -14,7 +15,8 @@ public final class TitleModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("title", TitleConfig.class, TitleConfig::defaults);
-    var service = new TitleService(config);
-    registerCommand(new TitleCommand(config, service));
+    var players = service(PlayerProvider.class);
+    var service = new TitleService(config, players);
+    registerCommand(new TitleCommand(config, service, players));
   }
 }

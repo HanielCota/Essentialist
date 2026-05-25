@@ -3,19 +3,23 @@ package com.hanielcota.essentials.modules.tpa.service;
 import com.hanielcota.essentials.modules.tpa.model.Destination;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 
+@RequiredArgsConstructor
 final class TeleportRequestExecutor {
+
+  private final PlayerProvider players;
 
   CompletableFuture<TeleportExecution> execute(@NonNull TeleportRequest request) {
     var requesterId = request.requester().id();
-    var requester = Bukkit.getPlayer(requesterId);
+    var requester = this.players.online(requesterId).orElse(null);
 
     var targetId = request.target().id();
-    var target = Bukkit.getPlayer(targetId);
+    var target = this.players.online(targetId).orElse(null);
 
     if (requester == null || target == null) {
       var failed = TeleportExecution.failed(AcceptResult.REQUESTER_OFFLINE);

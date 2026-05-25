@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.SqlSchema;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -55,7 +55,7 @@ public final class TpaHistoryTable {
       ON tpa_history (requester_id, created_at DESC)\
       """;
 
-  public static void install(@NonNull SqlExecutor sqlExecutor) {
-    sqlExecutor.ddl(CREATE_TABLE, CREATE_INDEX);
+  public static void install(@NonNull SqlSchema schema) {
+    schema.ddl(CREATE_TABLE, CREATE_INDEX);
   }
 }

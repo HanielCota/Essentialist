@@ -2,6 +2,8 @@ package com.hanielcota.essentials.modules.info.config;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
 import java.util.List;
+import lombok.NonNull;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -27,7 +29,13 @@ public record InfoConfig(
     @Comment("Slot of the about category.") int aboutSlot,
     @Comment("Material of the about category.") Material aboutMaterial,
     @Comment("Name of the about category.") String aboutName,
-    @Comment("Lore of the about category.") List<String> aboutLore) {
+    @Comment("Lore of the about category.") List<String> aboutLore,
+    @Comment("Label shown for GameMode SURVIVAL on the player info card.") String gameModeSurvival,
+    @Comment("Label shown for GameMode CREATIVE on the player info card.") String gameModeCreative,
+    @Comment("Label shown for GameMode ADVENTURE on the player info card.")
+        String gameModeAdventure,
+    @Comment("Label shown for GameMode SPECTATOR on the player info card.")
+        String gameModeSpectator) {
 
   public static InfoConfig defaults() {
     return new InfoConfig(
@@ -50,7 +58,11 @@ public record InfoConfig(
         15,
         Material.ENCHANTED_BOOK,
         "<yellow>Essentialist",
-        List.of("<gray>Sobre o plugin."));
+        List.of("<gray>Sobre o plugin."),
+        "Sobrevivência",
+        "Criativo",
+        "Aventura",
+        "Espectador");
   }
 
   public int effectiveRows() {
@@ -98,5 +110,14 @@ public record InfoConfig(
     var rows = effectiveRows();
 
     return MenuLayouts.sanitizeSlot(aboutSlot, rows, 15);
+  }
+
+  public String gameModeLabel(@NonNull GameMode mode) {
+    return switch (mode) {
+      case SURVIVAL -> gameModeSurvival;
+      case CREATIVE -> gameModeCreative;
+      case ADVENTURE -> gameModeAdventure;
+      case SPECTATOR -> gameModeSpectator;
+    };
   }
 }

@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.teleport.history;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,24 +8,22 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
-public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseable {
+@RequiredArgsConstructor
+public final class SqliteTeleportHistory implements TeleportHistory {
 
   private final SqlExecutor sqlExecutor;
 
   /**
    * Single-threaded writer for history mutations. Teleport events fire on the server thread; the
    * SQLite INSERT/DELETE must not block it on disk I/O. Reads ({@link #list}) stay synchronous —
-   * they only run on the rare {@code /back} command, not on every teleport.
+   * they only run on the rare {@code /back} command, not on every teleport. Lifecycle is owned by
+   * the module, not by this class.
    */
   private final AsyncDatabaseWriter writer;
-
-  public SqliteTeleportHistory(SqlExecutor sqlExecutor) {
-    this.sqlExecutor = sqlExecutor;
-    this.writer = new DefaultAsyncDatabaseWriter("Essentialist-TeleportHistory");
-  }
 
   /**
    * Maps one row from the {@code teleport_history} table to a {@link HistoryEntry}.
@@ -123,10 +120,5 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
         () -> this.sqlExecutor.update(TeleportHistoryTable.DELETE_BY_ID, entryId, playerId);
 
     this.writer.submit("remove", deleteEntry);
-  }
-
-  @Override
-  public void close() {
-    this.writer.close();
   }
 }

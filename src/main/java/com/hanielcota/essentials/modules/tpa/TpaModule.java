@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.tpa;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
@@ -64,16 +65,17 @@ public final class TpaModule extends AbstractModule {
     TpaHistoryTable.install(executor);
 
     var sqliteBacked = new SqliteTpaHistory(executor);
-    var history = new AsyncTpaHistory(sqliteBacked);
+    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaHistory");
+    registerCloseable(writer);
 
-    registerCloseable(history);
-    return history;
+    return new AsyncTpaHistory(sqliteBacked, writer);
   }
 
   private TpaRuntime requestRuntime(ConfigHandle<TpaConfig> config, AsyncTpaHistory history) {
     var store = new RequestStore();
-    var notifier = new TpaNotifier(config);
-    var requestService = new TeleportRequestService(config, store, history, notifier);
+    var players = service(PlayerProvider.class);
+    var notifier = new TpaNotifier(config, players);
+    var requestService = new TeleportRequestService(config, store, history, notifier, players);
 
     var expiry = new TeleportRequestExpiry(service(Scheduler.class), store, requestService);
     expiry.start();
@@ -102,6 +104,7 @@ public final class TpaModule extends AbstractModule {
       TeleportRequestService requestService,
       TpaHistoryMenuState menuState) {
     var framework = service(PaperCommandFramework.class);
+    var playerProvider = service(PlayerProvider.class);
 
     var tpaCommand = new TpaCommand(config, requestService);
     registerCommand(tpaCommand);
@@ -109,17 +112,16 @@ public final class TpaModule extends AbstractModule {
     var tpaHereCommand = new TpaHereCommand(config, requestService);
     registerCommand(tpaHereCommand);
 
-    var tpAcceptCommand = new TpAcceptCommand(config, requestService, framework);
+    var tpAcceptCommand = new TpAcceptCommand(config, requestService, framework, playerProvider);
     registerCommand(tpAcceptCommand);
 
-    var tpDenyCommand = new TpDenyCommand(config, requestService, framework);
+    var tpDenyCommand = new TpDenyCommand(config, requestService, framework, playerProvider);
     registerCommand(tpDenyCommand);
 
     var tpCancelCommand = new TpCancelCommand(config, requestService);
     registerCommand(tpCancelCommand);
 
     var menus = service(MenuService.class);
-    var playerProvider = service(PlayerProvider.class);
     var tpaHistoryCommand =
         new TpaHistoryCommand(config, history, menus, menuState, playerProvider);
     registerCommand(tpaHistoryCommand);

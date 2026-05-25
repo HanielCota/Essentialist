@@ -5,10 +5,12 @@ import com.hanielcota.essentials.modules.online.command.OnlineCommand;
 import com.hanielcota.essentials.modules.online.config.OnlineConfig;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public final class OnlineModule extends AbstractModule {
@@ -20,28 +22,32 @@ public final class OnlineModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("online", OnlineConfig.class, OnlineConfig::defaults);
-    var visibleCount = visibleCount();
-    var command = new OnlineCommand(config, visibleCount);
+    var players = service(PlayerProvider.class);
+    var registry = context().services();
+    Supplier<Optional<VanishService>> vanishService = () -> registry.find(VanishService.class);
+    var visibleCount = visibleCount(players, vanishService);
+    var command = new OnlineCommand(config, players, visibleCount);
 
     registerCommand(command);
   }
 
   /**
    * Counts online players, excluding vanished ones for viewers without {@link
-   * VanishVisibilityApplier#SEE_PERMISSION}. Staff with the see-perm get the true count. Looks up
-   * {@link VanishService} on each call so module load order does not matter — if vanish is disabled
-   * the raw count is returned.
+   * VanishVisibilityApplier#SEE_PERMISSION}. Staff with the see-perm get the true count. The vanish
+   * service is supplied lazily so module load order does not matter — if vanish is disabled the raw
+   * count is returned.
    */
-  private ToIntFunction<CommandActor> visibleCount() {
-    var registry = context().services();
+  private static ToIntFunction<CommandActor> visibleCount(
+      @NonNull PlayerProvider players, @NonNull Supplier<Optional<VanishService>> vanishService) {
     return actor -> {
-      var vanish = registry.find(VanishService.class).orElse(null);
-      return countFor(vanish, actor);
+      var vanish = vanishService.get().orElse(null);
+      return countFor(vanish, actor, players);
     };
   }
 
-  private static int countFor(VanishService vanish, @NonNull CommandActor actor) {
-    var online = Bukkit.getOnlinePlayers();
+  private static int countFor(
+      VanishService vanish, @NonNull CommandActor actor, @NonNull PlayerProvider players) {
+    var online = players.all();
 
     if (vanish == null) {
       return online.size();
@@ -63,6 +69,7 @@ public final class OnlineModule extends AbstractModule {
       }
       count++;
     }
+
     return count;
   }
 }

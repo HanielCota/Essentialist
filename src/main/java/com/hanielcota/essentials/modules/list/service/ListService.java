@@ -7,12 +7,13 @@ import com.hanielcota.essentials.modules.list.service.GroupResolution.Resolved;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.service.ServiceRegistry;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -31,12 +32,12 @@ public final class ListService {
 
   private final ConfigHandle<ListConfig> config;
   private final PlayerProvider players;
-  private final ServiceRegistry registry;
+  private final Supplier<Optional<VanishService>> vanishService;
 
   /** Visible roster sorted by group priority desc, then name asc. */
   public List<PlayerEntry> roster(@NonNull Player viewer) {
     var snap = this.config.value();
-    var vanish = this.registry.find(VanishService.class).orElse(null);
+    var vanish = this.vanishService.get().orElse(null);
     var seeVanish = viewer.hasPermission(VanishVisibilityApplier.SEE_PERMISSION);
 
     var sortedGroups = sortedGroups(snap);

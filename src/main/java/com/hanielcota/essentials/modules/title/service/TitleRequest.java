@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.title.service;
 
+import com.hanielcota.essentials.paper.PlayerProvider;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jspecify.annotations.Nullable;
 
@@ -17,7 +17,8 @@ import org.jspecify.annotations.Nullable;
  */
 public record TitleRequest(@Nullable Player target, String message) {
 
-  public static TitleRequest from(@Nullable Player self, @NonNull String input) {
+  public static TitleRequest from(
+      @Nullable Player self, @NonNull String input, @NonNull PlayerProvider players) {
     var trimmedInput = input.strip();
 
     if (trimmedInput.startsWith("\"")) {
@@ -37,7 +38,7 @@ public record TitleRequest(@Nullable Player target, String message) {
       return new TitleRequest(self, trimmedInput);
     }
 
-    var namedTarget = Bukkit.getPlayerExact(candidateName);
+    var namedTarget = players.online(candidateName).orElse(null);
     if (namedTarget == null) {
       return new TitleRequest(self, trimmedInput);
     }

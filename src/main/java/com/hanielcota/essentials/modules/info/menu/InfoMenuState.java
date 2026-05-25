@@ -1,13 +1,17 @@
 package com.hanielcota.essentials.modules.info.menu;
 
+import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public final class InfoMenuState {
+
+  private final PlayerProvider players;
 
   private final Map<UUID, InfoTab> openTab = new ConcurrentHashMap<>();
   private final Map<UUID, UUID> playerTarget = new ConcurrentHashMap<>();
@@ -31,13 +35,8 @@ public final class InfoMenuState {
   public Player resolveTarget(@NonNull Player viewer) {
     var viewerId = viewer.getUniqueId();
     var targetId = this.playerTarget.getOrDefault(viewerId, viewerId);
-    var target = Bukkit.getPlayer(targetId);
 
-    if (target != null) {
-      return target;
-    }
-
-    return viewer;
+    return this.players.online(targetId).orElse(viewer);
   }
 
   public void clear(@NonNull UUID viewer) {

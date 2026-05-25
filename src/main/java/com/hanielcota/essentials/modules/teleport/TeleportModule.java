@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.teleport;
 
+import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.teleport.command.TeleportCancelCommand;
@@ -27,9 +28,10 @@ public final class TeleportModule extends AbstractModule {
     var executor = service(SqlExecutor.class);
     TeleportHistoryTable.install(executor);
 
-    var history = new SqliteTeleportHistory(executor);
+    var historyWriter = new DefaultAsyncDatabaseWriter("Essentialist-TeleportHistory");
+    registerCloseable(historyWriter);
+    var history = new SqliteTeleportHistory(executor, historyWriter);
     registerService(TeleportHistory.class, history);
-    registerCloseable(history);
 
     var delayed = new DelayedTeleport(service(Scheduler.class));
     registerService(DelayedTeleport.class, delayed);

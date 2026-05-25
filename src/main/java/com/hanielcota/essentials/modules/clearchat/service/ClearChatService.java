@@ -1,15 +1,19 @@
 package com.hanielcota.essentials.modules.clearchat.service;
 
+import com.hanielcota.essentials.paper.AudienceProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 
+@RequiredArgsConstructor
 public final class ClearChatService {
 
   // A single space, not Component.empty(): a truly empty message is not reliably
   // rendered as a chat line by the client, which would leave the chat un-flushed.
   private static final Component BLANK_LINE = Component.space();
+
+  private final AudienceProvider audiences;
 
   public void clearChat(int lines, @NonNull String announcement) {
     var message = ComponentUtils.mini(announcement);
@@ -25,9 +29,7 @@ public final class ClearChatService {
     }
     var bundle = flush.append(message).build();
 
-    var onlinePlayers = Bukkit.getOnlinePlayers();
-    for (var player : onlinePlayers) {
-      player.sendMessage(bundle);
-    }
+    var broadcast = this.audiences.broadcast();
+    broadcast.sendMessage(bundle);
   }
 }

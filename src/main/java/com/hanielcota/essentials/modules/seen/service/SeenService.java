@@ -1,14 +1,14 @@
 package com.hanielcota.essentials.modules.seen.service;
 
 import com.hanielcota.essentials.modules.nick.service.NickService;
-import com.hanielcota.essentials.service.ServiceRegistry;
+import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.DurationFormatter;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
 /**
@@ -16,12 +16,13 @@ import org.bukkit.OfflinePlayer;
  * or offline along with the elapsed duration since the relevant transition.
  *
  * <p>The nick lookup is optional — {@link NickService} may not be registered when the nick module
- * is disabled. The registry is resolved lazily so module load order does not matter.
+ * is disabled. The supplier is invoked lazily so module load order does not matter.
  */
 @RequiredArgsConstructor
 public final class SeenService {
 
-  private final ServiceRegistry registry;
+  private final Supplier<Optional<NickService>> nickService;
+  private final PlayerProvider players;
 
   public Optional<OfflinePlayer> findPlayer(@NonNull String query) {
     var fromNick = lookupViaNick(query);
@@ -29,7 +30,7 @@ public final class SeenService {
       return fromNick;
     }
 
-    return lookupCached(query);
+    return this.players.offlineByName(query);
   }
 
   /**
@@ -59,7 +60,7 @@ public final class SeenService {
   }
 
   private Optional<OfflinePlayer> lookupViaNick(@NonNull String query) {
-    var nicks = this.registry.find(NickService.class).orElse(null);
+    var nicks = this.nickService.get().orElse(null);
     if (nicks == null) {
       return Optional.empty();
     }
@@ -69,15 +70,9 @@ public final class SeenService {
       return Optional.empty();
     }
 
-    var offline = Bukkit.getOfflinePlayer(id);
+    var offline = this.players.offline(id);
 
     return Optional.of(offline);
-  }
-
-  private static Optional<OfflinePlayer> lookupCached(@NonNull String query) {
-    var cached = Bukkit.getOfflinePlayerIfCached(query);
-
-    return Optional.ofNullable(cached);
   }
 
   private static String sinceMillis(long sourceMillis, @NonNull Instant now) {
