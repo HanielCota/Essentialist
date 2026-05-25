@@ -30,15 +30,17 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
         while (rs.next()) {
           var row = mapper.map(rs);
-          if (row != null) {
-            result.add(row);
+          if (row == null) {
+            continue;
           }
+          result.add(row);
         }
 
         return List.copyOf(result);
       }
     } catch (SQLException e) {
-      throw new PluginException("SQL query failed: " + sql, e);
+      var failureMessage = "SQL query failed: " + sql;
+      throw new PluginException(failureMessage, e);
     }
   }
 
@@ -56,7 +58,8 @@ public final class DefaultSqlExecutor implements SqlExecutor {
       return stmt.executeUpdate();
 
     } catch (SQLException e) {
-      throw new PluginException("SQL update failed: " + sql, e);
+      var failureMessage = "SQL update failed: " + sql;
+      throw new PluginException(failureMessage, e);
     }
   }
 
@@ -81,44 +84,45 @@ public final class DefaultSqlExecutor implements SqlExecutor {
   public void tx(@NonNull TxBlock work) {
     try (var conn = this.connectionFactory.getConnection()) {
       conn.setAutoCommit(false);
-      SQLException sqlPrimary = null;
-      RuntimeException runtimePrimary = null;
+      var state = new TxState();
 
       try {
         work.run(conn);
         conn.commit();
       } catch (SQLException e) {
-        sqlPrimary = e;
-        rollbackQuietly(conn, sqlPrimary);
+        state.sqlPrimary = e;
+        rollbackQuietly(conn, e);
       } catch (RuntimeException e) {
         // Without this catch, an NPE/IllegalStateException/PluginException raised inside
         // {@code work} would skip the explicit rollback and rely on the connection close to
         // implicitly roll back — driver-dependent. Roll back explicitly so the contract is the
         // same as the SQLException path.
-        runtimePrimary = e;
-        rollbackQuietly(conn, runtimePrimary);
+        state.runtimePrimary = e;
+        rollbackQuietly(conn, e);
       } finally {
-        try {
-          conn.setAutoCommit(true);
-        } catch (SQLException restoreError) {
-          if (sqlPrimary != null) {
-            sqlPrimary.addSuppressed(restoreError);
-          } else if (runtimePrimary != null) {
-            runtimePrimary.addSuppressed(restoreError);
-          } else {
-            sqlPrimary = restoreError;
-          }
-        }
+        restoreAutoCommit(conn, state);
       }
 
-      if (runtimePrimary != null) {
-        throw runtimePrimary;
-      }
-      if (sqlPrimary != null) {
-        throw sqlPrimary;
-      }
+      rethrowPrimary(state);
     } catch (SQLException e) {
       throw new PluginException("SQL transaction failed", e);
+    }
+  }
+
+  private static void restoreAutoCommit(@NonNull Connection conn, @NonNull TxState state) {
+    try {
+      conn.setAutoCommit(true);
+    } catch (SQLException restoreError) {
+      state.attachSuppressedOrAdopt(restoreError);
+    }
+  }
+
+  private static void rethrowPrimary(@NonNull TxState state) throws SQLException {
+    if (state.runtimePrimary != null) {
+      throw state.runtimePrimary;
+    }
+    if (state.sqlPrimary != null) {
+      throw state.sqlPrimary;
     }
   }
 
@@ -127,6 +131,23 @@ public final class DefaultSqlExecutor implements SqlExecutor {
       conn.rollback();
     } catch (SQLException rollbackError) {
       primary.addSuppressed(rollbackError);
+    }
+  }
+
+  private static final class TxState {
+    SQLException sqlPrimary;
+    RuntimeException runtimePrimary;
+
+    void attachSuppressedOrAdopt(@NonNull SQLException restoreError) {
+      if (this.sqlPrimary != null) {
+        this.sqlPrimary.addSuppressed(restoreError);
+        return;
+      }
+      if (this.runtimePrimary != null) {
+        this.runtimePrimary.addSuppressed(restoreError);
+        return;
+      }
+      this.sqlPrimary = restoreError;
     }
   }
 

@@ -59,14 +59,21 @@ public final class Placeholders {
       var tokenKey = matcher.group(1);
       var replacementValue = values.get(tokenKey);
 
-      var rawReplacementStr =
-          (replacementValue == null) ? matcher.group() : replacementValue.toString();
-
+      var rawReplacementStr = resolveReplacement(matcher, replacementValue);
       var safeReplacement = Matcher.quoteReplacement(rawReplacementStr);
+
       matcher.appendReplacement(out, safeReplacement);
     }
 
     matcher.appendTail(out);
     return out.toString();
+  }
+
+  private static String resolveReplacement(@NonNull Matcher matcher, Object replacementValue) {
+    if (replacementValue == null) {
+      return matcher.group();
+    }
+
+    return replacementValue.toString();
   }
 }

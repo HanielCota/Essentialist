@@ -44,15 +44,21 @@ public final class EssentialsCore implements EssentialsApi {
       // InventoryCloseEvent listeners, some of which (e.g. invsee release, homes session cleanup)
       // may still touch services that hit SQL. Both steps are wrapped so a thrown MenuService
       // shutdown never strands the HikariCP pool / SQLite file open.
-      safelyShutdown(
-          "MenuService",
-          () -> this.services.find(MenuService.class).ifPresent(MenuService::shutdown));
-      safelyShutdown(
-          "DatabaseProvider",
-          () -> this.services.find(DatabaseProvider.class).ifPresent(DatabaseProvider::close));
+      safelyShutdown("MenuService", this::shutdownMenuService);
+      safelyShutdown("DatabaseProvider", this::shutdownDatabase);
 
       this.phase = LifecyclePhase.DISABLED;
     }
+  }
+
+  private void shutdownMenuService() {
+    var menuHandle = this.services.find(MenuService.class);
+    menuHandle.ifPresent(MenuService::shutdown);
+  }
+
+  private void shutdownDatabase() {
+    var databaseHandle = this.services.find(DatabaseProvider.class);
+    databaseHandle.ifPresent(DatabaseProvider::close);
   }
 
   private static void safelyShutdown(@NonNull String label, @NonNull Runnable step) {

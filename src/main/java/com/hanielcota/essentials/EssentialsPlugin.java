@@ -12,11 +12,17 @@ public final class EssentialsPlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    var bootstrap = new EssentialsBootstrap(this);
+
     try {
-      this.core = new EssentialsBootstrap(this).start();
+      this.core = bootstrap.start();
     } catch (RuntimeException e) {
-      getLogger().log(Level.SEVERE, "Failed to enable Essentials", e);
-      getServer().getPluginManager().disablePlugin(this);
+      var logger = getLogger();
+      logger.log(Level.SEVERE, "Failed to enable Essentials", e);
+
+      var server = getServer();
+      var pluginManager = server.getPluginManager();
+      pluginManager.disablePlugin(this);
     }
   }
 
@@ -25,10 +31,12 @@ public final class EssentialsPlugin extends JavaPlugin {
     if (this.core == null) {
       return;
     }
+
     try {
       this.core.shutdown();
     } catch (RuntimeException e) {
-      getLogger().log(Level.SEVERE, "Error during Essentials shutdown", e);
+      var logger = getLogger();
+      logger.log(Level.SEVERE, "Error during Essentials shutdown", e);
     } finally {
       this.core = null;
     }
@@ -38,6 +46,7 @@ public final class EssentialsPlugin extends JavaPlugin {
     if (this.core == null) {
       throw new IllegalStateException("Essentials is not enabled");
     }
+
     return this.core;
   }
 }

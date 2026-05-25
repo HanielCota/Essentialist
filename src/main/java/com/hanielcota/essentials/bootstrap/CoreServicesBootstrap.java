@@ -39,7 +39,8 @@ final class CoreServicesBootstrap {
 
   private void registerConfigs(@NonNull ServiceRegistry services) {
     var dataFolder = this.plugin.getDataFolder();
-    var configDir = dataFolder.toPath().resolve("modules");
+    var dataFolderPath = dataFolder.toPath();
+    var configDir = dataFolderPath.resolve("modules");
 
     var configService = new YamlConfigService(configDir);
     services.register(ConfigService.class, configService);

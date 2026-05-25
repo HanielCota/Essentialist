@@ -32,18 +32,24 @@ public final class PaginatedInfoMenus {
       int infoSlot,
       @NonNull ItemTemplate infoTemplate,
       @NonNull DynamicContentProvider contentProvider) {
-    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
+    var paginationBuilder = PaginationConfig.builder();
+    paginationBuilder.contentSlots(contentSlots);
+
     if (rows > MIN_ROWS_FOR_PAGE_NAV) {
       PageNavigation.apply(menus, paginationBuilder, menuId, rows, navigation);
     }
 
-    MenuFramework.builder(menuId, menus)
-        .rows(rows)
-        .title(ComponentUtils.mini(titleMini))
-        .pagination(paginationBuilder.build())
-        .slot(infoSlot, infoTemplate, null)
-        .dynamicContent(contentProvider)
-        .build()
-        .register();
+    var titleComponent = ComponentUtils.mini(titleMini);
+    var paginationConfig = paginationBuilder.build();
+
+    var menuBuilder = MenuFramework.builder(menuId, menus);
+    menuBuilder.rows(rows);
+    menuBuilder.title(titleComponent);
+    menuBuilder.pagination(paginationConfig);
+    menuBuilder.slot(infoSlot, infoTemplate, null);
+    menuBuilder.dynamicContent(contentProvider);
+
+    var definition = menuBuilder.build();
+    definition.register();
   }
 }

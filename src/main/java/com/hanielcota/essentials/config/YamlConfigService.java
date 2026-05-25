@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +31,8 @@ public final class YamlConfigService implements ConfigService {
   @SuppressWarnings("unchecked")
   public <T> ConfigHandle<T> load(
       @NonNull String name, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {
-    var handle =
-        this.handles.computeIfAbsent(
-            name,
-            key -> {
-              var newHandle = new YamlConfigHandle<>(this.baseDir, key, type, defaults);
-              newHandle.refresh();
-              return newHandle;
-            });
+    Function<String, YamlConfigHandle<?>> factory = key -> createHandle(key, type, defaults);
+    var handle = this.handles.computeIfAbsent(name, factory);
 
     var existingType = handle.type();
     if (existingType != type) {
@@ -45,16 +40,25 @@ public final class YamlConfigService implements ConfigService {
       var existingTypeName = existingType.getName();
       var requestedTypeName = type.getName();
 
-      throw new IllegalStateException(
+      var errorMessage =
           "Config "
               + configName
               + " already loaded with type "
               + existingTypeName
               + ", refused to re-load as "
-              + requestedTypeName);
+              + requestedTypeName;
+
+      throw new IllegalStateException(errorMessage);
     }
 
     return (ConfigHandle<T>) handle;
+  }
+
+  private <T> YamlConfigHandle<T> createHandle(
+      @NonNull String key, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {
+    var newHandle = new YamlConfigHandle<>(this.baseDir, key, type, defaults);
+    newHandle.refresh();
+    return newHandle;
   }
 
   @Override
@@ -63,15 +67,24 @@ public final class YamlConfigService implements ConfigService {
 
     // Snapshot before iterating: handles is concurrent, and reporting `total` from a post-iteration
     // size() would skew the count if another thread loads a new config mid-reload.
-    var snapshot = List.copyOf(this.handles.values());
+    var handleValues = this.handles.values();
+    var snapshot = List.copyOf(handleValues);
+
     for (var handle : snapshot) {
       try {
         handle.refresh();
       } catch (RuntimeException e) {
         var exceptionMessage = e.getMessage();
-        var errorMessage = (exceptionMessage != null) ? exceptionMessage : e.toString();
 
-        failures.put(handle.name(), errorMessage);
+        String errorMessage;
+        if (exceptionMessage != null) {
+          errorMessage = exceptionMessage;
+        } else {
+          errorMessage = e.toString();
+        }
+
+        var handleName = handle.name();
+        failures.put(handleName, errorMessage);
       }
     }
 

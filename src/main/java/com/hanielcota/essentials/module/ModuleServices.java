@@ -17,7 +17,12 @@ final class ModuleServices {
     this.owned.add(type);
 
     var commandFrameworkOpt = services.find(PaperCommandFramework.class);
-    commandFrameworkOpt.ifPresent(framework -> framework.registerDependency(type, instance));
+    if (commandFrameworkOpt.isEmpty()) {
+      return;
+    }
+
+    var framework = commandFrameworkOpt.get();
+    framework.registerDependency(type, instance);
   }
 
   void unregisterOwned(ModuleContext context) {

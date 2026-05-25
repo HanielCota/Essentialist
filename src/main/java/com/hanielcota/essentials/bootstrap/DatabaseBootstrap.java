@@ -20,13 +20,16 @@ final class DatabaseBootstrap {
 
   void register(@NonNull ServiceRegistry services) {
     var dataFolder = this.plugin.getDataFolder();
-    var dbPath = dataFolder.toPath().resolve("data").resolve("essentials.db");
+    var dataFolderPath = dataFolder.toPath();
+    var dataDir = dataFolderPath.resolve("data");
+    var dbPath = dataDir.resolve("essentials.db");
     var parentDir = dbPath.getParent();
 
     try {
       Files.createDirectories(parentDir);
     } catch (IOException e) {
-      throw new PluginException("Failed to create database directory: " + parentDir, e);
+      var errorMessage = "Failed to create database directory: " + parentDir;
+      throw new PluginException(errorMessage, e);
     }
 
     var database = new SqliteDatabase(dbPath);

@@ -23,19 +23,34 @@ public final class PageNavigation {
       @NonNull String menuId,
       int rows,
       @NonNull NavigationButtonsConfig config) {
+    var material = config.material();
+    var previousName = config.previousName();
+    var nextName = config.nextName();
+
     var previousId = menuId + ".previous";
     var nextId = menuId + ".next";
-    menus.registerTemplate(previousId, button(config.material(), config.previousName()));
-    menus.registerTemplate(nextId, button(config.material(), config.nextName()));
-    pagination
-        .navigationSlots(
-            List.of(config.effectivePreviousSlot(rows), config.effectiveNextSlot(rows)))
-        .previousTemplate(previousId)
-        .nextTemplate(nextId)
-        .hideDisabledNavigation(true);
+
+    var previousTemplate = button(material, previousName);
+    var nextTemplate = button(material, nextName);
+
+    menus.registerTemplate(previousId, previousTemplate);
+    menus.registerTemplate(nextId, nextTemplate);
+
+    var previousSlot = config.effectivePreviousSlot(rows);
+    var nextSlot = config.effectiveNextSlot(rows);
+    var navigationSlots = List.of(previousSlot, nextSlot);
+
+    pagination.navigationSlots(navigationSlots);
+    pagination.previousTemplate(previousId);
+    pagination.nextTemplate(nextId);
+    pagination.hideDisabledNavigation(true);
   }
 
   private static ItemTemplate button(@NonNull Material material, @NonNull String name) {
-    return ItemTemplate.builder(material).name(name).italic(false).build();
+    var builder = ItemTemplate.builder(material);
+    builder.name(name);
+    builder.italic(false);
+
+    return builder.build();
   }
 }
