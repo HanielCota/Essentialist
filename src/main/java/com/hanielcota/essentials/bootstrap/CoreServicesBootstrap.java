@@ -15,11 +15,18 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-final class CoreServicesBootstrap {
+final class CoreServicesBootstrap implements BootstrapStage {
 
   private final EssentialsPlugin plugin;
 
-  void register(@NonNull ServiceRegistry services) {
+  @Override
+  public String name() {
+    return "core-services";
+  }
+
+  @Override
+  public void start(@NonNull StageContext context) {
+    var services = context.services();
     registerScheduler(services);
     registerPaperAdapters(services);
     registerConfigs(services);

@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
 class ArchitecturePackageTest {
@@ -24,6 +26,10 @@ class ArchitecturePackageTest {
           "MuteTable",
           "NickStore",
           "NickTable");
+
+  // Pattern: `import com.hanielcota.essentials.modules.<module>.` — captures the imported module.
+  private static final Pattern CROSS_MODULE_IMPORT =
+      Pattern.compile("^import com\\.hanielcota\\.essentials\\.modules\\.(\\w+)\\.");
 
   @Test
   void persistenceTypesDoNotLiveInServicePackages() throws IOException {
@@ -51,6 +57,59 @@ class ArchitecturePackageTest {
     assertTrue(violations.isEmpty(), () -> "Domain value types in service packages: " + violations);
   }
 
+  @Test
+  void repositoriesDoNotImportBukkitApi() throws IOException {
+    var violations =
+        Files.walk(mainJavaRoot())
+            .filter(Files::isRegularFile)
+            .filter(path -> path.toString().endsWith(".java"))
+            .filter(ArchitecturePackageTest::isRepositoryFile)
+            .filter(ArchitecturePackageTest::importsBukkitTypeOtherThanMaterialOrLocation)
+            .map(ArchitecturePackageTest::relativePath)
+            .toList();
+
+    assertTrue(
+        violations.isEmpty(),
+        () ->
+            "Repository classes must not depend on Bukkit beyond Material/Location: " + violations);
+  }
+
+  @Test
+  void modulesOnlyImportSiblingModulesViaServiceClasses() throws IOException {
+    // Allowed cross-module imports: anything in another module's `service`, `domain`, `model`,
+    // or `history` package (those are the inter-module API surfaces). Importing another module's
+    // `command`, `listener`, `menu`, `repository`, `config` is a contract violation.
+    var violations =
+        Files.walk(mainJavaRoot())
+            .filter(Files::isRegularFile)
+            .filter(path -> path.toString().endsWith(".java"))
+            .filter(ArchitecturePackageTest::isInsideModulesPackage)
+            .flatMap(path -> illegalCrossModuleImports(path).stream())
+            .toList();
+
+    assertTrue(
+        violations.isEmpty(),
+        () -> "Cross-module imports must go through service/domain/model packages: " + violations);
+  }
+
+  @Test
+  void onlyCoreApiPackageImplementsPublicApiInterfaces() throws IOException {
+    var violations =
+        Files.walk(mainJavaRoot())
+            .filter(Files::isRegularFile)
+            .filter(path -> path.toString().endsWith(".java"))
+            .filter(ArchitecturePackageTest::implementsPublicApiFacade)
+            .filter(ArchitecturePackageTest::livesOutsideCoreApi)
+            .map(ArchitecturePackageTest::relativePath)
+            .toList();
+
+    assertTrue(
+        violations.isEmpty(),
+        () ->
+            "Only com.hanielcota.essentials.core.api may implement public *Api interfaces: "
+                + violations);
+  }
+
   private static boolean isPersistenceTypeInServicePackage(Path path) {
     var typeName = fileName(path).replace(".java", "");
 
@@ -61,6 +120,85 @@ class ArchitecturePackageTest {
     var typeName = fileName(path).replace(".java", "");
 
     return relativePath(path).contains("/service/") && DOMAIN_VALUE_TYPES.contains(typeName);
+  }
+
+  private static boolean isRepositoryFile(Path path) {
+    return relativePath(path).contains("/repository/");
+  }
+
+  private static boolean importsBukkitTypeOtherThanMaterialOrLocation(Path path) {
+    try {
+      return Files.readAllLines(path).stream()
+          .anyMatch(
+              line -> {
+                var trimmed = line.trim();
+                if (!trimmed.startsWith("import org.bukkit")) {
+                  return false;
+                }
+                // Material and Location are stable, narrow value types that the persistence layer
+                // legitimately maps. Anything else (Player, World, Server, ...) leaks Bukkit
+                // lifecycle into storage.
+                return !trimmed.contains("org.bukkit.Material")
+                    && !trimmed.contains("org.bukkit.Location");
+              });
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  private static boolean isInsideModulesPackage(Path path) {
+    return relativePath(path).startsWith("com/hanielcota/essentials/modules/");
+  }
+
+  private static String moduleOf(Path path) {
+    var rel = relativePath(path);
+    var afterPrefix = rel.substring("com/hanielcota/essentials/modules/".length());
+    var nextSlash = afterPrefix.indexOf('/');
+    return nextSlash < 0 ? afterPrefix : afterPrefix.substring(0, nextSlash);
+  }
+
+  private static List<String> illegalCrossModuleImports(Path path) {
+    var ownModule = moduleOf(path);
+    try {
+      return Files.readAllLines(path).stream()
+          .map(String::trim)
+          .filter(
+              line -> {
+                var matcher = CROSS_MODULE_IMPORT.matcher(line);
+                return matcher.find() && !matcher.group(1).equals(ownModule);
+              })
+          .filter(line -> !isPermittedCrossModuleImport(line))
+          .map(line -> relativePath(path) + " → " + line)
+          .toList();
+    } catch (IOException e) {
+      return List.of();
+    }
+  }
+
+  private static boolean isPermittedCrossModuleImport(String importLine) {
+    return importLine.contains(".service.")
+        || importLine.contains(".domain.")
+        || importLine.contains(".model.")
+        || importLine.contains(".history.");
+  }
+
+  private static boolean implementsPublicApiFacade(Path path) {
+    try {
+      var body = Files.readString(path);
+      return body.contains("implements HomesApi")
+          || body.contains("implements WarpsApi")
+          || body.contains("implements MutesApi")
+          || body.contains("implements NicksApi")
+          || body.contains("implements VanishApi")
+          || body.contains("implements TeleportsApi");
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  private static boolean livesOutsideCoreApi(Path path) {
+    var rel = relativePath(path);
+    return !rel.startsWith("com/hanielcota/essentials/core/api/");
   }
 
   private static String fileName(Path path) {

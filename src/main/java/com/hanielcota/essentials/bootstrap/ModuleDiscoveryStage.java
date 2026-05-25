@@ -1,20 +1,31 @@
 package com.hanielcota.essentials.bootstrap;
 
+import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.module.Module;
 import com.hanielcota.essentials.module.ModuleFilter;
 import com.hanielcota.essentials.module.ModuleManager;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.ServiceLoader;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Discovers modules via {@link ServiceLoader}, filters out anything disabled in {@code
+ * modules.yml}, and publishes the resulting {@link ModuleManager} as a service.
+ */
 @RequiredArgsConstructor
-final class ModuleDiscovery {
+final class ModuleDiscoveryStage implements BootstrapStage {
 
-  private final @NonNull Path dataFolder;
+  private final EssentialsPlugin plugin;
 
-  ModuleManager discover() {
+  @Override
+  public String name() {
+    return "module-discovery";
+  }
+
+  @Override
+  public void start(@NonNull StageContext context) {
+    var dataFolder = this.plugin.getDataFolder().toPath();
     var modules = new ModuleManager();
     var classLoader = getClass().getClassLoader();
     var loader = ServiceLoader.load(Module.class, classLoader);
@@ -22,11 +33,12 @@ final class ModuleDiscovery {
 
     loader.forEach(discovered::add);
 
-    var settingsLoader = new ModuleSettingsLoader(this.dataFolder);
+    var settingsLoader = new ModuleSettingsLoader(dataFolder);
     var settings = settingsLoader.load(discovered);
     var enabledModules = ModuleFilter.enabled(discovered, settings);
 
     enabledModules.forEach(modules::register);
-    return modules;
+
+    context.services().register(ModuleManager.class, modules);
   }
 }
