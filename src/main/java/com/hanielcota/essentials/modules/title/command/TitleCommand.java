@@ -47,7 +47,7 @@ public record TitleCommand(
     // command parse and dispatch on a busy tick.
     var liveTarget = this.players.online(targetId).orElse(null);
     if (liveTarget == null) {
-      sender.sendError(snap.usage());
+      sender.sendError(snap.formatTargetOffline(targetName));
       return;
     }
 

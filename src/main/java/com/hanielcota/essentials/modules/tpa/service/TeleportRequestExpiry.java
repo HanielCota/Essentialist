@@ -12,8 +12,8 @@ import lombok.RequiredArgsConstructor;
  *
  * <p>Sole responsibility: once a second, hand every request that has outlived its deadline to
  * {@link TeleportRequestService#expire}. One shared timer sweeps the whole {@link
- * RequestRepository} â€” never one delayed task per request â€” so spamming {@code /tpa} cannot
- * pile up scheduler work. Holds no request state of its own.
+ * RequestRepository} — never one delayed task per request — so spamming {@code /tpa} cannot pile up
+ * scheduler work. Holds no request state of its own.
  */
 @RequiredArgsConstructor
 public final class TeleportRequestExpiry {

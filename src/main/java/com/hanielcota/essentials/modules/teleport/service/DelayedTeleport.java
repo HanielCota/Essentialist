@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
  * Teleports a player after a configurable delay, cancelling on damage or disconnect.
  *
  * <p>Used by {@code /spawn}, {@code /home} and {@code /warp} so warm-ups and cancel rules stay
- * consistent. Holds the only timer state for pending warm-ups â€” one per player. Callers route
+ * consistent. Holds the only timer state for pending warm-ups — one per player. Callers route
  * messaging through {@link Callback}; this class never sends chat itself.
  */
 public final class DelayedTeleport {

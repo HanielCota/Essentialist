@@ -16,7 +16,11 @@ public record TitleConfig(
         String broadcasted,
     @Comment("Shown when targeting another player without essentials.title.others.")
         String noPermissionOther,
-    @Comment("Shown when /title is used without any text.") String usage) {
+    @Comment("Shown when /title is used without any text.") String usage,
+    @Comment(
+            "Shown when the named target disconnected between parsing the command and dispatching"
+                + " the title. Placeholders: {player}.")
+        String targetOffline) {
 
   public static TitleConfig defaults() {
     return new TitleConfig(
@@ -29,7 +33,8 @@ public record TitleConfig(
         "<red>Você não tem permissão para enviar títulos a outros jogadores.",
         """
         <yellow>Uso: <gray>/title [jogador] "título" "subtítulo"</gray> — o subtítulo é opcional.\
-        """);
+        """,
+        "<red>O jogador <gold>{player}</gold> não está mais online.");
   }
 
   public MessagePair whenSent() {
@@ -39,5 +44,9 @@ public record TitleConfig(
   public String formatBroadcasted(int count) {
     var countStr = Integer.toString(count);
     return broadcasted.replace("{count}", countStr);
+  }
+
+  public String formatTargetOffline(String playerName) {
+    return targetOffline.replace("{player}", playerName);
   }
 }
