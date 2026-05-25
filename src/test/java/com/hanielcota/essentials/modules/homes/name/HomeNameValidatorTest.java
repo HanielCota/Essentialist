@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class DefaultHomeNameValidatorTest {
+class HomeNameValidatorTest {
 
-  private final DefaultHomeNameValidator validator = new DefaultHomeNameValidator();
+  private final HomeNameValidator validator = new HomeNameValidator();
 
   @Test
   void acceptsSimpleNamesWithLettersNumbersUnderscoreAndHyphen() {

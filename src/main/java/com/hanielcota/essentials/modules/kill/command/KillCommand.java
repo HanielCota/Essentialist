@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.kill.command;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kill.config.KillConfig;
-import com.hanielcota.essentials.modules.kill.service.KillService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Confirm;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -25,8 +24,7 @@ import org.bukkit.entity.Player;
 @Confirm(duration = "3s")
 @Description("Mata o jogador.")
 @Syntax("/matar [jogador]")
-public record KillCommand(
-    ConfigHandle<KillConfig> config, KillService service, PaperCommandFramework framework) {
+public record KillCommand(ConfigHandle<KillConfig> config, PaperCommandFramework framework) {
 
   private static final String EXEMPT_PERMISSION = "essentials.kill.exempt";
 
@@ -44,12 +42,14 @@ public record KillCommand(
       return;
     }
 
-    if (!this.service.kill(subject)) {
+    if (subject.getHealth() <= 0) {
       var alreadyDead = snap.whenAlreadyDead();
       var alreadyDeadMsg = alreadyDead.forSender(self, name);
       sender.sendError(alreadyDeadMsg);
       return;
     }
+
+    subject.setHealth(0);
 
     var messages = snap.whenKilled();
     var target = this.framework.actorOf(subject);

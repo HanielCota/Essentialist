@@ -10,7 +10,6 @@ import com.hanielcota.essentials.modules.info.menu.InfoMenuState;
 import com.hanielcota.essentials.modules.info.presentation.PlayerInfoEntries;
 import com.hanielcota.essentials.modules.info.presentation.PluginInfoEntries;
 import com.hanielcota.essentials.modules.info.presentation.ServerInfoEntries;
-import com.hanielcota.essentials.modules.info.service.InfoService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.user.UserSessionService;
 
@@ -30,10 +29,9 @@ public final class InfoModule extends AbstractModule {
     var serverEntries = new ServerInfoEntries();
     var playerEntries = new PlayerInfoEntries(sessions, config);
     var pluginEntries = new PluginInfoEntries(plugin());
-    var service = new InfoService(serverEntries, playerEntries, pluginEntries);
 
     var menuState = new InfoMenuState(players);
-    var menu = new InfoMenu(config, service, menuState);
+    var menu = new InfoMenu(config, serverEntries, playerEntries, pluginEntries, menuState);
     registerMenu(menu);
     var cleanupListener = new InfoMenuCleanupListener(menuState, menus);
     registerListener(cleanupListener);

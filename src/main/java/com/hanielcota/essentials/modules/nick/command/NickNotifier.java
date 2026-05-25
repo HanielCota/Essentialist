@@ -42,8 +42,8 @@ public final class NickNotifier {
       @NonNull NickResetOutcome outcome) {
     var snap = this.config.value();
     switch (outcome) {
-      case NickResetOutcome.AlreadyHasNoNick ignored -> sender.sendError(snap.alreadyHasNoNick());
-      case NickResetOutcome.Ok ignored -> sendResetOk(sender, subject, self, snap);
+      case ALREADY_HAS_NO_NICK -> sender.sendError(snap.alreadyHasNoNick());
+      case OK -> sendResetOk(sender, subject, self, snap);
     }
   }
 

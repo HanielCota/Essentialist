@@ -8,9 +8,4 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 @ConfigSerializable
 public record DefaultGroup(
     @Comment("Display name for the fallback group.") String name,
-    @Comment("Material rendered in the player slot when no group matches.") Material material) {
-
-  public static DefaultGroup of(String name, Material material) {
-    return new DefaultGroup(name, material);
-  }
-}
+    @Comment("Material rendered in the player slot when no group matches.") Material material) {}

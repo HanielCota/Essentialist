@@ -665,4 +665,26 @@ public enum MaterialCategory {
   public @NonNull List<Material> materials() {
     return materials;
   }
+
+  /** Representative icon for the category submenu. */
+  public @NonNull Material icon() {
+    return switch (this) {
+      case CONSTRUCTION -> Material.STONE_BRICKS;
+      case WOOD -> Material.OAK_LOG;
+      case DECORATION -> Material.WHITE_WOOL;
+      case LIGHTING -> Material.LANTERN;
+      case COMBAT -> Material.DIAMOND_SWORD;
+      case TOOLS -> Material.IRON_PICKAXE;
+      case MINERALS -> Material.DIAMOND_BLOCK;
+      case REDSTONE -> Material.REDSTONE_BLOCK;
+      case FOOD -> Material.GOLDEN_APPLE;
+      case TRANSPORT -> Material.MINECART;
+      case STORAGE -> Material.ENDER_CHEST;
+      case MAGIC -> Material.ENCHANTING_TABLE;
+      case NATURE -> Material.GRASS_BLOCK;
+      case PLANTS -> Material.OAK_SAPLING;
+      case FLOWERS -> Material.POPPY;
+      case MISC -> Material.BARRIER;
+    };
+  }
 }

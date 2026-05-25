@@ -1,8 +1,14 @@
 package com.hanielcota.essentials.modules.homes.name;
 
+import java.util.regex.Pattern;
 import lombok.NonNull;
 
-public interface HomeNameValidator {
+/** Default rule set: 1-32 chars, ASCII letters/numbers plus '_' and '-'. */
+public final class HomeNameValidator {
 
-  boolean isValid(@NonNull String name);
+  private static final Pattern SAFE_NAME = Pattern.compile("[A-Za-z0-9_-]{1,32}");
+
+  public boolean isValid(@NonNull String name) {
+    return SAFE_NAME.matcher(name).matches();
+  }
 }

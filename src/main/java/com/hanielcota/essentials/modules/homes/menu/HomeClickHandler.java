@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.modules.homes.domain.Home;
-import com.hanielcota.essentials.modules.homes.rename.HomeRenamePrompter;
+import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
@@ -21,7 +21,7 @@ public final class HomeClickHandler {
   private final HomeTeleporter teleporter;
   private final PaperCommandFramework framework;
   private final HomesActionTarget target;
-  private final HomeRenamePrompter rename;
+  private final HomeRenameOrchestrator rename;
 
   public void handle(@NonNull ClickContext click, @NonNull Home home) {
     var type = click.clickType();

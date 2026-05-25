@@ -12,7 +12,6 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialCategorySection;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
-import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategoryIcons;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +106,7 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
     var snap = this.config.value();
     var menuSpec = snap.menu();
 
-    var icon = MaterialCategoryIcons.iconFor(category);
+    var icon = category.icon();
     var categoryName = MaterialCategorySection.displayName(menuSpec, category);
     var name = MaterialCategorySection.itemName(menuSpec, categoryName);
     var lore = MaterialCategorySection.itemLore(menuSpec, categoryName);

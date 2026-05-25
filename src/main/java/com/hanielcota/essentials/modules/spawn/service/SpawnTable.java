@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.spawn.service;
 
-import com.hanielcota.essentials.database.SqlSchema;
+import com.hanielcota.essentials.database.SqlExecutor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -32,7 +32,7 @@ public final class SpawnTable {
       )
       """;
 
-  public static void install(@NonNull SqlSchema schema) {
-    schema.ddl(CREATE_TABLE);
+  public static void install(@NonNull SqlExecutor executor) {
+    executor.ddl(CREATE_TABLE);
   }
 }
