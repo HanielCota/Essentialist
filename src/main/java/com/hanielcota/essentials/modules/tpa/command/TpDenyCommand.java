@@ -29,23 +29,26 @@ public record TpDenyCommand(
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
+
     var sender = actor.unwrap(Player.class);
 
     var resolved = TpaRequests.resolveIncoming(this.service, sender, requester, messages, actor);
     if (resolved.isEmpty()) {
       return;
     }
-    var request = resolved.get();
 
+    var request = resolved.get();
     this.service.deny(request);
 
     var deniedSelfTemplate = messages.deniedSelf();
     var requesterName = request.requester().name();
-
     var deniedMsg = deniedSelfTemplate.replace("{player}", requesterName);
+
     actor.sendSuccess(deniedMsg);
 
-    TpaRequests.replyRequester(this.framework, request, messages.denied(), false);
+    var deniedTemplate = messages.denied();
+    TpaRequests.replyRequester(this.framework, request, deniedTemplate, false);
   }
 }

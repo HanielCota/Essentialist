@@ -77,7 +77,8 @@ public record TpaMenuConfig(
   public String formatItemName(int humanIndex, @NonNull String target) {
     var indexStr = Integer.toString(humanIndex);
 
-    return itemName.replace("{index}", indexStr).replace("{target}", target);
+    var withIndex = itemName.replace("{index}", indexStr);
+    return withIndex.replace("{target}", target);
   }
 
   public String statusLabel(@NonNull TeleportRequestStatus status) {
