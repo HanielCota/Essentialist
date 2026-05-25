@@ -7,11 +7,13 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.ModuleMetadata;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptCommand;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpCancelCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpDenyCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHereCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryCommand;
+import com.hanielcota.essentials.modules.tpa.command.TpaHistoryPresenter;
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
@@ -112,7 +114,8 @@ public final class TpaModule extends AbstractModule {
     var tpaHereCommand = new TpaHereCommand(config, requestService);
     registerCommand(tpaHereCommand);
 
-    var tpAcceptCommand = new TpAcceptCommand(config, requestService, framework, playerProvider);
+    var acceptResultHandler = new TpAcceptResultHandler(config, framework, playerProvider);
+    var tpAcceptCommand = new TpAcceptCommand(config, requestService, acceptResultHandler);
     registerCommand(tpAcceptCommand);
 
     var tpDenyCommand = new TpDenyCommand(config, requestService, framework, playerProvider);
@@ -122,8 +125,8 @@ public final class TpaModule extends AbstractModule {
     registerCommand(tpCancelCommand);
 
     var menus = service(MenuService.class);
-    var tpaHistoryCommand =
-        new TpaHistoryCommand(config, history, menus, menuState, playerProvider);
+    var historyPresenter = new TpaHistoryPresenter(config, history, menus, menuState);
+    var tpaHistoryCommand = new TpaHistoryCommand(config, playerProvider, historyPresenter);
     registerCommand(tpaHistoryCommand);
   }
 

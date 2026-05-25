@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.speed;
 
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.speed.command.SpeedCommand;
+import com.hanielcota.essentials.modules.speed.command.SpeedNotifier;
 import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
 import com.hanielcota.essentials.modules.speed.service.SpeedService;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
@@ -19,8 +20,9 @@ public final class SpeedModule extends AbstractModule {
 
     var service = service(SpeedService.class);
     var framework = service(PaperCommandFramework.class);
+    var notifier = new SpeedNotifier(framework);
 
-    var command = new SpeedCommand(config, service, framework);
+    var command = new SpeedCommand(config, service, notifier);
     registerCommand(command);
   }
 }

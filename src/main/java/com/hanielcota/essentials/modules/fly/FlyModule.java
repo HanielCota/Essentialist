@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.fly;
 
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.fly.command.FlyCommand;
+import com.hanielcota.essentials.modules.fly.command.FlyNotifier;
 import com.hanielcota.essentials.modules.fly.config.FlyConfig;
 import com.hanielcota.essentials.modules.fly.listener.FlyGameModeListener;
 import com.hanielcota.essentials.modules.fly.listener.FlyQuitListener;
@@ -22,7 +23,8 @@ public final class FlyModule extends AbstractModule {
     var scheduler = service(Scheduler.class);
 
     var framework = service(PaperCommandFramework.class);
-    var flyCommand = new FlyCommand(config, fly, framework);
+    var notifier = new FlyNotifier(config, framework);
+    var flyCommand = new FlyCommand(fly, notifier);
     registerCommand(flyCommand);
 
     var gameModeListener = new FlyGameModeListener(scheduler, fly);

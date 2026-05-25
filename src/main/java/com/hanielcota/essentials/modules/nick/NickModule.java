@@ -12,6 +12,7 @@ import com.hanielcota.essentials.modules.nick.service.NickOperationService;
 import com.hanielcota.essentials.modules.nick.service.NickService;
 import com.hanielcota.essentials.modules.nick.service.NickStore;
 import com.hanielcota.essentials.modules.nick.service.NickTable;
+import com.hanielcota.essentials.modules.nick.service.RealNameResolver;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 
@@ -43,8 +44,10 @@ public final class NickModule extends AbstractModule {
     var operations = new NickOperationService(config, service);
     var notifier = new NickNotifier(config, framework);
 
+    var realNameResolver = new RealNameResolver(service, players);
+
     registerCommand(new NickCommand(operations, notifier));
-    registerCommand(new RealNameCommand(config, service, players));
+    registerCommand(new RealNameCommand(config, service, realNameResolver));
 
     registerListener(new NickJoinListener(service));
   }

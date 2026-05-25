@@ -3,10 +3,7 @@ package com.hanielcota.essentials.modules.warps.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
-import com.hanielcota.essentials.modules.teleport.service.DelayedTeleportPrompt;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
-import com.hanielcota.essentials.modules.warps.config.WarpsMessages;
-import com.hanielcota.essentials.modules.warps.domain.Warp;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -26,18 +23,12 @@ import org.bukkit.entity.Player;
 @Description("Teleporta para uma warp do servidor.")
 @Syntax("/warp <nome>")
 public record WarpCommand(
-    ConfigHandle<WarpsConfig> config, WarpService service, DelayedTeleport delayed) {
+    ConfigHandle<WarpsConfig> config,
+    WarpService service,
+    DelayedTeleport delayed,
+    WarpPromptFactory promptFactory) {
 
   private static final String NAME = "{name}";
-
-  public WarpCommand(
-      @NonNull ConfigHandle<WarpsConfig> config,
-      @NonNull WarpService service,
-      @NonNull DelayedTeleport delayed) {
-    this.config = config;
-    this.service = service;
-    this.delayed = delayed;
-  }
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @NonNull @Arg("nome") String name) {
@@ -72,24 +63,8 @@ public record WarpCommand(
 
     var destination = locationOpt.get();
     var delay = snap.teleportDelay();
-    var teleportPrompt = prompt(actor, messages, warp);
+    var teleportPrompt = this.promptFactory.create(actor, messages, warp);
 
     this.delayed.schedule(sender, destination, delay, teleportPrompt);
-  }
-
-  private DelayedTeleportPrompt prompt(
-      @NonNull CommandActor actor, @NonNull WarpsMessages messages, @NonNull Warp warp) {
-    var warpName = warp.name();
-
-    var teleportingTemplate = messages.teleporting();
-    var teleportingMsg = teleportingTemplate.replace(NAME, warpName);
-
-    var teleportedTemplate = messages.teleported();
-    var teleportedMsg = teleportedTemplate.replace(NAME, warpName);
-
-    var cancelledMsg = messages.cancelled();
-    var failedMsg = messages.failed();
-
-    return new DelayedTeleportPrompt(actor, teleportingMsg, teleportedMsg, cancelledMsg, failedMsg);
   }
 }

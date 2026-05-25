@@ -19,10 +19,6 @@ import org.bukkit.entity.Player;
 @Syntax("/enchant <encantamento> [nível] | /enchant remove <encantamento> | /enchant clear")
 public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService service) {
 
-  private static String enchantName(@NonNull Enchantment enchantment) {
-    return enchantment.getKey().getKey();
-  }
-
   @DefaultSubcommand
   public void apply(
       @NonNull CommandActor sender,
@@ -42,7 +38,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       return;
     }
 
-    var label = enchantName(enchantment);
+    var label = enchantment.getKey().getKey();
     var appliedMsg = snap.formatApplied(label, level);
 
     sender.sendSuccess(appliedMsg);
@@ -53,7 +49,7 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       @NonNull CommandActor sender,
       @Suggestions("enchantments") @Arg("encantamento") Enchantment enchantment) {
     var snap = this.config.value();
-    var label = enchantName(enchantment);
+    var label = enchantment.getKey().getKey();
 
     var player = sender.unwrap(Player.class);
     var result = this.service.remove(player, enchantment);

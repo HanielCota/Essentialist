@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.near;
 
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.near.command.NearCommand;
+import com.hanielcota.essentials.modules.near.command.NearResultFormatter;
 import com.hanielcota.essentials.modules.near.config.NearConfig;
 import com.hanielcota.essentials.modules.near.service.NearService;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
@@ -21,7 +22,8 @@ public final class NearModule extends AbstractModule {
     var config = config("near", NearConfig.class, NearConfig::defaults);
     var filter = visibilityFilter();
     var service = new NearService(filter);
-    var command = new NearCommand(config, service);
+    var formatter = new NearResultFormatter();
+    var command = new NearCommand(config, service, formatter);
 
     registerCommand(command);
   }

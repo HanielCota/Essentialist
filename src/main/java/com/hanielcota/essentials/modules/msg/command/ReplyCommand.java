@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
 import com.hanielcota.essentials.modules.msg.service.MsgDispatcher;
 import com.hanielcota.essentials.modules.msg.service.MsgService;
+import com.hanielcota.essentials.paper.PlayerNames;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -15,7 +16,6 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.UUID;
 import java.util.function.BiPredicate;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -57,23 +57,12 @@ public record ReplyCommand(
     var target = this.players.online(partnerId).orElse(null);
 
     if (target == null || !this.visibilityFilter.test(from, target)) {
-      var partnerName = resolvePartnerName(partnerId, target);
+      var partnerName = PlayerNames.nameOf(this.players, partnerId, target);
       var offlineMsg = snap.formatReplyPartnerUnavailable(partnerName);
       sender.sendError(offlineMsg);
       return;
     }
 
     this.dispatcher.send(from, target, body);
-  }
-
-  private String resolvePartnerName(@NonNull UUID id, Player onlinePartner) {
-    if (onlinePartner != null) {
-      return onlinePartner.getName();
-    }
-
-    var offline = this.players.offline(id);
-    var stored = offline.getName();
-
-    return stored != null ? stored : id.toString();
   }
 }
