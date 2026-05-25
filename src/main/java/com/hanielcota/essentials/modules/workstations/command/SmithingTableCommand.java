@@ -26,7 +26,10 @@ public final class SmithingTableCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
-    player.openInventory(MenuType.SMITHING.create(player));
+    var player = actor.unwrap(Player.class);
+
+    var menu = MenuType.SMITHING.create(player);
+
+    player.openInventory(menu);
   }
 }

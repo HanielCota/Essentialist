@@ -54,12 +54,18 @@ public record VanishCommand(
     }
 
     var messages = snap.toggle(newlyVanished);
+
     if (self) {
-      sender.sendSuccess(messages.forSender(true, name));
+      var selfMsg = messages.forSender(true, name);
+      sender.sendSuccess(selfMsg);
       return;
     }
+
+    var senderMsg = messages.forSender(false, name);
+    var targetMsg = messages.forTarget(name);
     var target = this.framework.actorOf(subject);
-    sender.sendDualMessage(target, messages.forSender(false, name), messages.forTarget(name));
+
+    sender.sendDualMessage(target, senderMsg, targetMsg);
   }
 
   @Subcommand("list")
@@ -68,6 +74,7 @@ public record VanishCommand(
   @Description("Opens the menu with every currently vanished player.")
   @Syntax("/vanish list")
   public void list(@NonNull CommandActor sender) {
-    MenuOpenings.open(this.menus, sender.unwrap(Player.class), VanishMenu.ID, sender);
+    var player = sender.unwrap(Player.class);
+    MenuOpenings.open(this.menus, player, VanishMenu.ID, sender);
   }
 }

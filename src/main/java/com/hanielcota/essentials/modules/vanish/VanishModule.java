@@ -27,22 +27,28 @@ public final class VanishModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("vanish", VanishConfig.class, VanishConfig::defaults);
+
     this.service = new VanishService();
     registerService(VanishService.class, this.service);
 
     this.applier = new VanishVisibilityApplier(plugin());
 
-    registerListener(new VanishJoinListener(this.service, this.applier));
-    registerListener(new VanishQuitListener(this.service, this.applier));
-    registerListener(new VanishProtectionListener(this.service));
+    var joinListener = new VanishJoinListener(this.service, this.applier);
+    var quitListener = new VanishQuitListener(this.service, this.applier);
+    var protectionListener = new VanishProtectionListener(this.service);
+    registerListener(joinListener);
+    registerListener(quitListener);
+    registerListener(protectionListener);
 
     var renderer = new VanishEntryRenderer(config);
     var clickHandler = new VanishClickHandler(config, this.service);
-    registerMenu(new VanishMenu(config, this.service, renderer, clickHandler));
+    var menu = new VanishMenu(config, this.service, renderer, clickHandler);
+    registerMenu(menu);
 
     var framework = service(PaperCommandFramework.class);
     var menus = service(MenuService.class);
-    registerCommand(new VanishCommand(config, this.service, this.applier, framework, menus));
+    var command = new VanishCommand(config, this.service, this.applier, framework, menus);
+    registerCommand(command);
   }
 
   @Override
@@ -50,14 +56,18 @@ public final class VanishModule extends AbstractModule {
     if (this.service == null || this.applier == null) {
       return;
     }
+
     // setInvulnerable / setCanPickupItems persist to player NBT — every still-vanished player
     // must be unapplied or they rejoin permanently invulnerable.
-    for (var id : this.service.vanished()) {
+    var vanishedIds = this.service.vanished();
+    for (var id : vanishedIds) {
       var player = Bukkit.getPlayer(id);
-      if (player != null) {
-        this.applier.unapply(player);
+      if (player == null) {
+        continue;
       }
+      this.applier.unapply(player);
     }
+
     this.service = null;
     this.applier = null;
   }

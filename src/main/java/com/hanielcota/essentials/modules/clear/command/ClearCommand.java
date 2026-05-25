@@ -31,20 +31,25 @@ public record ClearCommand(
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
-    var removed = this.service.clear(subject, snap.clearArmor());
+    var clearArmor = snap.clearArmor();
+    var removed = this.service.clear(subject, clearArmor);
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
     if (removed == 0) {
-      sender.sendError(snap.whenEmpty().forSender(self, name));
+      var emptyMessages = snap.whenEmpty();
+      var emptyMsg = emptyMessages.forSender(self, name);
+      sender.sendError(emptyMsg);
       return;
     }
 
     var messages = snap.whenCleared();
     var count = Integer.toString(removed);
     var target = this.framework.actorOf(subject);
+
     var selfBase = messages.forSender(self, name);
     var selfMessage = selfBase.replace("{count}", count);
+
     var targetBase = messages.forTarget(name);
     var targetMessage = targetBase.replace("{count}", count);
 

@@ -34,6 +34,8 @@ public final class SpawnService {
   /** Updates the cache immediately and queues a write-through to SQLite on the writer thread. */
   public void set(@NonNull SpawnLocation location) {
     this.cached.set(location);
-    this.writer.submit("save spawn", () -> this.store.save(location));
+
+    Runnable persistTask = () -> this.store.save(location);
+    this.writer.submit("save spawn", persistTask);
   }
 }

@@ -30,6 +30,7 @@ public record FeedConfig(
   }
 
   public String formatFedAll(int count) {
-    return fedAll.replace("{count}", Integer.toString(count));
+    var countText = Integer.toString(count);
+    return fedAll.replace("{count}", countText);
   }
 }
