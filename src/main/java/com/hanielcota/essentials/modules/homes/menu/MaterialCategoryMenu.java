@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -70,7 +71,8 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
       }
 
       var template = representativeItem(category);
-      var slot = SlotDefinition.of(-1, template, ctx -> this.clickHandler.handle(ctx, category));
+      ClickHandler onCategory = ctx -> this.clickHandler.handle(ctx, category);
+      var slot = SlotDefinition.of(-1, template, onCategory);
 
       slots.add(slot);
     }

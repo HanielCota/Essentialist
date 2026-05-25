@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -92,8 +93,8 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     for (var icon : icons) {
       var pickedMaterial = icon.material();
       var template = icon.template();
-      var slot =
-          SlotDefinition.of(-1, template, ctx -> this.clickHandler.pick(ctx, pickedMaterial));
+      ClickHandler onPick = ctx -> this.clickHandler.pick(ctx, pickedMaterial);
+      var slot = SlotDefinition.of(-1, template, onPick);
 
       slots.add(slot);
     }
