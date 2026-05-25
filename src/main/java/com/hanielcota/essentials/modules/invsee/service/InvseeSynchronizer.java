@@ -23,14 +23,16 @@ public final class InvseeSynchronizer {
     }
 
     // Routed through the target's region: on Folia its inventory may only be touched there.
+    // Re-resolve inside the callback — `target` was captured here on the click thread and the
+    // player can quit between scheduling and execution. Resolving by UUID at run time gives us
+    // the live entity (or null if they're gone).
     Runnable writeBack =
         () -> {
-          // Skip when the target died meanwhile: writing a stale view onto an inventory
-          // already emptied by death drops would duplicate items.
-          if (target.isDead()) {
+          var live = Bukkit.getPlayer(targetId);
+          if (live == null || !live.isOnline() || live.isDead()) {
             return;
           }
-          this.service.sync(target, view);
+          this.service.sync(live, view);
         };
 
     this.scheduler.runOnEntity(target, writeBack);

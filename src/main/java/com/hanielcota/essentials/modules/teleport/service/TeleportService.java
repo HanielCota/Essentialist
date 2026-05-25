@@ -1,8 +1,6 @@
 package com.hanielcota.essentials.modules.teleport.service;
 
 import java.util.concurrent.CompletableFuture;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,12 +12,17 @@ import org.bukkit.entity.Player;
  * caller's notifier consumes.
  *
  * <p>Stateless — every call is independent. Pre-flight rejections short-circuit by completing the
- * future immediately so callers always observe a single completion signal.
+ * future immediately so callers always observe a single completion signal. Instance-based so
+ * callers can inject a mock in tests; the registered singleton is owned by {@code TeleportModule}.
+ *
+ * <p>Callers must drive the returned future through {@link
+ * com.hanielcota.essentials.scheduler.MainThreadCallbacks#hop} (or schedule the callback on the
+ * appropriate entity) before touching Bukkit API. The future completes on Paper's teleport
+ * completion thread, not the main thread.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TeleportService {
 
-  public static CompletableFuture<TeleportOutcome> toPlayer(
+  public CompletableFuture<TeleportOutcome> toPlayer(
       @NonNull Player sender, @NonNull Player target) {
     if (sameId(sender, target)) {
       return rejected(TeleportOutcome.SELF_TARGET);
@@ -30,8 +33,7 @@ public final class TeleportService {
     return dispatch(sender, destination);
   }
 
-  public static CompletableFuture<TeleportOutcome> movePlayer(
-      @NonNull Player from, @NonNull Player to) {
+  public CompletableFuture<TeleportOutcome> movePlayer(@NonNull Player from, @NonNull Player to) {
     if (sameId(from, to)) {
       return rejected(TeleportOutcome.SELF_TARGET);
     }
@@ -41,7 +43,7 @@ public final class TeleportService {
     return dispatch(from, destination);
   }
 
-  public static CompletableFuture<TeleportOutcome> toPosition(
+  public CompletableFuture<TeleportOutcome> toPosition(
       @NonNull Player sender, double x, double y, double z) {
     var world = sender.getWorld();
     var currentLocation = sender.getLocation();
@@ -60,7 +62,7 @@ public final class TeleportService {
     return dispatch(sender, destination);
   }
 
-  public static CompletableFuture<TeleportOutcome> bringHere(
+  public CompletableFuture<TeleportOutcome> bringHere(
       @NonNull Player viewer, @NonNull Player target) {
     if (sameId(viewer, target)) {
       return rejected(TeleportOutcome.SELF_TARGET);

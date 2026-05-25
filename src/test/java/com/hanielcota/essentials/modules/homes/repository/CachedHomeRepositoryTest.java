@@ -129,9 +129,9 @@ class CachedHomeRepositoryTest {
     private final Queue<Runnable> tasks = new ArrayDeque<>();
 
     @Override
-    public boolean submit(String operation, Runnable work) {
+    public java.util.concurrent.CompletableFuture<Void> submit(String operation, Runnable work) {
       tasks.add(work);
-      return true;
+      return java.util.concurrent.CompletableFuture.completedFuture(null);
     }
 
     int pending() {

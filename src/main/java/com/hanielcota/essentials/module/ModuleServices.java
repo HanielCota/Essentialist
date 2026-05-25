@@ -12,7 +12,9 @@ final class ModuleServices {
   <T> void register(@NonNull ModuleContext context, @NonNull Class<T> type, @NonNull T instance) {
     var services = context.services();
 
-    services.unregister(type);
+    // Let the registry's duplicate-detection surface conflicts. Silently overwriting hides the
+    // case where two modules both claim the same service type — order of module enable then
+    // decides the winner, which is invisible at runtime.
     services.register(type, instance);
     this.owned.add(type);
 

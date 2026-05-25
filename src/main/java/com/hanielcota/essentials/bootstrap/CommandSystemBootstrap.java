@@ -32,7 +32,12 @@ final class CommandSystemBootstrap {
     return framework;
   }
 
-  @SuppressWarnings("unchecked")
+  /**
+   * Mirrors infrastructure services (Scheduler, ConfigService, DatabaseProvider, MenuService,
+   * EssentialsApi, ModuleManager, …) registered before the framework existed so command handlers
+   * can request them via constructor injection. Services registered after this — i.e. all
+   * module-owned services — are auto-mirrored by {@code ModuleServices.register} as they appear.
+   */
   void mirrorServicesToCommands(
       @NonNull PaperCommandFramework framework, @NonNull ServiceRegistry services) {
     var registeredTypes = services.registered();
@@ -42,10 +47,15 @@ final class CommandSystemBootstrap {
         continue;
       }
 
-      var castedType = (Class<Object>) type;
-      var resolvedService = services.resolve(castedType);
-
-      framework.registerDependency(castedType, resolvedService);
+      mirrorOne(framework, services, type);
     }
+  }
+
+  private <T> void mirrorOne(
+      @NonNull PaperCommandFramework framework,
+      @NonNull ServiceRegistry services,
+      @NonNull Class<T> type) {
+    var instance = services.resolve(type);
+    framework.registerDependency(type, instance);
   }
 }

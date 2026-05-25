@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.kill.command;
 
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kill.config.KillConfig;
@@ -52,10 +53,6 @@ public record KillCommand(ConfigHandle<KillConfig> config, PaperCommandFramework
     subject.setHealth(0);
 
     var messages = snap.whenKilled();
-    var target = this.framework.actorOf(subject);
-    var selfMsg = messages.forSender(self, name);
-    var targetMsg = messages.forTarget(name);
-
-    sender.sendDualMessage(target, selfMsg, targetMsg);
+    DualReply.send(sender, subject, this.framework, messages);
   }
 }

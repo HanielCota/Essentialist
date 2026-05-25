@@ -14,6 +14,7 @@ import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 
 public final class VanishModule extends AbstractModule {
@@ -45,7 +46,8 @@ public final class VanishModule extends AbstractModule {
     registerListener(protectionListener);
 
     var renderer = new VanishEntryRenderer(config);
-    var clickHandler = new VanishClickHandler(config, this.service, this.players);
+    var callbacks = service(MainThreadCallbacks.class);
+    var clickHandler = new VanishClickHandler(config, this.service, this.players, callbacks);
     var menu = new VanishMenu(config, this.service, renderer, clickHandler, this.players);
     registerMenu(menu);
 

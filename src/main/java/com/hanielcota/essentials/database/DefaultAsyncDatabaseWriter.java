@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.database;
 
 import com.hanielcota.essentials.util.Log;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -45,16 +46,9 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   }
 
   @Override
-  public boolean submit(@NonNull String operation, @NonNull Runnable work) {
-    Runnable wrapped = () -> runSafely(operation, work);
-
-    try {
-      this.executor.execute(wrapped);
-      return true;
-    } catch (RejectedExecutionException _) {
-      LOG.warn("{} rejected {} (shutting down?)", this.threadName, operation);
-      return false;
-    }
+  public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
+    return CompletableFuture.runAsync(() -> runSafely(operation, work), this.executor)
+        .exceptionally(error -> handleSubmitFailure(operation, error));
   }
 
   private void runSafely(@NonNull String operation, @NonNull Runnable work) {
@@ -62,7 +56,21 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
       work.run();
     } catch (RuntimeException e) {
       LOG.warn(e, "{} async {} failed", this.threadName, operation);
+      throw e;
     }
+  }
+
+  private Void handleSubmitFailure(@NonNull String operation, @NonNull Throwable error) {
+    if (error instanceof RejectedExecutionException) {
+      LOG.warn("{} rejected {} (shutting down?)", this.threadName, operation);
+      return null;
+    }
+    // Other failures already logged in runSafely; rethrow so callers that observe the future see
+    // the cause.
+    if (error instanceof RuntimeException runtime) {
+      throw runtime;
+    }
+    throw new IllegalStateException(error);
   }
 
   @Override

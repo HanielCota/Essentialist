@@ -5,6 +5,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,8 @@ public final class TeleportDispatcher {
   private final ConfigHandle<TeleportConfig> config;
   private final PlayerProvider players;
   private final TeleportNotifier notifier;
+  private final TeleportService teleport;
+  private final MainThreadCallbacks callbacks;
 
   public void dispatch(
       @NonNull CommandActor sender,
@@ -65,10 +68,12 @@ public final class TeleportDispatcher {
     var senderName = senderPlayer.getName();
     var actualTargetName = target.getName();
 
-    var future = TeleportService.toPlayer(senderPlayer, target);
-    future.thenAccept(
+    var future = this.teleport.toPlayer(senderPlayer, target);
+    this.callbacks.hop(
+        future,
         outcome ->
-            this.notifier.notifyToPlayer(sender, target, senderName, actualTargetName, outcome));
+            this.notifier.notifyToPlayer(sender, target, senderName, actualTargetName, outcome),
+        "tp to player");
   }
 
   private void dispatchMove(
@@ -99,11 +104,13 @@ public final class TeleportDispatcher {
     var senderName = sender.name();
     var selfMove = Senders.isSelf(sender, from);
 
-    var future = TeleportService.movePlayer(from, to);
-    future.thenAccept(
+    var future = this.teleport.movePlayer(from, to);
+    this.callbacks.hop(
+        future,
         outcome ->
             this.notifier.notifyMove(
-                sender, from, actualFromName, actualToName, senderName, selfMove, outcome));
+                sender, from, actualFromName, actualToName, senderName, selfMove, outcome),
+        "tp move");
   }
 
   private void dispatchToPosition(
@@ -129,8 +136,9 @@ public final class TeleportDispatcher {
     }
 
     var senderPlayer = sender.unwrap(Player.class);
-    var future = TeleportService.toPosition(senderPlayer, x, y, z);
-    future.thenAccept(outcome -> this.notifier.notifyToPos(sender, x, y, z, outcome));
+    var future = this.teleport.toPosition(senderPlayer, x, y, z);
+    this.callbacks.hop(
+        future, outcome -> this.notifier.notifyToPos(sender, x, y, z, outcome), "tp to position");
   }
 
   private void sendPlayerNotFound(@NonNull CommandActor sender, @NonNull String name) {

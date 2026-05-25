@@ -6,11 +6,10 @@ import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.config.VanishMessages;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.NonNull;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 /**
  * Teleports the viewer to a vanished player. Re-checks {@link VanishService#isVanished(UUID)} at
@@ -18,15 +17,10 @@ import org.bukkit.entity.Player;
  * viewer to a now-visible player.
  */
 public record VanishClickHandler(
-    ConfigHandle<VanishConfig> config, VanishService service, PlayerProvider players) {
-
-  private static void dispatchTeleport(
-      @NonNull Player viewer,
-      @NonNull Location destination,
-      @NonNull Consumer<Boolean> afterTeleport) {
-    var future = viewer.teleportAsync(destination);
-    future.thenAccept(afterTeleport);
-  }
+    ConfigHandle<VanishConfig> config,
+    VanishService service,
+    PlayerProvider players,
+    MainThreadCallbacks callbacks) {
 
   private static Consumer<Boolean> afterTeleport(
       @NonNull ClickContext click, @NonNull String teleportedMsg, @NonNull String failedMsg) {
@@ -71,6 +65,8 @@ public record VanishClickHandler(
     var afterTeleport = afterTeleport(click, teleportedMsg, failedMsg);
 
     click.close();
-    dispatchTeleport(viewer, location, afterTeleport);
+
+    var future = viewer.teleportAsync(location);
+    this.callbacks.hop(future, afterTeleport, "vanish teleport");
   }
 }

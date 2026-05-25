@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.feed.command;
 
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.feed.config.FeedConfig;
@@ -45,12 +46,7 @@ public record FeedCommand(
     }
 
     var messages = snap.whenFed();
-    var target = this.framework.actorOf(subject);
-
-    var senderMsg = messages.forSender(self, name);
-    var targetMsg = messages.forTarget(name);
-
-    sender.sendDualMessage(target, senderMsg, targetMsg);
+    DualReply.send(sender, subject, this.framework, messages);
   }
 
   @Subcommand("todos")

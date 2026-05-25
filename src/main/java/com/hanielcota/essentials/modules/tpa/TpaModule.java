@@ -29,6 +29,7 @@ import com.hanielcota.essentials.modules.tpa.service.RequestStore;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExpiry;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
@@ -124,7 +125,9 @@ public final class TpaModule extends AbstractModule {
     registerCommand(tpaHereCommand);
 
     var acceptResultHandler = new TpAcceptResultHandler(config, framework, playerProvider);
-    var tpAcceptCommand = new TpAcceptCommand(config, requestService, acceptResultHandler);
+    var callbacks = service(MainThreadCallbacks.class);
+    var tpAcceptCommand =
+        new TpAcceptCommand(config, requestService, acceptResultHandler, callbacks);
     registerCommand(tpAcceptCommand);
 
     var tpDenyCommand = new TpDenyCommand(config, requestService, framework, playerProvider);

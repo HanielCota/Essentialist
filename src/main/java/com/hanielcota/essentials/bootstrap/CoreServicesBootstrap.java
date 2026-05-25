@@ -7,6 +7,7 @@ import com.hanielcota.essentials.paper.AudienceProvider;
 import com.hanielcota.essentials.paper.BukkitPlayerProvider;
 import com.hanielcota.essentials.paper.PaperAudienceProvider;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.scheduler.PaperScheduler;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.service.ServiceRegistry;
@@ -27,6 +28,9 @@ final class CoreServicesBootstrap {
   private void registerScheduler(@NonNull ServiceRegistry services) {
     var scheduler = new PaperScheduler(this.plugin);
     services.register(Scheduler.class, scheduler);
+
+    var mainThreadCallbacks = new MainThreadCallbacks(scheduler);
+    services.register(MainThreadCallbacks.class, mainThreadCallbacks);
   }
 
   private void registerPaperAdapters(@NonNull ServiceRegistry services) {

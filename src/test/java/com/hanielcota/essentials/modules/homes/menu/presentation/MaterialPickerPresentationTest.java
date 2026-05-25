@@ -24,6 +24,11 @@ class MaterialPickerPresentationTest {
 
       @Override
       public void reload() {}
+
+      @Override
+      public AutoCloseable onReload(java.util.function.Consumer<MaterialNamesConfig> listener) {
+        return () -> {};
+      }
     };
   }
 

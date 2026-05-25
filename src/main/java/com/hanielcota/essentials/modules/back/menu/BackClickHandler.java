@@ -5,11 +5,13 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.NonNull;
 
-public record BackClickHandler(ConfigHandle<BackConfig> config, TeleportHistory history) {
+public record BackClickHandler(
+    ConfigHandle<BackConfig> config, TeleportHistory history, MainThreadCallbacks callbacks) {
 
   public void handle(@NonNull ClickContext click, @NonNull HistoryEntry entry) {
     var player = click.player();
@@ -42,7 +44,7 @@ public record BackClickHandler(ConfigHandle<BackConfig> config, TeleportHistory 
         success -> onTeleportResult(success, click, snap, playerId, entryId, worldName, x, y, z);
 
     var teleportFuture = player.teleportAsync(target);
-    teleportFuture.thenAccept(onResult);
+    this.callbacks.hop(teleportFuture, onResult, "back teleport");
   }
 
   private void onTeleportResult(
