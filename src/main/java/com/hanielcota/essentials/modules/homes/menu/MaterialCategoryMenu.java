@@ -39,20 +39,25 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
 
   @Override
   public void register(@NonNull MenuService menusRef) {
-    var menuSpec = this.config.value().menu();
+    var snap = this.config.value();
+    var menuSpec = snap.menu();
+
     var rows = menuSpec.effectiveCategoryRows();
-    var title = ComponentUtils.mini(menuSpec.categoryTitle());
+    var titleText = menuSpec.categoryTitle();
+    var title = ComponentUtils.mini(titleText);
+    var contentSlots = menuSpec.effectiveCategoryContentSlots();
 
-    var pagination =
-        PaginationConfig.builder().contentSlots(menuSpec.effectiveCategoryContentSlots()).build();
+    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
+    var pagination = paginationBuilder.build();
 
-    MenuFramework.builder(ID, menusRef)
-        .rows(rows)
-        .title(title)
-        .pagination(pagination)
-        .dynamicContent(this::buildSlots)
-        .build()
-        .register();
+    var builder = MenuFramework.builder(ID, menusRef);
+    builder.rows(rows);
+    builder.title(title);
+    builder.pagination(pagination);
+    builder.dynamicContent(this::buildSlots);
+
+    var menu = builder.build();
+    menu.register();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
@@ -63,34 +68,53 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
       if (category == MaterialCategory.MISC) {
         continue;
       }
+
       var template = representativeItem(category);
-      slots.add(SlotDefinition.of(-1, template, ctx -> this.clickHandler.handle(ctx, category)));
+      var slot = SlotDefinition.of(-1, template, ctx -> this.clickHandler.handle(ctx, category));
+
+      slots.add(slot);
     }
 
-    slots.add(backButtonSlot());
+    var backSlot = backButtonSlot();
+    slots.add(backSlot);
 
     return slots;
   }
 
   private @NonNull SlotDefinition backButtonSlot() {
-    var menuSpec = this.config.value().menu();
-    var back =
-        ItemTemplate.builder(menuSpec.categoryBackMaterial())
-            .name(menuSpec.categoryBackName())
-            .lore(menuSpec.categoryBackLore().toArray(String[]::new))
-            .italic(false)
-            .build();
+    var snap = this.config.value();
+    var menuSpec = snap.menu();
 
-    return SlotDefinition.of(menuSpec.effectiveCategoryBackSlot(), back, this.clickHandler::back);
+    var material = menuSpec.categoryBackMaterial();
+    var name = menuSpec.categoryBackName();
+    var lore = menuSpec.categoryBackLore();
+    var loreArray = lore.toArray(String[]::new);
+
+    var templateBuilder = ItemTemplate.builder(material);
+    templateBuilder.name(name);
+    templateBuilder.lore(loreArray);
+    templateBuilder.italic(false);
+    var template = templateBuilder.build();
+
+    var slot = menuSpec.effectiveCategoryBackSlot();
+
+    return SlotDefinition.of(slot, template, this.clickHandler::back);
   }
 
   private @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
-    var menuSpec = this.config.value().menu();
+    var snap = this.config.value();
+    var menuSpec = snap.menu();
+
     var icon = this.icons.iconFor(category);
     var categoryName = menuSpec.categoryName(category);
     var name = menuSpec.formatCategoryItemName(categoryName);
     var lore = menuSpec.formatCategoryItemLore(categoryName);
 
-    return ItemTemplate.builder(icon).name(name).lore(lore).italic(false).build();
+    var builder = ItemTemplate.builder(icon);
+    builder.name(name);
+    builder.lore(lore);
+    builder.italic(false);
+
+    return builder.build();
   }
 }

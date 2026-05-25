@@ -33,16 +33,19 @@ public record HomesCommand(
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var homes = this.service.list(sender.getUniqueId());
+    var uuid = sender.getUniqueId();
+    var homes = this.service.list(uuid);
 
     if (homes.isEmpty()) {
-      var messages = this.config.value().messages();
+      var snap = this.config.value();
+      var messages = snap.messages();
       var noHomesMsg = messages.noHomes();
       actor.sendError(noHomesMsg);
       return;
     }
 
-    this.state.prefetch(sender.getUniqueId(), homes);
+    this.state.prefetch(uuid, homes);
+
     MenuOpenings.open(this.menus, sender, HomesMenu.ID, actor);
   }
 }

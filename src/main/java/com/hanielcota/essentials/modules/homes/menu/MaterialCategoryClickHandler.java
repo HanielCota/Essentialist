@@ -12,12 +12,17 @@ public final class MaterialCategoryClickHandler {
 
   public void handle(@NonNull ClickContext click, @NonNull MaterialCategory category) {
     var player = click.player();
-    this.target.setCategory(player.getUniqueId(), category);
+    var uuid = player.getUniqueId();
+
+    this.target.setCategory(uuid, category);
     click.switchTo(MaterialPickerMenu.ID);
   }
 
   public void back(@NonNull ClickContext click) {
-    this.target.clear(click.player().getUniqueId());
+    var player = click.player();
+    var uuid = player.getUniqueId();
+
+    this.target.clear(uuid);
     click.switchTo(HomesMenu.ID);
   }
 }

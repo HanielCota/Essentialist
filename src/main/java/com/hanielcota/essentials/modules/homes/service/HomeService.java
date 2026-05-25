@@ -52,15 +52,26 @@ public final class HomeService {
     var sanitizedMaterial = HomeMaterials.sanitizeIcon(material);
 
     if (existing.isPresent()) {
-      var keepMaterial = material != null ? sanitizedMaterial : existing.get().material();
-      this.repository.save(Home.of(ownerId, name, location, keepMaterial));
+      var previous = existing.get();
+      var previousMaterial = previous.material();
+      var keepMaterial = material != null ? sanitizedMaterial : previousMaterial;
+
+      var updatedHome = Home.of(ownerId, name, location, keepMaterial);
+      this.repository.save(updatedHome);
+
       return SaveResult.UPDATED;
     }
-    if (this.repository.count(ownerId) >= this.limits.resolve(owner)) {
+
+    var currentCount = this.repository.count(ownerId);
+    var maxAllowed = this.limits.resolve(owner);
+
+    if (currentCount >= maxAllowed) {
       return SaveResult.LIMIT_REACHED;
     }
 
-    this.repository.save(Home.of(ownerId, name, location, sanitizedMaterial));
+    var newHome = Home.of(ownerId, name, location, sanitizedMaterial);
+    this.repository.save(newHome);
+
     return SaveResult.CREATED;
   }
 
@@ -74,12 +85,18 @@ public final class HomeService {
     // truth. Pre-checking with two finds risked reporting NAME_TAKEN when the
     // cache was actually empty (or NOT_FOUND when it actually had the entry)
     // if eviction interleaved between the finds and the rename.
-    if (this.repository.rename(owner, oldName, newName)) {
+    var renamed = this.repository.rename(owner, oldName, newName);
+
+    if (renamed) {
       return RenameResult.RENAMED;
     }
-    if (this.repository.find(owner, oldName).isEmpty()) {
+
+    var existing = this.repository.find(owner, oldName);
+
+    if (existing.isEmpty()) {
       return RenameResult.NOT_FOUND;
     }
+
     return RenameResult.NAME_TAKEN;
   }
 
@@ -88,6 +105,7 @@ public final class HomeService {
     if (!HomeMaterials.isUsableIcon(material)) {
       return false;
     }
+
     return this.repository.updateMaterial(owner, name, material);
   }
 

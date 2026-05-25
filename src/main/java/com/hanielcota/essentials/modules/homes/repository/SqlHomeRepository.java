@@ -41,7 +41,9 @@ public final class SqlHomeRepository implements HomeRepository {
   @Override
   public int count(@NonNull UUID owner) {
     var ownerStr = owner.toString();
-    var counts = this.sqlExecutor.query(SqlHomeTable.COUNT, rs -> rs.getInt("total"), ownerStr);
+
+    SqlExecutor.ResultMapper<Integer> totalMapper = rs -> rs.getInt("total");
+    var counts = this.sqlExecutor.query(SqlHomeTable.COUNT, totalMapper, ownerStr);
 
     if (counts.isEmpty()) {
       return 0;
@@ -55,18 +57,19 @@ public final class SqlHomeRepository implements HomeRepository {
     var ownerStr = home.owner().toString();
     var materialStr = home.material().name();
 
+    var name = home.name();
+    var world = home.world();
+
+    var x = home.x();
+    var y = home.y();
+    var z = home.z();
+    var yaw = home.yaw();
+    var pitch = home.pitch();
+
+    var createdAt = home.createdAt();
+
     this.sqlExecutor.update(
-        SqlHomeTable.UPSERT,
-        ownerStr,
-        home.name(),
-        home.world(),
-        home.x(),
-        home.y(),
-        home.z(),
-        home.yaw(),
-        home.pitch(),
-        materialStr,
-        home.createdAt());
+        SqlHomeTable.UPSERT, ownerStr, name, world, x, y, z, yaw, pitch, materialStr, createdAt);
   }
 
   @Override
@@ -79,7 +82,15 @@ public final class SqlHomeRepository implements HomeRepository {
 
   @Override
   public boolean rename(@NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
-    if (find(owner, oldName).isEmpty() || find(owner, newName).isPresent()) {
+    var existing = find(owner, oldName);
+
+    if (existing.isEmpty()) {
+      return false;
+    }
+
+    var collision = find(owner, newName);
+
+    if (collision.isPresent()) {
       return false;
     }
 

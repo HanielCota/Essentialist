@@ -27,10 +27,11 @@ public final class HomesCommandFactory {
 
     var materialResolver = new HomeMaterialResolver(config);
 
-    return List.of(
-        new SetHomeCommand(config, homeService, nameResolver, materialResolver),
-        new HomeCommand(config, homeService, teleporter, nameResolver),
-        new DelHomeCommand(config, homeService, nameResolver),
-        new HomesCommand(config, homeService, menus, menuState));
+    var setHomeCommand = new SetHomeCommand(config, homeService, nameResolver, materialResolver);
+    var homeCommand = new HomeCommand(config, homeService, teleporter, nameResolver);
+    var delHomeCommand = new DelHomeCommand(config, homeService, nameResolver);
+    var homesCommand = new HomesCommand(config, homeService, menus, menuState);
+
+    return List.of(setHomeCommand, homeCommand, delHomeCommand, homesCommand);
   }
 }

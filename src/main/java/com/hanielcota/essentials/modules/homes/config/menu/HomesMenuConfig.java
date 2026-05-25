@@ -235,7 +235,12 @@ public record HomesMenuConfig(
 
   public String categoryName(@NonNull MaterialCategory category) {
     var configured = categoryNames.get(category);
-    return configured != null ? configured : category.name();
+
+    if (configured != null) {
+      return configured;
+    }
+
+    return category.name();
   }
 
   public String formatCategoryItemName(@NonNull String category) {

@@ -42,7 +42,11 @@ public final class HomesMenuFactory {
     var clickHandler = new HomeClickHandler(teleporter, framework, actionTarget, rename);
     var homesMenu = new HomesMenu(config, homeService, renderer, clickHandler, menuState);
 
-    var iconRegistry = new MaterialIconRegistry(config.value().menu(), materialNames.value());
+    var configSnap = config.value();
+    var menuConfig = configSnap.menu();
+    var materialNamesSnap = materialNames.value();
+
+    var iconRegistry = new MaterialIconRegistry(menuConfig, materialNamesSnap);
     var pickerPresentation = new MaterialPickerPresentation(materialNames);
 
     var categoryClickHandler = new MaterialCategoryClickHandler(actionTarget);
@@ -53,9 +57,9 @@ public final class HomesMenuFactory {
     var categoryIcons = new MaterialCategoryIconRegistry();
     var categoryMenu = new MaterialCategoryMenu(config, categoryClickHandler, categoryIcons);
     var pickerMenu = new MaterialPickerMenu(config, actionTarget, iconRegistry, pickerClickHandler);
+    var deleteDialog = new DeleteHomeDialog(config, deleteClickHandler);
 
-    var dialogs =
-        List.of(categoryMenu, new DeleteHomeDialog(config, deleteClickHandler), pickerMenu);
+    var dialogs = List.<EssentialsMenu>of(categoryMenu, deleteDialog, pickerMenu);
 
     var cleanupListener = new HomesMenuCleanupListener(menuState);
 

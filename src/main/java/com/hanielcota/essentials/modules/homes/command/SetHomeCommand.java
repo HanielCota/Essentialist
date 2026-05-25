@@ -37,28 +37,36 @@ public record SetHomeCommand(
       @DefaultValue("") @Arg("nome") String rawName,
       @DefaultValue("") @Arg("material") String rawMaterial) {
     var sender = actor.unwrap(Player.class);
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var name = this.nameResolver.resolve(rawName);
+
     if (name == null) {
-      actor.sendError(messages.invalidName());
+      var invalidNameMsg = messages.invalidName();
+      actor.sendError(invalidNameMsg);
       return;
     }
 
     var material = this.materialResolver.resolve(rawMaterial);
     if (material == null) {
-      var invalidMaterialMsg = messages.invalidMaterial().replace("{material}", rawMaterial);
+      var invalidMaterialTemplate = messages.invalidMaterial();
+      var invalidMaterialMsg = invalidMaterialTemplate.replace("{material}", rawMaterial);
       actor.sendError(invalidMaterialMsg);
       return;
     }
 
-    var outcome = this.service.save(sender, name, sender.getLocation(), material);
+    var location = sender.getLocation();
+    var outcome = this.service.save(sender, name, location, material);
+
     switch (outcome) {
       case CREATED -> {
-        var homeSetMsg = messages.homeSet().replace("{name}", name);
+        var homeSetTemplate = messages.homeSet();
+        var homeSetMsg = homeSetTemplate.replace("{name}", name);
         actor.sendSuccess(homeSetMsg);
       }
       case UPDATED -> {
-        var homeUpdatedMsg = messages.homeUpdated().replace("{name}", name);
+        var homeUpdatedTemplate = messages.homeUpdated();
+        var homeUpdatedMsg = homeUpdatedTemplate.replace("{name}", name);
         actor.sendSuccess(homeUpdatedMsg);
       }
       case LIMIT_REACHED -> {
@@ -70,10 +78,12 @@ public record SetHomeCommand(
 
   private String limitReachedMessage(
       @NonNull HomesMessages messages, @NonNull String name, @NonNull Player sender) {
-    var limit = Integer.toString(this.service.limit(sender));
+    var limitValue = this.service.limit(sender);
+    var limit = Integer.toString(limitValue);
 
     var limitReachedMsg = messages.limitReached();
     var withName = limitReachedMsg.replace("{name}", name);
+
     return withName.replace("{limit}", limit);
   }
 }
