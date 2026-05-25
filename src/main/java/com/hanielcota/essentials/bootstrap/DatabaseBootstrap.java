@@ -9,18 +9,23 @@ import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.database.SqliteDatabase;
 import com.hanielcota.essentials.database.SqliteDialect;
 import com.hanielcota.essentials.exception.PluginException;
-import com.hanielcota.essentials.service.ServiceRegistry;
 import java.io.IOException;
 import java.nio.file.Files;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-final class DatabaseBootstrap {
+final class DatabaseBootstrap implements BootstrapStage {
 
   private final EssentialsPlugin plugin;
 
-  void register(@NonNull ServiceRegistry services) {
+  @Override
+  public String name() {
+    return "database";
+  }
+
+  @Override
+  public void start(@NonNull StageContext context) {
     var dataFolder = this.plugin.getDataFolder();
     var dataFolderPath = dataFolder.toPath();
     var dataDir = dataFolderPath.resolve("data");
@@ -37,6 +42,7 @@ final class DatabaseBootstrap {
     var database = new SqliteDatabase(dbPath);
     database.connect();
 
+    var services = context.services();
     services.register(DatabaseProvider.class, database);
     services.register(SqlConnectionFactory.class, database);
 

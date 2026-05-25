@@ -44,7 +44,10 @@ public final class NearService {
       double maxDistanceSquared,
       @NonNull Collection<? extends Player> candidates) {
 
-    var matches = new ArrayList<Nearby>();
+    // Pre-size to the upper bound (every candidate is in range) to avoid the default capacity-10
+    // ArrayList grow-by-50% cycle on dense worlds. Over-allocation is cheap; reallocs on every
+    // /near are not.
+    var matches = new ArrayList<Nearby>(candidates.size());
     for (var other : candidates) {
       if (other.equals(center)) {
         continue;

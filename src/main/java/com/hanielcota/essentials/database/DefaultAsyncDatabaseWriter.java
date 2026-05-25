@@ -64,8 +64,15 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
     warnIfSaturated();
 
-    return CompletableFuture.runAsync(() -> runSafely(operation, work), this.executor)
-        .exceptionally(error -> handleSubmitFailure(operation, error));
+    try {
+      return CompletableFuture.runAsync(() -> runSafely(operation, work), this.executor)
+          .exceptionally(error -> handleSubmitFailure(operation, error));
+    } catch (RejectedExecutionException e) {
+      // CompletableFuture.runAsync rethrows REE from the executor directly instead of completing
+      // the future exceptionally. Translate so every rejection reaches callers the same way.
+      handleSubmitFailure(operation, e);
+      return CompletableFuture.failedFuture(e);
+    }
   }
 
   private void warnIfSaturated() {
