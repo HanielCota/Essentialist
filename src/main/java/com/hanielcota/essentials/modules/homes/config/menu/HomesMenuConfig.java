@@ -168,7 +168,7 @@ public record HomesMenuConfig(
   public DateTimeFormatter createdDateFormatter() {
     try {
       return DateTimeFormatter.ofPattern(createdDateFormat);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException _) {
       return DateTimeFormatter.ofPattern("dd/MM/yyyy");
     }
   }
@@ -176,7 +176,7 @@ public record HomesMenuConfig(
   public DateTimeFormatter createdTimeFormatter() {
     try {
       return DateTimeFormatter.ofPattern(createdTimeFormat);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException _) {
       return DateTimeFormatter.ofPattern("HH:mm");
     }
   }

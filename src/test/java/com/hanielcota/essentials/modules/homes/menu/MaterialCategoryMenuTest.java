@@ -117,7 +117,9 @@ class MaterialCategoryMenuTest {
       }
 
       @Override
-      public void reload() {}
+      public void reload() {
+        // no-op — test double, the menu never reloads during the test
+      }
     };
   }
 }

@@ -38,7 +38,9 @@ class ListEntryRendererTest {
       }
 
       @Override
-      public void reload() {}
+      public void reload() {
+        // no-op — test double, the renderer never reloads during the test
+      }
     };
   }
 }

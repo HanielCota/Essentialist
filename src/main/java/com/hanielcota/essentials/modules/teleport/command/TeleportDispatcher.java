@@ -142,7 +142,7 @@ public final class TeleportDispatcher {
   private static Double parseDouble(@NonNull String value) {
     try {
       return Double.parseDouble(value);
-    } catch (NumberFormatException ignored) {
+    } catch (NumberFormatException _) {
       return null;
     }
   }

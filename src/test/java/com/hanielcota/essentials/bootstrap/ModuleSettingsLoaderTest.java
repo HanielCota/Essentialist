@@ -55,9 +55,13 @@ class ModuleSettingsLoaderTest {
   private record TestModule(ModuleMetadata metadata) implements Module {
 
     @Override
-    public void enable(ModuleContext context) {}
+    public void enable(ModuleContext context) {
+      // no-op — test double, settings loader only inspects metadata
+    }
 
     @Override
-    public void disable() {}
+    public void disable() {
+      // no-op — test double
+    }
   }
 }

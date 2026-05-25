@@ -23,6 +23,10 @@ import org.bukkit.Material;
 @RequiredArgsConstructor
 public final class TpaHelpMenu implements EssentialsMenu {
 
+  // Matches the convention shared by every other menu (WhitelistMenu.ID, BackMenu.ID, etc.).
+  // The id()/ID lookalike is intentional — keeping the constant uppercase and the accessor
+  // lowercase preserves both the field-as-constant convention and the EssentialsMenu interface.
+  @SuppressWarnings("java:S1845")
   public static final String ID = "essentials.tpa.help";
 
   private final ConfigHandle<TpaConfig> config;
