@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.give.service;
+package com.hanielcota.essentials.modules.give.model;
 
 public record GiveResult(int requested, int given, int leftover) {
 

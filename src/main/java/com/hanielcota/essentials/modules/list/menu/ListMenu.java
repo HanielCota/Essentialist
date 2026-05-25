@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 
 @RequiredArgsConstructor
 public final class ListMenu implements EssentialsMenu {
@@ -33,6 +34,7 @@ public final class ListMenu implements EssentialsMenu {
     var builder = ItemTemplate.builder(material);
     builder = builder.name(name);
     builder = builder.lore(loreArray);
+    builder = builder.flags(ItemFlag.HIDE_ATTRIBUTES);
     builder = builder.italic(false);
 
     return builder.build();

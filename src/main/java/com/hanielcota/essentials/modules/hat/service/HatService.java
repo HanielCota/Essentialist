@@ -8,6 +8,39 @@ import org.bukkit.inventory.PlayerInventory;
 
 public final class HatService {
 
+  /** True when {@code item} fits in {@code inv}'s storage slots without overflow. */
+  private static boolean hasRoomFor(@NonNull PlayerInventory inv, @NonNull ItemStack item) {
+    var contents = inv.getStorageContents();
+    var needed = item.getAmount();
+
+    for (var slot : contents) {
+      if (slot == null) {
+        return true;
+      }
+
+      var slotType = slot.getType();
+      if (slotType.isAir()) {
+        return true;
+      }
+      if (!slot.isSimilar(item)) {
+        continue;
+      }
+
+      var maxStack = slot.getMaxStackSize();
+      var currentAmount = slot.getAmount();
+      var capacity = maxStack - currentAmount;
+
+      if (capacity >= needed) {
+        return true;
+      }
+      needed -= capacity;
+      if (needed <= 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public Result equip(@NonNull Player player, @NonNull HatConfig snap) {
     var inv = player.getInventory();
     var held = inv.getItemInMainHand();
@@ -49,39 +82,6 @@ public final class HatService {
       inv.addItem(previousHelmet);
     }
     return Result.EQUIPPED;
-  }
-
-  /** True when {@code item} fits in {@code inv}'s storage slots without overflow. */
-  private static boolean hasRoomFor(@NonNull PlayerInventory inv, @NonNull ItemStack item) {
-    var contents = inv.getStorageContents();
-    var needed = item.getAmount();
-
-    for (var slot : contents) {
-      if (slot == null) {
-        return true;
-      }
-
-      var slotType = slot.getType();
-      if (slotType.isAir()) {
-        return true;
-      }
-      if (!slot.isSimilar(item)) {
-        continue;
-      }
-
-      var maxStack = slot.getMaxStackSize();
-      var currentAmount = slot.getAmount();
-      var capacity = maxStack - currentAmount;
-
-      if (capacity >= needed) {
-        return true;
-      }
-      needed -= capacity;
-      if (needed <= 0) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public enum Result {

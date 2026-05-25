@@ -12,7 +12,7 @@ public final class LightService {
 
   private final NamespacedKey key;
 
-  public LightService(Plugin plugin) {
+  public LightService(@NonNull Plugin plugin) {
     this.key = new NamespacedKey(plugin, "light_night_vision");
   }
 

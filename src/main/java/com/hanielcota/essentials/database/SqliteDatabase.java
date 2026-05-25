@@ -20,6 +20,14 @@ public final class SqliteDatabase implements DatabaseProvider {
   private final Path file;
   private final AtomicReference<HikariDataSource> sourceRef = new AtomicReference<>();
 
+  private static void silenceHikariLoggers() {
+    var essentialsHikariLogger = Logger.getLogger("com.hanielcota.essentials.libs.hikari");
+    essentialsHikariLogger.setLevel(Level.WARNING);
+
+    var zaxxerHikariLogger = Logger.getLogger("com.zaxxer.hikari");
+    zaxxerHikariLogger.setLevel(Level.WARNING);
+  }
+
   @Override
   public void connect() {
     var current = this.sourceRef.get();
@@ -40,14 +48,6 @@ public final class SqliteDatabase implements DatabaseProvider {
 
       this.sourceRef.set(dataSource);
     }
-  }
-
-  private static void silenceHikariLoggers() {
-    var essentialsHikariLogger = Logger.getLogger("com.hanielcota.essentials.libs.hikari");
-    essentialsHikariLogger.setLevel(Level.WARNING);
-
-    var zaxxerHikariLogger = Logger.getLogger("com.zaxxer.hikari");
-    zaxxerHikariLogger.setLevel(Level.WARNING);
   }
 
   private HikariConfig buildHikariConfig() {

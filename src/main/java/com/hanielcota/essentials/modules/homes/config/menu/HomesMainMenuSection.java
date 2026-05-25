@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.config.menu;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
-import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.modules.homes.menu.presentation.HomeMenuPlaceholders;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -40,21 +40,28 @@ public final class HomesMainMenuSection {
   }
 
   public static String[] itemLore(
-      @NonNull HomesMenuConfig snap, @NonNull String world, double x, double y, double z) {
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
+      @NonNull HomesMenuConfig snap, @NonNull HomeMenuPlaceholders placeholders) {
     var template = snap.itemLore();
     var rendered = new String[template.size()];
 
     for (var i = 0; i < template.size(); i++) {
       var line = template.get(i);
-      var withWorld = line.replace("{world}", world);
-      var withX = withWorld.replace("{x}", xStr);
-      var withY = withX.replace("{y}", yStr);
-      rendered[i] = withY.replace("{z}", zStr);
+      rendered[i] = formatLine(line, placeholders);
     }
 
     return rendered;
+  }
+
+  private static String formatLine(
+      @NonNull String line, @NonNull HomeMenuPlaceholders placeholders) {
+    var withWorld = line.replace("{world}", placeholders.world());
+    var withX = withWorld.replace("{x}", placeholders.x());
+    var withY = withX.replace("{y}", placeholders.y());
+    var withZ = withY.replace("{z}", placeholders.z());
+    var withDirection = withZ.replace("{direction}", placeholders.direction());
+    var withDate = withDirection.replace("{created_date}", placeholders.createdDate());
+    var withTime = withDate.replace("{created_time}", placeholders.createdTime());
+
+    return withTime.replace("{created_at}", placeholders.createdAt());
   }
 }

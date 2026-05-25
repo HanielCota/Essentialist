@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.give.service;
 
+import com.hanielcota.essentials.modules.give.model.GiveResult;
 import java.util.function.BiConsumer;
 import lombok.NonNull;
 import org.bukkit.Material;

@@ -12,13 +12,6 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NickValidator {
 
-  public enum Result {
-    OK,
-    TOO_SHORT,
-    TOO_LONG,
-    INVALID_CHARS
-  }
-
   public static Result check(@NonNull String nickname, int minLength, int maxLength) {
     var length = nickname.length();
 
@@ -60,5 +53,12 @@ public final class NickValidator {
     }
 
     return ch == '_';
+  }
+
+  public enum Result {
+    OK,
+    TOO_SHORT,
+    TOO_LONG,
+    INVALID_CHARS
   }
 }

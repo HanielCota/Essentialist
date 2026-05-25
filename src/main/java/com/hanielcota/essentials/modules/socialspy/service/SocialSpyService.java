@@ -10,10 +10,6 @@ public final class SocialSpyService {
 
   private final Set<UUID> spies = ConcurrentHashMap.newKeySet();
 
-  public boolean isSpying(@NonNull UUID id) {
-    return this.spies.contains(id);
-  }
-
   /** Returns {@code true} when the player was not already spying. */
   public boolean enter(@NonNull UUID id) {
     return this.spies.add(id);

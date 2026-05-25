@@ -23,6 +23,17 @@ public final class MuteNotifier {
   private final ConfigHandle<MuteConfig> config;
   private final PaperCommandFramework framework;
 
+  private static Duration remainingFrom(@NonNull Mute mute) {
+    var expiresAt = mute.expiresAt();
+    if (expiresAt == null) {
+      return Duration.ZERO;
+    }
+
+    var now = Instant.now();
+
+    return Duration.between(now, expiresAt);
+  }
+
   public void sendCannotMuteSelf(@NonNull CommandActor sender) {
     var snap = this.config.value();
     var selfMsg = snap.cannotMuteSelf();
@@ -83,16 +94,5 @@ public final class MuteNotifier {
 
     sender.sendMessage(senderMsg);
     targetActor.sendMessage(targetMsg);
-  }
-
-  private static Duration remainingFrom(@NonNull Mute mute) {
-    var expiresAt = mute.expiresAt();
-    if (expiresAt == null) {
-      return Duration.ZERO;
-    }
-
-    var now = Instant.now();
-
-    return Duration.between(now, expiresAt);
   }
 }

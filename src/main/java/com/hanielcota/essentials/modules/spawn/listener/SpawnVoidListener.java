@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.spawn.listener;
 
-import com.hanielcota.essentials.modules.spawn.service.SpawnLocation;
+import com.hanielcota.essentials.modules.spawn.domain.SpawnLocation;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import lombok.NonNull;

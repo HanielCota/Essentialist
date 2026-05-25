@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.seen.config;
 
-import com.hanielcota.essentials.modules.seen.service.SeenLine;
+import com.hanielcota.essentials.modules.seen.model.SeenLine;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;

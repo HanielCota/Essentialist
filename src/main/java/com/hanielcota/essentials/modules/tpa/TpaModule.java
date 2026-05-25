@@ -21,6 +21,7 @@ import com.hanielcota.essentials.modules.tpa.history.SqliteTpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryTable;
 import com.hanielcota.essentials.modules.tpa.listener.TpaHistoryMenuCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaQuitListener;
+import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
@@ -55,6 +56,7 @@ public final class TpaModule extends AbstractModule {
     var history = history();
     var runtime = requestRuntime(config, history);
     var menuState = registerHistoryMenu(config, history);
+    registerHelpMenu(config);
 
     registerCommands(config, history, runtime.requestService(), menuState);
 
@@ -86,6 +88,12 @@ public final class TpaModule extends AbstractModule {
     return new TpaRuntime(requestService, notifier);
   }
 
+  private void registerHelpMenu(ConfigHandle<TpaConfig> config) {
+    var menu = new TpaHelpMenu(config);
+
+    registerMenu(menu);
+  }
+
   private TpaHistoryMenuState registerHistoryMenu(
       ConfigHandle<TpaConfig> config, AsyncTpaHistory history) {
     var menuState = new TpaHistoryMenuState();
@@ -107,8 +115,9 @@ public final class TpaModule extends AbstractModule {
       TpaHistoryMenuState menuState) {
     var framework = service(PaperCommandFramework.class);
     var playerProvider = service(PlayerProvider.class);
+    var menus = service(MenuService.class);
 
-    var tpaCommand = new TpaCommand(config, requestService);
+    var tpaCommand = new TpaCommand(config, requestService, playerProvider, menus);
     registerCommand(tpaCommand);
 
     var tpaHereCommand = new TpaHereCommand(config, requestService);
@@ -124,7 +133,6 @@ public final class TpaModule extends AbstractModule {
     var tpCancelCommand = new TpCancelCommand(config, requestService);
     registerCommand(tpCancelCommand);
 
-    var menus = service(MenuService.class);
     var historyPresenter = new TpaHistoryPresenter(config, history, menus, menuState);
     var tpaHistoryCommand = new TpaHistoryCommand(config, playerProvider, historyPresenter);
     registerCommand(tpaHistoryCommand);

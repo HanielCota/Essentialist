@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
+import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -39,8 +40,15 @@ public record TpAcceptCommand(
     }
 
     var request = resolved.get();
-    var pending = this.service.accept(request);
+    var claim = this.service.tryAccept(request);
 
-    pending.thenAccept(result -> this.resultHandler.handle(result, request, actor));
+    this.resultHandler.handleClaim(claim, request, actor);
+
+    if (claim != AcceptResult.ACCEPTED) {
+      return;
+    }
+
+    var pending = this.service.dispatchTeleport(request);
+    pending.thenAccept(success -> this.resultHandler.handleTeleportOutcome(success, actor));
   }
 }

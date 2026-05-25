@@ -31,6 +31,15 @@ import org.jspecify.annotations.Nullable;
 @Syntax("/rename [nome]")
 public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService service) {
 
+  private static @Nullable Component renderName(@NonNull String trimmed) {
+    if (trimmed.isEmpty()) {
+      return null;
+    }
+
+    var base = ComponentUtils.mini(trimmed);
+    return base.decoration(TextDecoration.ITALIC, false);
+  }
+
   @DefaultSubcommand
   public void execute(
       @NonNull CommandActor sender, @DefaultValue("") @GreedyString @Arg("nome") String nome) {
@@ -55,14 +64,5 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
         sender.sendError(emptyHandMsg);
       }
     }
-  }
-
-  private static @Nullable Component renderName(@NonNull String trimmed) {
-    if (trimmed.isEmpty()) {
-      return null;
-    }
-
-    var base = ComponentUtils.mini(trimmed);
-    return base.decoration(TextDecoration.ITALIC, false);
   }
 }

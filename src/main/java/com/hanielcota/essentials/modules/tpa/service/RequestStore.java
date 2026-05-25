@@ -43,6 +43,10 @@ public final class RequestStore {
     return window.createdAt();
   }
 
+  private static Set<RequestId> newRequestIdSet() {
+    return ConcurrentHashMap.newKeySet();
+  }
+
   /**
    * Adds a request and indexes it by requester and by target.
    *
@@ -177,9 +181,5 @@ public final class RequestStore {
     if (ids.isEmpty()) {
       this.incomingByTarget.remove(target, ids);
     }
-  }
-
-  private static Set<RequestId> newRequestIdSet() {
-    return ConcurrentHashMap.newKeySet();
   }
 }

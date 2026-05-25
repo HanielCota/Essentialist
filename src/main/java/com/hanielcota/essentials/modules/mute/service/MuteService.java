@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.mute.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.model.Mute;
+import com.hanielcota.essentials.modules.mute.repository.MuteStore;
 import io.github.hanielcota.commandframework.core.util.TimeParser;
 import java.time.Duration;
 import java.time.Instant;
@@ -34,6 +35,14 @@ public final class MuteService {
   private final MuteStore store;
   private final AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, Mute> cache = new ConcurrentHashMap<>();
+
+  private static @Nullable Duration tryParseDuration(@NonNull String input) {
+    try {
+      return TimeParser.parse(input);
+    } catch (RuntimeException ignored) {
+      return null;
+    }
+  }
 
   public void loadAll(@NonNull List<Map.Entry<UUID, Mute>> rows) {
     for (var row : rows) {
@@ -106,13 +115,5 @@ public final class MuteService {
 
     Runnable persist = () -> this.store.save(id, mute);
     this.writer.submit("save mute", persist);
-  }
-
-  private static @Nullable Duration tryParseDuration(@NonNull String input) {
-    try {
-      return TimeParser.parse(input);
-    } catch (RuntimeException ignored) {
-      return null;
-    }
   }
 }

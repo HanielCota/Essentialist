@@ -18,8 +18,14 @@ public record TeleportConfig(
     @Comment("/tphere <player> notification to the moved player. Placeholders: {sender}.")
         String broughtBy,
     @Comment("Shown when a teleport could not be completed.") String teleportFailed,
-    @Comment("Shown by /tp pos when coordinates are outside the world limits.")
+    @Comment("Shown by /tp when coordinates are invalid or outside the world limits.")
         String invalidPosition,
+    @Comment("Shown by /tp when the named player is not online. Placeholders: {player}.")
+        String playerNotFound,
+    @Comment("Shown when /tp is invoked from the console without target arguments.")
+        String mustBePlayer,
+    @Comment("Shown when /tp <from> <to> is used without the .others permission.")
+        String noPermissionOthers,
     @Comment("Shown by /tpcancel when the player has no warm-up teleport in progress.")
         String cancelNoPending) {
 
@@ -35,6 +41,9 @@ public record TeleportConfig(
         "<yellow>Teleported to <gold>{sender}</gold>.",
         "<red>The teleport could not be completed.",
         "<red>Those coordinates are outside the world limits.",
+        "<red>Player <gold>{player}</gold> is not online.",
+        "<red>Only players can teleport. Use /tp <from> <to> from the console.",
+        "<red>You don't have permission to teleport other players.",
         "<red>You don't have any teleport in progress.");
   }
 
@@ -71,5 +80,9 @@ public record TeleportConfig(
 
   public String formatBroughtBy(@NonNull String sender) {
     return broughtBy.replace("{sender}", sender);
+  }
+
+  public String formatPlayerNotFound(@NonNull String player) {
+    return playerNotFound.replace("{player}", player);
   }
 }

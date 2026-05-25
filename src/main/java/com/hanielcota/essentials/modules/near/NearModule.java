@@ -17,6 +17,18 @@ public final class NearModule extends AbstractModule {
     super("near");
   }
 
+  private static boolean canSee(
+      VanishService vanish, @NonNull Player viewer, @NonNull Player target) {
+    if (vanish == null) {
+      return true;
+    }
+    if (viewer.hasPermission(VanishVisibilityApplier.SEE_PERMISSION)) {
+      return true;
+    }
+    var targetId = target.getUniqueId();
+    return !vanish.isVanished(targetId);
+  }
+
   @Override
   protected void onEnable() {
     var config = config("near", NearConfig.class, NearConfig::defaults);
@@ -40,17 +52,5 @@ public final class NearModule extends AbstractModule {
       var vanish = registry.find(VanishService.class).orElse(null);
       return canSee(vanish, viewer, target);
     };
-  }
-
-  private static boolean canSee(
-      VanishService vanish, @NonNull Player viewer, @NonNull Player target) {
-    if (vanish == null) {
-      return true;
-    }
-    if (viewer.hasPermission(VanishVisibilityApplier.SEE_PERMISSION)) {
-      return true;
-    }
-    var targetId = target.getUniqueId();
-    return !vanish.isVanished(targetId);
   }
 }

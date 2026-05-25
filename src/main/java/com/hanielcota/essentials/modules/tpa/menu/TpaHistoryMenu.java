@@ -32,6 +32,17 @@ public final class TpaHistoryMenu implements EssentialsMenu {
   private final TpaHistoryEntryRenderer renderer;
   private final TpaHistoryMenuState state;
 
+  private static List<Integer> resolveContentSlots(@NonNull TpaMenuConfig settings, int rows) {
+    var totalSlots = MenuLayouts.slotCount(rows);
+    var capacity = TpaHistory.CAPACITY;
+    var fallbackSize = Math.min(totalSlots, capacity);
+
+    var configured = settings.contentSlots();
+    var fallback = MenuLayouts.fallbackContentSlots(rows, fallbackSize);
+
+    return MenuLayouts.sanitizeSlots(configured, rows, fallback);
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -95,16 +106,5 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     var slot = SlotDefinition.of(centerSlot, template, click -> {});
 
     return List.of(slot);
-  }
-
-  private static List<Integer> resolveContentSlots(@NonNull TpaMenuConfig settings, int rows) {
-    var totalSlots = MenuLayouts.slotCount(rows);
-    var capacity = TpaHistory.CAPACITY;
-    var fallbackSize = Math.min(totalSlots, capacity);
-
-    var configured = settings.contentSlots();
-    var fallback = MenuLayouts.fallbackContentSlots(rows, fallbackSize);
-
-    return MenuLayouts.sanitizeSlots(configured, rows, fallback);
   }
 }

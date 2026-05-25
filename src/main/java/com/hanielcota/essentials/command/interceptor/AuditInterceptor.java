@@ -17,6 +17,24 @@ public final class AuditInterceptor implements RichCommandInterceptor {
 
   private final @NonNull Logger logger;
 
+  private static String jsonPartOf(@NonNull String fullString, int openIndex) {
+    if (openIndex < 0) {
+      return "";
+    }
+    return fullString.substring(openIndex);
+  }
+
+  private static int firstBracketIndex(@NonNull String s) {
+    var earliest = -1;
+    for (var bracket : new char[] {'[', '{', '('}) {
+      var idx = s.indexOf(bracket);
+      if (idx >= 0 && (earliest < 0 || idx < earliest)) {
+        earliest = idx;
+      }
+    }
+    return earliest;
+  }
+
   @Override
   public @NonNull CommandResult before(
       @NonNull CommandContext context, @NonNull List<ParsedParameter<?>> parameters) {
@@ -78,23 +96,5 @@ public final class AuditInterceptor implements RichCommandInterceptor {
 
     var simpleName = clazz.getSimpleName();
     return simpleName + jsonPart;
-  }
-
-  private static String jsonPartOf(@NonNull String fullString, int openIndex) {
-    if (openIndex < 0) {
-      return "";
-    }
-    return fullString.substring(openIndex);
-  }
-
-  private static int firstBracketIndex(@NonNull String s) {
-    var earliest = -1;
-    for (var bracket : new char[] {'[', '{', '('}) {
-      var idx = s.indexOf(bracket);
-      if (idx >= 0 && (earliest < 0 || idx < earliest)) {
-        earliest = idx;
-      }
-    }
-    return earliest;
   }
 }

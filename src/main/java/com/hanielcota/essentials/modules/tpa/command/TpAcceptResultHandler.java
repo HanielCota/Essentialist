@@ -12,9 +12,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Routes the {@link AcceptResult} of {@code /tpaccept} to the accepter (own message) and, on
- * success, to the requester (out-of-band reply). Keeps the command class free of the multi-branch
- * switch and {@code .replace} chains.
+ * Routes the two phases of a {@code /tpaccept}: the synchronous claim outcome (so accepter and
+ * requester are notified immediately) and the deferred teleport outcome (so a teleport failure can
+ * be reported without making the success messages wait for the async teleport to land).
  */
 @RequiredArgsConstructor
 public final class TpAcceptResultHandler {
@@ -23,20 +23,30 @@ public final class TpAcceptResultHandler {
   private final PaperCommandFramework framework;
   private final PlayerProvider players;
 
-  public void handle(
+  public void handleClaim(
       @NonNull AcceptResult result, @NonNull TeleportRequest request, @NonNull CommandActor actor) {
     var snap = this.config.value();
     var messages = snap.messages();
 
     switch (result) {
-      case SUCCESS -> handleSuccess(request, messages, actor);
-      case REQUESTER_OFFLINE -> handleRequesterOffline(request, messages, actor);
-      case TELEPORT_FAILED -> actor.sendError(messages.teleportFailed());
+      case ACCEPTED -> notifyAccepted(request, messages, actor);
+      case REQUESTER_OFFLINE -> notifyRequesterOffline(request, messages, actor);
       case NOT_FOUND -> actor.sendError(messages.noIncoming());
     }
   }
 
-  private void handleSuccess(
+  public void handleTeleportOutcome(boolean success, @NonNull CommandActor actor) {
+    if (success) {
+      return;
+    }
+
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    actor.sendError(messages.teleportFailed());
+  }
+
+  private void notifyAccepted(
       @NonNull TeleportRequest request,
       @NonNull TpaMessages messages,
       @NonNull CommandActor actor) {
@@ -50,7 +60,7 @@ public final class TpAcceptResultHandler {
     TpaRequests.replyRequester(this.framework, this.players, request, acceptedTemplate, true);
   }
 
-  private void handleRequesterOffline(
+  private void notifyRequesterOffline(
       @NonNull TeleportRequest request,
       @NonNull TpaMessages messages,
       @NonNull CommandActor actor) {

@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.spawn.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
-import com.hanielcota.essentials.modules.spawn.service.SpawnLocation;
+import com.hanielcota.essentials.modules.spawn.domain.SpawnLocation;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;

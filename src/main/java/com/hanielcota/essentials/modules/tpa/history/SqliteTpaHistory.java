@@ -84,36 +84,6 @@ public final class SqliteTpaHistory implements TpaHistory {
     }
   }
 
-  @Override
-  public void push(@NonNull TpaHistoryEntry entry) {
-    this.sqlExecutor.tx(conn -> persist(conn, entry));
-  }
-
-  @Override
-  public List<TpaHistoryEntry> list(@NonNull UUID requester) {
-    var requesterId = requester.toString();
-    var capacity = TpaHistory.CAPACITY;
-
-    return this.sqlExecutor.query(
-        TpaHistoryTable.LIST, SqliteTpaHistory::mapRow, requesterId, capacity);
-  }
-
-  private void persist(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
-      throws SQLException {
-    insert(conn, entry);
-    trim(conn, entry.requester());
-  }
-
-  private void insert(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
-      throws SQLException {
-    try (var statement = conn.prepareStatement(TpaHistoryTable.INSERT)) {
-      bindEntry(statement, entry);
-      bindDestination(statement, entry.destination());
-
-      statement.executeUpdate();
-    }
-  }
-
   private static void bindEntry(
       @NonNull PreparedStatement statement, @NonNull TpaHistoryEntry entry) throws SQLException {
     var requesterId = entry.requester().toString();
@@ -152,6 +122,36 @@ public final class SqliteTpaHistory implements TpaHistory {
     setNullable(statement, 9, xValue, Types.REAL);
     setNullable(statement, 10, yValue, Types.REAL);
     setNullable(statement, 11, zValue, Types.REAL);
+  }
+
+  @Override
+  public void push(@NonNull TpaHistoryEntry entry) {
+    this.sqlExecutor.tx(conn -> persist(conn, entry));
+  }
+
+  @Override
+  public List<TpaHistoryEntry> list(@NonNull UUID requester) {
+    var requesterId = requester.toString();
+    var capacity = TpaHistory.CAPACITY;
+
+    return this.sqlExecutor.query(
+        TpaHistoryTable.LIST, SqliteTpaHistory::mapRow, requesterId, capacity);
+  }
+
+  private void persist(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
+      throws SQLException {
+    insert(conn, entry);
+    trim(conn, entry.requester());
+  }
+
+  private void insert(@NonNull Connection conn, @NonNull TpaHistoryEntry entry)
+      throws SQLException {
+    try (var statement = conn.prepareStatement(TpaHistoryTable.INSERT)) {
+      bindEntry(statement, entry);
+      bindDestination(statement, entry.destination());
+
+      statement.executeUpdate();
+    }
   }
 
   private void trim(@NonNull Connection conn, @NonNull UUID requester) throws SQLException {

@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.seen.service;
+package com.hanielcota.essentials.modules.seen.model;
 
 import lombok.NonNull;
 

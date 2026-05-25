@@ -15,14 +15,6 @@ public final class SocialSpyNotifier {
 
   private final ConfigHandle<SocialSpyConfig> config;
 
-  public void sendToggle(
-      @NonNull CommandActor sender, boolean enabled, boolean self, @NonNull String subjectName) {
-    var snap = this.config.value();
-    var msg = render(snap, enabled, self, subjectName);
-
-    sender.sendMessage(msg);
-  }
-
   private static String render(
       @NonNull SocialSpyConfig snap, boolean enabled, boolean self, @NonNull String subjectName) {
     if (self) {
@@ -30,5 +22,13 @@ public final class SocialSpyNotifier {
     }
 
     return enabled ? snap.formatEnabledOther(subjectName) : snap.formatDisabledOther(subjectName);
+  }
+
+  public void sendToggle(
+      @NonNull CommandActor sender, boolean enabled, boolean self, @NonNull String subjectName) {
+    var snap = this.config.value();
+    var msg = render(snap, enabled, self, subjectName);
+
+    sender.sendMessage(msg);
   }
 }

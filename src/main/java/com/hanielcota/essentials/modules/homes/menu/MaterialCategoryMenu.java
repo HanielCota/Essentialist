@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
+import com.github.hanielcota.menuframework.builder.MenuBuilder;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
@@ -18,6 +19,7 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Category selector for the material picker. Shows one representative item per category (Combat,
@@ -55,6 +57,7 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
     builder.title(title);
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
+    registerBackButton(builder);
 
     var menu = builder.build();
     menu.register();
@@ -62,7 +65,7 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var categories = MaterialCategory.browsable();
-    var slots = new ArrayList<SlotDefinition>(categories.size() + 1);
+    var slots = new ArrayList<SlotDefinition>(categories.size());
 
     for (var category : categories) {
       if (category == MaterialCategory.MISC) {
@@ -76,15 +79,25 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
       slots.add(slot);
     }
 
-    var backSlot = backButtonSlot();
-    slots.add(backSlot);
-
     return slots;
   }
 
-  private @NonNull SlotDefinition backButtonSlot() {
+  private void registerBackButton(@NonNull MenuBuilder builder) {
+    var backSlot = backButtonSlot();
+    if (backSlot == null) {
+      return;
+    }
+
+    builder.slot(backSlot.slot(), backSlot.template(), backSlot.handler());
+  }
+
+  private @Nullable SlotDefinition backButtonSlot() {
     var snap = this.config.value();
     var menuSpec = snap.menu();
+
+    if (!menuSpec.categoryBackEnabled()) {
+      return null;
+    }
 
     var material = menuSpec.categoryBackMaterial();
     var name = menuSpec.categoryBackName();

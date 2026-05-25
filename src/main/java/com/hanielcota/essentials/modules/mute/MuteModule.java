@@ -8,9 +8,9 @@ import com.hanielcota.essentials.modules.mute.command.MuteNotifier;
 import com.hanielcota.essentials.modules.mute.command.UnmuteCommand;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
 import com.hanielcota.essentials.modules.mute.listener.MuteChatListener;
+import com.hanielcota.essentials.modules.mute.repository.MuteStore;
+import com.hanielcota.essentials.modules.mute.repository.MuteTable;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
-import com.hanielcota.essentials.modules.mute.service.MuteStore;
-import com.hanielcota.essentials.modules.mute.service.MuteTable;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.time.Instant;
 

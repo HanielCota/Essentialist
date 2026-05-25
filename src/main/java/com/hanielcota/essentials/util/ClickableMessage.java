@@ -13,9 +13,9 @@ import net.kyori.adventure.text.ComponentLike;
 /**
  * Fluent builder for interactive (clickable / hoverable) chat messages.
  *
- * <p>Each segment is written in MiniMessage format and may receive click and hover actions through
- * a {@link ClickableMessageSegment} lambda. The builder itself is a {@link ComponentLike}, so it
- * can be passed anywhere Adventure expects a component.
+ * <p>Each segment is written in MiniMessage format and may receive command and hover actions
+ * through a {@link ClickableMessageSegment} lambda. The builder itself is a {@link ComponentLike},
+ * so it can be passed anywhere Adventure expects a component.
  *
  * <pre>{@code
  * ClickableMessage.create()
@@ -32,7 +32,7 @@ import net.kyori.adventure.text.ComponentLike;
  *
  * <p>For fully static clickable text, MiniMessage already supports {@code <click>} and {@code
  * <hover>} tags directly in config strings via {@link ComponentUtils#mini(String)}. This builder is
- * meant for messages whose command, URL or tooltip is computed at runtime.
+ * meant for messages whose command or tooltip is computed at runtime.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ClickableMessage implements ComponentLike {

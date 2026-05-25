@@ -3,9 +3,10 @@ package com.hanielcota.essentials.modules.list.menu;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
-import com.hanielcota.essentials.modules.list.service.PlayerEntry;
+import com.hanielcota.essentials.modules.list.model.PlayerEntry;
 import lombok.NonNull;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 
 /** Renders the player entries and the empty state shown when no players are visible. */
 public record ListEntryRenderer(ConfigHandle<ListConfig> config) {
@@ -27,6 +28,7 @@ public record ListEntryRenderer(ConfigHandle<ListConfig> config) {
 
     builder = builder.name(itemName);
     builder = builder.lore(loreArray);
+    builder = builder.flags(ItemFlag.HIDE_ATTRIBUTES);
     builder = builder.italic(false);
 
     return builder.build();
@@ -42,6 +44,7 @@ public record ListEntryRenderer(ConfigHandle<ListConfig> config) {
     var builder = ItemTemplate.builder(material);
     builder = builder.name(name);
     builder = builder.lore(loreArray);
+    builder = builder.flags(ItemFlag.HIDE_ATTRIBUTES);
     builder = builder.italic(false);
 
     return builder.build();

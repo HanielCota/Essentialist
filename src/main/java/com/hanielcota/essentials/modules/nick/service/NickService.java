@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.nick.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.model.NickEntry;
+import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;

@@ -12,10 +12,10 @@ import com.hanielcota.essentials.modules.warps.command.WarpPromptFactory;
 import com.hanielcota.essentials.modules.warps.command.WarpsCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpsListNotifier;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
-import com.hanielcota.essentials.modules.warps.service.WarpCache;
+import com.hanielcota.essentials.modules.warps.repository.WarpCache;
+import com.hanielcota.essentials.modules.warps.repository.WarpStore;
+import com.hanielcota.essentials.modules.warps.repository.WarpTable;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
-import com.hanielcota.essentials.modules.warps.service.WarpStore;
-import com.hanielcota.essentials.modules.warps.service.WarpTable;
 import java.util.Set;
 
 /**

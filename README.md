@@ -66,8 +66,8 @@ additional `.others` permission, such as `essentials.fly.others`.
 | `/setspawn` | Sets the server spawn at your current location. | `essentials.spawn.set` |
 | `/back` | Opens or uses recent teleport history. | `essentials.back` |
 | `/tp <player>` | Teleports to another player. | `essentials.tp` |
-| `/tp move <from> <to>` | Moves one player to another player. | `essentials.tp.others` |
-| `/tp pos <x> <y> <z>` | Teleports to coordinates. | `essentials.tp` |
+| `/tp <from> <to>` | Moves one player to another player. | `essentials.tp.others` |
+| `/tp <x> <y> <z>` | Teleports to coordinates. | `essentials.tp` |
 | `/tphere <player>` | Brings another player to you. | `essentials.tphere` |
 | `/tpcancel` | Cancels a warm-up teleport in progress. | `essentials.teleport.cancel` |
 | `/tpa <player>` | Requests teleportation to a player. | `essentials.tpa` |

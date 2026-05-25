@@ -88,11 +88,6 @@ public final class MaterialIconRegistry {
     return this.iconsByCategory.getOrDefault(category, List.of());
   }
 
-  /** Total item count inside a category. */
-  public int sizeOf(@NonNull MaterialCategory category) {
-    return iconsFor(category).size();
-  }
-
   private @NonNull List<MaterialIcon> buildMiscIcons(
       @NonNull HomesMenuConfig menu, @NonNull MaterialNamesConfig names) {
     var known = new ArrayList<Material>();

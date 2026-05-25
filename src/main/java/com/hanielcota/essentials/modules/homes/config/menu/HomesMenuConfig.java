@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.config.menu;
 
 import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
+import java.time.format.DateTimeFormatter;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,17 @@ public record HomesMenuConfig(
     @Comment("Lore of the static info item — explain how /homes works to the player.")
         List<String> infoLore,
     @Comment("/homes item name. Placeholders: {name}.") String itemName,
-    @Comment("/homes item lore. Placeholders: {world}, {x}, {y}, {z}.") List<String> itemLore,
+    @Comment(
+            "/homes item lore. Placeholders: {world}, {x}, {y}, {z}, {direction}, "
+                + "{created_date}, {created_time}, {created_at}.")
+        List<String> itemLore,
     @Comment("Add an enchant glow to the /homes items.") boolean itemGlow,
+    @Comment("Date pattern for {created_date}, see java.time.format.DateTimeFormatter.")
+        String createdDateFormat,
+    @Comment("Time pattern for {created_time}, see java.time.format.DateTimeFormatter.")
+        String createdTimeFormat,
+    @Comment("Display names for worlds in /homes. Keys are stored world names, values are labels.")
+        Map<String, String> worldNames,
     @Comment("Material category submenu title.") String categoryTitle,
     @Comment("Material category submenu rows (1-6).") int categoryRows,
     @Comment("Material category content slots (0-based).") List<Integer> categoryContentSlots,
@@ -38,6 +48,7 @@ public record HomesMenuConfig(
     @Comment("Material category item lore. Placeholder: {category}.") List<String> categoryItemLore,
     @Comment("Display name of each material category shown in the picker submenu.")
         Map<MaterialCategory, String> categoryNames,
+    @Comment("Show the back button in the material category submenu.") boolean categoryBackEnabled,
     @Comment("Slot of the category back button.") int categoryBackSlot,
     @Comment("Material of the category back button.") Material categoryBackMaterial,
     @Comment("Name of the category back button.") String categoryBackName,
@@ -90,18 +101,24 @@ public record HomesMenuConfig(
         List.of(
             "<gray>World: <white>{world}",
             "<gray>Coordinates: <white>{x}, {y}, {z}",
+            "<gray>Direction: <white>{direction}",
+            "<gray>Created: <white>{created_at}",
             "",
             "<yellow>Left-click <gray>to teleport",
             "<yellow>Right-click <gray>to delete",
             "<yellow>Shift + click <gray>to rename",
             "<yellow>Q (drop) <gray>to change the icon"),
         false,
+        "dd/MM/yyyy",
+        "HH:mm",
+        Map.of("world", "spawn", "world_nether", "nether", "world_the_end", "end"),
         "<dark_gray>Pick a category",
         4,
         List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25),
         "<gold>{category}",
         List.of("<gray>Click to browse the items"),
         defaultCategoryNames(),
+        true,
         31,
         Material.ARROW,
         "<yellow>Back to homes",
@@ -146,5 +163,21 @@ public record HomesMenuConfig(
     map.put(MaterialCategory.FLOWERS, "Flowers");
     map.put(MaterialCategory.MISC, "Misc");
     return map;
+  }
+
+  public DateTimeFormatter createdDateFormatter() {
+    try {
+      return DateTimeFormatter.ofPattern(createdDateFormat);
+    } catch (IllegalArgumentException e) {
+      return DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    }
+  }
+
+  public DateTimeFormatter createdTimeFormatter() {
+    try {
+      return DateTimeFormatter.ofPattern(createdTimeFormat);
+    } catch (IllegalArgumentException e) {
+      return DateTimeFormatter.ofPattern("HH:mm");
+    }
   }
 }

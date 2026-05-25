@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.give.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.give.config.GiveConfig;
-import com.hanielcota.essentials.modules.give.service.GiveResult;
+import com.hanielcota.essentials.modules.give.model.GiveResult;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Locale;
@@ -21,6 +21,31 @@ public final class GiveNotifier {
 
   private final ConfigHandle<GiveConfig> config;
   private final PaperCommandFramework framework;
+
+  private static String displayName(@NonNull Material item) {
+    var rawName = item.name();
+
+    return rawName.toLowerCase(Locale.ROOT);
+  }
+
+  private static String format(
+      @NonNull String template, @NonNull String item, @NonNull GiveResult result) {
+    var given = result.given();
+    var leftover = result.leftover();
+
+    return fill(template, item, given, leftover);
+  }
+
+  private static String fill(
+      @NonNull String template, @NonNull String item, int amount, int leftover) {
+    var amountStr = Integer.toString(amount);
+    var leftoverStr = Integer.toString(leftover);
+
+    var withItem = template.replace("{item}", item);
+    var withAmount = withItem.replace("{amount}", amountStr);
+
+    return withAmount.replace("{leftover}", leftoverStr);
+  }
 
   public void sendInvalidItem(@NonNull CommandActor sender) {
     var snap = this.config.value();
@@ -113,30 +138,5 @@ public final class GiveNotifier {
     var fullMsg = format(fullTemplate, itemName, result);
 
     sender.sendError(fullMsg);
-  }
-
-  private static String displayName(@NonNull Material item) {
-    var rawName = item.name();
-
-    return rawName.toLowerCase(Locale.ROOT);
-  }
-
-  private static String format(
-      @NonNull String template, @NonNull String item, @NonNull GiveResult result) {
-    var given = result.given();
-    var leftover = result.leftover();
-
-    return fill(template, item, given, leftover);
-  }
-
-  private static String fill(
-      @NonNull String template, @NonNull String item, int amount, int leftover) {
-    var amountStr = Integer.toString(amount);
-    var leftoverStr = Integer.toString(leftover);
-
-    var withItem = template.replace("{item}", item);
-    var withAmount = withItem.replace("{amount}", amountStr);
-
-    return withAmount.replace("{leftover}", leftoverStr);
   }
 }

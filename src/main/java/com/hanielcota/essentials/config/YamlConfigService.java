@@ -27,6 +27,14 @@ public final class YamlConfigService implements ConfigService {
   private final Map<String, YamlConfigHandle<?>> handles = new ConcurrentHashMap<>();
   private final CopyOnWriteArrayList<Runnable> reloadCallbacks = new CopyOnWriteArrayList<>();
 
+  private static String errorMessageOf(@NonNull RuntimeException e) {
+    var message = e.getMessage();
+    if (message != null) {
+      return message;
+    }
+    return e.toString();
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   public <T> ConfigHandle<T> load(
@@ -89,14 +97,6 @@ public final class YamlConfigService implements ConfigService {
     }
 
     return new ReloadReport(snapshot.size(), failures);
-  }
-
-  private static String errorMessageOf(@NonNull RuntimeException e) {
-    var message = e.getMessage();
-    if (message != null) {
-      return message;
-    }
-    return e.toString();
   }
 
   @Override

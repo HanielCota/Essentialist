@@ -20,6 +20,25 @@ import org.bukkit.entity.Player;
 public record VanishClickHandler(
     ConfigHandle<VanishConfig> config, VanishService service, PlayerProvider players) {
 
+  private static void dispatchTeleport(
+      @NonNull Player viewer,
+      @NonNull Location destination,
+      @NonNull Consumer<Boolean> afterTeleport) {
+    var future = viewer.teleportAsync(destination);
+    future.thenAccept(afterTeleport);
+  }
+
+  private static Consumer<Boolean> afterTeleport(
+      @NonNull ClickContext click, @NonNull String teleportedMsg, @NonNull String failedMsg) {
+    return success -> {
+      if (Boolean.TRUE.equals(success)) {
+        click.reply(teleportedMsg);
+        return;
+      }
+      click.reply(failedMsg);
+    };
+  }
+
   public void handle(
       @NonNull ClickContext click, @NonNull UUID targetId, @NonNull String targetName) {
     var snap = this.config.value();
@@ -53,24 +72,5 @@ public record VanishClickHandler(
 
     click.close();
     dispatchTeleport(viewer, location, afterTeleport);
-  }
-
-  private static void dispatchTeleport(
-      @NonNull Player viewer,
-      @NonNull Location destination,
-      @NonNull Consumer<Boolean> afterTeleport) {
-    var future = viewer.teleportAsync(destination);
-    future.thenAccept(afterTeleport);
-  }
-
-  private static Consumer<Boolean> afterTeleport(
-      @NonNull ClickContext click, @NonNull String teleportedMsg, @NonNull String failedMsg) {
-    return success -> {
-      if (Boolean.TRUE.equals(success)) {
-        click.reply(teleportedMsg);
-        return;
-      }
-      click.reply(failedMsg);
-    };
   }
 }

@@ -17,6 +17,31 @@ public final class DefaultSqlExecutor implements SqlExecutor {
 
   private final SqlConnectionFactory connectionFactory;
 
+  private static void restoreAutoCommit(@NonNull Connection conn, @NonNull TxState state) {
+    try {
+      conn.setAutoCommit(true);
+    } catch (SQLException restoreError) {
+      state.attachSuppressedOrAdopt(restoreError);
+    }
+  }
+
+  private static void rethrowPrimary(@NonNull TxState state) throws SQLException {
+    if (state.runtimePrimary != null) {
+      throw state.runtimePrimary;
+    }
+    if (state.sqlPrimary != null) {
+      throw state.sqlPrimary;
+    }
+  }
+
+  private static void rollbackQuietly(@NonNull Connection conn, @NonNull Throwable primary) {
+    try {
+      conn.rollback();
+    } catch (SQLException rollbackError) {
+      primary.addSuppressed(rollbackError);
+    }
+  }
+
   @Override
   public <T> List<T> query(
       @NonNull String sql, @NonNull StatementBinder binder, @NonNull ResultMapper<T> mapper) {
@@ -109,28 +134,22 @@ public final class DefaultSqlExecutor implements SqlExecutor {
     }
   }
 
-  private static void restoreAutoCommit(@NonNull Connection conn, @NonNull TxState state) {
-    try {
-      conn.setAutoCommit(true);
-    } catch (SQLException restoreError) {
-      state.attachSuppressedOrAdopt(restoreError);
-    }
-  }
+  @Override
+  public void ddl(@NonNull String... statements) {
+    try (var conn = this.connectionFactory.getConnection();
+        var stmt = conn.createStatement()) {
 
-  private static void rethrowPrimary(@NonNull TxState state) throws SQLException {
-    if (state.runtimePrimary != null) {
-      throw state.runtimePrimary;
-    }
-    if (state.sqlPrimary != null) {
-      throw state.sqlPrimary;
-    }
-  }
+      for (var statement : statements) {
+        if (statement == null || statement.isBlank()) {
+          continue;
+        }
+        stmt.addBatch(statement);
+      }
 
-  private static void rollbackQuietly(@NonNull Connection conn, @NonNull Throwable primary) {
-    try {
-      conn.rollback();
-    } catch (SQLException rollbackError) {
-      primary.addSuppressed(rollbackError);
+      stmt.executeBatch();
+
+    } catch (SQLException e) {
+      throw new PluginException("SQL DDL failed", e);
     }
   }
 
@@ -148,25 +167,6 @@ public final class DefaultSqlExecutor implements SqlExecutor {
         return;
       }
       this.sqlPrimary = restoreError;
-    }
-  }
-
-  @Override
-  public void ddl(@NonNull String... statements) {
-    try (var conn = this.connectionFactory.getConnection();
-        var stmt = conn.createStatement()) {
-
-      for (var statement : statements) {
-        if (statement == null || statement.isBlank()) {
-          continue;
-        }
-        stmt.addBatch(statement);
-      }
-
-      stmt.executeBatch();
-
-    } catch (SQLException e) {
-      throw new PluginException("SQL DDL failed", e);
     }
   }
 }

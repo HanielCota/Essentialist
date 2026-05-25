@@ -29,6 +29,18 @@ public final class MuteChatListener implements Listener {
   private final ConfigHandle<MuteConfig> config;
   private final MuteService service;
 
+  private static String renderBlocked(@NonNull MuteConfig snap, @Nullable Instant expiresAt) {
+    if (expiresAt == null) {
+      return snap.chatBlocked();
+    }
+
+    var now = Instant.now();
+    var remaining = Duration.between(now, expiresAt);
+    var timeStr = DurationFormatter.format(remaining);
+
+    return snap.formatChatBlockedTimed(timeStr);
+  }
+
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
   public void onChat(@NonNull AsyncChatEvent event) {
     var player = event.getPlayer();
@@ -46,17 +58,5 @@ public final class MuteChatListener implements Listener {
     var component = ComponentUtils.mini(line);
 
     player.sendMessage(component);
-  }
-
-  private static String renderBlocked(@NonNull MuteConfig snap, @Nullable Instant expiresAt) {
-    if (expiresAt == null) {
-      return snap.chatBlocked();
-    }
-
-    var now = Instant.now();
-    var remaining = Duration.between(now, expiresAt);
-    var timeStr = DurationFormatter.format(remaining);
-
-    return snap.formatChatBlockedTimed(timeStr);
   }
 }

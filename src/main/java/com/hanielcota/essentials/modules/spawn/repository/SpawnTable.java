@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.spawn.service;
+package com.hanielcota.essentials.modules.spawn.repository;
 
 import com.hanielcota.essentials.database.SqlExecutor;
 import lombok.AccessLevel;

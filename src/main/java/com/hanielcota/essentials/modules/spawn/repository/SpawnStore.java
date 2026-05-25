@@ -1,6 +1,7 @@
-package com.hanielcota.essentials.modules.spawn.service;
+package com.hanielcota.essentials.modules.spawn.repository;
 
 import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.modules.spawn.domain.SpawnLocation;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;

@@ -59,6 +59,20 @@ public final class InfoMenu implements EssentialsMenu {
     return SlotDefinition.of(slot, template, click -> {});
   }
 
+  private static ItemTemplate buildBackTemplate(@NonNull InfoConfig snap) {
+    var material = snap.backMaterial();
+    var name = snap.backName();
+    var lore = snap.backLore();
+    var loreArray = lore.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(material);
+    builder = builder.name(name);
+    builder = builder.lore(loreArray);
+    builder = builder.italic(false);
+
+    return builder.build();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -172,20 +186,6 @@ public final class InfoMenu implements EssentialsMenu {
     slots.add(backDef);
 
     return slots;
-  }
-
-  private static ItemTemplate buildBackTemplate(@NonNull InfoConfig snap) {
-    var material = snap.backMaterial();
-    var name = snap.backName();
-    var lore = snap.backLore();
-    var loreArray = lore.toArray(String[]::new);
-
-    var builder = ItemTemplate.builder(material);
-    builder = builder.name(name);
-    builder = builder.lore(loreArray);
-    builder = builder.italic(false);
-
-    return builder.build();
   }
 
   private SlotDefinition category(

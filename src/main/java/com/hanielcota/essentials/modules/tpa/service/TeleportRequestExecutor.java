@@ -22,8 +22,7 @@ final class TeleportRequestExecutor {
     var target = this.players.online(targetId).orElse(null);
 
     if (requester == null || target == null) {
-      var failed = TeleportExecution.failed(AcceptResult.REQUESTER_OFFLINE);
-      return CompletableFuture.completedFuture(failed);
+      return CompletableFuture.completedFuture(TeleportExecution.failed());
     }
 
     var toTarget = request.type() == TeleportRequestType.TPA;
@@ -37,7 +36,7 @@ final class TeleportRequestExecutor {
 
   private static TeleportExecution mapOutcome(Boolean success, @NonNull Location landing) {
     if (!Boolean.TRUE.equals(success)) {
-      return TeleportExecution.failed(AcceptResult.TELEPORT_FAILED);
+      return TeleportExecution.failed();
     }
 
     var destination = Destination.of(landing);

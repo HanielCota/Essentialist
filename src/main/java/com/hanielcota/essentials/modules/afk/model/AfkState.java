@@ -8,10 +8,6 @@ import org.jspecify.annotations.Nullable;
  */
 public record AfkState(@Nullable String reason) {
 
-  public static AfkState withoutReason() {
-    return new AfkState(null);
-  }
-
   public static AfkState withReason(@Nullable String reason) {
     return new AfkState(reason);
   }
