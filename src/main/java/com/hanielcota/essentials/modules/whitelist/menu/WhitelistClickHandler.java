@@ -14,8 +14,10 @@ public record WhitelistClickHandler(
   public void handle(@NonNull ClickContext click, @NonNull OfflinePlayer player) {
     this.service.remove(player);
 
+    var snap = this.config.value();
     var playerName = WhitelistService.nameOf(player);
-    var removedMsg = this.config.value().formatRemoved(playerName);
+    var removedMsg = snap.formatRemoved(playerName);
+
     click.reply(removedMsg);
     click.refresh();
   }

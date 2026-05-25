@@ -30,13 +30,17 @@ public record WhitelistCommand(
   @DefaultSubcommand
   @PlayerOnly
   public void open(@NonNull CommandActor actor) {
-    MenuOpenings.open(this.menus, actor.unwrap(Player.class), WhitelistMenu.ID, actor);
+    var viewer = actor.unwrap(Player.class);
+
+    MenuOpenings.open(this.menus, viewer, WhitelistMenu.ID, actor);
   }
 
   @Subcommand("add")
   public void add(@NonNull CommandActor sender, @Arg("jogador") String name) {
     var snap = this.config.value();
-    switch (this.service.add(name)) {
+    var result = this.service.add(name);
+
+    switch (result) {
       case ADDED -> {
         var addedMsg = snap.formatAdded(name);
         sender.sendSuccess(addedMsg);
@@ -55,7 +59,9 @@ public record WhitelistCommand(
   @Subcommand("remove")
   public void remove(@NonNull CommandActor sender, @Arg("jogador") String name) {
     var snap = this.config.value();
-    if (this.service.remove(name)) {
+    var removed = this.service.remove(name);
+
+    if (removed) {
       var removedMsg = snap.formatRemoved(name);
       sender.sendSuccess(removedMsg);
       return;

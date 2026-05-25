@@ -27,22 +27,36 @@ public final class InfoMenuCleanupListener implements Listener {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onClose(@NonNull InventoryCloseEvent event) {
-    if (!(event.getPlayer() instanceof Player viewer)) {
+    var human = event.getPlayer();
+    if (!(human instanceof Player viewer)) {
       return;
     }
+
     var viewerId = viewer.getUniqueId();
-    var session = this.menus.getSession(viewerId).orElse(null);
-    if (session == null || !session.menuId().equals(InfoMenu.ID)) {
+    var sessionOpt = this.menus.getSession(viewerId);
+    var session = sessionOpt.orElse(null);
+    if (session == null) {
       return;
     }
-    if (!session.isSameView(event.getView())) {
+
+    var menuId = session.menuId();
+    if (!menuId.equals(InfoMenu.ID)) {
       return;
     }
+
+    var view = event.getView();
+    if (!session.isSameView(view)) {
+      return;
+    }
+
     this.state.clear(viewerId);
   }
 
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
-    this.state.clear(event.getPlayer().getUniqueId());
+    var quitter = event.getPlayer();
+    var viewerId = quitter.getUniqueId();
+
+    this.state.clear(viewerId);
   }
 }

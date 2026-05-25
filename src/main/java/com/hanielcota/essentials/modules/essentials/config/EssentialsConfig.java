@@ -18,13 +18,18 @@ public record EssentialsConfig(
   }
 
   public String formatSuccess(int count) {
-    return reloadSuccess.replace("{count}", String.valueOf(count));
+    var countStr = String.valueOf(count);
+
+    return reloadSuccess.replace("{count}", countStr);
   }
 
   public String formatFailure(int succeeded, int total, @NonNull String failed) {
-    return reloadFailure
-        .replace("{succeeded}", String.valueOf(succeeded))
-        .replace("{total}", String.valueOf(total))
-        .replace("{failed}", failed);
+    var succeededStr = String.valueOf(succeeded);
+    var totalStr = String.valueOf(total);
+
+    var withSucceeded = reloadFailure.replace("{succeeded}", succeededStr);
+    var withTotal = withSucceeded.replace("{total}", totalStr);
+
+    return withTotal.replace("{failed}", failed);
   }
 }

@@ -12,19 +12,33 @@ public final class WhitelistService {
   // Player name; falls back to UUID when the server has never resolved the name.
   public static String nameOf(@NonNull OfflinePlayer player) {
     var name = player.getName();
-    return name != null ? name : player.getUniqueId().toString();
+    if (name != null) {
+      return name;
+    }
+
+    return player.getUniqueId().toString();
   }
 
   // Online or cached player for `name`; null when the server has never seen it.
   private static OfflinePlayer resolveKnown(@NonNull String name) {
     var online = Bukkit.getPlayerExact(name);
-    return online != null ? online : Bukkit.getOfflinePlayerIfCached(name);
+    if (online != null) {
+      return online;
+    }
+
+    return Bukkit.getOfflinePlayerIfCached(name);
   }
 
   private static OfflinePlayer findWhitelisted(@NonNull String name) {
-    for (var player : Bukkit.getWhitelistedPlayers()) {
-      if (name.equalsIgnoreCase(player.getName())) return player;
+    var whitelisted = Bukkit.getWhitelistedPlayers();
+
+    for (var player : whitelisted) {
+      var playerName = player.getName();
+      if (name.equalsIgnoreCase(playerName)) {
+        return player;
+      }
     }
+
     return null;
   }
 
@@ -32,7 +46,10 @@ public final class WhitelistService {
   public List<OfflinePlayer> list() {
     var whitelisted = Bukkit.getWhitelistedPlayers();
     var sorted = new ArrayList<OfflinePlayer>(whitelisted);
-    sorted.sort(Comparator.comparing(WhitelistService::nameOf, String.CASE_INSENSITIVE_ORDER));
+    var byName = Comparator.comparing(WhitelistService::nameOf, String.CASE_INSENSITIVE_ORDER);
+
+    sorted.sort(byName);
+
     return sorted;
   }
 

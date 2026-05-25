@@ -28,8 +28,12 @@ public record InfoCommand(InfoMenuState state, MenuService menus) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @TargetOrSelf @NonNull Player target) {
-    Player viewer = actor.unwrap(Player.class);
-    this.state.prepare(viewer.getUniqueId(), target.getUniqueId());
+    var viewer = actor.unwrap(Player.class);
+    var viewerId = viewer.getUniqueId();
+    var targetId = target.getUniqueId();
+
+    this.state.prepare(viewerId, targetId);
+
     MenuOpenings.open(this.menus, viewer, InfoMenu.ID, actor);
   }
 }
