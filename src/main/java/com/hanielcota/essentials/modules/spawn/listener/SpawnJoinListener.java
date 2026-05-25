@@ -16,6 +16,9 @@ public final class SpawnJoinListener implements Listener {
 
   @EventHandler(priority = EventPriority.HIGH)
   public void onSpawnLocation(@NonNull AsyncPlayerSpawnLocationEvent event) {
-    this.service.current().flatMap(SpawnLocation::resolve).ifPresent(event::setSpawnLocation);
+    var current = this.service.current();
+    var resolved = current.flatMap(SpawnLocation::resolve);
+
+    resolved.ifPresent(event::setSpawnLocation);
   }
 }

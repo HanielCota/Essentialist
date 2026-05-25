@@ -9,9 +9,12 @@ public final class FeedService {
   private static final float MAX_SATURATION = 20f;
 
   public boolean feed(@NonNull Player player) {
-    if (player.getFoodLevel() >= MAX_FOOD
-        && player.getSaturation() >= MAX_SATURATION
-        && player.getExhaustion() <= 0f) {
+    var food = player.getFoodLevel();
+    var saturation = player.getSaturation();
+    var exhaustion = player.getExhaustion();
+
+    var alreadyFull = food >= MAX_FOOD && saturation >= MAX_SATURATION && exhaustion <= 0f;
+    if (alreadyFull) {
       return false;
     }
 

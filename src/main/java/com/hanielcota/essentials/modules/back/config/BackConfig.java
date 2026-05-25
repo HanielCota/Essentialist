@@ -47,7 +47,8 @@ public record BackConfig(
   }
 
   public String formatItemName(int humanIndex) {
-    return itemName.replace("{index}", Integer.toString(humanIndex));
+    var indexText = Integer.toString(humanIndex);
+    return itemName.replace("{index}", indexText);
   }
 
   /**
@@ -63,9 +64,13 @@ public record BackConfig(
   }
 
   public String formatBack(@NonNull String world, double x, double y, double z) {
-    return back.replace("{world}", world)
-        .replace("{x}", Numbers.compact(x))
-        .replace("{y}", Numbers.compact(y))
-        .replace("{z}", Numbers.compact(z));
+    var xStr = Numbers.compact(x);
+    var yStr = Numbers.compact(y);
+    var zStr = Numbers.compact(z);
+
+    var withWorld = back.replace("{world}", world);
+    var withX = withWorld.replace("{x}", xStr);
+    var withY = withX.replace("{y}", yStr);
+    return withY.replace("{z}", zStr);
   }
 }

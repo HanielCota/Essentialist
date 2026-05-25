@@ -88,9 +88,12 @@ public record TpaMessages(
   /** The request line shown to the target, picked by {@code type}. */
   public String formatRequestReceived(
       @NonNull TeleportRequestType type, @NonNull String player, long seconds) {
-    var line = type == TeleportRequestType.TPAHERE ? requestReceivedHere : requestReceived;
+    var isHere = type == TeleportRequestType.TPAHERE;
+    var line = isHere ? requestReceivedHere : requestReceived;
+
     var secondsStr = Long.toString(seconds);
 
-    return line.replace("{player}", player).replace("{seconds}", secondsStr);
+    var withPlayer = line.replace("{player}", player);
+    return withPlayer.replace("{seconds}", secondsStr);
   }
 }

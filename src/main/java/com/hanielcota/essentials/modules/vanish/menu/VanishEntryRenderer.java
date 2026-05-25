@@ -9,29 +9,46 @@ import org.bukkit.entity.Player;
 
 public record VanishEntryRenderer(ConfigHandle<VanishConfig> config) {
 
+  private static final String UNKNOWN_WORLD = "?";
+
   public ItemTemplate render(@NonNull Player player) {
     var snap = this.config.value();
+
+    var playerId = player.getUniqueId();
     var name = player.getName();
     var location = player.getLocation();
     var world = location.getWorld();
-    var worldName = world != null ? world.getName() : "?";
+    var worldName = world != null ? world.getName() : UNKNOWN_WORLD;
+    var x = location.getX();
+    var y = location.getY();
+    var z = location.getZ();
 
-    return ItemTemplate.builder(Material.PLAYER_HEAD)
-        .head(player.getUniqueId())
-        .name(snap.formatItemName(name))
-        .lore(
-            snap.formatItemLore(name, worldName, location.getX(), location.getY(), location.getZ())
-                .toArray(String[]::new))
-        .italic(false)
-        .build();
+    var displayName = snap.formatItemName(name);
+    var loreList = snap.formatItemLore(name, worldName, x, y, z);
+    var loreArray = loreList.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(Material.PLAYER_HEAD);
+    builder.head(playerId);
+    builder.name(displayName);
+    builder.lore(loreArray);
+    builder.italic(false);
+
+    return builder.build();
   }
 
   public ItemTemplate renderEmpty() {
     var snap = this.config.value();
-    return ItemTemplate.builder(snap.emptyMaterial())
-        .name(snap.emptyName())
-        .lore(snap.emptyLore().toArray(String[]::new))
-        .italic(false)
-        .build();
+
+    var material = snap.emptyMaterial();
+    var name = snap.emptyName();
+    var loreList = snap.emptyLore();
+    var loreArray = loreList.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(material);
+    builder.name(name);
+    builder.lore(loreArray);
+    builder.italic(false);
+
+    return builder.build();
   }
 }

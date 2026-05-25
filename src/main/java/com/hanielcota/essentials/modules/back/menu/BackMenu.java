@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.back.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
@@ -36,14 +37,22 @@ public final class BackMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
-    var rows = MenuLayouts.clampRows(snap.menuRows());
-    var fallbackSize = Math.min(MenuLayouts.slotCount(rows), TeleportHistory.CAPACITY);
-    var slots =
-        MenuLayouts.sanitizeSlots(
-            snap.menuContentSlots(), rows, MenuLayouts.fallbackContentSlots(rows, fallbackSize));
+
+    var configuredRows = snap.menuRows();
+    var rows = MenuLayouts.clampRows(configuredRows);
+
+    var rowSlotCount = MenuLayouts.slotCount(rows);
+    var fallbackSize = Math.min(rowSlotCount, TeleportHistory.CAPACITY);
+
+    var configuredSlots = snap.menuContentSlots();
+    var fallbackSlots = MenuLayouts.fallbackContentSlots(rows, fallbackSize);
+    var slots = MenuLayouts.sanitizeSlots(configuredSlots, rows, fallbackSlots);
+
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
 
-    var menuTitle = ComponentUtils.mini(snap.menuTitle());
+    var rawTitle = snap.menuTitle();
+    var menuTitle = ComponentUtils.mini(rawTitle);
+
     MenuFramework.builder(ID, menus)
         .rows(rows)
         .title(menuTitle)
@@ -54,16 +63,22 @@ public final class BackMenu implements EssentialsMenu {
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
-    var entries = this.state.consumePrefetch(player.getUniqueId());
-    if (entries == null) {
-      entries = this.history.list(player.getUniqueId());
-    }
-    var slots = new ArrayList<SlotDefinition>(entries.size());
+    var playerId = player.getUniqueId();
 
+    var entries = this.state.consumePrefetch(playerId);
+    if (entries == null) {
+      entries = this.history.list(playerId);
+    }
+
+    var slots = new ArrayList<SlotDefinition>(entries.size());
     for (var i = 0; i < entries.size(); i++) {
       var entry = entries.get(i);
-      var template = this.renderer.render(entry, i + 1);
-      slots.add(SlotDefinition.of(-1, template, click -> this.clickHandler.handle(click, entry)));
+      var humanIndex = i + 1;
+      var template = this.renderer.render(entry, humanIndex);
+
+      ClickHandler onClick = click -> this.clickHandler.handle(click, entry);
+      var slot = SlotDefinition.of(-1, template, onClick);
+      slots.add(slot);
     }
 
     return slots;

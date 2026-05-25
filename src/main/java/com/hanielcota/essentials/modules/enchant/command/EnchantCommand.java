@@ -42,7 +42,9 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       return;
     }
 
-    var appliedMsg = snap.formatApplied(enchantName(enchantment), level);
+    var label = enchantName(enchantment);
+    var appliedMsg = snap.formatApplied(label, level);
+
     sender.sendSuccess(appliedMsg);
   }
 

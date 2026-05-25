@@ -19,26 +19,36 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config) {
     var entryWorld = location.getWorld();
     var worldName = entryWorld != null ? entryWorld.getName() : "?";
 
-    var instant = Instant.ofEpochMilli(entry.createdAt());
-    var moment = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    var createdAt = entry.createdAt();
+    var instant = Instant.ofEpochMilli(createdAt);
+    var zone = ZoneId.systemDefault();
+    var moment = LocalDateTime.ofInstant(instant, zone);
 
-    var time = snap.timeFormatter().format(moment);
+    var formatter = snap.timeFormatter();
+    var time = formatter.format(moment);
 
-    var xStr = Numbers.compact(location.getX());
-    var yStr = Numbers.compact(location.getY());
-    var zStr = Numbers.compact(location.getZ());
+    var x = location.getX();
+    var y = location.getY();
+    var z = location.getZ();
+    var xStr = Numbers.compact(x);
+    var yStr = Numbers.compact(y);
+    var zStr = Numbers.compact(z);
 
     var loreTemplate = snap.itemLore();
     var lore = new String[loreTemplate.size()];
-
     for (var i = 0; i < loreTemplate.size(); i++) {
-      lore[i] = formatLine(loreTemplate.get(i), worldName, xStr, yStr, zStr, time);
+      var line = loreTemplate.get(i);
+      lore[i] = formatLine(line, worldName, xStr, yStr, zStr, time);
     }
 
-    return ItemTemplate.builder(snap.itemMaterial())
-        .name(snap.formatItemName(humanIndex))
+    var material = snap.itemMaterial();
+    var itemName = snap.formatItemName(humanIndex);
+    var glow = snap.itemGlow();
+
+    return ItemTemplate.builder(material)
+        .name(itemName)
         .lore(lore)
-        .glow(snap.itemGlow())
+        .glow(glow)
         .italic(false)
         .build();
   }
@@ -50,10 +60,10 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config) {
       @NonNull String y,
       @NonNull String z,
       @NonNull String time) {
-    return line.replace("{world}", world)
-        .replace("{x}", x)
-        .replace("{y}", y)
-        .replace("{z}", z)
-        .replace("{time}", time);
+    var withWorld = line.replace("{world}", world);
+    var withX = withWorld.replace("{x}", x);
+    var withY = withX.replace("{y}", y);
+    var withZ = withY.replace("{z}", z);
+    return withZ.replace("{time}", time);
   }
 }

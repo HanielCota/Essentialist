@@ -33,14 +33,17 @@ public record BackCommand(
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var entries = this.history.list(sender.getUniqueId());
+    var senderId = sender.getUniqueId();
+
+    var entries = this.history.list(senderId);
     if (entries.isEmpty()) {
-      var noBackMsg = this.config.value().noBack();
+      var snap = this.config.value();
+      var noBackMsg = snap.noBack();
       actor.sendError(noBackMsg);
       return;
     }
 
-    this.state.prefetch(sender.getUniqueId(), entries);
+    this.state.prefetch(senderId, entries);
     MenuOpenings.open(this.menus, sender, BackMenu.ID, actor);
   }
 }
