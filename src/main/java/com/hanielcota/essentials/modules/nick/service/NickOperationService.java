@@ -44,11 +44,11 @@ public final class NickOperationService {
     var subjectId = subject.getUniqueId();
     var removed = this.service.reset(subjectId);
     if (!removed) {
-      return new NickResetOutcome.AlreadyHasNoNick();
+      return NickResetOutcome.ALREADY_HAS_NO_NICK;
     }
 
     NickApplier.reset(subject);
 
-    return new NickResetOutcome.Ok();
+    return NickResetOutcome.OK;
   }
 }

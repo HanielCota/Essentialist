@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
@@ -8,7 +9,6 @@ import com.hanielcota.essentials.modules.tpa.model.Participant;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.model.TeleportRequestType;
-import com.hanielcota.essentials.modules.tpa.notification.TpaNotifier;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.List;
 import java.util.Optional;

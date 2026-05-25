@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
  * HomeRenameNotifier}. The orchestrator itself only sequences these collaborators.
  */
 @RequiredArgsConstructor
-public final class HomeRenameOrchestrator implements HomeRenamePrompter {
+public final class HomeRenameOrchestrator {
 
   private final ConfigHandle<HomesConfig> config;
   private final HomeService service;
@@ -30,7 +30,6 @@ public final class HomeRenameOrchestrator implements HomeRenamePrompter {
     return input.equalsIgnoreCase("cancel") || input.equalsIgnoreCase("cancelar");
   }
 
-  @Override
   public void prompt(@NonNull Player player, @NonNull String homeName) {
     var snap = this.config.value();
     var timeout = snap.renameTimeout();

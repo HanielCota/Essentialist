@@ -56,11 +56,11 @@ public record ListConfig(
         "<red>Nenhum jogador online",
         List.of("<gray>Não há jogadores visíveis no momento."),
         List.of(
-            GroupDefinition.of(
+            new GroupDefinition(
                 "admin", "<gold>Admin", "essentials.list.group.admin", Material.GOLDEN_HELMET, 100),
-            GroupDefinition.of(
+            new GroupDefinition(
                 "vip", "<aqua>VIP", "essentials.list.group.vip", Material.DIAMOND_HELMET, 50)),
-        DefaultGroup.of("<gray>Membro", Material.PLAYER_HEAD),
+        new DefaultGroup("<gray>Membro", Material.PLAYER_HEAD),
         "<red>O menu da lista só pode ser aberto por jogadores.");
   }
 

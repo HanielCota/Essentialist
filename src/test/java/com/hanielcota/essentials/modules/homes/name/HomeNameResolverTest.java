@@ -28,16 +28,14 @@ class HomeNameResolverTest {
 
   @Test
   void usesConfiguredDefaultWhenArgumentIsBlank() {
-    var resolver =
-        new HomeNameResolver(config(HomesConfig.defaults()), new DefaultHomeNameValidator());
+    var resolver = new HomeNameResolver(config(HomesConfig.defaults()), new HomeNameValidator());
 
     assertEquals("home", resolver.resolve(""));
   }
 
   @Test
   void rejectsInvalidNamesAfterDefaultResolution() {
-    var resolver =
-        new HomeNameResolver(config(HomesConfig.defaults()), new DefaultHomeNameValidator());
+    var resolver = new HomeNameResolver(config(HomesConfig.defaults()), new HomeNameValidator());
 
     assertNull(resolver.resolve("<red>base"));
   }

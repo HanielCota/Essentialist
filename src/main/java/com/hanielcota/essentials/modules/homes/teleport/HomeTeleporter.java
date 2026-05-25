@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -22,7 +21,6 @@ public final class HomeTeleporter {
 
   private final ConfigHandle<HomesConfig> config;
   private final DelayedTeleport delayed;
-  private final PaperCommandFramework framework;
 
   private static HomeTeleportPrompt buildPrompt(
       @NonNull Player player,
@@ -68,10 +66,5 @@ public final class HomeTeleporter {
     var prompt = buildPrompt(player, actor, messages, home);
 
     this.delayed.schedule(player, resolved, delay, prompt);
-  }
-
-  public void teleport(@NonNull Player player, @NonNull Home home) {
-    var actor = this.framework.actorOf(player);
-    teleport(player, home, actor);
   }
 }

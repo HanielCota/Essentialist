@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.list.service;
 
-import com.hanielcota.essentials.modules.list.service.GroupResolution.Resolved;
 import java.util.UUID;
 import lombok.NonNull;
 import org.bukkit.Material;

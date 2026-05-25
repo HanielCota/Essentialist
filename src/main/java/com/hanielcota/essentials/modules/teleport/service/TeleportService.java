@@ -22,7 +22,7 @@ public final class TeleportService {
   public static CompletableFuture<TeleportOutcome> toPlayer(
       @NonNull Player sender, @NonNull Player target) {
     if (sameId(sender, target)) {
-      return rejected(new TeleportOutcome.SelfTarget());
+      return rejected(TeleportOutcome.SELF_TARGET);
     }
 
     var destination = target.getLocation();
@@ -33,7 +33,7 @@ public final class TeleportService {
   public static CompletableFuture<TeleportOutcome> movePlayer(
       @NonNull Player from, @NonNull Player to) {
     if (sameId(from, to)) {
-      return rejected(new TeleportOutcome.SelfTarget());
+      return rejected(TeleportOutcome.SELF_TARGET);
     }
 
     var destination = to.getLocation();
@@ -54,7 +54,7 @@ public final class TeleportService {
     var worldBorder = world.getWorldBorder();
     var insideBorder = worldBorder.isInside(destination);
     if (y < minHeight || y >= maxHeight || !insideBorder) {
-      return rejected(new TeleportOutcome.InvalidPosition());
+      return rejected(TeleportOutcome.INVALID_POSITION);
     }
 
     return dispatch(sender, destination);
@@ -63,7 +63,7 @@ public final class TeleportService {
   public static CompletableFuture<TeleportOutcome> bringHere(
       @NonNull Player viewer, @NonNull Player target) {
     if (sameId(viewer, target)) {
-      return rejected(new TeleportOutcome.SelfTarget());
+      return rejected(TeleportOutcome.SELF_TARGET);
     }
 
     var destination = viewer.getLocation();
@@ -80,10 +80,10 @@ public final class TeleportService {
 
   private static TeleportOutcome translate(Boolean success) {
     if (Boolean.TRUE.equals(success)) {
-      return new TeleportOutcome.Success();
+      return TeleportOutcome.SUCCESS;
     }
 
-    return new TeleportOutcome.Failed();
+    return TeleportOutcome.FAILED;
   }
 
   private static CompletableFuture<TeleportOutcome> rejected(@NonNull TeleportOutcome outcome) {

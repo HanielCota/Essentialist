@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.kick.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kick.config.KickConfig;
-import com.hanielcota.essentials.modules.kick.service.KickService;
+import com.hanielcota.essentials.util.ComponentUtils;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "3s")
 @Description("Expulsa um jogador do servidor.")
 @Syntax("/kick <jogador> [motivo]")
-public record KickCommand(ConfigHandle<KickConfig> config, KickService service) {
+public record KickCommand(ConfigHandle<KickConfig> config) {
 
   private static final String EXEMPT_PERMISSION = "essentials.kick.exempt";
 
@@ -43,8 +43,9 @@ public record KickCommand(ConfigHandle<KickConfig> config, KickService service) 
     var trimmed = motivo.strip();
     var reason = snap.reasonOr(trimmed);
     var screenMsg = snap.formatScreen(reason);
+    var screenComponent = ComponentUtils.mini(screenMsg);
 
-    this.service.kick(target, screenMsg);
+    target.kick(screenComponent);
 
     var kickedMsg = snap.formatKicked(name, reason);
     sender.sendSuccess(kickedMsg);

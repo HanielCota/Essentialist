@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.list.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.list.config.GroupDefinition;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
-import com.hanielcota.essentials.modules.list.service.GroupResolution.Resolved;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -100,8 +99,7 @@ public final class ListService {
     var name = fallback.name();
     var material = fallback.material();
 
-    return new Resolved(
-        GroupResolution.DEFAULT_ID, name, material, GroupResolution.DEFAULT_PRIORITY);
+    return new Resolved(Resolved.DEFAULT_ID, name, material, Resolved.DEFAULT_PRIORITY);
   }
 
   private static Resolved resolveGroup(

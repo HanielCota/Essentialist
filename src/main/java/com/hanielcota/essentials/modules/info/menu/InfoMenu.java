@@ -11,7 +11,9 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.modules.info.presentation.InfoEntry;
-import com.hanielcota.essentials.modules.info.service.InfoService;
+import com.hanielcota.essentials.modules.info.presentation.PlayerInfoEntries;
+import com.hanielcota.essentials.modules.info.presentation.PluginInfoEntries;
+import com.hanielcota.essentials.modules.info.presentation.ServerInfoEntries;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,9 @@ public final class InfoMenu implements EssentialsMenu {
   public static final String ID = "essentials.info";
 
   private final ConfigHandle<InfoConfig> config;
-  private final InfoService service;
+  private final ServerInfoEntries serverEntries;
+  private final PlayerInfoEntries playerEntries;
+  private final PluginInfoEntries pluginEntries;
   private final InfoMenuState state;
 
   private static SlotDefinition entryItem(int slot, @NonNull InfoEntry entry) {
@@ -96,20 +100,20 @@ public final class InfoMenu implements EssentialsMenu {
   }
 
   private List<SlotDefinition> serverSlots() {
-    var entries = this.service.serverEntries();
+    var entries = this.serverEntries.entries();
 
     return detailSlots(entries);
   }
 
   private List<SlotDefinition> aboutSlots() {
-    var entries = this.service.aboutEntries();
+    var entries = this.pluginEntries.entries();
 
     return detailSlots(entries);
   }
 
   private List<SlotDefinition> playerSlots(@NonNull Player viewer) {
     var target = this.state.resolveTarget(viewer);
-    var entries = this.service.playerEntries(target);
+    var entries = this.playerEntries.entries(target);
 
     return detailSlots(entries);
   }

@@ -4,7 +4,6 @@ import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.modules.enderchest.command.EnderChestCommand;
 import com.hanielcota.essentials.modules.enderchest.config.EnderChestConfig;
 import com.hanielcota.essentials.modules.enderchest.listener.EnderChestQuitListener;
-import com.hanielcota.essentials.modules.enderchest.service.EnderChestService;
 
 public final class EnderChestModule extends AbstractModule {
 
@@ -15,9 +14,7 @@ public final class EnderChestModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("enderchest", EnderChestConfig.class, EnderChestConfig::defaults);
-    var enderChestService = new EnderChestService();
-    var enderChestCommand = new EnderChestCommand(config, enderChestService);
-    registerCommand(enderChestCommand);
+    registerCommand(new EnderChestCommand(config));
     registerListener(new EnderChestQuitListener());
   }
 }

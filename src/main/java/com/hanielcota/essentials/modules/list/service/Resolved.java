@@ -8,13 +8,9 @@ import org.bukkit.Material;
  * raw {@code GroupDefinition} / {@code DefaultGroup} records so the renderer doesn't have to handle
  * "matched group" vs "default group" specially.
  */
-public final class GroupResolution {
+public record Resolved(
+    @NonNull String id, @NonNull String displayName, @NonNull Material material, int priority) {
 
   public static final String DEFAULT_ID = "default";
   public static final int DEFAULT_PRIORITY = 0;
-
-  private GroupResolution() {}
-
-  public record Resolved(
-      @NonNull String id, @NonNull String displayName, @NonNull Material material, int priority) {}
 }

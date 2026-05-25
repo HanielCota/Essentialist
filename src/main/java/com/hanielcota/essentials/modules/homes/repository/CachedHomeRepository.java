@@ -22,15 +22,13 @@ import org.bukkit.Material;
  * HomeRepository} contract honest (no silent empty returns when the bucket is missing).
  */
 @RequiredArgsConstructor
-public final class CachedHomeRepository
-    implements HomeRepository, HomeCacheLifecycle, AutoCloseable {
+public final class CachedHomeRepository implements HomeRepository, AutoCloseable {
 
   private final HomeRepository delegate;
   private final AsyncDatabaseWriter writer;
   private final HomeCache cache;
 
   /** Loads {@code owner}'s homes from SQL and populates the cache. Blocks the calling thread. */
-  @Override
   public void loadFor(@NonNull UUID owner) {
     var homes = this.delegate.list(owner);
     this.cache.loadFor(owner, homes);
@@ -45,7 +43,6 @@ public final class CachedHomeRepository
    * eviction does not need to wait for the writer to drain. Deferring it through the writer queue
    * would race a fresh {@link #loadFor} from a quick reconnect and wipe the freshly loaded bucket.
    */
-  @Override
   public void evictFor(@NonNull UUID owner) {
     this.cache.evictFor(owner);
   }

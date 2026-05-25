@@ -2,8 +2,8 @@ package com.hanielcota.essentials.modules.warps.command;
 
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.teleport.feedback.DelayedTeleportPrompt;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
+import com.hanielcota.essentials.modules.teleport.service.DelayedTeleportPrompt;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.config.WarpsMessages;
 import com.hanielcota.essentials.modules.warps.domain.Warp;
