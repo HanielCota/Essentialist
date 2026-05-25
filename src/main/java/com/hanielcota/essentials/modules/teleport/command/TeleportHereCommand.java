@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.teleport.command;
 
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -19,7 +20,11 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "3s")
 @Description("Teleporta um jogador até você.")
 @Syntax("/tphere <jogador>")
-public record TeleportHereCommand(PaperCommandFramework framework, TeleportNotifier notifier) {
+public record TeleportHereCommand(
+    PaperCommandFramework framework,
+    TeleportNotifier notifier,
+    TeleportService teleport,
+    MainThreadCallbacks callbacks) {
 
   @DefaultSubcommand
   public void execute(@NonNull Player sender, @OnlinePlayer @NonNull Player target) {
@@ -27,10 +32,11 @@ public record TeleportHereCommand(PaperCommandFramework framework, TeleportNotif
     var senderName = sender.getName();
     var targetName = target.getName();
 
-    TeleportService.bringHere(sender, target)
-        .thenAccept(
-            outcome ->
-                this.notifier.notifyBringHere(
-                    senderActor, target, senderName, targetName, outcome));
+    var future = this.teleport.bringHere(sender, target);
+    this.callbacks.hop(
+        future,
+        outcome ->
+            this.notifier.notifyBringHere(senderActor, target, senderName, targetName, outcome),
+        "tphere");
   }
 }

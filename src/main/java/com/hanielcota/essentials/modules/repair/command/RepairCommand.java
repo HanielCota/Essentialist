@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.repair.command;
 
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
@@ -47,10 +48,7 @@ public record RepairCommand(
       }
       case REPAIRED -> {
         var messages = snap.whenHandRepaired();
-        var target = this.framework.actorOf(subject);
-        var selfMessage = messages.forSender(self, name);
-        var targetMessage = messages.forTarget(name);
-        sender.sendDualMessage(target, selfMessage, targetMessage);
+        DualReply.send(sender, subject, this.framework, messages);
       }
     }
   }

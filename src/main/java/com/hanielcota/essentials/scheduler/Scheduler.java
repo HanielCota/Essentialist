@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.scheduler;
 
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import lombok.NonNull;
 import org.bukkit.entity.Entity;
 
@@ -9,6 +10,19 @@ public interface Scheduler {
   void runSync(@NonNull Runnable task);
 
   void runAsync(@NonNull Runnable task);
+
+  /**
+   * Executor that hops back to the main (global region) thread. Use it as the second arg of {@link
+   * java.util.concurrent.CompletableFuture#thenAcceptAsync(java.util.function.Consumer, Executor)}
+   * and friends when a callback chained off an async future must touch Bukkit API that is not
+   * scoped to a single entity (sending messages to a different player, closing menus, calling
+   * services that read multiple entities).
+   *
+   * <p>For callbacks that only touch a single entity, prefer scheduling on that entity via {@link
+   * #runOnEntity(Entity, Runnable)} — under Folia the entity's region is more local than the global
+   * one.
+   */
+  Executor mainExecutor();
 
   /**
    * Runs {@code task} on {@code entity}'s region next tick. On Folia an entity's state (inventory,

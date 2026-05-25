@@ -5,6 +5,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -25,7 +26,8 @@ import org.bukkit.entity.Player;
 public record TpAcceptCommand(
     ConfigHandle<TpaConfig> config,
     TeleportRequestService service,
-    TpAcceptResultHandler resultHandler) {
+    TpAcceptResultHandler resultHandler,
+    MainThreadCallbacks callbacks) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
@@ -49,6 +51,9 @@ public record TpAcceptCommand(
     }
 
     var pending = this.service.dispatchTeleport(request);
-    pending.thenAccept(success -> this.resultHandler.handleTeleportOutcome(success, actor));
+    this.callbacks.hop(
+        pending,
+        success -> this.resultHandler.handleTeleportOutcome(success, actor),
+        "tpaccept dispatch");
   }
 }

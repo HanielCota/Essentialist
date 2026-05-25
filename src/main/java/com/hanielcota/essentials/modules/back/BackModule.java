@@ -13,6 +13,7 @@ import com.hanielcota.essentials.modules.back.menu.BackEntryRenderer;
 import com.hanielcota.essentials.modules.back.menu.BackMenu;
 import com.hanielcota.essentials.modules.back.menu.BackMenuState;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
+import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import java.util.Set;
 
 public final class BackModule extends AbstractModule {
@@ -28,7 +29,8 @@ public final class BackModule extends AbstractModule {
     var menus = service(MenuService.class);
 
     var renderer = new BackEntryRenderer(config);
-    var clickHandler = new BackClickHandler(config, history);
+    var callbacks = service(MainThreadCallbacks.class);
+    var clickHandler = new BackClickHandler(config, history, callbacks);
     var menuState = new BackMenuState();
     var menu = new BackMenu(config, history, renderer, clickHandler, menuState);
     registerMenu(menu);

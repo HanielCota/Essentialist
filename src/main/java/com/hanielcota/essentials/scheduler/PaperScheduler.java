@@ -2,6 +2,7 @@ package com.hanielcota.essentials.scheduler;
 
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.time.Duration;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import lombok.NonNull;
@@ -21,6 +22,11 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var adaptedTask = adapt(task);
 
     scheduler.run(this.plugin, adaptedTask);
+  }
+
+  @Override
+  public Executor mainExecutor() {
+    return this::runSync;
   }
 
   @Override

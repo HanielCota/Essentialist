@@ -41,6 +41,11 @@ class ListEntryRendererTest {
       public void reload() {
         // no-op — test double, the renderer never reloads during the test
       }
+
+      @Override
+      public AutoCloseable onReload(java.util.function.Consumer<ListConfig> listener) {
+        return () -> {};
+      }
     };
   }
 }

@@ -120,6 +120,11 @@ class MaterialCategoryMenuTest {
       public void reload() {
         // no-op — test double, the menu never reloads during the test
       }
+
+      @Override
+      public AutoCloseable onReload(java.util.function.Consumer<HomesConfig> listener) {
+        return () -> {};
+      }
     };
   }
 }
