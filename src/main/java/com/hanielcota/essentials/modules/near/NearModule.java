@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.near.service.NearService;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import java.util.function.BiPredicate;
+import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 public final class NearModule extends AbstractModule {
@@ -18,7 +19,11 @@ public final class NearModule extends AbstractModule {
   @Override
   protected void onEnable() {
     var config = config("near", NearConfig.class, NearConfig::defaults);
-    registerCommand(new NearCommand(config, new NearService(visibilityFilter())));
+    var filter = visibilityFilter();
+    var service = new NearService(filter);
+    var command = new NearCommand(config, service);
+
+    registerCommand(command);
   }
 
   /**
@@ -31,13 +36,19 @@ public final class NearModule extends AbstractModule {
     var registry = context().services();
     return (viewer, target) -> {
       var vanish = registry.find(VanishService.class).orElse(null);
-      if (vanish == null) {
-        return true;
-      }
-      if (viewer.hasPermission(VanishVisibilityApplier.SEE_PERMISSION)) {
-        return true;
-      }
-      return !vanish.isVanished(target.getUniqueId());
+      return canSee(vanish, viewer, target);
     };
+  }
+
+  private static boolean canSee(
+      VanishService vanish, @NonNull Player viewer, @NonNull Player target) {
+    if (vanish == null) {
+      return true;
+    }
+    if (viewer.hasPermission(VanishVisibilityApplier.SEE_PERMISSION)) {
+      return true;
+    }
+    var targetId = target.getUniqueId();
+    return !vanish.isVanished(targetId);
   }
 }

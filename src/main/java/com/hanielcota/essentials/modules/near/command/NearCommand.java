@@ -13,7 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
-import java.util.stream.Collectors;
+import java.util.List;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,13 +27,10 @@ public record NearCommand(ConfigHandle<NearConfig> config, NearService service) 
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("-1") @Arg("raio") int raio) {
-    Player player = actor.unwrap(Player.class);
     var snap = this.config.value();
+    var player = actor.unwrap(Player.class);
+    var radius = resolveRadius(raio, snap.defaultRadius());
 
-    int radius = snap.defaultRadius();
-    if (raio >= 0) {
-      radius = raio;
-    }
     if (radius < 1 || radius > snap.maxRadius()) {
       var invalidRadiusMsg = snap.formatInvalidRadius();
       actor.sendError(invalidRadiusMsg);
@@ -47,12 +44,37 @@ public record NearCommand(ConfigHandle<NearConfig> config, NearService service) 
       return;
     }
 
-    var stream = nearby.stream();
-    var formatted =
-        stream.map(found -> snap.formatEntry(found.player().getName(), found.distance()));
-    String players = formatted.collect(Collectors.joining(snap.separator()));
+    var separator = snap.separator();
+    var playersText = joinEntries(snap, nearby, separator);
+    var foundMsg = snap.formatFound(radius, nearby.size(), playersText);
 
-    var foundMsg = snap.formatFound(radius, nearby.size(), players);
     actor.sendMessage(foundMsg);
+  }
+
+  private static int resolveRadius(int requested, int fallback) {
+    if (requested >= 0) {
+      return requested;
+    }
+    return fallback;
+  }
+
+  private static String joinEntries(
+      @NonNull NearConfig snap,
+      @NonNull List<NearService.Nearby> nearby,
+      @NonNull String separator) {
+    var builder = new StringBuilder();
+    var first = true;
+    for (var found : nearby) {
+      var name = found.player().getName();
+      var distance = found.distance();
+      var entryMsg = snap.formatEntry(name, distance);
+
+      if (!first) {
+        builder.append(separator);
+      }
+      builder.append(entryMsg);
+      first = false;
+    }
+    return builder.toString();
   }
 }
