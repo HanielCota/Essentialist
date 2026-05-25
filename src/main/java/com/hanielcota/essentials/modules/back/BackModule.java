@@ -2,7 +2,9 @@ package com.hanielcota.essentials.modules.back;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
 import com.hanielcota.essentials.module.ModuleMetadata;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.back.command.BackCommand;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.back.listener.BackMenuCleanupListener;
@@ -15,6 +17,7 @@ import com.hanielcota.essentials.modules.back.menu.BackMenuState;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import java.util.Set;
+import lombok.NonNull;
 
 public final class BackModule extends AbstractModule {
 
@@ -23,27 +26,27 @@ public final class BackModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("back", BackConfig.class, BackConfig::defaults);
-    var history = service(TeleportHistory.class);
-    var menus = service(MenuService.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("back", BackConfig.class, BackConfig::defaults);
+    var history = env.service(TeleportHistory.class);
+    var menus = env.service(MenuService.class);
 
     var renderer = new BackEntryRenderer(config);
-    var callbacks = service(MainThreadCallbacks.class);
+    var callbacks = env.service(MainThreadCallbacks.class);
     var clickHandler = new BackClickHandler(config, history, callbacks);
     var menuState = new BackMenuState();
     var menu = new BackMenu(config, history, renderer, clickHandler, menuState);
-    registerMenu(menu);
+    registrar.menu(menu);
     var cleanupListener = new BackMenuCleanupListener(menuState);
-    registerListener(cleanupListener);
+    registrar.listener(cleanupListener);
 
     var backCommand = new BackCommand(config, history, menus, menuState);
-    registerCommand(backCommand);
+    registrar.command(backCommand);
 
     var deathListener = new PlayerDeathListener(history);
-    registerListener(deathListener);
+    registrar.listener(deathListener);
 
     var teleportListener = new PlayerTeleportListener(history);
-    registerListener(teleportListener);
+    registrar.listener(teleportListener);
   }
 }

@@ -1,6 +1,8 @@
 package com.hanielcota.essentials.modules.near;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.near.command.NearCommand;
 import com.hanielcota.essentials.modules.near.command.NearResultFormatter;
 import com.hanielcota.essentials.modules.near.config.NearConfig;
@@ -30,14 +32,14 @@ public final class NearModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("near", NearConfig.class, NearConfig::defaults);
-    var filter = visibilityFilter();
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("near", NearConfig.class, NearConfig::defaults);
+    var filter = visibilityFilter(env);
     var service = new NearService(filter);
     var formatter = new NearResultFormatter();
     var command = new NearCommand(config, service, formatter);
 
-    registerCommand(command);
+    registrar.command(command);
   }
 
   /**
@@ -46,10 +48,9 @@ public final class NearModule extends AbstractModule {
    * {@link VanishService} on each call so module load order between vanish and near does not
    * matter; if vanish is disabled, every player is visible.
    */
-  private BiPredicate<Player, Player> visibilityFilter() {
-    var registry = context().services();
+  private BiPredicate<Player, Player> visibilityFilter(@NonNull ModuleEnvironment env) {
     return (viewer, target) -> {
-      var vanish = registry.find(VanishService.class).orElse(null);
+      var vanish = env.findService(VanishService.class).orElse(null);
       return canSee(vanish, viewer, target);
     };
   }

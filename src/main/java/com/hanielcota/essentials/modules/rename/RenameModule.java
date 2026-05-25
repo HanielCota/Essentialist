@@ -1,9 +1,12 @@
 package com.hanielcota.essentials.modules.rename;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.rename.command.RenameCommand;
 import com.hanielcota.essentials.modules.rename.config.RenameConfig;
 import com.hanielcota.essentials.modules.rename.service.RenameService;
+import lombok.NonNull;
 
 public final class RenameModule extends AbstractModule {
 
@@ -12,8 +15,8 @@ public final class RenameModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("rename", RenameConfig.class, RenameConfig::defaults);
-    registerCommand(new RenameCommand(config, new RenameService()));
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("rename", RenameConfig.class, RenameConfig::defaults);
+    registrar.command(new RenameCommand(config, new RenameService()));
   }
 }

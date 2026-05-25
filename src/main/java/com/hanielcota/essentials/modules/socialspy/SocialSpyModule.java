@@ -1,6 +1,8 @@
 package com.hanielcota.essentials.modules.socialspy;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.socialspy.command.SocialSpyCommand;
 import com.hanielcota.essentials.modules.socialspy.command.SocialSpyNotifier;
 import com.hanielcota.essentials.modules.socialspy.config.SocialSpyConfig;
@@ -9,6 +11,7 @@ import com.hanielcota.essentials.modules.socialspy.service.SocialSpyBroadcaster;
 import com.hanielcota.essentials.modules.socialspy.service.SocialSpyService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import lombok.NonNull;
 
 public final class SocialSpyModule extends AbstractModule {
 
@@ -17,19 +20,18 @@ public final class SocialSpyModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var service = new SocialSpyService();
     var config =
-        configure(
-            "socialspy", SocialSpyConfig.class, SocialSpyConfig::defaults, new SocialSpyService());
-    var service = service(SocialSpyService.class);
-    var players = service(PlayerProvider.class);
-    var framework = service(PaperCommandFramework.class);
+        registrar.configure("socialspy", SocialSpyConfig.class, SocialSpyConfig::defaults, service);
+    var players = env.service(PlayerProvider.class);
+    var framework = env.service(PaperCommandFramework.class);
     var broadcaster = new SocialSpyBroadcaster(config, service, players, framework);
 
-    registerService(SocialSpyBroadcaster.class, broadcaster);
+    registrar.provide(SocialSpyBroadcaster.class, broadcaster);
 
     var notifier = new SocialSpyNotifier(config);
-    registerCommand(new SocialSpyCommand(service, notifier));
-    registerListener(new SocialSpyQuitListener(service));
+    registrar.command(new SocialSpyCommand(service, notifier));
+    registrar.listener(new SocialSpyQuitListener(service));
   }
 }

@@ -1,8 +1,11 @@
 package com.hanielcota.essentials.modules.kick;
 
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.kick.command.KickCommand;
 import com.hanielcota.essentials.modules.kick.config.KickConfig;
+import lombok.NonNull;
 
 public final class KickModule extends AbstractModule {
 
@@ -11,8 +14,8 @@ public final class KickModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("kick", KickConfig.class, KickConfig::defaults);
-    registerCommand(new KickCommand(config));
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("kick", KickConfig.class, KickConfig::defaults);
+    registrar.command(new KickCommand(config));
   }
 }

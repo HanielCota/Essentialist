@@ -3,7 +3,9 @@ package com.hanielcota.essentials.modules.warps;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
 import com.hanielcota.essentials.module.ModuleMetadata;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.modules.warps.command.DelWarpCommand;
 import com.hanielcota.essentials.modules.warps.command.SetWarpCommand;
@@ -17,6 +19,7 @@ import com.hanielcota.essentials.modules.warps.repository.WarpStore;
 import com.hanielcota.essentials.modules.warps.repository.WarpTable;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import java.util.Set;
+import lombok.NonNull;
 
 /**
  * Server warps: {@code /warp}, {@code /setwarp}, {@code /delwarp}, {@code /warps}.
@@ -34,9 +37,9 @@ public final class WarpsModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("warps", WarpsConfig.class, WarpsConfig::defaults);
-    var executor = service(SqlExecutor.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("warps", WarpsConfig.class, WarpsConfig::defaults);
+    var executor = env.service(SqlExecutor.class);
     WarpTable.install(executor);
 
     var store = new WarpStore(executor);
@@ -46,12 +49,12 @@ public final class WarpsModule extends AbstractModule {
     cache.loadAll(existingWarps);
 
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-Warps");
-    registerCloseable(writer);
+    registrar.closeable(writer);
 
     var warpService = new WarpService(store, cache, writer);
-    registerService(WarpService.class, warpService);
+    registrar.provide(WarpService.class, warpService);
 
-    var delayed = service(DelayedTeleport.class);
+    var delayed = env.service(DelayedTeleport.class);
 
     var setWarpCommand = new SetWarpCommand(config, warpService);
     var promptFactory = new WarpPromptFactory();
@@ -60,9 +63,9 @@ public final class WarpsModule extends AbstractModule {
     var warpsNotifier = new WarpsListNotifier(config);
     var warpsCommand = new WarpsCommand(warpService, warpsNotifier);
 
-    registerCommand(setWarpCommand);
-    registerCommand(warpCommand);
-    registerCommand(delWarpCommand);
-    registerCommand(warpsCommand);
+    registrar.command(setWarpCommand);
+    registrar.command(warpCommand);
+    registrar.command(delWarpCommand);
+    registrar.command(warpsCommand);
   }
 }

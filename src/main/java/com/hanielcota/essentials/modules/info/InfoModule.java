@@ -2,6 +2,8 @@ package com.hanielcota.essentials.modules.info;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.info.command.InfoCommand;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.modules.info.listener.InfoMenuCleanupListener;
@@ -12,6 +14,7 @@ import com.hanielcota.essentials.modules.info.presentation.PluginInfoEntries;
 import com.hanielcota.essentials.modules.info.presentation.ServerInfoEntries;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.user.UserSessionService;
+import lombok.NonNull;
 
 public final class InfoModule extends AbstractModule {
 
@@ -20,23 +23,23 @@ public final class InfoModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("info", InfoConfig.class, InfoConfig::defaults);
-    var sessions = service(UserSessionService.class);
-    var menus = service(MenuService.class);
-    var players = service(PlayerProvider.class);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("info", InfoConfig.class, InfoConfig::defaults);
+    var sessions = env.service(UserSessionService.class);
+    var menus = env.service(MenuService.class);
+    var players = env.service(PlayerProvider.class);
 
     var serverEntries = new ServerInfoEntries();
     var playerEntries = new PlayerInfoEntries(sessions, config);
-    var pluginEntries = new PluginInfoEntries(plugin());
+    var pluginEntries = new PluginInfoEntries(env.plugin());
 
     var menuState = new InfoMenuState(players);
     var menu = new InfoMenu(config, serverEntries, playerEntries, pluginEntries, menuState);
-    registerMenu(menu);
+    registrar.menu(menu);
     var cleanupListener = new InfoMenuCleanupListener(menuState, menus);
-    registerListener(cleanupListener);
+    registrar.listener(cleanupListener);
 
     var infoCommand = new InfoCommand(menuState, menus);
-    registerCommand(infoCommand);
+    registrar.command(infoCommand);
   }
 }

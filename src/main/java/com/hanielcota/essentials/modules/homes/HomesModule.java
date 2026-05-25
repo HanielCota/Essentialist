@@ -4,7 +4,9 @@ import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
+import com.hanielcota.essentials.module.ModuleEnvironment;
 import com.hanielcota.essentials.module.ModuleMetadata;
+import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.homes.command.DelHomeCommand;
 import com.hanielcota.essentials.modules.homes.command.HomeCommand;
 import com.hanielcota.essentials.modules.homes.command.HomesCommand;
@@ -49,6 +51,7 @@ import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.Set;
 import java.util.function.IntSupplier;
+import lombok.NonNull;
 
 /**
  * Per-player homes: {@code /sethome}, {@code /home}, {@code /delhome}, {@code /homes}.
@@ -64,16 +67,17 @@ public final class HomesModule extends AbstractModule {
   }
 
   @Override
-  protected void onEnable() {
-    var config = config("homes", HomesConfig.class, HomesConfig::defaults);
+  protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var config = env.config("homes", HomesConfig.class, HomesConfig::defaults);
     var materialNames =
-        config("homes/material-names", MaterialNamesConfig.class, MaterialNamesConfig::defaults);
+        env.config(
+            "homes/material-names", MaterialNamesConfig.class, MaterialNamesConfig::defaults);
 
-    var menus = service(MenuService.class);
-    var framework = service(PaperCommandFramework.class);
-    var scheduler = service(Scheduler.class);
-    var delayed = service(DelayedTeleport.class);
-    var sqlExecutor = service(SqlExecutor.class);
+    var menus = env.service(MenuService.class);
+    var framework = env.service(PaperCommandFramework.class);
+    var scheduler = env.service(Scheduler.class);
+    var delayed = env.service(DelayedTeleport.class);
+    var sqlExecutor = env.service(SqlExecutor.class);
 
     // 1. Storage + service layer.
     SqlHomeTable.install(sqlExecutor);
@@ -85,9 +89,9 @@ public final class HomesModule extends AbstractModule {
     var limits = new HomeLimitResolver(defaultLimit);
     var homeService = new HomeService(repository, limits);
 
-    registerCloseable(repository);
-    registerListener(new HomesCacheListener(repository));
-    registerService(HomeService.class, homeService);
+    registrar.closeable(repository);
+    registrar.listener(new HomesCacheListener(repository));
+    registrar.provide(HomeService.class, homeService);
 
     // 2. Interaction layer (rename flow + teleport + per-player action target).
     var actionTarget = new HomesActionTarget();
@@ -101,14 +105,14 @@ public final class HomesModule extends AbstractModule {
         new HomeRenameOrchestrator(
             config, homeService, renameSessions, nameValidator, renameTimer, renameNotifier);
 
-    registerListener(new HomesSessionCleanupListener(actionTarget, renameSessions));
-    registerListener(new HomeRenameChatListener(rename, renameSessions));
+    registrar.listener(new HomesSessionCleanupListener(actionTarget, renameSessions));
+    registrar.listener(new HomeRenameChatListener(rename, renameSessions));
 
     // 3. Menus + dialogs.
     var menuState = new HomesMenuState();
     var renderer = new HomeEntryRenderer(config);
     var clickHandler = new HomeClickHandler(teleporter, framework, actionTarget, rename);
-    registerMenu(new HomesMenu(config, homeService, renderer, clickHandler, menuState));
+    registrar.menu(new HomesMenu(config, homeService, renderer, clickHandler, menuState));
 
     var configSnap = config.value();
     var menuConfig = configSnap.menu();
@@ -121,21 +125,21 @@ public final class HomesModule extends AbstractModule {
         new MaterialPickerClickHandler(config, homeService, actionTarget, pickerPresentation);
     var deleteClickHandler = new DeleteHomeClickHandler(config, homeService, actionTarget);
 
-    registerMenu(new MaterialCategoryMenu(config, categoryClickHandler));
-    registerMenu(new MaterialPickerMenu(config, actionTarget, iconRegistry, pickerClickHandler));
-    registerMenu(new DeleteHomeDialog(config, deleteClickHandler));
-    registerListener(new HomesMenuCleanupListener(menuState));
+    registrar.menu(new MaterialCategoryMenu(config, categoryClickHandler));
+    registrar.menu(new MaterialPickerMenu(config, actionTarget, iconRegistry, pickerClickHandler));
+    registrar.menu(new DeleteHomeDialog(config, deleteClickHandler));
+    registrar.listener(new HomesMenuCleanupListener(menuState));
 
     // 4. Commands.
     var materialResolver = new HomeMaterialResolver(config);
     var missingResolver = new MissingHomeMessageResolver(config, homeService);
     var limitReachedResolver = new HomeLimitReachedMessageResolver(config, homeService);
-    registerCommand(
+    registrar.command(
         new SetHomeCommand(
             config, homeService, nameResolver, materialResolver, limitReachedResolver));
-    registerCommand(
+    registrar.command(
         new HomeCommand(config, homeService, teleporter, nameResolver, missingResolver));
-    registerCommand(new DelHomeCommand(config, homeService, nameResolver));
-    registerCommand(new HomesCommand(config, homeService, menus, menuState));
+    registrar.command(new DelHomeCommand(config, homeService, nameResolver));
+    registrar.command(new HomesCommand(config, homeService, menus, menuState));
   }
 }
