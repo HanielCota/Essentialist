@@ -77,9 +77,10 @@ public final class CommandBootstrap {
     return builder.build();
   }
 
-  // The framework's CommandExceptionHandler takes RuntimeException, so we can't bind a
-  // method reference typed on a narrower subclass — the handlers stay as lambdas that
-  // downcast inside the body for the specific subclass branch.
+  // The framework's CommandExceptionHandler signature is (CommandContext, RuntimeException),
+  // so each handler method must accept the supertype even when the registered Class<?> picks
+  // a narrower branch — the framework dispatches by the registered class, not by the method
+  // parameter type.
   private void registerExceptionHandlers(@NonNull PaperCommandFramework.Builder builder) {
     builder.onException(IllegalArgumentException.class, this::handleIllegalArgument);
     builder.onException(RuntimeException.class, this::handleUnexpected);
