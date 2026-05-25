@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.teleport.history;
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlExecutor;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -41,13 +42,16 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     if (world == null) {
       return null;
     }
+
     var x = rs.getDouble("x");
     var y = rs.getDouble("y");
     var z = rs.getDouble("z");
     var yaw = (float) rs.getDouble("yaw");
     var pitch = (float) rs.getDouble("pitch");
     var location = new Location(world, x, y, z, yaw, pitch);
+
     var createdAt = rs.getLong("created_at");
+
     return new HistoryEntry(id, location, createdAt);
   }
 
@@ -57,6 +61,7 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     if (world == null) {
       return;
     }
+
     // Snapshot the (mutable) Location's values on the calling thread before handing off.
     var playerId = player.toString();
     var worldName = world.getName();
@@ -67,31 +72,44 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     var pitch = location.getPitch();
     var createdAt = System.currentTimeMillis();
 
-    this.writer.submit(
-        "push",
-        () ->
-            this.sqlExecutor.tx(
-                conn -> {
-                  this.sqlExecutor.execute(
-                      conn,
-                      TeleportHistoryTable.INSERT,
-                      playerId,
-                      worldName,
-                      x,
-                      y,
-                      z,
-                      yaw,
-                      pitch,
-                      createdAt);
-                  this.sqlExecutor.execute(
-                      conn, TeleportHistoryTable.TRIM, playerId, playerId, CAPACITY);
-                }));
+    Runnable insertAndTrim = () -> writeEntry(playerId, worldName, x, y, z, yaw, pitch, createdAt);
+    this.writer.submit("push", insertAndTrim);
+  }
+
+  private void writeEntry(
+      String playerId,
+      String worldName,
+      double x,
+      double y,
+      double z,
+      float yaw,
+      float pitch,
+      long createdAt) {
+    this.sqlExecutor.tx(
+        conn -> insertAndTrim(conn, playerId, worldName, x, y, z, yaw, pitch, createdAt));
+  }
+
+  private void insertAndTrim(
+      Connection conn,
+      String playerId,
+      String worldName,
+      double x,
+      double y,
+      double z,
+      float yaw,
+      float pitch,
+      long createdAt)
+      throws SQLException {
+    this.sqlExecutor.execute(
+        conn, TeleportHistoryTable.INSERT, playerId, worldName, x, y, z, yaw, pitch, createdAt);
+    this.sqlExecutor.execute(conn, TeleportHistoryTable.TRIM, playerId, playerId, CAPACITY);
   }
 
   @Override
   public List<HistoryEntry> list(@NonNull UUID player) {
+    var playerId = player.toString();
     return this.sqlExecutor.query(
-        TeleportHistoryTable.LIST, SqliteTeleportHistory::readEntry, player.toString(), CAPACITY);
+        TeleportHistoryTable.LIST, SqliteTeleportHistory::readEntry, playerId, CAPACITY);
   }
 
   @Override
@@ -99,10 +117,12 @@ public final class SqliteTeleportHistory implements TeleportHistory, AutoCloseab
     if (entryId <= 0) {
       return;
     }
+
     var playerId = player.toString();
-    this.writer.submit(
-        "remove",
-        () -> this.sqlExecutor.update(TeleportHistoryTable.DELETE_BY_ID, entryId, playerId));
+    Runnable deleteEntry =
+        () -> this.sqlExecutor.update(TeleportHistoryTable.DELETE_BY_ID, entryId, playerId);
+
+    this.writer.submit("remove", deleteEntry);
   }
 
   @Override
