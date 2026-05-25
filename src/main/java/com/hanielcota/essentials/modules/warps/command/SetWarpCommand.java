@@ -28,6 +28,7 @@ public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
     var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
     var messages = snap.messages();
+
     var warpOpt = this.service.find(name);
     var existed = warpOpt.isPresent();
 
@@ -35,9 +36,12 @@ public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
     // Reuse the stored name when overwriting so the canonical case (and any
     // per-warp permission node derived from it) stays stable.
     var persistedName = existed ? warpOpt.get().name() : name;
+
     this.service.save(persistedName, sender);
+
     var template = existed ? messages.warpUpdated() : messages.warpSet();
     var successMsg = template.replace("{name}", persistedName);
+
     actor.sendSuccess(successMsg);
   }
 }

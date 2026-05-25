@@ -45,7 +45,8 @@ public final class WarpStore {
       return Optional.empty();
     }
 
-    return Optional.of(rows.getFirst());
+    var first = rows.getFirst();
+    return Optional.of(first);
   }
 
   public List<Warp> list() {
@@ -53,19 +54,21 @@ public final class WarpStore {
   }
 
   public void save(@NonNull Warp warp) {
+    var name = warp.name();
+    var world = warp.world();
+
+    var x = warp.x();
+    var y = warp.y();
+    var z = warp.z();
+
+    var yaw = warp.yaw();
+    var pitch = warp.pitch();
+
+    var createdAt = warp.createdAt();
     var creatorIdStr = warp.createdBy().toString();
 
     this.sqlExecutor.update(
-        WarpTable.UPSERT,
-        warp.name(),
-        warp.world(),
-        warp.x(),
-        warp.y(),
-        warp.z(),
-        warp.yaw(),
-        warp.pitch(),
-        warp.createdAt(),
-        creatorIdStr);
+        WarpTable.UPSERT, name, world, x, y, z, yaw, pitch, createdAt, creatorIdStr);
   }
 
   /** Deletes the warp. Returns {@code true} when a row was removed. */

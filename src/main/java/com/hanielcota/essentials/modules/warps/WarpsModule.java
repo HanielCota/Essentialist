@@ -39,7 +39,9 @@ public final class WarpsModule extends AbstractModule {
 
     var store = new WarpStore(executor);
     var cache = new WarpCache();
-    cache.loadAll(store.list());
+
+    var existingWarps = store.list();
+    cache.loadAll(existingWarps);
 
     var writer = new DefaultAsyncDatabaseWriter("Essentialist-Warps");
     registerCloseable(writer);
@@ -49,9 +51,14 @@ public final class WarpsModule extends AbstractModule {
 
     var delayed = service(DelayedTeleport.class);
 
-    registerCommand(new SetWarpCommand(config, warpService));
-    registerCommand(new WarpCommand(config, warpService, delayed));
-    registerCommand(new DelWarpCommand(config, warpService));
-    registerCommand(new WarpsCommand(config, warpService));
+    var setWarpCommand = new SetWarpCommand(config, warpService);
+    var warpCommand = new WarpCommand(config, warpService, delayed);
+    var delWarpCommand = new DelWarpCommand(config, warpService);
+    var warpsCommand = new WarpsCommand(config, warpService);
+
+    registerCommand(setWarpCommand);
+    registerCommand(warpCommand);
+    registerCommand(delWarpCommand);
+    registerCommand(warpsCommand);
   }
 }
