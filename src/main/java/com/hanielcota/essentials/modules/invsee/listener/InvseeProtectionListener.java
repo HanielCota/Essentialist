@@ -6,7 +6,6 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -29,24 +28,38 @@ public final class InvseeProtectionListener implements Listener {
 
   /** Closes every open /invsee GUI that mirrors the player with {@code targetId}. */
   private static void closeViewsTargeting(@NonNull UUID targetId) {
-    for (var viewer : Bukkit.getOnlinePlayers()) {
-      if (viewer.getOpenInventory().getTopInventory().getHolder() instanceof InvseeHolder holder
-          && holder.targetId().equals(targetId)) {
-        viewer.closeInventory();
+    var onlinePlayers = Bukkit.getOnlinePlayers();
+
+    for (var viewer : onlinePlayers) {
+      var openInventory = viewer.getOpenInventory();
+      var topInventory = openInventory.getTopInventory();
+      var topHolder = topInventory.getHolder();
+
+      if (!(topHolder instanceof InvseeHolder holder)) {
+        continue;
       }
+      if (!holder.targetId().equals(targetId)) {
+        continue;
+      }
+
+      viewer.closeInventory();
     }
   }
 
   @EventHandler
   public void onTargetQuit(@NonNull PlayerQuitEvent event) {
-    var targetId = event.getPlayer().getUniqueId();
+    var player = event.getPlayer();
+    var targetId = player.getUniqueId();
+
     closeViewsTargeting(targetId);
     this.service.releaseTarget(targetId);
   }
 
   @EventHandler
   public void onTargetDeath(@NonNull PlayerDeathEvent event) {
-    var targetId = event.getEntity().getUniqueId();
+    var entity = event.getEntity();
+    var targetId = entity.getUniqueId();
+
     closeViewsTargeting(targetId);
     // Mirror onTargetQuit — don't rely on each viewer's InventoryCloseEvent racing through the
     // event bus to free the lock. On Folia the close may be deferred until the viewer's region
@@ -56,10 +69,17 @@ public final class InvseeProtectionListener implements Listener {
 
   @EventHandler
   public void onClose(@NonNull InventoryCloseEvent event) {
-    if (!(event.getInventory().getHolder() instanceof InvseeHolder holder)) {
+    var inventory = event.getInventory();
+    var inventoryHolder = inventory.getHolder();
+
+    if (!(inventoryHolder instanceof InvseeHolder holder)) {
       return;
     }
-    HumanEntity viewer = event.getPlayer();
-    this.service.release(holder.targetId(), viewer.getUniqueId());
+
+    var viewer = event.getPlayer();
+    var viewerId = viewer.getUniqueId();
+    var targetId = holder.targetId();
+
+    this.service.release(targetId, viewerId);
   }
 }

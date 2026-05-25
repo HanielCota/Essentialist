@@ -32,8 +32,13 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config, EnderChes
     var viewer = sender.unwrap(Player.class);
     var snap = this.config.value();
     var self = target.equals(viewer);
+    var targetName = target.getName();
 
     this.service.open(viewer, target);
-    sender.sendSuccess(snap.whenOpened().forSender(self, target.getName()));
+
+    var messages = snap.whenOpened();
+    var openedMsg = messages.forSender(self, targetName);
+
+    sender.sendSuccess(openedMsg);
   }
 }

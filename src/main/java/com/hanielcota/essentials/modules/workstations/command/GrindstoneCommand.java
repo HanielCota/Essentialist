@@ -24,7 +24,10 @@ public final class GrindstoneCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
-    player.openInventory(MenuType.GRINDSTONE.create(player));
+    var player = actor.unwrap(Player.class);
+
+    var menu = MenuType.GRINDSTONE.create(player);
+
+    player.openInventory(menu);
   }
 }

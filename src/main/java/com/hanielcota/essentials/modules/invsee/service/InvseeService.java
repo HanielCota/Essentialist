@@ -12,7 +12,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 public final class InvseeService {
 
@@ -35,8 +34,11 @@ public final class InvseeService {
   private static ItemStack filler() {
     var item = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
     var meta = item.getItemMeta();
-    meta.displayName(Component.empty());
+    var emptyName = Component.empty();
+
+    meta.displayName(emptyName);
     item.setItemMeta(meta);
+
     return item;
   }
 
@@ -49,9 +51,9 @@ public final class InvseeService {
    */
   public Optional<Inventory> createView(
       @NonNull Player viewer, @NonNull Player target, @NonNull String title) {
-
     var targetId = target.getUniqueId();
     var viewerId = viewer.getUniqueId();
+
     // Any existing holder — even the same viewer — denies the new view. The previous view's
     // InventoryCloseEvent will fire `release(...)` for the old holder; allowing two open views
     // from the same viewer would let the old close handler free the lock while the new view is
@@ -66,19 +68,28 @@ public final class InvseeService {
     var view = Bukkit.createInventory(holder, SIZE, titleComponent);
     holder.inventory(view);
 
-    PlayerInventory source = target.getInventory();
-    ItemStack[] storage = source.getStorageContents();
-    for (int slot = 0; slot < STORAGE_SLOTS; slot++) {
+    var source = target.getInventory();
+    var storage = source.getStorageContents();
+    for (var slot = 0; slot < STORAGE_SLOTS; slot++) {
       view.setItem(slot, storage[slot]);
     }
-    view.setItem(HELMET_SLOT, source.getHelmet());
-    view.setItem(CHESTPLATE_SLOT, source.getChestplate());
-    view.setItem(LEGGINGS_SLOT, source.getLeggings());
-    view.setItem(BOOTS_SLOT, source.getBoots());
-    view.setItem(OFFHAND_SLOT, source.getItemInOffHand());
-    for (int slot = FIRST_LOCKED_SLOT; slot < SIZE; slot++) {
+
+    var helmet = source.getHelmet();
+    var chestplate = source.getChestplate();
+    var leggings = source.getLeggings();
+    var boots = source.getBoots();
+    var offhand = source.getItemInOffHand();
+
+    view.setItem(HELMET_SLOT, helmet);
+    view.setItem(CHESTPLATE_SLOT, chestplate);
+    view.setItem(LEGGINGS_SLOT, leggings);
+    view.setItem(BOOTS_SLOT, boots);
+    view.setItem(OFFHAND_SLOT, offhand);
+
+    for (var slot = FIRST_LOCKED_SLOT; slot < SIZE; slot++) {
       view.setItem(slot, FILLER);
     }
+
     return Optional.of(view);
   }
 
@@ -94,17 +105,24 @@ public final class InvseeService {
 
   /** Writes the editable slots of {@code view} back into {@code target}'s inventory. */
   public void sync(@NonNull Player target, @NonNull Inventory view) {
+    var inv = target.getInventory();
 
-    PlayerInventory inv = target.getInventory();
-    ItemStack[] storage = new ItemStack[STORAGE_SLOTS];
-    for (int slot = 0; slot < STORAGE_SLOTS; slot++) {
+    var storage = new ItemStack[STORAGE_SLOTS];
+    for (var slot = 0; slot < STORAGE_SLOTS; slot++) {
       storage[slot] = view.getItem(slot);
     }
     inv.setStorageContents(storage);
-    inv.setHelmet(view.getItem(HELMET_SLOT));
-    inv.setChestplate(view.getItem(CHESTPLATE_SLOT));
-    inv.setLeggings(view.getItem(LEGGINGS_SLOT));
-    inv.setBoots(view.getItem(BOOTS_SLOT));
-    inv.setItemInOffHand(view.getItem(OFFHAND_SLOT));
+
+    var helmet = view.getItem(HELMET_SLOT);
+    var chestplate = view.getItem(CHESTPLATE_SLOT);
+    var leggings = view.getItem(LEGGINGS_SLOT);
+    var boots = view.getItem(BOOTS_SLOT);
+    var offhand = view.getItem(OFFHAND_SLOT);
+
+    inv.setHelmet(helmet);
+    inv.setChestplate(chestplate);
+    inv.setLeggings(leggings);
+    inv.setBoots(boots);
+    inv.setItemInOffHand(offhand);
   }
 }

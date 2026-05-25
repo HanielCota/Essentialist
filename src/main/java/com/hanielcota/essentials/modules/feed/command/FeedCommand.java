@@ -38,13 +38,19 @@ public record FeedCommand(
     var self = Senders.isSelf(sender, subject);
 
     if (!this.service.feed(subject)) {
-      sender.sendError(snap.whenAlreadyFull().forSender(self, name));
+      var alreadyFull = snap.whenAlreadyFull();
+      var alreadyFullMsg = alreadyFull.forSender(self, name);
+      sender.sendError(alreadyFullMsg);
       return;
     }
 
     var messages = snap.whenFed();
     var target = this.framework.actorOf(subject);
-    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
+
+    var senderMsg = messages.forSender(self, name);
+    var targetMsg = messages.forTarget(name);
+
+    sender.sendDualMessage(target, senderMsg, targetMsg);
   }
 
   @Subcommand("todos")
@@ -52,13 +58,18 @@ public record FeedCommand(
   @Description("Alimenta todos os jogadores online.")
   @Syntax("/alimentar todos")
   public void feedAll(@NonNull CommandActor sender) {
+    var online = this.players.all();
+
     var fed = 0;
-    for (var player : this.players.all()) {
+    for (var player : online) {
       if (this.service.feed(player)) {
         fed++;
       }
     }
+
     var snap = this.config.value();
-    sender.sendSuccess(snap.formatFedAll(fed));
+    var summaryMsg = snap.formatFedAll(fed);
+
+    sender.sendSuccess(summaryMsg);
   }
 }

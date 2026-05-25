@@ -15,19 +15,24 @@ public final class InvseeSynchronizer {
 
   // Syncs view back to its target next tick, once the current click/drag is applied.
   public void scheduleSync(@NonNull InvseeHolder holder, @NonNull Inventory view) {
-    var target = Bukkit.getPlayer(holder.targetId());
+    var targetId = holder.targetId();
+    var target = Bukkit.getPlayer(targetId);
+
     if (target == null) {
       return;
     }
+
     // Routed through the target's region: on Folia its inventory may only be touched there.
-    this.scheduler.runOnEntity(
-        target,
+    Runnable writeBack =
         () -> {
           // Skip when the target died meanwhile: writing a stale view onto an inventory
           // already emptied by death drops would duplicate items.
-          if (!target.isDead()) {
-            this.service.sync(target, view);
+          if (target.isDead()) {
+            return;
           }
-        });
+          this.service.sync(target, view);
+        };
+
+    this.scheduler.runOnEntity(target, writeBack);
   }
 }

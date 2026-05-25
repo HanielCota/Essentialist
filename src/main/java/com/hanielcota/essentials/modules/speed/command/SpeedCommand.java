@@ -32,7 +32,8 @@ public record SpeedCommand(
   @DefaultSubcommand
   public void showUsage(@NonNull CommandActor sender) {
     var snap = this.config.value();
-    sender.sendMessage(snap.usage());
+    var usageMsg = snap.usage();
+    sender.sendMessage(usageMsg);
   }
 
   @Subcommand("walk")
@@ -42,12 +43,15 @@ public record SpeedCommand(
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
     var snap = this.config.value();
+
     if (!this.service.setWalkSpeed(subject, valor)) {
-      sender.sendError(snap.invalid());
+      var invalidMsg = snap.invalid();
+      sender.sendError(invalidMsg);
       return;
     }
 
-    announce(sender, subject, snap.whenWalkSet(valor));
+    var messages = snap.whenWalkSet(valor);
+    announce(sender, subject, messages);
   }
 
   @Subcommand("fly")
@@ -57,12 +61,15 @@ public record SpeedCommand(
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
     var snap = this.config.value();
+
     if (!this.service.setFlySpeed(subject, valor)) {
-      sender.sendError(snap.invalid());
+      var invalidMsg = snap.invalid();
+      sender.sendError(invalidMsg);
       return;
     }
 
-    announce(sender, subject, snap.whenFlySet(valor));
+    var messages = snap.whenFlySet(valor);
+    announce(sender, subject, messages);
   }
 
   @Subcommand({"reset", "resetar"})
@@ -70,7 +77,9 @@ public record SpeedCommand(
   public void reset(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     this.service.reset(subject);
-    announce(sender, subject, snap.whenReset());
+
+    var messages = snap.whenReset();
+    announce(sender, subject, messages);
   }
 
   private void announce(
@@ -79,6 +88,9 @@ public record SpeedCommand(
     var isSelf = Senders.isSelf(sender, subject);
     var target = this.framework.actorOf(subject);
 
-    sender.sendDualMessage(target, messages.forSender(isSelf, name), messages.forTarget(name));
+    var senderMsg = messages.forSender(isSelf, name);
+    var targetMsg = messages.forTarget(name);
+
+    sender.sendDualMessage(target, senderMsg, targetMsg);
   }
 }

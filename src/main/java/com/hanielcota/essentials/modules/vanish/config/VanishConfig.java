@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.MessagePair;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import com.hanielcota.essentials.util.Numbers;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -84,9 +85,10 @@ public record VanishConfig(
   }
 
   public MessagePair toggle(boolean vanished) {
-    return vanished
-        ? new MessagePair(enabled, enabledOther)
-        : new MessagePair(disabled, disabledOther);
+    if (vanished) {
+      return new MessagePair(enabled, enabledOther);
+    }
+    return new MessagePair(disabled, disabledOther);
   }
 
   public int effectiveRows() {
@@ -97,17 +99,31 @@ public record VanishConfig(
   public List<Integer> effectiveContentSlots() {
     var rows = effectiveRows();
     var info = effectiveInfoSlot();
-    List<Integer> sanitized;
-    if (menuContentSlots.isEmpty()) {
-      var count = rows > MIN_ROWS ? (rows - 1) * 9 : 9;
-      sanitized = MenuLayouts.fallbackContentSlots(rows, count);
-    } else {
-      sanitized = MenuLayouts.sanitizeSlots(menuContentSlots, rows);
-    }
+    var sanitized = sanitizedSlots(rows);
+
     if (!sanitized.contains(info)) {
       return sanitized;
     }
-    return sanitized.stream().filter(slot -> slot != info).toList();
+    return withoutInfoSlot(sanitized, info);
+  }
+
+  private List<Integer> sanitizedSlots(int rows) {
+    if (menuContentSlots.isEmpty()) {
+      var count = rows > MIN_ROWS ? (rows - 1) * 9 : 9;
+      return MenuLayouts.fallbackContentSlots(rows, count);
+    }
+    return MenuLayouts.sanitizeSlots(menuContentSlots, rows);
+  }
+
+  private static List<Integer> withoutInfoSlot(@NonNull List<Integer> slots, int info) {
+    var filtered = new ArrayList<Integer>(slots.size());
+    for (var slot : slots) {
+      if (slot == info) {
+        continue;
+      }
+      filtered.add(slot);
+    }
+    return filtered;
   }
 
   public int effectiveInfoSlot() {
@@ -124,15 +140,21 @@ public record VanishConfig(
     var yStr = Numbers.compact(y);
     var zStr = Numbers.compact(z);
 
-    return itemLore.stream()
-        .map(line -> formatLine(line, player, world, xStr, yStr, zStr))
-        .toList();
+    var lines = new ArrayList<String>(itemLore.size());
+    for (var line : itemLore) {
+      var formatted = formatLine(line, player, world, xStr, yStr, zStr);
+      lines.add(formatted);
+    }
+    return lines;
   }
 
   public String formatTeleported(
       @NonNull String player, @NonNull String world, double x, double y, double z) {
-    return formatLine(
-        teleported, player, world, Numbers.compact(x), Numbers.compact(y), Numbers.compact(z));
+    var xStr = Numbers.compact(x);
+    var yStr = Numbers.compact(y);
+    var zStr = Numbers.compact(z);
+
+    return formatLine(teleported, player, world, xStr, yStr, zStr);
   }
 
   public String formatTeleportTargetGone(@NonNull String player) {
@@ -146,11 +168,10 @@ public record VanishConfig(
       @NonNull String x,
       @NonNull String y,
       @NonNull String z) {
-    return template
-        .replace(PLAYER_PLACEHOLDER, player)
-        .replace("{world}", world)
-        .replace("{x}", x)
-        .replace("{y}", y)
-        .replace("{z}", z);
+    var withPlayer = template.replace(PLAYER_PLACEHOLDER, player);
+    var withWorld = withPlayer.replace("{world}", world);
+    var withX = withWorld.replace("{x}", x);
+    var withY = withX.replace("{y}", y);
+    return withY.replace("{z}", z);
   }
 }
