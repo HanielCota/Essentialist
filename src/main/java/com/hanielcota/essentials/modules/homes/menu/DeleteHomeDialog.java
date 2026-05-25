@@ -10,6 +10,7 @@ import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.util.ComponentUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.text.Component;
 
 /**
  * Yes/no confirmation before deleting a home. The home to act on is read from {@link
@@ -58,7 +59,7 @@ public final class DeleteHomeDialog implements EssentialsMenu {
     menu.register();
   }
 
-  private @NonNull net.kyori.adventure.text.Component title(@NonNull HomesConfig configSnap) {
+  private @NonNull Component title(@NonNull HomesConfig configSnap) {
     var messages = configSnap.messages();
     var titleText = messages.deleteConfirmTitle();
     return ComponentUtils.mini(titleText);
