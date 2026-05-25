@@ -7,8 +7,10 @@ import com.hanielcota.essentials.modules.homes.listener.HomesSessionCleanupListe
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.name.DefaultHomeNameValidator;
 import com.hanielcota.essentials.modules.homes.name.HomeNameResolver;
+import com.hanielcota.essentials.modules.homes.rename.HomeRenameNotifier;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameSessions;
+import com.hanielcota.essentials.modules.homes.rename.HomeRenameTimer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
@@ -33,8 +35,11 @@ public final class HomesInteractionFactory {
     var teleporter = new HomeTeleporter(config, delayed, framework);
     var teleportListener = new HomesSessionCleanupListener(actionTarget, renameSessions);
 
+    var renameTimer = new HomeRenameTimer(scheduler);
+    var renameNotifier = new HomeRenameNotifier(config);
     var rename =
-        new HomeRenameOrchestrator(config, homeService, scheduler, renameSessions, nameValidator);
+        new HomeRenameOrchestrator(
+            config, homeService, renameSessions, nameValidator, renameTimer, renameNotifier);
     var renameListener = new HomeRenameChatListener(rename, renameSessions);
 
     return new HomesInteractions(

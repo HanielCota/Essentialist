@@ -11,6 +11,7 @@ import com.hanielcota.essentials.modules.vanish.menu.VanishClickHandler;
 import com.hanielcota.essentials.modules.vanish.menu.VanishEntryRenderer;
 import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
+import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import org.bukkit.Bukkit;
@@ -32,9 +33,10 @@ public final class VanishModule extends AbstractModule {
     registerService(VanishService.class, this.service);
 
     this.applier = new VanishVisibilityApplier(plugin());
+    var transitions = new VanishTransitions(this.service, this.applier);
 
     var joinListener = new VanishJoinListener(this.service, this.applier);
-    var quitListener = new VanishQuitListener(this.service, this.applier);
+    var quitListener = new VanishQuitListener(this.service, transitions);
     var protectionListener = new VanishProtectionListener(this.service);
     registerListener(joinListener);
     registerListener(quitListener);
@@ -47,7 +49,7 @@ public final class VanishModule extends AbstractModule {
 
     var framework = service(PaperCommandFramework.class);
     var menus = service(MenuService.class);
-    var command = new VanishCommand(config, this.service, this.applier, framework, menus);
+    var command = new VanishCommand(config, transitions, framework, menus);
     registerCommand(command);
   }
 

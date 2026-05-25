@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.warps.command.DelWarpCommand;
 import com.hanielcota.essentials.modules.warps.command.SetWarpCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpCommand;
 import com.hanielcota.essentials.modules.warps.command.WarpsCommand;
+import com.hanielcota.essentials.modules.warps.command.WarpsListNotifier;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.service.WarpCache;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
@@ -54,7 +55,8 @@ public final class WarpsModule extends AbstractModule {
     var setWarpCommand = new SetWarpCommand(config, warpService);
     var warpCommand = new WarpCommand(config, warpService, delayed);
     var delWarpCommand = new DelWarpCommand(config, warpService);
-    var warpsCommand = new WarpsCommand(config, warpService);
+    var warpsNotifier = new WarpsListNotifier(config);
+    var warpsCommand = new WarpsCommand(warpService, warpsNotifier);
 
     registerCommand(setWarpCommand);
     registerCommand(warpCommand);

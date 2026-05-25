@@ -66,13 +66,7 @@ public record HealCommand(
   @Syntax("/curar todos")
   public void healAll(@NonNull CommandActor sender) {
     var online = this.players.all();
-
-    var healed = 0;
-    for (Player player : online) {
-      if (player.getHealth() > 0 && this.service.heal(player)) {
-        healed++;
-      }
-    }
+    var healed = this.service.healAll(online);
 
     var snap = this.config.value();
     var summaryMsg = snap.formatHealedAll(healed);

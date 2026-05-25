@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.MaterialPickerSection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -68,8 +69,8 @@ public final class MaterialIconRegistry {
       @NonNull MaterialNamesConfig names) {
 
     var pretty = names.displayName(material);
-    var name = menu.formatPickerItemName(pretty);
-    var lore = menu.formatPickerItemLore(pretty);
+    var name = MaterialPickerSection.itemName(menu, pretty);
+    var lore = MaterialPickerSection.itemLore(menu, pretty);
 
     var builder = ItemTemplate.builder(material);
     builder.name(name);

@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.vanish.menu;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
+import com.hanielcota.essentials.modules.vanish.config.VanishMessages;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -24,7 +25,7 @@ public record VanishClickHandler(ConfigHandle<VanishConfig> config, VanishServic
     var target = Bukkit.getPlayer(targetId);
 
     if (target == null || !this.service.isVanished(targetId)) {
-      var goneMsg = snap.formatTeleportTargetGone(targetName);
+      var goneMsg = VanishMessages.teleportTargetGone(snap, targetName);
       click.reply(goneMsg);
       click.refresh();
       return;
@@ -45,7 +46,7 @@ public record VanishClickHandler(ConfigHandle<VanishConfig> config, VanishServic
     var z = location.getZ();
     var name = target.getName();
 
-    var teleportedMsg = snap.formatTeleported(name, worldName, x, y, z);
+    var teleportedMsg = VanishMessages.teleported(snap, name, worldName, x, y, z);
     var failedMsg = snap.teleportFailed();
     var afterTeleport = afterTeleport(click, teleportedMsg, failedMsg);
 

@@ -3,10 +3,7 @@ package com.hanielcota.essentials.modules.vanish.config;
 import com.hanielcota.essentials.config.MessagePair;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.NavigationButtonsConfig;
-import com.hanielcota.essentials.util.Numbers;
-import java.util.ArrayList;
 import java.util.List;
-import lombok.NonNull;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -40,9 +37,6 @@ public record VanishConfig(
     @Comment("Shown when the clicked player is no longer online. Placeholder: {player}.")
         String teleportTargetGone,
     @Comment("Shown when the teleport call itself fails.") String teleportFailed) {
-
-  private static final int MIN_ROWS = 1;
-  private static final String PLAYER_PLACEHOLDER = "{player}";
 
   public static VanishConfig defaults() {
     return new VanishConfig(
@@ -88,6 +82,7 @@ public record VanishConfig(
     if (vanished) {
       return new MessagePair(enabled, enabledOther);
     }
+
     return new MessagePair(disabled, disabledOther);
   }
 
@@ -95,83 +90,7 @@ public record VanishConfig(
     return MenuLayouts.clampRows(menuRows);
   }
 
-  /** Content slots minus the info slot, so the static info item never collides with a head. */
-  public List<Integer> effectiveContentSlots() {
-    var rows = effectiveRows();
-    var info = effectiveInfoSlot();
-    var sanitized = sanitizedSlots(rows);
-
-    if (!sanitized.contains(info)) {
-      return sanitized;
-    }
-    return withoutInfoSlot(sanitized, info);
-  }
-
-  private List<Integer> sanitizedSlots(int rows) {
-    if (menuContentSlots.isEmpty()) {
-      var count = rows > MIN_ROWS ? (rows - 1) * 9 : 9;
-      return MenuLayouts.fallbackContentSlots(rows, count);
-    }
-    return MenuLayouts.sanitizeSlots(menuContentSlots, rows);
-  }
-
-  private static List<Integer> withoutInfoSlot(@NonNull List<Integer> slots, int info) {
-    var filtered = new ArrayList<Integer>(slots.size());
-    for (var slot : slots) {
-      if (slot == info) {
-        continue;
-      }
-      filtered.add(slot);
-    }
-    return filtered;
-  }
-
   public int effectiveInfoSlot() {
     return MenuLayouts.sanitizeSlot(infoSlot, effectiveRows(), 10);
-  }
-
-  public String formatItemName(@NonNull String player) {
-    return itemName.replace(PLAYER_PLACEHOLDER, player);
-  }
-
-  public List<String> formatItemLore(
-      @NonNull String player, @NonNull String world, double x, double y, double z) {
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
-
-    var lines = new ArrayList<String>(itemLore.size());
-    for (var line : itemLore) {
-      var formatted = formatLine(line, player, world, xStr, yStr, zStr);
-      lines.add(formatted);
-    }
-    return lines;
-  }
-
-  public String formatTeleported(
-      @NonNull String player, @NonNull String world, double x, double y, double z) {
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
-
-    return formatLine(teleported, player, world, xStr, yStr, zStr);
-  }
-
-  public String formatTeleportTargetGone(@NonNull String player) {
-    return teleportTargetGone.replace(PLAYER_PLACEHOLDER, player);
-  }
-
-  private static String formatLine(
-      @NonNull String template,
-      @NonNull String player,
-      @NonNull String world,
-      @NonNull String x,
-      @NonNull String y,
-      @NonNull String z) {
-    var withPlayer = template.replace(PLAYER_PLACEHOLDER, player);
-    var withWorld = withPlayer.replace("{world}", world);
-    var withX = withWorld.replace("{x}", x);
-    var withY = withX.replace("{y}", y);
-    return withY.replace("{z}", z);
   }
 }

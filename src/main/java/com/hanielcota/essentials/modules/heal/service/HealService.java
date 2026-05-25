@@ -23,4 +23,22 @@ public final class HealService {
     player.setHealth(maxHealth);
     return true;
   }
+
+  /**
+   * Heals every alive, non-full player in the given roster. Returns the number of players that were
+   * actually healed (skips the dead and the already-full).
+   */
+  public int healAll(@NonNull Iterable<? extends Player> targets) {
+    var healed = 0;
+    for (var player : targets) {
+      if (player.getHealth() <= 0) {
+        continue;
+      }
+      if (heal(player)) {
+        healed++;
+      }
+    }
+
+    return healed;
+  }
 }

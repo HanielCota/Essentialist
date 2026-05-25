@@ -34,3 +34,11 @@ com.hanielcota.essentials.modules.actionbar.ActionBarModule
 com.hanielcota.essentials.modules.essentials.EssentialsModule
 com.hanielcota.essentials.modules.workstations.WorkstationsModule
 com.hanielcota.essentials.modules.vanish.VanishModule
+com.hanielcota.essentials.modules.msg.MsgModule
+com.hanielcota.essentials.modules.socialspy.SocialSpyModule
+com.hanielcota.essentials.modules.mute.MuteModule
+com.hanielcota.essentials.modules.broadcast.BroadcastModule
+com.hanielcota.essentials.modules.nick.NickModule
+com.hanielcota.essentials.modules.afk.AfkModule
+com.hanielcota.essentials.modules.seen.SeenModule
+com.hanielcota.essentials.modules.list.ListModule
