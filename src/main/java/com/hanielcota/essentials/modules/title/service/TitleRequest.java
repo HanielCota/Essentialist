@@ -18,7 +18,6 @@ import org.jspecify.annotations.Nullable;
 public record TitleRequest(@Nullable Player target, String message) {
 
   public static TitleRequest from(@Nullable Player self, @NonNull String input) {
-
     var trimmedInput = input.strip();
 
     if (trimmedInput.startsWith("\"")) {
@@ -26,18 +25,23 @@ public record TitleRequest(@Nullable Player target, String message) {
     }
 
     var space = trimmedInput.indexOf(' ');
-    if (space > 0) {
-      var candidateName = trimmedInput.substring(0, space);
-      var rest = trimmedInput.substring(space + 1).strip();
-
-      if (rest.startsWith("\"")) {
-        var namedTarget = Bukkit.getPlayerExact(candidateName);
-        if (namedTarget != null) {
-          return new TitleRequest(namedTarget, rest);
-        }
-      }
+    if (space <= 0) {
+      return new TitleRequest(self, trimmedInput);
     }
 
-    return new TitleRequest(self, trimmedInput);
+    var candidateName = trimmedInput.substring(0, space);
+    var tail = trimmedInput.substring(space + 1);
+    var rest = tail.strip();
+
+    if (!rest.startsWith("\"")) {
+      return new TitleRequest(self, trimmedInput);
+    }
+
+    var namedTarget = Bukkit.getPlayerExact(candidateName);
+    if (namedTarget == null) {
+      return new TitleRequest(self, trimmedInput);
+    }
+
+    return new TitleRequest(namedTarget, rest);
   }
 }

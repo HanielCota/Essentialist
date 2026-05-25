@@ -26,7 +26,9 @@ public final class VanishVisibilityApplier {
 
   /** Hides {@code target} from every viewer without {@link #SEE_PERMISSION} and enables guards. */
   public void apply(@NonNull Player target) {
-    for (var viewer : Bukkit.getOnlinePlayers()) {
+    var viewers = Bukkit.getOnlinePlayers();
+
+    for (var viewer : viewers) {
       if (viewer.equals(target)) {
         continue;
       }
@@ -35,18 +37,22 @@ public final class VanishVisibilityApplier {
       }
       viewer.hidePlayer(this.plugin, target);
     }
+
     target.setInvulnerable(true);
     target.setCanPickupItems(false);
   }
 
   /** Reveals {@code target} to every viewer and clears the protection flags. */
   public void unapply(@NonNull Player target) {
-    for (var viewer : Bukkit.getOnlinePlayers()) {
+    var viewers = Bukkit.getOnlinePlayers();
+
+    for (var viewer : viewers) {
       if (viewer.equals(target)) {
         continue;
       }
       viewer.showPlayer(this.plugin, target);
     }
+
     target.setInvulnerable(false);
     target.setCanPickupItems(true);
   }
@@ -59,9 +65,13 @@ public final class VanishVisibilityApplier {
     if (viewer.hasPermission(SEE_PERMISSION)) {
       return;
     }
+
     for (var id : vanishedIds) {
       var target = Bukkit.getPlayer(id);
-      if (target == null || target.equals(viewer)) {
+      if (target == null) {
+        continue;
+      }
+      if (target.equals(viewer)) {
         continue;
       }
       viewer.hidePlayer(this.plugin, target);

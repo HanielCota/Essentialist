@@ -32,7 +32,9 @@ public record SpeedConfig(
 
   private static MessagePair resolve(@NonNull String self, @NonNull String other, int valor) {
     var formatted = Integer.toString(valor);
-    return new MessagePair(self.replace("{valor}", formatted), other.replace("{valor}", formatted));
+    var selfFormatted = self.replace("{valor}", formatted);
+    var otherFormatted = other.replace("{valor}", formatted);
+    return new MessagePair(selfFormatted, otherFormatted);
   }
 
   public MessagePair whenWalkSet(int valor) {

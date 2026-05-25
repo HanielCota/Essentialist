@@ -16,6 +16,9 @@ public final class SpawnRespawnListener implements Listener {
 
   @EventHandler(priority = EventPriority.HIGH)
   public void onRespawn(@NonNull PlayerRespawnEvent event) {
-    this.service.current().flatMap(SpawnLocation::resolve).ifPresent(event::setRespawnLocation);
+    var current = this.service.current();
+    var resolved = current.flatMap(SpawnLocation::resolve);
+
+    resolved.ifPresent(event::setRespawnLocation);
   }
 }

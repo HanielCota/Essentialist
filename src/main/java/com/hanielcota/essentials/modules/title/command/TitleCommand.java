@@ -20,24 +20,32 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
   public void execute(@NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
     var snap = this.config.value();
     var self = sender.isPlayer() ? sender.unwrap(Player.class) : null;
-    var request = TitleRequest.from(self, texto.strip());
+    var input = texto.strip();
+    var request = TitleRequest.from(self, input);
 
-    if (request.target() == null || request.message().isBlank()) {
-      sender.sendError(snap.usage());
+    var target = request.target();
+    var message = request.message();
+
+    if (target == null || message.isBlank()) {
+      var usageMsg = snap.usage();
+      sender.sendError(usageMsg);
       return;
     }
 
-    var target = request.target();
     var toSelf = target.equals(self);
 
     if (!toSelf && !sender.hasPermission("essentials.title.others")) {
-      sender.sendError(snap.noPermissionOther());
+      var noPermissionMsg = snap.noPermissionOther();
+      sender.sendError(noPermissionMsg);
       return;
     }
 
-    this.service.send(target, request.message());
+    this.service.send(target, message);
 
-    var sentMsg = snap.whenSent().forSender(toSelf, target.getName());
+    var targetName = target.getName();
+    var messages = snap.whenSent();
+    var sentMsg = messages.forSender(toSelf, targetName);
+
     sender.sendSuccess(sentMsg);
   }
 
@@ -51,12 +59,14 @@ public record TitleCommand(ConfigHandle<TitleConfig> config, TitleService servic
     var message = texto.strip();
 
     if (message.isBlank()) {
-      sender.sendError(snap.usage());
+      var usageMsg = snap.usage();
+      sender.sendError(usageMsg);
       return;
     }
 
     var count = this.service.broadcast(message);
     var broadcastedMsg = snap.formatBroadcasted(count);
+
     sender.sendSuccess(broadcastedMsg);
   }
 }

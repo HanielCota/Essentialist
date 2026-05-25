@@ -37,15 +37,19 @@ public record GamemodeCommand(
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
-    if (this.service.apply(subject, mode) == GamemodeService.Result.ALREADY_IN_MODE) {
-      sender.sendError(snap.whenAlreadyInMode(mode).forSender(self, name));
+    var result = this.service.apply(subject, mode);
+    if (result == GamemodeService.Result.ALREADY_IN_MODE) {
+      var alreadyMessages = snap.whenAlreadyInMode(mode);
+      var alreadyMsg = alreadyMessages.forSender(self, name);
+      sender.sendError(alreadyMsg);
       return;
     }
 
     var messages = snap.whenUpdated(mode);
     var target = this.framework.actorOf(subject);
     var selfMessage = messages.forSender(self, name);
+    var targetMessage = messages.forTarget(name);
 
-    sender.sendDualMessage(target, selfMessage, messages.forTarget(name));
+    sender.sendDualMessage(target, selfMessage, targetMessage);
   }
 }

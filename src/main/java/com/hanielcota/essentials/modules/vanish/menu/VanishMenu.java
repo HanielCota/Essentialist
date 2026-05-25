@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.vanish.menu;
 
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -12,6 +13,7 @@ import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -32,11 +34,17 @@ public final class VanishMenu implements EssentialsMenu {
   private final VanishClickHandler clickHandler;
 
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull VanishConfig snap) {
-    return ItemTemplate.builder(snap.infoMaterial())
-        .name(snap.infoName())
-        .lore(snap.infoLore().toArray(String[]::new))
-        .italic(false)
-        .build();
+    var material = snap.infoMaterial();
+    var name = snap.infoName();
+    var loreList = snap.infoLore();
+    var loreArray = loreList.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(material);
+    builder.name(name);
+    builder.lore(loreArray);
+    builder.italic(false);
+
+    return builder.build();
   }
 
   @Override
@@ -47,48 +55,72 @@ public final class VanishMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
+
+    var rows = snap.effectiveRows();
+    var title = snap.menuTitle();
+    var contentSlots = snap.effectiveContentSlots();
+    var navigation = snap.navigation();
+    var infoSlot = snap.effectiveInfoSlot();
+    var infoTemplate = buildInfoTemplate(snap);
+
     PaginatedInfoMenus.register(
-        menus,
-        ID,
-        snap.effectiveRows(),
-        snap.menuTitle(),
-        snap.effectiveContentSlots(),
-        snap.navigation(),
-        snap.effectiveInfoSlot(),
-        buildInfoTemplate(snap),
-        this::buildSlots);
+        menus, ID, rows, title, contentSlots, navigation, infoSlot, infoTemplate, this::buildSlots);
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player viewer, @NonNull MenuSession session) {
     var vanishedIds = this.service.vanished();
-    var players = new ArrayList<Player>(vanishedIds.size());
-    for (var id : vanishedIds) {
-      var player = Bukkit.getPlayer(id);
-      if (player != null) {
-        players.add(player);
-      }
-    }
+    var players = collectOnline(vanishedIds, vanishedIds.size());
+
     if (players.isEmpty()) {
       return emptyState();
     }
-    players.sort(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER));
+
+    var nameOrder = Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER);
+    players.sort(nameOrder);
 
     var slots = new ArrayList<SlotDefinition>(players.size());
     for (var player : players) {
-      var template = this.renderer.render(player);
-      var targetId = player.getUniqueId();
-      var targetName = player.getName();
-      slots.add(
-          SlotDefinition.of(
-              -1, template, click -> this.clickHandler.handle(click, targetId, targetName)));
+      var slot = buildEntrySlot(player);
+      slots.add(slot);
     }
     return slots;
   }
 
-  private List<SlotDefinition> emptyState() {
-    var slots = this.config.value().effectiveContentSlots();
-    var centerSlot = slots.get(slots.size() / 2);
+  private static List<Player> collectOnline(@NonNull Iterable<UUID> ids, int expectedSize) {
+    var players = new ArrayList<Player>(expectedSize);
+    for (var id : ids) {
+      var player = Bukkit.getPlayer(id);
+      if (player == null) {
+        continue;
+      }
+      players.add(player);
+    }
+    return players;
+  }
 
-    return List.of(SlotDefinition.of(centerSlot, this.renderer.renderEmpty(), click -> {}));
+  private SlotDefinition buildEntrySlot(@NonNull Player player) {
+    var template = this.renderer.render(player);
+    var targetId = player.getUniqueId();
+    var targetName = player.getName();
+    var onClick = entryClick(targetId, targetName);
+
+    return SlotDefinition.of(-1, template, onClick);
+  }
+
+  private ClickHandler entryClick(@NonNull UUID targetId, @NonNull String targetName) {
+    return click -> this.clickHandler.handle(click, targetId, targetName);
+  }
+
+  private List<SlotDefinition> emptyState() {
+    var snap = this.config.value();
+    var slots = snap.effectiveContentSlots();
+    var midIndex = slots.size() / 2;
+    var centerSlot = slots.get(midIndex);
+
+    var emptyTemplate = this.renderer.renderEmpty();
+    ClickHandler noop = click -> {};
+    var slot = SlotDefinition.of(centerSlot, emptyTemplate, noop);
+
+    return List.of(slot);
   }
 }

@@ -12,15 +12,24 @@ import org.bukkit.inventory.meta.Damageable;
 public record RepairService(ConfigHandle<RepairConfig> config) {
 
   private static boolean repair(ItemStack item, @NonNull List<Material> blacklist) {
-    if (item == null || item.getType().getMaxDurability() <= 0) {
+    if (item == null) {
       return false;
     }
-    if (blacklist.contains(item.getType())) {
+
+    var type = item.getType();
+    var maxDurability = type.getMaxDurability();
+    if (maxDurability <= 0) {
       return false;
     }
-    if (!(item.getItemMeta() instanceof Damageable damageable)
-        || damageable.isUnbreakable()
-        || !damageable.hasDamage()) {
+    if (blacklist.contains(type)) {
+      return false;
+    }
+
+    var meta = item.getItemMeta();
+    if (!(meta instanceof Damageable damageable)) {
+      return false;
+    }
+    if (damageable.isUnbreakable() || !damageable.hasDamage()) {
       return false;
     }
 
@@ -32,11 +41,15 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
   public HandResult repairHand(@NonNull Player player) {
     var inv = player.getInventory();
     var held = inv.getItemInMainHand();
+    var heldType = held.getType();
 
-    if (held.getType().isAir()) {
+    if (heldType.isAir()) {
       return HandResult.EMPTY_HAND;
     }
-    if (!repair(held, this.config.value().blacklist())) {
+
+    var snap = this.config.value();
+    var blacklist = snap.blacklist();
+    if (!repair(held, blacklist)) {
       return HandResult.NOTHING_TO_REPAIR;
     }
 
@@ -47,11 +60,12 @@ public record RepairService(ConfigHandle<RepairConfig> config) {
   public int repairAll(@NonNull Player player) {
     var snap = this.config.value();
     var blacklist = snap.blacklist();
-    int limit = snap.repairAllLimit();
+    var limit = snap.repairAllLimit();
     var inv = player.getInventory();
-    int count = 0;
+    var size = inv.getSize();
 
-    for (int slot = 0; slot < inv.getSize() && count < limit; slot++) {
+    var count = 0;
+    for (var slot = 0; slot < size && count < limit; slot++) {
       var item = inv.getItem(slot);
       if (repair(item, blacklist)) {
         inv.setItem(slot, item);

@@ -22,29 +22,45 @@ public final class InvseeListener implements Listener {
   // overwrites the live inventory with the stale view (item-loss / dupe vector).
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onClick(@NonNull InventoryClickEvent event) {
-    var top = event.getView().getTopInventory();
-    if (!(top.getHolder() instanceof InvseeHolder holder)) {
+    var view = event.getView();
+    var top = view.getTopInventory();
+    var topHolder = top.getHolder();
+
+    if (!(topHolder instanceof InvseeHolder holder)) {
       return;
     }
-    if (event.getClickedInventory() == top && event.getSlot() >= InvseeService.FIRST_LOCKED_SLOT) {
+
+    var clickedInventory = event.getClickedInventory();
+    var clickedSlot = event.getSlot();
+
+    if (clickedInventory == top && clickedSlot >= InvseeService.FIRST_LOCKED_SLOT) {
       event.setCancelled(true);
       return;
     }
+
     this.synchronizer.scheduleSync(holder, top);
   }
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onDrag(@NonNull InventoryDragEvent event) {
-    var top = event.getView().getTopInventory();
-    if (!(top.getHolder() instanceof InvseeHolder holder)) {
+    var view = event.getView();
+    var top = view.getTopInventory();
+    var topHolder = top.getHolder();
+
+    if (!(topHolder instanceof InvseeHolder holder)) {
       return;
     }
-    for (var rawSlot : event.getRawSlots()) {
-      if (rawSlot < top.getSize() && rawSlot >= InvseeService.FIRST_LOCKED_SLOT) {
+
+    var topSize = top.getSize();
+    var rawSlots = event.getRawSlots();
+
+    for (var rawSlot : rawSlots) {
+      if (rawSlot < topSize && rawSlot >= InvseeService.FIRST_LOCKED_SLOT) {
         event.setCancelled(true);
         return;
       }
     }
+
     this.synchronizer.scheduleSync(holder, top);
   }
 }

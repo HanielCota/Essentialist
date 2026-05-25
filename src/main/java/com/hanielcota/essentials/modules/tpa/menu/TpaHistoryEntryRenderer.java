@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
+import com.hanielcota.essentials.modules.tpa.model.Destination;
 import com.hanielcota.essentials.util.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.ZoneId;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.Material;
+import org.jspecify.annotations.Nullable;
 
 /** Renders one {@link TpaHistoryEntry} as the target player's head in the history menu. */
 public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
@@ -27,59 +29,91 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
       @NonNull String y,
       @NonNull String z,
       @NonNull String time) {
-    return line.replace("{target}", targetName)
-        .replace("{type}", type)
-        .replace("{status}", status)
-        .replace("{world}", world)
-        .replace("{x}", x)
-        .replace("{y}", y)
-        .replace("{z}", z)
-        .replace("{time}", time);
+    var withTarget = line.replace("{target}", targetName);
+    var withType = withTarget.replace("{type}", type);
+    var withStatus = withType.replace("{status}", status);
+    var withWorld = withStatus.replace("{world}", world);
+    var withX = withWorld.replace("{x}", x);
+    var withY = withX.replace("{y}", y);
+    var withZ = withY.replace("{z}", z);
+
+    return withZ.replace("{time}", time);
   }
 
   public @NonNull ItemTemplate render(@NonNull TpaHistoryEntry entry, int humanIndex) {
-    var settings = this.config.value().menu();
-    var target = entry.target();
-    var destination = entry.destination();
+    var snap = this.config.value();
+    var settings = snap.menu();
 
-    var worldName = UNKNOWN;
-    var x = UNKNOWN;
-    var y = UNKNOWN;
-    var z = UNKNOWN;
-    if (destination != null) {
-      worldName = destination.world();
-      x = Numbers.compact(destination.x());
-      y = Numbers.compact(destination.y());
-      z = Numbers.compact(destination.z());
-    }
+    var target = entry.target();
+    var targetName = target.name();
+    var targetId = target.id();
+
+    var coords = resolveCoordinates(entry.destination());
 
     var instant = Instant.ofEpochMilli(entry.resolvedAt());
-    var moment = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-    var time = settings.timeFormatter().format(moment);
+    var zone = ZoneId.systemDefault();
+    var moment = LocalDateTime.ofInstant(instant, zone);
+
+    var formatter = settings.timeFormatter();
+    var time = formatter.format(moment);
 
     var typeLabel = settings.typeLabel(entry.type());
     var statusLabel = settings.statusLabel(entry.status());
+
+    var loreTemplate = settings.itemLore();
     var lore =
         buildLore(
-            settings.itemLore(), target.name(), typeLabel, statusLabel, worldName, x, y, z, time);
+            loreTemplate,
+            targetName,
+            typeLabel,
+            statusLabel,
+            coords.world(),
+            coords.x(),
+            coords.y(),
+            coords.z(),
+            time);
 
-    return ItemTemplate.builder(Material.PLAYER_HEAD)
-        .head(target.id())
-        .name(settings.formatItemName(humanIndex, target.name()))
-        .lore(lore)
-        .glow(settings.itemGlow())
-        .italic(false)
-        .build();
+    var itemName = settings.formatItemName(humanIndex, targetName);
+    var glow = settings.itemGlow();
+
+    var builder = ItemTemplate.builder(Material.PLAYER_HEAD);
+    builder.head(targetId);
+    builder.name(itemName);
+    builder.lore(lore);
+    builder.glow(glow);
+    builder.italic(false);
+
+    return builder.build();
   }
 
   /** The placeholder item shown when the history is empty. */
   public @NonNull ItemTemplate renderEmpty() {
-    var settings = this.config.value().menu();
-    return ItemTemplate.builder(settings.emptyMaterial())
-        .name(settings.emptyName())
-        .lore(settings.emptyLore().toArray(String[]::new))
-        .italic(false)
-        .build();
+    var snap = this.config.value();
+    var settings = snap.menu();
+
+    var material = settings.emptyMaterial();
+    var emptyName = settings.emptyName();
+    var loreArray = settings.emptyLore().toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(material);
+    builder.name(emptyName);
+    builder.lore(loreArray);
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  private static Coordinates resolveCoordinates(@Nullable Destination destination) {
+    if (destination == null) {
+      return new Coordinates(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
+    }
+
+    var world = destination.world();
+    var x = Numbers.compact(destination.x());
+    var y = Numbers.compact(destination.y());
+    var z = Numbers.compact(destination.z());
+
+    return new Coordinates(world, x, y, z);
   }
 
   private String[] buildLore(
@@ -94,8 +128,11 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
       @NonNull String time) {
     var lore = new String[template.size()];
     for (var i = 0; i < template.size(); i++) {
-      lore[i] = formatLine(template.get(i), targetName, type, status, world, x, y, z, time);
+      var line = template.get(i);
+      lore[i] = formatLine(line, targetName, type, status, world, x, y, z, time);
     }
     return lore;
   }
+
+  private record Coordinates(String world, String x, String y, String z) {}
 }
