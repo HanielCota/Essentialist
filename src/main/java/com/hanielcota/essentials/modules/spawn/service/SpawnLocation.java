@@ -16,23 +16,25 @@ public record SpawnLocation(String world, double x, double y, double z, float ya
   /** Captures a Bukkit {@link Location} as an immutable spawn point. */
   public static SpawnLocation of(@NonNull Location location) {
     var world = location.getWorld();
+    var worldName = world.getName();
 
-    return new SpawnLocation(
-        world.getName(),
-        location.getX(),
-        location.getY(),
-        location.getZ(),
-        location.getYaw(),
-        location.getPitch());
+    var x = location.getX();
+    var y = location.getY();
+    var z = location.getZ();
+    var yaw = location.getYaw();
+    var pitch = location.getPitch();
+
+    return new SpawnLocation(worldName, x, y, z, yaw, pitch);
   }
 
   /** Materializes the spawn back into a Bukkit location, or empty when the world is unloaded. */
   public Optional<Location> resolve() {
-    var w = Bukkit.getWorld(this.world);
-    if (w == null) {
+    var world = Bukkit.getWorld(this.world);
+    if (world == null) {
       return Optional.empty();
     }
-    var location = new Location(w, this.x, this.y, this.z, this.yaw, this.pitch);
+
+    var location = new Location(world, this.x, this.y, this.z, this.yaw, this.pitch);
     return Optional.of(location);
   }
 }
