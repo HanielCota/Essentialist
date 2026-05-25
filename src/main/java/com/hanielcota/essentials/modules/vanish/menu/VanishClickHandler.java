@@ -5,8 +5,11 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import java.util.UUID;
+import java.util.function.Consumer;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 /**
  * Teleports the viewer to a vanished player. Re-checks {@link VanishService#isVanished(UUID)} at
@@ -21,7 +24,8 @@ public record VanishClickHandler(ConfigHandle<VanishConfig> config, VanishServic
     var target = Bukkit.getPlayer(targetId);
 
     if (target == null || !this.service.isVanished(targetId)) {
-      click.reply(snap.formatTeleportTargetGone(targetName));
+      var goneMsg = snap.formatTeleportTargetGone(targetName);
+      click.reply(goneMsg);
       click.refresh();
       return;
     }
@@ -29,7 +33,8 @@ public record VanishClickHandler(ConfigHandle<VanishConfig> config, VanishServic
     var location = target.getLocation();
     var world = location.getWorld();
     if (world == null) {
-      click.reply(snap.teleportFailed());
+      var failedMsg = snap.teleportFailed();
+      click.reply(failedMsg);
       return;
     }
 
@@ -40,16 +45,30 @@ public record VanishClickHandler(ConfigHandle<VanishConfig> config, VanishServic
     var z = location.getZ();
     var name = target.getName();
 
+    var teleportedMsg = snap.formatTeleported(name, worldName, x, y, z);
+    var failedMsg = snap.teleportFailed();
+    var afterTeleport = afterTeleport(click, teleportedMsg, failedMsg);
+
     click.close();
-    viewer
-        .teleportAsync(location)
-        .thenAccept(
-            success -> {
-              if (Boolean.TRUE.equals(success)) {
-                click.reply(snap.formatTeleported(name, worldName, x, y, z));
-              } else {
-                click.reply(snap.teleportFailed());
-              }
-            });
+    dispatchTeleport(viewer, location, afterTeleport);
+  }
+
+  private static void dispatchTeleport(
+      @NonNull Player viewer,
+      @NonNull Location destination,
+      @NonNull Consumer<Boolean> afterTeleport) {
+    var future = viewer.teleportAsync(destination);
+    future.thenAccept(afterTeleport);
+  }
+
+  private static Consumer<Boolean> afterTeleport(
+      @NonNull ClickContext click, @NonNull String teleportedMsg, @NonNull String failedMsg) {
+    return success -> {
+      if (Boolean.TRUE.equals(success)) {
+        click.reply(teleportedMsg);
+        return;
+      }
+      click.reply(failedMsg);
+    };
   }
 }

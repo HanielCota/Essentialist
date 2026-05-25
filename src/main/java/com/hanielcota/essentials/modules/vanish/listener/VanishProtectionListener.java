@@ -29,20 +29,29 @@ public final class VanishProtectionListener implements Listener {
     if (!(event.getTarget() instanceof Player target)) {
       return;
     }
-    if (this.service.isVanished(target.getUniqueId())) {
-      event.setCancelled(true);
+
+    var targetId = target.getUniqueId();
+    if (!this.service.isVanished(targetId)) {
+      return;
     }
+
+    event.setCancelled(true);
   }
 
   @EventHandler(ignoreCancelled = true)
   public void onDamage(@NonNull EntityDamageByEntityEvent event) {
-    var attacker = resolveAttacker(event.getDamager());
+    var damager = event.getDamager();
+    var attacker = resolveAttacker(damager);
     if (attacker == null) {
       return;
     }
-    if (this.service.isVanished(attacker.getUniqueId())) {
-      event.setCancelled(true);
+
+    var attackerId = attacker.getUniqueId();
+    if (!this.service.isVanished(attackerId)) {
+      return;
     }
+
+    event.setCancelled(true);
   }
 
   private static Player resolveAttacker(@NonNull Entity damager) {

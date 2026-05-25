@@ -19,12 +19,24 @@ public record OnlineConfig(
   }
 
   public String format(int count, int max) {
-    String template = count == 0 ? empty : count == 1 ? singular : plural;
+    var template = templateFor(count);
+
     // Full-server-bypass players can push the count past max — never display more than max.
-    int shown = Math.min(count, max);
+    var shown = Math.min(count, max);
     var shownStr = Integer.toString(shown);
     var maxStr = Integer.toString(max);
 
-    return template.replace("{count}", shownStr).replace("{max}", maxStr);
+    var withCount = template.replace("{count}", shownStr);
+    return withCount.replace("{max}", maxStr);
+  }
+
+  private String templateFor(int count) {
+    if (count == 0) {
+      return empty;
+    }
+    if (count == 1) {
+      return singular;
+    }
+    return plural;
   }
 }
