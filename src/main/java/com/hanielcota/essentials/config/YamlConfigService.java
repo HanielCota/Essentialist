@@ -74,15 +74,7 @@ public final class YamlConfigService implements ConfigService {
       try {
         handle.refresh();
       } catch (RuntimeException e) {
-        var exceptionMessage = e.getMessage();
-
-        String errorMessage;
-        if (exceptionMessage != null) {
-          errorMessage = exceptionMessage;
-        } else {
-          errorMessage = e.toString();
-        }
-
+        var errorMessage = errorMessageOf(e);
         var handleName = handle.name();
         failures.put(handleName, errorMessage);
       }
@@ -97,6 +89,14 @@ public final class YamlConfigService implements ConfigService {
     }
 
     return new ReloadReport(snapshot.size(), failures);
+  }
+
+  private static String errorMessageOf(@NonNull RuntimeException e) {
+    var message = e.getMessage();
+    if (message != null) {
+      return message;
+    }
+    return e.toString();
   }
 
   @Override
