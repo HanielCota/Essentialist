@@ -32,18 +32,21 @@ public record KickCommand(ConfigHandle<KickConfig> config, KickService service) 
       @OnlinePlayer @NonNull Player target,
       @DefaultValue("") @GreedyString @Arg("motivo") String motivo) {
     var snap = this.config.value();
+    var name = target.getName();
 
     if (target.hasPermission(EXEMPT_PERMISSION)) {
-      sender.sendError(snap.formatExempt(target.getName()));
+      var exemptMsg = snap.formatExempt(name);
+      sender.sendError(exemptMsg);
       return;
     }
 
-    var reason = snap.reasonOr(motivo.strip());
-
+    var trimmed = motivo.strip();
+    var reason = snap.reasonOr(trimmed);
     var screenMsg = snap.formatScreen(reason);
+
     this.service.kick(target, screenMsg);
 
-    var kickedMsg = snap.formatKicked(target.getName(), reason);
+    var kickedMsg = snap.formatKicked(name, reason);
     sender.sendSuccess(kickedMsg);
   }
 }

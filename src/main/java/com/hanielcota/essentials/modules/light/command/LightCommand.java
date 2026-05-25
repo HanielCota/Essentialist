@@ -29,7 +29,8 @@ public record LightCommand(
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
-    announce(sender, subject, this.service.toggle(subject));
+    var enabled = this.service.toggle(subject);
+    announce(sender, subject, enabled);
   }
 
   @Subcommand("on")
@@ -45,10 +46,15 @@ public record LightCommand(
   }
 
   private void announce(@NonNull CommandActor sender, @NonNull Player subject, boolean enabled) {
-    var messages = this.config.value().toggle(enabled);
-    String name = subject.getName();
-    boolean self = Senders.isSelf(sender, subject);
+    var snap = this.config.value();
+    var messages = snap.toggle(enabled);
+    var name = subject.getName();
+    var self = Senders.isSelf(sender, subject);
+
     var target = this.framework.actorOf(subject);
-    sender.sendDualMessage(target, messages.forSender(self, name), messages.forTarget(name));
+    var selfMessage = messages.forSender(self, name);
+    var targetMessage = messages.forTarget(name);
+
+    sender.sendDualMessage(target, selfMessage, targetMessage);
   }
 }

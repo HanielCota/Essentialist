@@ -26,9 +26,11 @@ public record TrashCommand(ConfigHandle<TrashConfig> config, TrashService servic
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    Player player = actor.unwrap(Player.class);
+    var player = actor.unwrap(Player.class);
     var snap = this.config.value();
+    var size = snap.size();
+    var title = snap.title();
 
-    this.service.openTrash(player, snap.size(), snap.title());
+    this.service.openTrash(player, size, title);
   }
 }

@@ -28,10 +28,13 @@ public final class FlyGameModeListener implements Listener {
     if (next == GameMode.CREATIVE || next == GameMode.SPECTATOR) {
       return;
     }
+
     var player = event.getPlayer();
     if (!this.service.isEnabled(player)) {
       return;
     }
-    this.scheduler.runOnEntity(player, () -> player.setAllowFlight(true));
+
+    Runnable reapplyFlight = () -> player.setAllowFlight(true);
+    this.scheduler.runOnEntity(player, reapplyFlight);
   }
 }
