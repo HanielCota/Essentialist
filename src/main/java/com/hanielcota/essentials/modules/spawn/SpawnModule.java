@@ -14,8 +14,8 @@ import com.hanielcota.essentials.modules.spawn.listener.SpawnJoinListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnRespawnListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnVoidListener;
 import com.hanielcota.essentials.modules.spawn.repository.SpawnRepository;
-import com.hanielcota.essentials.modules.spawn.repository.SpawnStore;
 import com.hanielcota.essentials.modules.spawn.repository.SpawnTable;
+import com.hanielcota.essentials.modules.spawn.repository.SqlSpawnRepository;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import java.util.Set;
@@ -24,9 +24,9 @@ import lombok.NonNull;
 /**
  * Server spawn point and the {@code /spawn} / {@code /setspawn} commands.
  *
- * <p>Persists the single spawn point in SQLite via {@link SpawnRepository}; the SQL write is queued
- * on an {@link com.hanielcota.essentials.database.AsyncDatabaseWriter AsyncDatabaseWriter} so
- * {@code /setspawn} returns immediately. Warm-up and damage cancel logic comes from the shared
+ * <p>Persists the single spawn point in SQLite via {@link SqlSpawnRepository}; the SQL write is
+ * queued on an {@link com.hanielcota.essentials.database.AsyncDatabaseWriter AsyncDatabaseWriter}
+ * so {@code /setspawn} returns immediately. Warm-up and damage cancel logic comes from the shared
  * {@link DelayedTeleport} service registered by the {@code teleport} module.
  */
 public final class SpawnModule extends AbstractModule {
@@ -43,13 +43,13 @@ public final class SpawnModule extends AbstractModule {
     var table = new SpawnTable(dialect);
     table.install(executor);
 
-    var store = new SpawnRepository(executor, table);
+    var repository = new SqlSpawnRepository(executor, table);
     var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
     var writer = writerFactory.create("Spawn");
     registrar.closeable(writer);
 
-    var spawnService = new SpawnService(store, writer);
-    registrar.provide(SpawnStore.class, store);
+    var spawnService = new SpawnService(repository, writer);
+    registrar.provide(SpawnRepository.class, repository);
     registrar.provide(SpawnService.class, spawnService);
 
     var delayed = env.service(DelayedTeleport.class);

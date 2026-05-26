@@ -1,5 +1,18 @@
 package com.hanielcota.essentials.modules.tpa.config;
 
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaBehaviorSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaBlockedMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoriteActionMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaHelpInfoMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaHelpMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaNotificationSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingActionMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaPrivacySettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaProfileMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaSettingsMenuConfig;
 import java.time.Duration;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;

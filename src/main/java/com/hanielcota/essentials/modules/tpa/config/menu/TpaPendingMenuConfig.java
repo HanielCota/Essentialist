@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.config;
+package com.hanielcota.essentials.modules.tpa.config.menu;
 
 import java.util.List;
 import org.bukkit.Material;

@@ -8,13 +8,13 @@ import com.hanielcota.essentials.module.ModuleRegistrar;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.SqliteTpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryTable;
-import com.hanielcota.essentials.modules.tpa.repository.TpaBlockRepository;
+import com.hanielcota.essentials.modules.tpa.repository.SqlTpaBlockRepository;
+import com.hanielcota.essentials.modules.tpa.repository.SqlTpaContactRepository;
+import com.hanielcota.essentials.modules.tpa.repository.SqlTpaFavoriteRepository;
+import com.hanielcota.essentials.modules.tpa.repository.SqlTpaProfileRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaBlockTable;
-import com.hanielcota.essentials.modules.tpa.repository.TpaContactRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaContactTable;
-import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteTable;
-import com.hanielcota.essentials.modules.tpa.repository.TpaProfileRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaProfileTable;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
@@ -46,7 +46,7 @@ public final class TpaPersistenceBootstrap {
   public TpaProfileService profiles() {
     var executor = this.env.service(SqlExecutor.class);
     var table = profileTable(executor);
-    var repository = new TpaProfileRepository(executor, table);
+    var repository = new SqlTpaProfileRepository(executor, table);
     var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
     var writer = writerFactory.create("TpaProfiles");
     this.registrar.closeable(writer);
@@ -61,7 +61,7 @@ public final class TpaPersistenceBootstrap {
   public TpaBlockService blocks() {
     var executor = this.env.service(SqlExecutor.class);
     var table = blockTable(executor);
-    var repository = new TpaBlockRepository(executor, table);
+    var repository = new SqlTpaBlockRepository(executor, table);
     var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
     var writer = writerFactory.create("TpaBlocks");
     this.registrar.closeable(writer);
@@ -76,7 +76,7 @@ public final class TpaPersistenceBootstrap {
   public TpaFavoriteService favorites() {
     var executor = this.env.service(SqlExecutor.class);
     var table = favoriteTable(executor);
-    var repository = new TpaFavoriteRepository(executor, table);
+    var repository = new SqlTpaFavoriteRepository(executor, table);
     var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
     var writer = writerFactory.create("TpaFavorites");
     this.registrar.closeable(writer);
@@ -91,7 +91,7 @@ public final class TpaPersistenceBootstrap {
   public TpaContactService contacts() {
     var executor = this.env.service(SqlExecutor.class);
     var table = contactTable(executor);
-    var repository = new TpaContactRepository(executor, table);
+    var repository = new SqlTpaContactRepository(executor, table);
     var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
     var writer = writerFactory.create("TpaContacts");
     this.registrar.closeable(writer);

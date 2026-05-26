@@ -7,7 +7,7 @@ import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
-import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
+import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import lombok.NonNull;
 import org.junit.jupiter.api.Test;
@@ -104,7 +104,7 @@ class TpaPendingBulkActionsTest {
   }
 
   private static Fixture newFixture() {
-    var store = new RequestRepository();
+    var store = new InMemoryRequestRepository();
     var history = new TpaTestSupport.RecordingHistory();
     var players = new TpaTestSupport.RecordingPlayerProvider();
     var profiles = TpaTestSupport.profiles();

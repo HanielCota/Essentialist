@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.config;
+package com.hanielcota.essentials.modules.tpa.config.menu;
 
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;

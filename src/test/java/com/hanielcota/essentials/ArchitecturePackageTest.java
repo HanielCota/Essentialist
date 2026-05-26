@@ -21,15 +21,28 @@ class ArchitecturePackageTest {
   private static final Set<String> PERSISTENCE_TYPES =
       Set.of(
           "WarpRepository",
+          "SqlWarpRepository",
           "WarpTable",
           "WarpCache",
           "SpawnRepository",
+          "SqlSpawnRepository",
           "SpawnTable",
           "MuteRepository",
+          "SqlMuteRepository",
           "MuteTable",
           "NickRepository",
+          "SqlNickRepository",
           "NickTable",
-          "RequestRepository");
+          "RequestRepository",
+          "InMemoryRequestRepository",
+          "TpaBlockRepository",
+          "SqlTpaBlockRepository",
+          "TpaContactRepository",
+          "SqlTpaContactRepository",
+          "TpaFavoriteRepository",
+          "SqlTpaFavoriteRepository",
+          "TpaProfileRepository",
+          "SqlTpaProfileRepository");
 
   // Pattern: `import com.hanielcota.essentials.modules.<module>.` — captures the imported module.
   private static final Pattern CROSS_MODULE_IMPORT =

@@ -11,13 +11,13 @@ import lombok.NonNull;
 
 public final class NickCache {
 
-  private final NickStore store;
+  private final NickRepository repository;
   private final AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, NickEntry> byId = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, UUID> idByLowerNick = new ConcurrentHashMap<>();
 
-  public NickCache(@NonNull NickStore store, @NonNull AsyncDatabaseWriter writer) {
-    this.store = store;
+  public NickCache(@NonNull NickRepository repository, @NonNull AsyncDatabaseWriter writer) {
+    this.repository = repository;
     this.writer = writer;
   }
 
@@ -53,7 +53,7 @@ public final class NickCache {
     var entry = new NickEntry(id, nickname, realName);
     cacheInsert(entry);
 
-    Runnable persist = () -> this.store.save(entry);
+    Runnable persist = () -> this.repository.save(entry);
     this.writer.submit("save nick", persist);
   }
 
@@ -63,7 +63,7 @@ public final class NickCache {
       return false;
     }
 
-    Runnable persist = () -> this.store.delete(id);
+    Runnable persist = () -> this.repository.delete(id);
     this.writer.submit("delete nick", persist);
 
     return true;

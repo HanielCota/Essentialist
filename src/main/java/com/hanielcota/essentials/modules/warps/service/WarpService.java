@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.warps.service;
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.warps.domain.Warp;
 import com.hanielcota.essentials.modules.warps.repository.WarpCache;
-import com.hanielcota.essentials.modules.warps.repository.WarpStore;
+import com.hanielcota.essentials.modules.warps.repository.WarpRepository;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public final class WarpService {
   private static final String USE_PREFIX = "essentials.warp.use.";
   private static final String USE_WILDCARD = "essentials.warp.use.*";
 
-  private final WarpStore store;
+  private final WarpRepository repository;
   private final WarpCache cache;
   private final AsyncDatabaseWriter writer;
 
@@ -53,7 +53,7 @@ public final class WarpService {
 
     this.cache.put(warp);
 
-    Runnable persist = () -> this.store.save(warp);
+    Runnable persist = () -> this.repository.save(warp);
     this.writer.submit("save warp", persist);
   }
 
@@ -65,7 +65,7 @@ public final class WarpService {
 
     var canonicalName = removed.get().name();
 
-    Runnable persist = () -> this.store.delete(canonicalName);
+    Runnable persist = () -> this.repository.delete(canonicalName);
     this.writer.submit("delete warp", persist);
 
     return true;

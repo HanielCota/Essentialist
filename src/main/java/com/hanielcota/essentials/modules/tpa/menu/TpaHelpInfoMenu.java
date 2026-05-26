@@ -10,7 +10,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaHelpInfoMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaHelpInfoMenuConfig;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.List;
 import lombok.NonNull;

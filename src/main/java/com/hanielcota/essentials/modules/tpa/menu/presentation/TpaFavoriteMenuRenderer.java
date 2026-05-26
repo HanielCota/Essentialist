@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.menu.MenuLayouts;
-import com.hanielcota.essentials.modules.tpa.config.TpaFavoritesMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;

@@ -10,7 +10,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
-import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
+import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
@@ -109,7 +109,7 @@ class TeleportRequestServiceTest {
       @NonNull TpaProfileService profiles, @NonNull TpaBlockService blocks) {
     return new TeleportRequestService(
         new StaticConfigHandle(),
-        new RequestRepository(),
+        new InMemoryRequestRepository(),
         new NoopHistory(),
         new TpaNotifier(new StaticConfigHandle(), new EmptyPlayerProvider(), profiles),
         new EmptyPlayerProvider(),

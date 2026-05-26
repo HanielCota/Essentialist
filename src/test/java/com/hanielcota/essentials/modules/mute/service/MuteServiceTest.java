@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.modules.mute.repository.MuteCache;
-import com.hanielcota.essentials.modules.mute.repository.MuteStore;
+import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -52,10 +52,10 @@ class MuteServiceTest {
   }
 
   private static MuteCache newCache() {
-    return new MuteCache(new NoopStore(), new NoopWriter());
+    return new MuteCache(new NoopRepository(), new NoopWriter());
   }
 
-  private static final class NoopStore implements MuteStore {
+  private static final class NoopRepository implements MuteRepository {
     @Override
     public List<Map.Entry<UUID, Mute>> listActive(@NonNull Instant now) {
       return List.of();

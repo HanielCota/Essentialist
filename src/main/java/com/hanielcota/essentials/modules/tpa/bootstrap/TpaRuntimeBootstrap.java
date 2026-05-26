@@ -15,7 +15,7 @@ import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
 import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteChatListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteSessionCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaQuitListener;
-import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
+import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExpiry;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
@@ -44,7 +44,7 @@ public final class TpaRuntimeBootstrap {
       @NonNull TpaProfileService profiles,
       @NonNull TpaBlockService blocks,
       @NonNull TpaContactService contacts) {
-    var store = new RequestRepository();
+    var store = new InMemoryRequestRepository();
     var players = this.env.service(PlayerProvider.class);
     var notifier = new TpaNotifier(this.config, players, profiles);
     var requestService =
