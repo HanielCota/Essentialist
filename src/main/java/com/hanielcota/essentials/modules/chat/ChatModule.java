@@ -15,24 +15,40 @@ import com.hanielcota.essentials.modules.chat.command.GlobalChatNotifier;
 import com.hanielcota.essentials.modules.chat.command.StaffChatCommand;
 import com.hanielcota.essentials.modules.chat.command.StaffChatNotifier;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
+import com.hanielcota.essentials.modules.chat.format.ChatFormatPipeline;
+import com.hanielcota.essentials.modules.chat.format.ChatLineRenderer;
+import com.hanielcota.essentials.modules.chat.format.ChatTagResolverFactory;
+import com.hanielcota.essentials.modules.chat.format.ChatTemplateCompiler;
+import com.hanielcota.essentials.modules.chat.format.PlayerMessageStyler;
+import com.hanielcota.essentials.modules.chat.guard.ChatGuardCheck;
+import com.hanielcota.essentials.modules.chat.guard.ChatGuardPipeline;
+import com.hanielcota.essentials.modules.chat.guard.CooldownCheck;
+import com.hanielcota.essentials.modules.chat.guard.RepeatedMessageCheck;
 import com.hanielcota.essentials.modules.chat.listener.AsyncChatListener;
 import com.hanielcota.essentials.modules.chat.listener.ChatPlayerCleanupListener;
-import com.hanielcota.essentials.modules.chat.placeholder.PlaceholderApiBridge;
+import com.hanielcota.essentials.modules.chat.placeholder.PlaceholderApiResolver;
+import com.hanielcota.essentials.modules.chat.placeholder.PlaceholderResolver;
 import com.hanielcota.essentials.modules.chat.service.AntiSpamService;
-import com.hanielcota.essentials.modules.chat.service.ChatFormatter;
-import com.hanielcota.essentials.modules.chat.service.ChatGuard;
 import com.hanielcota.essentials.modules.chat.service.CooldownService;
-import com.hanielcota.essentials.modules.chat.service.PlayerMessageStyler;
 import com.hanielcota.essentials.modules.chat.service.StaffChatToggleService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.AudienceProvider;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import java.util.List;
 import lombok.NonNull;
 
 /**
- * Chat module wiring: formatting + local/staff routing via {@link AsyncChatListener}, global
- * delivery via {@code /g}. The channel router picks between staff (toggle active) and local; global
- * is reached exclusively through the command.
+ * Chat module wiring. Composition root for the three sub-systems:
+ *
+ * <ul>
+ *   <li><b>format/</b> — parse → placeholders → render pipeline ({@link ChatFormatPipeline}).
+ *   <li><b>guard/</b> — pluggable pre-send checks composed into {@link ChatGuardPipeline}.
+ *   <li><b>channel/</b> — sealed routing + viewer filtering ({@link ChannelRouter}).
+ * </ul>
+ *
+ * <p>The PlaceholderAPI integration is chosen here at startup: {@link PlaceholderApiResolver}
+ * inspects the plugin manager and falls back to a no-op internally if PAPI is absent, so wiring is
+ * unconditional — callers only see the {@link PlaceholderResolver} abstraction.
  */
 public final class ChatModule extends AbstractModule {
 
@@ -48,13 +64,21 @@ public final class ChatModule extends AbstractModule {
     var audiences = env.service(AudienceProvider.class);
     var players = env.service(PlayerProvider.class);
 
-    var papi = new PlaceholderApiBridge();
-    var formatter = new ChatFormatter(config, papi);
+    PlaceholderResolver placeholders = new PlaceholderApiResolver();
+
+    var compiler = new ChatTemplateCompiler();
+    var resolverFactory = new ChatTagResolverFactory(config, placeholders);
+    var renderer = new ChatLineRenderer();
+    var formatPipeline = new ChatFormatPipeline(compiler, placeholders, resolverFactory, renderer);
     var styler = new PlayerMessageStyler();
+
     var toggleService = new StaffChatToggleService();
     var cooldowns = new CooldownService();
     var antiSpam = new AntiSpamService();
-    var guard = new ChatGuard(config, cooldowns, antiSpam);
+
+    List<ChatGuardCheck> checks =
+        List.of(new CooldownCheck(config, cooldowns), new RepeatedMessageCheck(config, antiSpam));
+    var guards = new ChatGuardPipeline(checks, cooldowns, antiSpam);
 
     var globalChannel = new GlobalChannel();
     var localChannel = new LocalChannel(config);
@@ -63,15 +87,15 @@ public final class ChatModule extends AbstractModule {
     var router = new ChannelRouter(toggleService, localChannel, staffChannel);
 
     var chatNotifier = new ChatNotifier(config, actors);
-    var staffNotifier = new StaffChatNotifier(config, formatter, players, audiences);
+    var staffNotifier = new StaffChatNotifier(config, formatPipeline, players, audiences);
     var globalNotifier =
-        new GlobalChatNotifier(config, formatter, styler, guard, globalChannel, audiences);
+        new GlobalChatNotifier(config, formatPipeline, styler, guards, globalChannel, audiences);
 
     registrar.command(new ChatCommand(configs, chatNotifier));
     registrar.command(new GlobalChatCommand(globalNotifier));
     registrar.command(new StaffChatCommand(toggleService, staffNotifier));
 
-    registrar.listener(new AsyncChatListener(config, router, formatter, guard, styler));
+    registrar.listener(new AsyncChatListener(config, router, formatPipeline, guards, styler));
     registrar.listener(new ChatPlayerCleanupListener(toggleService, cooldowns, antiSpam));
   }
 }
