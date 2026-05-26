@@ -31,38 +31,69 @@ public record TpaMenuConfig(
     @Comment("Label for an expired request.") String statusExpired,
     @Comment("Label for a cancelled request.") String statusCancelled,
     @Comment("Label for the /tpa request type.") String typeTpa,
-    @Comment("Label for the /tpahere request type.") String typeTpaHere) {
+    @Comment("Label for the /tpahere request type.") String typeTpaHere,
+    @Comment("Slot of the status filter cycle button.") int filterSlot,
+    @Comment("Material of the status filter button.") Material filterIcon,
+    @Comment("Name of the status filter button. Placeholder: {filter}.") String filterName,
+    @Comment(
+            "Lore of the status filter button. Use {filter} for the current label and {options} to "
+                + "expand the full list of filter states with the active one marked.")
+        List<String> filterLore,
+    @Comment("Label shown in {filter} when no status filter is active.") String filterAll,
+    @Comment("Suffix appended to the active option in the {options} expansion.")
+        String filterActiveMarker,
+    @Comment("Slot of the back item. Clicking returns to the /tpa hub.") int backSlot,
+    @Comment("Material of the back item.") Material backIcon,
+    @Comment("Name of the back item.") String backName,
+    @Comment("Lore of the back item.") List<String> backLore,
+    @Comment("Click-to-copy hint sent in chat after clicking an accepted entry.")
+        String destinationCopyMessage) {
 
   private static final DateTimeFormatter FALLBACK_TIME_FORMAT =
       DateTimeFormatter.ofPattern("dd/MM HH:mm");
 
   public static TpaMenuConfig defaults() {
     return new TpaMenuConfig(
-        "<dark_aqua>Histórico de TPA",
-        1,
-        List.of(2, 3, 4, 5, 6),
+        "Histórico de TPA",
+        6,
+        List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34),
         "<gold>#{index} <yellow>{target}",
         false,
         "dd/MM HH:mm",
         List.of(
-            "<gray>Para: <white>{target}",
-            "<gray>Tipo: <white>{type}",
+            "<gray>{type} <gold>{target}</gold>.",
             "<gray>Resultado: {status}",
-            "<gray>Local: <white>{world} {x}, {y}, {z}",
+            "<gray>Onde: <white>{world} {x}, {y}, {z}",
             "<gray>Quando: <white>{time}"),
         Material.BARRIER,
         "<red>Sem histórico ainda",
         List.of(
-            "<gray>Nenhum pedido recente.",
+            "<gray>Você não tem teleportes recentes.",
             "",
-            "<yellow>/tpa [jogador] <gray>para ir até alguém",
-            "<yellow>/tpahere [jogador] <gray>para chamar alguém"),
-        "<green>Aceito",
-        "<red>Recusado",
-        "<gray>Expirado",
-        "<yellow>Cancelado",
-        "Você foi até o jogador",
-        "Você chamou o jogador");
+            "<yellow>/tpa <jogador> <gray>para visitar alguém",
+            "<yellow>/tpahere <jogador> <gray>para chamar alguém"),
+        "<green>aceito",
+        "<red>recusado",
+        "<gray>expirado",
+        "<yellow>cancelado",
+        "Você foi até",
+        "Você chamou",
+        49,
+        Material.HOPPER,
+        "Filtro: {filter}",
+        List.of(
+            "<gray>Filtra os resultados mostrados.",
+            "",
+            "{options}",
+            "",
+            "<yellow>Clique para alternar."),
+        "<yellow>todos",
+        " <gold>◀",
+        45,
+        Material.ARROW,
+        "<yellow>Voltar",
+        List.of("<gray>Retorna ao menu de TPA."),
+        "<gray>Destino: <white>{world} {x}, {y}, {z}");
   }
 
   /** Configured time pattern, falling back to a safe default when malformed. */

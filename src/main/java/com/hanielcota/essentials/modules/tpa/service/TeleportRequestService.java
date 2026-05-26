@@ -34,6 +34,7 @@ public final class TeleportRequestService {
   private final PlayerProvider players;
   private final TpaProfileService profiles;
   private final TpaBlockService blocks;
+  private final TpaContactService contacts;
   private final TeleportRequestExecutor executor;
 
   public TeleportRequestService(
@@ -43,7 +44,8 @@ public final class TeleportRequestService {
       @NonNull TpaNotifier notifier,
       @NonNull PlayerProvider players,
       @NonNull TpaProfileService profiles,
-      @NonNull TpaBlockService blocks) {
+      @NonNull TpaBlockService blocks,
+      @NonNull TpaContactService contacts) {
     this.config = config;
     this.store = store;
     this.history = history;
@@ -51,6 +53,7 @@ public final class TeleportRequestService {
     this.players = players;
     this.profiles = profiles;
     this.blocks = blocks;
+    this.contacts = contacts;
     this.executor = new TeleportRequestExecutor(players);
   }
 
@@ -68,6 +71,14 @@ public final class TeleportRequestService {
 
     var requesterId = requester.getUniqueId();
     if (this.blocks.isBlocked(targetId, requesterId)) {
+      return Optional.empty();
+    }
+
+    if (this.profiles.isDndActive(targetId)) {
+      return Optional.empty();
+    }
+
+    if (refusedDueToCrossWorld(requester, target, targetId)) {
       return Optional.empty();
     }
 
@@ -103,6 +114,24 @@ public final class TeleportRequestService {
 
   public boolean isBlockedBy(@NonNull UUID blockerId, @NonNull UUID requesterId) {
     return this.blocks.isBlocked(blockerId, requesterId);
+  }
+
+  public boolean isDndActive(@NonNull UUID targetId) {
+    return this.profiles.isDndActive(targetId);
+  }
+
+  public boolean isCrossWorldRefused(@NonNull Player requester, @NonNull Player target) {
+    return refusedDueToCrossWorld(requester, target, target.getUniqueId());
+  }
+
+  private boolean refusedDueToCrossWorld(
+      @NonNull Player requester, @NonNull Player target, @NonNull UUID targetId) {
+    var targetProfile = this.profiles.profile(targetId);
+    if (targetProfile.allowCrossWorld()) {
+      return false;
+    }
+    var sameWorld = requester.getWorld().getUID().equals(target.getWorld().getUID());
+    return !sameWorld;
   }
 
   /** A specific pending request to {@code target} from the named requester, case-insensitive. */
@@ -198,7 +227,19 @@ public final class TeleportRequestService {
     var acceptedEntry = TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, destination);
 
     this.history.push(acceptedEntry);
+    recordAcceptedOutgoingStats(request, acceptedEntry);
     return true;
+  }
+
+  private void recordAcceptedOutgoingStats(
+      @NonNull TeleportRequest request, @NonNull TpaHistoryEntry entry) {
+    var requesterId = request.requester().id();
+    var target = request.target();
+    var latencyMs = Math.max(0L, entry.resolvedAt() - entry.createdAt());
+    var latency = java.time.Duration.ofMillis(latencyMs);
+
+    this.profiles.recordAcceptedOutgoing(requesterId, latency);
+    this.contacts.recordContact(requesterId, target.id(), target.name());
   }
 
   /** Removes a request and writes its terminal state to history in one step. */

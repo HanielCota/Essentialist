@@ -14,6 +14,15 @@ final class TeleportRequestExecutor {
 
   private final PlayerProvider players;
 
+  private static TeleportExecution mapOutcome(Boolean success, @NonNull Location landing) {
+    if (!Boolean.TRUE.equals(success)) {
+      return TeleportExecution.failed();
+    }
+
+    var destination = Destination.of(landing);
+    return TeleportExecution.success(destination);
+  }
+
   CompletableFuture<TeleportExecution> execute(@NonNull TeleportRequest request) {
     var requesterId = request.requester().id();
     var requester = this.players.online(requesterId).orElse(null);
@@ -32,14 +41,5 @@ final class TeleportRequestExecutor {
 
     var pending = mover.teleportAsync(landing);
     return pending.thenApply(success -> mapOutcome(success, landing));
-  }
-
-  private static TeleportExecution mapOutcome(Boolean success, @NonNull Location landing) {
-    if (!Boolean.TRUE.equals(success)) {
-      return TeleportExecution.failed();
-    }
-
-    var destination = Destination.of(landing);
-    return TeleportExecution.success(destination);
   }
 }

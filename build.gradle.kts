@@ -103,4 +103,6 @@ tasks {
 
     jar { enabled = false }
     assemble { dependsOn(shadowJar) }
+
+    named("spotlessCheck") { dependsOn("spotlessApply") }
 }

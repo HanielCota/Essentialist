@@ -5,8 +5,6 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
-import com.hanielcota.essentials.paper.ActorFactory;
-import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +18,7 @@ import lombok.RequiredArgsConstructor;
 public final class TpAcceptResultHandler {
 
   private final ConfigHandle<TpaConfig> config;
-  private final ActorFactory actors;
-  private final PlayerProvider players;
+  private final TpaRequestReplyNotifier replyNotifier;
 
   public void handleClaim(
       @NonNull AcceptResult result, @NonNull TeleportRequest request, @NonNull CommandActor actor) {
@@ -57,7 +54,7 @@ public final class TpAcceptResultHandler {
     actor.sendSuccess(acceptedMsg);
 
     var acceptedTemplate = messages.accepted();
-    TpaRequests.replyRequester(this.actors, this.players, request, acceptedTemplate, true);
+    this.replyNotifier.notifyAccepted(request, acceptedTemplate);
   }
 
   private void notifyRequesterOffline(

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import java.util.List;
@@ -76,7 +77,9 @@ class TpaProfileServiceTest {
   void loadAllSeedsPersistedProfiles() {
     var service = newService();
     var playerId = UUID.randomUUID();
-    var stored = new TpaProfile(false, true, 7, 3);
+    var stored =
+        new TpaProfile(
+            false, true, 7, 3, 0, 0, 0, false, true, true, true, 0, FavoriteOrdering.NAME);
 
     service.loadAll(List.of(new TpaProfileService.Entry(playerId, stored)));
 

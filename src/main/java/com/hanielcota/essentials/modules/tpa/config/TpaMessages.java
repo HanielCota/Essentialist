@@ -80,7 +80,20 @@ public record TpaMessages(
                 + "Placeholders: {player}.")
         String favoriteUnknownPlayer,
     @Comment("Shown when the chosen favorite is not online right now. Placeholders: {player}.")
-        String favoriteOffline) {
+        String favoriteOffline,
+    @Comment("Shown when the target is in Do-Not-Disturb mode. Placeholders: {player}.")
+        String dndActive,
+    @Comment(
+            "Sent to a player when another player adds them to their favorites. Gated by the "
+                + "target's notifyWhenFavorited toggle. Placeholders: {player}.")
+        String favoriteNotifyTarget,
+    @Comment(
+            "Shown when the target refuses TPA requests from other worlds. Placeholders: {player}.")
+        String crossWorldRefused,
+    @Comment("Sent after the player clicks accept-all in the pending menu. Placeholder: {count}.")
+        String acceptedAllMessage,
+    @Comment("Sent after the player clicks deny-all in the pending menu. Placeholder: {count}.")
+        String deniedAllMessage) {
 
   public static TpaMessages defaults() {
     return new TpaMessages(
@@ -128,7 +141,12 @@ public record TpaMessages(
         "<yellow>Adição de favorito cancelada.",
         "<red>Você não pode adicionar a si mesmo como favorito.",
         "<red>O jogador <gold>{player}</gold> nunca entrou neste servidor.",
-        "<red><gold>{player}</gold> não está online no momento.");
+        "<red><gold>{player}</gold> não está online no momento.",
+        "<red><gold>{player}</gold> está no modo Não-Perturbe e não está recebendo pedidos.",
+        "<gold>{player}</gold> te adicionou aos favoritos.",
+        "<red><gold>{player}</gold> não está aceitando pedidos vindos de outros mundos.",
+        "<green>Você aceitou <white>{count}</white> pedido(s).",
+        "<yellow>Você recusou <white>{count}</white> pedido(s).");
   }
 
   /** The request line shown to the target, picked by {@code type}. */

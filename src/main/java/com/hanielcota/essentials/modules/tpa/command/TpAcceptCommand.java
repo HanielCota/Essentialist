@@ -27,16 +27,14 @@ public record TpAcceptCommand(
     ConfigHandle<TpaConfig> config,
     TeleportRequestService service,
     TpAcceptResultHandler resultHandler,
+    TpaIncomingResolver incomingResolver,
     MainThreadCallbacks callbacks) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
-    var snap = this.config.value();
-    var messages = snap.messages();
-
     var sender = actor.unwrap(Player.class);
 
-    var resolved = TpaRequests.resolveIncoming(this.service, sender, requester, messages, actor);
+    var resolved = this.incomingResolver.resolve(sender, requester, actor);
     if (resolved.isEmpty()) {
       return;
     }

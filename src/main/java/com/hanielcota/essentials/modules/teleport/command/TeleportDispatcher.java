@@ -28,6 +28,14 @@ public final class TeleportDispatcher {
   private final TeleportService teleport;
   private final MainThreadCallbacks callbacks;
 
+  private static Double parseDouble(@NonNull String value) {
+    try {
+      return Double.parseDouble(value);
+    } catch (NumberFormatException _) {
+      return null;
+    }
+  }
+
   public void dispatch(
       @NonNull CommandActor sender,
       @NonNull String arg1,
@@ -145,13 +153,5 @@ public final class TeleportDispatcher {
     var snap = this.config.value();
     var msg = snap.formatPlayerNotFound(name);
     sender.sendError(msg);
-  }
-
-  private static Double parseDouble(@NonNull String value) {
-    try {
-      return Double.parseDouble(value);
-    } catch (NumberFormatException _) {
-      return null;
-    }
   }
 }

@@ -17,12 +17,16 @@ public record TpaHelpMenuConfig(
     @Comment("Fallback material of the profile item.") Material profileIcon,
     @Comment("Custom head texture for the profile item when not using the viewer's skin.")
         String profileHeadTexture,
-    @Comment("Name of the profile item. Placeholders: {player}, {sent}, {received}.")
+    @Comment(
+            "Name of the profile item. Placeholders: {player}, {sent}, {received}, {pending}, "
+                + "{accept_rate}, {avg_accept}, {most_contacted}.")
         String profileName,
     @Comment(
-            "Lore of the profile item. Placeholders: {player}, {sent}, {received}, "
-                + "{receive_tpa}, {receive_tpahere}.")
+            "Lore of the profile item. Placeholders: {player}, {sent}, {received}, {receive_tpa},"
+                + " {receive_tpahere}, {accept_rate}, {avg_accept}, {most_contacted}.")
         List<String> profileLore,
+    @Comment("Label used in the profile lore when there is no data yet for a stat.")
+        String statsFallback,
     @Comment("Slot of the /tpa explainer.") int tpaSlot,
     @Comment("Material of the /tpa explainer.") Material tpaIcon,
     @Comment("Custom head texture for the /tpa explainer when material is PLAYER_HEAD.")
@@ -56,84 +60,168 @@ public record TpaHelpMenuConfig(
     @Comment("Name of the favorites shortcut. Placeholder: {favorites}.") String favoritesName,
     @Comment("Lore of the favorites shortcut. Placeholder: {favorites}.")
         List<String> favoritesLore,
+    @Comment(
+            "Slot of the outgoing-request shortcut — shown when there is a pending /tpa to cancel.")
+        int outgoingSlot,
+    @Comment("Material of the outgoing shortcut when there is a pending request.")
+        Material outgoingIcon,
+    @Comment("Use the target's skin on the outgoing shortcut head.") boolean outgoingUsePlayerHead,
+    @Comment("Custom head texture for the outgoing shortcut when material is PLAYER_HEAD.")
+        String outgoingHeadTexture,
+    @Comment("Name of the outgoing shortcut. Placeholders: {target}, {type}, {seconds}.")
+        String outgoingName,
+    @Comment("Lore of the outgoing shortcut. Placeholders: {target}, {type}, {seconds}.")
+        List<String> outgoingLore,
+    @Comment("Label used in {type} when the outgoing request is a /tpa.") String outgoingTypeTpa,
+    @Comment("Label used in {type} when the outgoing request is a /tpahere.")
+        String outgoingTypeTpaHere,
+    @Comment("Material of the outgoing shortcut when there is no pending request.")
+        Material outgoingIdleIcon,
+    @Comment("Name of the outgoing shortcut when idle.") String outgoingIdleName,
+    @Comment("Lore of the outgoing shortcut when idle.") List<String> outgoingIdleLore,
+    @Comment("Slot of the DND toggle.") int dndSlot,
+    @Comment("Material of the DND toggle when it is off.") Material dndOffIcon,
+    @Comment("Material of the DND toggle when it is on.") Material dndOnIcon,
+    @Comment("Name of the DND toggle. Placeholder: {state}.") String dndName,
+    @Comment("Lore of the DND toggle. Placeholders: {state}, {remaining}.") List<String> dndLore,
+    @Comment("Label used in {state} when DND is off.") String dndStateOff,
+    @Comment("Label used in {state} when DND is for 30 minutes.") String dndState30m,
+    @Comment("Label used in {state} when DND is for 1 hour.") String dndState1h,
+    @Comment("Label used in {state} when DND is for 4 hours.") String dndState4h,
+    @Comment("Slot of the last-contacted shortcut — clicking sends a /tpa to that player.")
+        int lastContactedSlot,
+    @Comment("Material of the last-contacted shortcut.") Material lastContactedIcon,
+    @Comment("Use the contacted player's skin on the shortcut head.")
+        boolean lastContactedUsePlayerHead,
+    @Comment("Custom head texture for the last-contacted shortcut when material is PLAYER_HEAD.")
+        String lastContactedHeadTexture,
+    @Comment("Name of the last-contacted shortcut. Placeholder: {player}.")
+        String lastContactedName,
+    @Comment("Lore of the last-contacted shortcut. Placeholder: {player}.")
+        List<String> lastContactedLore,
+    @Comment("Material of the last-contacted shortcut when the player has never used TPA.")
+        Material lastContactedEmptyIcon,
+    @Comment("Name shown when there is no last-contacted player.") String lastContactedEmptyName,
+    @Comment("Lore shown when there is no last-contacted player.")
+        List<String> lastContactedEmptyLore,
     @Comment("Label used for enabled settings.") String enabledLabel,
     @Comment("Label used for disabled settings.") String disabledLabel) {
 
   public static TpaHelpMenuConfig defaults() {
     return new TpaHelpMenuConfig(
-        "<dark_aqua>TPA",
-        3,
-        13,
+        "TPA",
+        5,
+        12,
         true,
         Material.PLAYER_HEAD,
         "",
         "<gold>{player}",
         List.of(
-            "<gray>Pedidos enviados: <white>{sent}",
-            "<gray>Pedidos recebidos: <white>{received}",
-            "<gray>Pedidos pendentes: <white>{pending}",
+            "<gray>Você enviou <white>{sent}</white> pedidos.",
+            "<gray>Recebeu <white>{received}</white>, com <white>{pending}</white> pendentes.",
             "",
-            "<gray>Deixar virem até você: {receive_tpa}",
-            "<gray>Deixar chamarem você: {receive_tpahere}",
+            "<gray>Taxa de aceite: <white>{accept_rate}",
+            "<gray>Resposta média: <white>{avg_accept}",
+            "<gray>Mais teleporta com: <white>{most_contacted}",
             "",
-            "<dark_gray>Use /tpa <jogador> para",
-            "<dark_gray>pedir para ir até alguém."),
-        10,
+            "<gray>Aceita /tpa: {receive_tpa}",
+            "<gray>Aceita /tpahere: {receive_tpahere}"),
+        "<gray>—",
+        11,
         Material.ENDER_PEARL,
         "",
-        "<yellow>Pedidos de teleporte",
+        "<yellow>Como funciona",
         List.of(
-            "<gray>Ir até alguém: você pede",
-            "<gray>permissão para teleportar até",
-            "<gray>outro jogador.",
+            "<gray>Use <yellow>/tpa <jogador> <gray>para",
+            "<gray>pedir para ir até alguém.",
             "",
-            "<gray>Chamar alguém: você pede",
-            "<gray>para o jogador vir até você.",
+            "<gray>Use <yellow>/tpahere <jogador> <gray>para",
+            "<gray>chamar alguém até você.",
             "",
-            "<dark_gray>O alvo aceita ou recusa",
-            "<dark_gray>pela mensagem no chat.",
-            "",
-            "<dark_gray>Exemplos: <gray>/tpa Notch",
-            "<dark_gray>          <gray>/tpahere Notch"),
-        12,
+            "<dark_gray>O outro jogador aceita ou recusa.",
+            "<dark_gray>Exemplo: /tpa Notch"),
+        14,
         Material.PAPER,
         "",
-        "<yellow>Pedidos pendentes",
+        "<yellow>Pedidos recebidos",
         List.of(
             "<gray>Você tem <white>{pending}</white> pedido(s)",
-            "<gray>aguardando resposta.",
+            "<gray>esperando sua resposta.",
             "",
-            "<yellow>Clique para abrir."),
+            "<yellow>Clique para ver."),
         15,
         Material.BOOK,
         "",
         "<gold>Histórico",
         List.of(
-            "<gray>Abre os seus últimos",
-            "<gray>pedidos de teleporte.",
+            "<gray>Veja seus últimos teleportes",
+            "<gray>recentes.",
             "",
             "<yellow>Clique para abrir."),
-        16,
+        13,
         Material.COMPARATOR,
         "",
-        "<aqua>Configurações",
+        "Configurações",
         List.of(
-            "<gray>Escolha se outros jogadores",
-            "<gray>podem ir até você ou chamar",
-            "<gray>você até eles.",
+            "<gray>Ajuste suas preferências:",
+            "<gray>quem pode te chamar, sons,",
+            "<gray>auto-aceitar favoritos e mais.",
             "",
-            "<yellow>Clique para configurar."),
-        14,
+            "<yellow>Clique para ajustar."),
+        20,
         Material.NETHER_STAR,
         "",
         "<gold>Favoritos",
         List.of(
-            "<gray>Atalhos rápidos de TPA para",
-            "<gray>seus jogadores favoritos.",
-            "<gray>Salvos: <white>{favorites}",
+            "<gray>Seus jogadores favoritos.",
+            "<gray>Você tem <white>{favorites}</white> salvos.",
             "",
             "<yellow>Clique para abrir."),
-        "<green>Ligado",
-        "<red>Desligado");
+        22,
+        Material.PLAYER_HEAD,
+        true,
+        "",
+        "<yellow>Pedido enviado",
+        List.of(
+            "<gray>Você pediu para <white>{type}</white>",
+            "<gold>{target}</gold>.",
+            "",
+            "<gray>Expira em <white>{seconds}s</white>.",
+            "",
+            "<yellow>Clique para cancelar."),
+        "ir até",
+        "chamar",
+        Material.LIGHT_GRAY_DYE,
+        "<gray>Sem pedido em aberto",
+        List.of("<gray>Você não tem nenhum TPA", "<gray>aguardando resposta agora."),
+        24,
+        Material.LIME_DYE,
+        Material.GRAY_DYE,
+        "<yellow>Não perturbe: {state}",
+        List.of(
+            "<gray>Enquanto ativo, seus pedidos",
+            "<gray>de TPA são recusados em silêncio.",
+            "<gray>Tempo restante: <white>{remaining}",
+            "",
+            "<yellow>Clique para mudar."),
+        "<green>desligado",
+        "30 minutos",
+        "1 hora",
+        "4 horas",
+        26,
+        Material.PLAYER_HEAD,
+        true,
+        "",
+        "<gold>Último: {player}",
+        List.of(
+            "<gray>Envia um novo /tpa para",
+            "<gold>{player}</gold> rapidinho.",
+            "",
+            "<yellow>Clique para enviar."),
+        Material.GRAY_DYE,
+        "<gray>Sem histórico",
+        List.of("<gray>Você ainda não teleportou", "<gray>para ninguém."),
+        "<green>sim",
+        "<red>não");
   }
 }

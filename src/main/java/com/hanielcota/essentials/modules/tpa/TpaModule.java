@@ -20,7 +20,10 @@ import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrat
 import com.hanielcota.essentials.modules.tpa.command.TpaHereCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryPresenter;
+import com.hanielcota.essentials.modules.tpa.command.TpaIncomingResolver;
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
+import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
+import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.command.TpaUnblockCommand;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
@@ -37,12 +40,16 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
+import com.hanielcota.essentials.modules.tpa.menu.TpaHubClickHandler;
+import com.hanielcota.essentials.modules.tpa.menu.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaBlockRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaBlockTable;
+import com.hanielcota.essentials.modules.tpa.repository.TpaContactRepository;
+import com.hanielcota.essentials.modules.tpa.repository.TpaContactTable;
 import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteTable;
 import com.hanielcota.essentials.modules.tpa.repository.TpaProfileRepository;
@@ -50,6 +57,7 @@ import com.hanielcota.essentials.modules.tpa.repository.TpaProfileTable;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExpiry;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
+import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
@@ -85,20 +93,57 @@ public final class TpaModule extends AbstractModule {
     var profiles = profiles(env, registrar);
     var blocks = blocks(env, registrar);
     var favorites = favorites(env, registrar);
-    var runtime = requestRuntime(env, registrar, config, history, profiles, blocks);
-    var favoriteRuntime = favoriteRuntime(env, registrar, config, favorites);
+    var contacts = contacts(env, registrar);
+    var runtime = requestRuntime(env, registrar, config, history, profiles, blocks, contacts);
+    var shared = sharedHelpers(env, config, runtime.requestService());
+    var favoriteRuntime = favoriteRuntime(env, registrar, config, favorites, profiles);
+    var dispatcher =
+        sendDispatcher(env, config, runtime.requestService(), favorites, profiles, shared);
     var menuState = registerHistoryMenu(registrar, config, history);
-    registerHelpMenu(registrar, config, profiles, runtime.requestService(), favorites);
-    registerPendingMenu(env, registrar, config, runtime.requestService());
+    registerHelpMenu(
+        env,
+        registrar,
+        config,
+        profiles,
+        runtime.requestService(),
+        favorites,
+        contacts,
+        dispatcher);
+    registerPendingMenu(env, registrar, config, runtime.requestService(), blocks, shared);
     registerSettingsMenu(registrar, config, profiles);
     registerBlockedMenu(registrar, config, blocks);
-    registerFavoritesMenu(registrar, config, favorites, favoriteRuntime);
-    registerFavoriteActionMenu(env, registrar, config, favorites, favoriteRuntime, runtime);
+    registerFavoritesMenu(env, registrar, config, favorites, contacts, profiles, favoriteRuntime);
+    registerFavoriteActionMenu(
+        env, registrar, config, favorites, favoriteRuntime, runtime, dispatcher);
 
-    registerCommands(env, registrar, config, history, runtime.requestService(), blocks, menuState);
+    registerCommands(
+        env,
+        registrar,
+        config,
+        history,
+        runtime.requestService(),
+        blocks,
+        menuState,
+        dispatcher,
+        shared);
 
     var quitListener = new TpaQuitListener(runtime.requestService(), runtime.notifier());
     registrar.listener(quitListener);
+  }
+
+  private TpaShared sharedHelpers(
+      @NonNull ModuleEnvironment env,
+      @NonNull ConfigHandle<TpaConfig> config,
+      @NonNull TeleportRequestService requestService) {
+    var actors = env.service(ActorFactory.class);
+    var players = env.service(PlayerProvider.class);
+    var callbacks = env.service(MainThreadCallbacks.class);
+    var replyNotifier = new TpaRequestReplyNotifier(actors, players);
+    var acceptHandler = new TpAcceptResultHandler(config, replyNotifier);
+    var incomingResolver = new TpaIncomingResolver(config, requestService);
+
+    return new TpaShared(
+        actors, players, callbacks, replyNotifier, acceptHandler, incomingResolver);
   }
 
   private AsyncTpaHistory history(
@@ -166,18 +211,37 @@ public final class TpaModule extends AbstractModule {
     return service;
   }
 
+  private TpaContactService contacts(
+      @NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var executor = env.service(SqlExecutor.class);
+    var dialect = env.service(SqlDialect.class);
+    var table = new TpaContactTable(dialect);
+    table.install(executor);
+
+    var repository = new TpaContactRepository(executor, table);
+    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaContacts");
+    registrar.closeable(writer);
+
+    var service = new TpaContactService(repository, writer);
+    service.loadAll(repository.listAll());
+
+    return service;
+  }
+
   private TpaRuntime requestRuntime(
       @NonNull ModuleEnvironment env,
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
       AsyncTpaHistory history,
       TpaProfileService profiles,
-      TpaBlockService blocks) {
+      TpaBlockService blocks,
+      TpaContactService contacts) {
     var store = new RequestRepository();
     var players = env.service(PlayerProvider.class);
-    var notifier = new TpaNotifier(config, players);
+    var notifier = new TpaNotifier(config, players, profiles);
     var requestService =
-        new TeleportRequestService(config, store, history, notifier, players, profiles, blocks);
+        new TeleportRequestService(
+            config, store, history, notifier, players, profiles, blocks, contacts);
 
     var expiry = new TeleportRequestExpiry(env.service(Scheduler.class), store, requestService);
     expiry.start();
@@ -186,13 +250,37 @@ public final class TpaModule extends AbstractModule {
     return new TpaRuntime(requestService, notifier);
   }
 
+  private TpaSendOrchestrator sendDispatcher(
+      @NonNull ModuleEnvironment env,
+      ConfigHandle<TpaConfig> config,
+      TeleportRequestService requests,
+      TpaFavoriteService favorites,
+      TpaProfileService profiles,
+      TpaShared shared) {
+    return new TpaSendOrchestrator(
+        config,
+        requests,
+        favorites,
+        profiles,
+        shared.acceptHandler(),
+        shared.callbacks(),
+        shared.actors());
+  }
+
   private void registerHelpMenu(
+      @NonNull ModuleEnvironment env,
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
       TpaProfileService profiles,
       TeleportRequestService requests,
-      TpaFavoriteService favorites) {
-    var menu = new TpaHelpMenu(config, profiles, requests, favorites);
+      TpaFavoriteService favorites,
+      TpaContactService contacts,
+      TpaSendOrchestrator dispatcher) {
+    var playerProvider = env.service(PlayerProvider.class);
+    var actors = env.service(ActorFactory.class);
+    var clickHandler =
+        new TpaHubClickHandler(config, requests, profiles, playerProvider, actors, dispatcher);
+    var menu = new TpaHelpMenu(config, profiles, requests, favorites, contacts, clickHandler);
 
     registrar.menu(menu);
   }
@@ -201,7 +289,8 @@ public final class TpaModule extends AbstractModule {
       @NonNull ModuleEnvironment env,
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
-      TpaFavoriteService favorites) {
+      TpaFavoriteService favorites,
+      TpaProfileService profiles) {
     var sessions = new TpaFavoriteSessions();
     var selections = new TpaFavoriteSelections();
     var notifier = new TpaFavoriteNotifier(config);
@@ -209,7 +298,7 @@ public final class TpaModule extends AbstractModule {
     var scheduler = env.service(Scheduler.class);
     var orchestrator =
         new TpaFavoritePromptOrchestrator(
-            config, favorites, sessions, notifier, playerProvider, scheduler);
+            config, favorites, sessions, notifier, playerProvider, scheduler, profiles);
 
     var chatListener = new TpaFavoriteChatListener(orchestrator, sessions);
     registrar.listener(chatListener);
@@ -221,13 +310,23 @@ public final class TpaModule extends AbstractModule {
   }
 
   private void registerFavoritesMenu(
+      @NonNull ModuleEnvironment env,
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
       TpaFavoriteService favorites,
+      TpaContactService contacts,
+      TpaProfileService profiles,
       FavoriteRuntime favoriteRuntime) {
+    var playerProvider = env.service(PlayerProvider.class);
     var menu =
         new TpaFavoritesMenu(
-            config, favorites, favoriteRuntime.selections(), favoriteRuntime.orchestrator());
+            config,
+            favorites,
+            contacts,
+            profiles,
+            favoriteRuntime.selections(),
+            favoriteRuntime.orchestrator(),
+            playerProvider);
 
     registrar.menu(menu);
   }
@@ -238,7 +337,8 @@ public final class TpaModule extends AbstractModule {
       ConfigHandle<TpaConfig> config,
       TpaFavoriteService favorites,
       FavoriteRuntime favoriteRuntime,
-      TpaRuntime runtime) {
+      TpaRuntime runtime,
+      TpaSendOrchestrator dispatcher) {
     var playerProvider = env.service(PlayerProvider.class);
     var actors = env.service(ActorFactory.class);
     var menu =
@@ -248,7 +348,8 @@ public final class TpaModule extends AbstractModule {
             favoriteRuntime.selections(),
             runtime.requestService(),
             playerProvider,
-            actors);
+            actors,
+            dispatcher);
 
     registrar.menu(menu);
   }
@@ -257,15 +358,23 @@ public final class TpaModule extends AbstractModule {
       @NonNull ModuleEnvironment env,
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
-      TeleportRequestService requestService) {
-    var actors = env.service(ActorFactory.class);
-    var players = env.service(PlayerProvider.class);
-    var callbacks = env.service(MainThreadCallbacks.class);
-    var acceptHandler = new TpAcceptResultHandler(config, actors, players);
+      TeleportRequestService requestService,
+      TpaBlockService blocks,
+      TpaShared shared) {
+    var bulkActions =
+        new TpaPendingBulkActions(
+            config, requestService, shared.acceptHandler(), shared.callbacks(), shared.actors());
     var clickHandler =
         new TpaPendingClickHandler(
-            config, requestService, acceptHandler, callbacks, actors, players);
-    var menu = new TpaPendingMenu(config, requestService, clickHandler);
+            config,
+            requestService,
+            shared.acceptHandler(),
+            shared.replyNotifier(),
+            shared.callbacks(),
+            shared.actors(),
+            blocks,
+            bulkActions);
+    var menu = new TpaPendingMenu(config, requestService, clickHandler, shared.players());
 
     registrar.menu(menu);
   }
@@ -307,27 +416,33 @@ public final class TpaModule extends AbstractModule {
       AsyncTpaHistory history,
       TeleportRequestService requestService,
       TpaBlockService blocks,
-      TpaHistoryMenuState menuState) {
-    var actors = env.service(ActorFactory.class);
-    var playerProvider = env.service(PlayerProvider.class);
+      TpaHistoryMenuState menuState,
+      TpaSendOrchestrator dispatcher,
+      TpaShared shared) {
     var menus = env.service(MenuService.class);
+    var playerProvider = shared.players();
 
-    var tpaCommand = new TpaCommand(config, requestService, playerProvider, menus);
+    var tpaCommand = new TpaCommand(config, requestService, playerProvider, menus, dispatcher);
     registrar.command(tpaCommand);
 
-    var tpaHereCommand = new TpaHereCommand(config, requestService);
+    var tpaHereCommand = new TpaHereCommand(config, requestService, dispatcher);
     registrar.command(tpaHereCommand);
 
     registrar.command(new TpaBlockCommand(config, blocks, playerProvider));
     registrar.command(new TpaUnblockCommand(config, blocks, playerProvider));
 
-    var acceptResultHandler = new TpAcceptResultHandler(config, actors, playerProvider);
-    var callbacks = env.service(MainThreadCallbacks.class);
     var tpAcceptCommand =
-        new TpAcceptCommand(config, requestService, acceptResultHandler, callbacks);
+        new TpAcceptCommand(
+            config,
+            requestService,
+            shared.acceptHandler(),
+            shared.incomingResolver(),
+            shared.callbacks());
     registrar.command(tpAcceptCommand);
 
-    var tpDenyCommand = new TpDenyCommand(config, requestService, actors, playerProvider);
+    var tpDenyCommand =
+        new TpDenyCommand(
+            config, requestService, shared.incomingResolver(), shared.replyNotifier());
     registrar.command(tpDenyCommand);
 
     var tpCancelCommand = new TpCancelCommand(config, requestService);
@@ -342,4 +457,12 @@ public final class TpaModule extends AbstractModule {
 
   private record FavoriteRuntime(
       TpaFavoriteSelections selections, TpaFavoritePromptOrchestrator orchestrator) {}
+
+  private record TpaShared(
+      ActorFactory actors,
+      PlayerProvider players,
+      MainThreadCallbacks callbacks,
+      TpaRequestReplyNotifier replyNotifier,
+      TpAcceptResultHandler acceptHandler,
+      TpaIncomingResolver incomingResolver) {}
 }

@@ -10,15 +10,24 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.modules.tpa.command.TpaProfileStatsFormatter;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaHelpMenuConfig;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
+import com.hanielcota.essentials.modules.tpa.service.TpaDndCycle;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.util.ComponentUtils;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -26,7 +35,7 @@ import org.bukkit.entity.Player;
 
 /**
  * Hub shown when {@code /tpa} is invoked without a target. It renders the viewer profile,
- * request-help, history and settings shortcuts.
+ * request-help, history, settings, favorites, outgoing-request, DND and last-contacted shortcuts.
  */
 @RequiredArgsConstructor
 public final class TpaHelpMenu implements EssentialsMenu {
@@ -41,6 +50,8 @@ public final class TpaHelpMenu implements EssentialsMenu {
   private final TpaProfileService profiles;
   private final TeleportRequestService requests;
   private final TpaFavoriteService favorites;
+  private final TpaContactService contacts;
+  private final TpaHubClickHandler clicks;
 
   static List<Integer> contentSlots(@NonNull TpaHelpMenuConfig helpMenu, int rows) {
     return List.of(
@@ -49,7 +60,10 @@ public final class TpaHelpMenu implements EssentialsMenu {
         MenuLayouts.sanitizeSlot(helpMenu.pendingSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(helpMenu.historySlot(), rows, 0),
         MenuLayouts.sanitizeSlot(helpMenu.settingsSlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(helpMenu.favoritesSlot(), rows, 0));
+        MenuLayouts.sanitizeSlot(helpMenu.favoritesSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(helpMenu.outgoingSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(helpMenu.dndSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(helpMenu.lastContactedSlot(), rows, 0));
   }
 
   private static ItemTemplate template(
@@ -75,11 +89,13 @@ public final class TpaHelpMenu implements EssentialsMenu {
       @NonNull Player player,
       @NonNull TpaProfile profile,
       int pending,
+      @org.jspecify.annotations.Nullable String mostContacted,
       @NonNull TpaHelpMenuConfig settings) {
     var replaced = new ArrayList<String>(lore.size());
 
     for (var line : lore) {
-      replaced.add(applyProfilePlaceholders(line, player, profile, pending, settings));
+      replaced.add(
+          applyProfilePlaceholders(line, player, profile, pending, mostContacted, settings));
     }
 
     return replaced;
@@ -90,6 +106,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
       @NonNull Player player,
       @NonNull TpaProfile profile,
       int pending,
+      @org.jspecify.annotations.Nullable String mostContacted,
       @NonNull TpaHelpMenuConfig settings) {
     var playerName = player.getName();
     var sent = Long.toString(profile.sentRequests());
@@ -98,13 +115,155 @@ public final class TpaHelpMenu implements EssentialsMenu {
     var receiveTpa = profile.receiveTpa() ? settings.enabledLabel() : settings.disabledLabel();
     var receiveTpaHere =
         profile.receiveTpaHere() ? settings.enabledLabel() : settings.disabledLabel();
+    var statsFallback = settings.statsFallback();
+    var acceptRate = TpaProfileStatsFormatter.acceptRate(profile, statsFallback);
+    var avgAccept = TpaProfileStatsFormatter.averageAccept(profile, statsFallback);
+    var mostContactedText =
+        TpaProfileStatsFormatter.mostContactedName(mostContacted, statsFallback);
 
     return raw.replace("{player}", playerName)
         .replace("{sent}", sent)
         .replace("{received}", received)
         .replace("{pending}", pendingRequests)
         .replace("{receive_tpa}", receiveTpa)
-        .replace("{receive_tpahere}", receiveTpaHere);
+        .replace("{receive_tpahere}", receiveTpaHere)
+        .replace("{accept_rate}", acceptRate)
+        .replace("{avg_accept}", avgAccept)
+        .replace("{most_contacted}", mostContactedText);
+  }
+
+  private static List<String> replacePending(@NonNull List<String> lore, int pending) {
+    var replaced = new ArrayList<String>(lore.size());
+    var pendingText = Integer.toString(pending);
+    for (var line : lore) {
+      replaced.add(line.replace("{pending}", pendingText));
+    }
+    return replaced;
+  }
+
+  private static List<String> replaceFavorites(@NonNull List<String> lore, int favoriteCount) {
+    var replaced = new ArrayList<String>(lore.size());
+    var countText = Integer.toString(favoriteCount);
+    for (var line : lore) {
+      replaced.add(line.replace("{favorites}", countText));
+    }
+    return replaced;
+  }
+
+  private static ItemTemplate idleOutgoingTemplate(@NonNull TpaHelpMenuConfig helpMenu) {
+    var builder = ItemTemplate.builder(helpMenu.outgoingIdleIcon());
+    builder.name(helpMenu.outgoingIdleName());
+    builder.lore(helpMenu.outgoingIdleLore().toArray(String[]::new));
+    builder.italic(false);
+    return builder.build();
+  }
+
+  private static ItemTemplate activeOutgoingTemplate(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull TeleportRequest request) {
+    var targetName = request.target().name();
+    var typeLabel =
+        request.type() == TeleportRequestType.TPA
+            ? helpMenu.outgoingTypeTpa()
+            : helpMenu.outgoingTypeTpaHere();
+    var seconds = Long.toString(secondsLeft(request));
+
+    var name =
+        helpMenu
+            .outgoingName()
+            .replace("{target}", targetName)
+            .replace("{type}", typeLabel)
+            .replace("{seconds}", seconds);
+    var lore =
+        helpMenu.outgoingLore().stream()
+            .map(line -> line.replace("{target}", targetName))
+            .map(line -> line.replace("{type}", typeLabel))
+            .map(line -> line.replace("{seconds}", seconds))
+            .toList();
+
+    var builder = ItemTemplate.builder(helpMenu.outgoingIcon());
+    if (helpMenu.outgoingIcon() == Material.PLAYER_HEAD) {
+      if (helpMenu.outgoingUsePlayerHead()) {
+        builder.head(request.target().id());
+      } else if (!helpMenu.outgoingHeadTexture().isBlank()) {
+        builder.head(helpMenu.outgoingHeadTexture());
+      }
+    }
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  private static long secondsLeft(@NonNull TeleportRequest request) {
+    var now = Instant.now();
+    var remaining = Duration.between(now, request.window().expiresAt()).toSeconds();
+
+    return Math.max(0, remaining);
+  }
+
+  private static String stageLabel(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull TpaDndCycle.Stage stage) {
+    return switch (stage) {
+      case OFF -> helpMenu.dndStateOff();
+      case THIRTY_MINUTES -> helpMenu.dndState30m();
+      case ONE_HOUR -> helpMenu.dndState1h();
+      case FOUR_HOURS -> helpMenu.dndState4h();
+    };
+  }
+
+  private static String stageRemaining(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull TpaProfile profile, long now) {
+    var until = profile.dndUntilEpochMs();
+    if (until <= now) {
+      return helpMenu.statsFallback();
+    }
+    var remaining = Duration.ofMillis(until - now);
+    var totalMinutes = remaining.toMinutes();
+    if (totalMinutes < 1) {
+      return "<1m";
+    }
+    if (totalMinutes < 60) {
+      return totalMinutes + "m";
+    }
+    var hours = totalMinutes / 60;
+    var mins = totalMinutes % 60;
+    if (mins == 0) {
+      return hours + "h";
+    }
+    return hours + "h" + mins + "m";
+  }
+
+  private static ItemTemplate lastContactedTemplate(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull TpaContact contact) {
+    var name = helpMenu.lastContactedName().replace("{player}", contact.targetName());
+    var lore =
+        helpMenu.lastContactedLore().stream()
+            .map(line -> line.replace("{player}", contact.targetName()))
+            .toList();
+
+    var builder = ItemTemplate.builder(helpMenu.lastContactedIcon());
+    if (helpMenu.lastContactedIcon() == Material.PLAYER_HEAD) {
+      if (helpMenu.lastContactedUsePlayerHead()) {
+        builder.head(contact.targetId());
+      } else if (!helpMenu.lastContactedHeadTexture().isBlank()) {
+        builder.head(helpMenu.lastContactedHeadTexture());
+      }
+    }
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  private static ItemTemplate simpleTemplate(
+      @NonNull Material icon, @NonNull String name, @NonNull List<String> lore) {
+    var builder = ItemTemplate.builder(icon);
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+    return builder.build();
   }
 
   @Override
@@ -142,14 +301,21 @@ public final class TpaHelpMenu implements EssentialsMenu {
     var profile = this.profiles.profile(playerId);
     var pending = this.requests.incoming(playerId).size();
     var favoriteCount = this.favorites.favoritesOf(playerId).size();
+    var mostContacted =
+        this.contacts.mostContacted(playerId).map(TpaContact::targetName).orElse(null);
+    var outgoing = this.requests.outgoing(playerId);
+    var lastContacted = this.contacts.lastContacted(playerId);
 
     var slots = new ArrayList<SlotDefinition>();
-    slots.add(profileSlot(player, profile, pending, helpMenu, rows));
+    slots.add(profileSlot(player, profile, pending, mostContacted, helpMenu, rows));
     slots.add(tpaSlot(helpMenu, pending, rows));
     slots.add(pendingSlot(helpMenu, pending, rows));
     slots.add(historySlot(helpMenu, rows));
     slots.add(settingsSlot(helpMenu, rows));
     slots.add(favoritesSlot(helpMenu, favoriteCount, rows));
+    slots.add(outgoingSlot(helpMenu, outgoing, rows));
+    slots.add(dndSlot(helpMenu, profile, rows));
+    slots.add(lastContactedSlot(helpMenu, lastContacted, rows));
 
     return slots;
   }
@@ -158,12 +324,15 @@ public final class TpaHelpMenu implements EssentialsMenu {
       @NonNull Player player,
       @NonNull TpaProfile profile,
       int pending,
+      @org.jspecify.annotations.Nullable String mostContacted,
       @NonNull TpaHelpMenuConfig helpMenu,
       int rows) {
     var profileName =
-        applyProfilePlaceholders(helpMenu.profileName(), player, profile, pending, helpMenu);
+        applyProfilePlaceholders(
+            helpMenu.profileName(), player, profile, pending, mostContacted, helpMenu);
     var profileLore =
-        applyProfilePlaceholders(helpMenu.profileLore(), player, profile, pending, helpMenu);
+        applyProfilePlaceholders(
+            helpMenu.profileLore(), player, profile, pending, mostContacted, helpMenu);
 
     var builder = ItemTemplate.builder(helpMenu.profileIcon());
     if (helpMenu.profileUsePlayerHead()) {
@@ -204,15 +373,6 @@ public final class TpaHelpMenu implements EssentialsMenu {
     return SlotDefinition.of(safeSlot, template, this::openPending);
   }
 
-  private static List<String> replacePending(@NonNull List<String> lore, int pending) {
-    var replaced = new ArrayList<String>(lore.size());
-    var pendingText = Integer.toString(pending);
-    for (var line : lore) {
-      replaced.add(line.replace("{pending}", pendingText));
-    }
-    return replaced;
-  }
-
   private SlotDefinition historySlot(@NonNull TpaHelpMenuConfig helpMenu, int rows) {
     var template =
         template(
@@ -248,13 +408,61 @@ public final class TpaHelpMenu implements EssentialsMenu {
     return SlotDefinition.of(safeSlot, template, this::openFavorites);
   }
 
-  private static List<String> replaceFavorites(@NonNull List<String> lore, int favoriteCount) {
-    var replaced = new ArrayList<String>(lore.size());
-    var countText = Integer.toString(favoriteCount);
-    for (var line : lore) {
-      replaced.add(line.replace("{favorites}", countText));
+  private SlotDefinition outgoingSlot(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull Optional<TeleportRequest> outgoing, int rows) {
+    var safeSlot = MenuLayouts.sanitizeSlot(helpMenu.outgoingSlot(), rows, 0);
+
+    if (outgoing.isEmpty()) {
+      var idleTemplate = idleOutgoingTemplate(helpMenu);
+      return SlotDefinition.of(safeSlot, idleTemplate, click -> {});
     }
-    return replaced;
+
+    var request = outgoing.get();
+    var activeTemplate = activeOutgoingTemplate(helpMenu, request);
+
+    return SlotDefinition.of(
+        safeSlot, activeTemplate, click -> this.clicks.cancelOutgoing(click, request));
+  }
+
+  private SlotDefinition dndSlot(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull TpaProfile profile, int rows) {
+    var now = System.currentTimeMillis();
+    var stage = TpaDndCycle.stageOf(profile.dndUntilEpochMs(), now);
+    var stateLabel = stageLabel(helpMenu, stage);
+    var remainingLabel = stageRemaining(helpMenu, profile, now);
+
+    var name =
+        helpMenu.dndName().replace("{state}", stateLabel).replace("{remaining}", remainingLabel);
+    var lore =
+        helpMenu.dndLore().stream()
+            .map(line -> line.replace("{state}", stateLabel))
+            .map(line -> line.replace("{remaining}", remainingLabel))
+            .toList();
+    var icon = stage == TpaDndCycle.Stage.OFF ? helpMenu.dndOffIcon() : helpMenu.dndOnIcon();
+    var template = simpleTemplate(icon, name, lore);
+    var safeSlot = MenuLayouts.sanitizeSlot(helpMenu.dndSlot(), rows, 0);
+
+    return SlotDefinition.of(safeSlot, template, this.clicks::cycleDnd);
+  }
+
+  private SlotDefinition lastContactedSlot(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull Optional<TpaContact> lastContacted, int rows) {
+    var safeSlot = MenuLayouts.sanitizeSlot(helpMenu.lastContactedSlot(), rows, 0);
+
+    if (lastContacted.isEmpty()) {
+      var emptyTemplate =
+          simpleTemplate(
+              helpMenu.lastContactedEmptyIcon(),
+              helpMenu.lastContactedEmptyName(),
+              helpMenu.lastContactedEmptyLore());
+      return SlotDefinition.of(safeSlot, emptyTemplate, click -> {});
+    }
+
+    var contact = lastContacted.get();
+    var template = lastContactedTemplate(helpMenu, contact);
+
+    return SlotDefinition.of(
+        safeSlot, template, click -> this.clicks.repeatLastContacted(click, contact));
   }
 
   private void openHistory(@NonNull ClickContext click) {

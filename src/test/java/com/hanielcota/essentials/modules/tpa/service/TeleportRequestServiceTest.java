@@ -98,6 +98,10 @@ class TeleportRequestServiceTest {
     return new TpaBlockService(null, new NoopWriter());
   }
 
+  private static TpaContactService newContactService() {
+    return new TpaContactService(null, new NoopWriter());
+  }
+
   private static TeleportRequestService newService(@NonNull TpaProfileService profiles) {
     return newService(profiles, newBlockService());
   }
@@ -108,10 +112,11 @@ class TeleportRequestServiceTest {
         new StaticConfigHandle(),
         new RequestRepository(),
         new NoopHistory(),
-        new TpaNotifier(new StaticConfigHandle(), new EmptyPlayerProvider()),
+        new TpaNotifier(new StaticConfigHandle(), new EmptyPlayerProvider(), profiles),
         new EmptyPlayerProvider(),
         profiles,
-        blocks);
+        blocks,
+        newContactService());
   }
 
   private static Player player(@NonNull UUID id, @NonNull String name) {
@@ -123,7 +128,7 @@ class TeleportRequestServiceTest {
                 switch (method.getName()) {
                   case "getUniqueId" -> id;
                   case "getName" -> name;
-                  case "sendMessage" -> null;
+                  case "sendMessage", "playSound", "getLocation", "getWorld" -> null;
                   default -> throw new UnsupportedOperationException(method.getName());
                 });
   }

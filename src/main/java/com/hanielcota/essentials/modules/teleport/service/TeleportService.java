@@ -22,6 +22,32 @@ import org.bukkit.entity.Player;
  */
 public final class TeleportService {
 
+  private static CompletableFuture<TeleportOutcome> dispatch(
+      @NonNull Player subject, @NonNull Location destination) {
+    var teleport = subject.teleportAsync(destination);
+
+    return teleport.thenApply(TeleportService::translate);
+  }
+
+  private static TeleportOutcome translate(Boolean success) {
+    if (Boolean.TRUE.equals(success)) {
+      return TeleportOutcome.SUCCESS;
+    }
+
+    return TeleportOutcome.FAILED;
+  }
+
+  private static CompletableFuture<TeleportOutcome> rejected(@NonNull TeleportOutcome outcome) {
+    return CompletableFuture.completedFuture(outcome);
+  }
+
+  private static boolean sameId(@NonNull Player a, @NonNull Player b) {
+    var aId = a.getUniqueId();
+    var bId = b.getUniqueId();
+
+    return aId.equals(bId);
+  }
+
   public CompletableFuture<TeleportOutcome> toPlayer(
       @NonNull Player sender, @NonNull Player target) {
     if (sameId(sender, target)) {
@@ -71,31 +97,5 @@ public final class TeleportService {
     var destination = viewer.getLocation();
 
     return dispatch(target, destination);
-  }
-
-  private static CompletableFuture<TeleportOutcome> dispatch(
-      @NonNull Player subject, @NonNull Location destination) {
-    var teleport = subject.teleportAsync(destination);
-
-    return teleport.thenApply(TeleportService::translate);
-  }
-
-  private static TeleportOutcome translate(Boolean success) {
-    if (Boolean.TRUE.equals(success)) {
-      return TeleportOutcome.SUCCESS;
-    }
-
-    return TeleportOutcome.FAILED;
-  }
-
-  private static CompletableFuture<TeleportOutcome> rejected(@NonNull TeleportOutcome outcome) {
-    return CompletableFuture.completedFuture(outcome);
-  }
-
-  private static boolean sameId(@NonNull Player a, @NonNull Player b) {
-    var aId = a.getUniqueId();
-    var bId = b.getUniqueId();
-
-    return aId.equals(bId);
   }
 }

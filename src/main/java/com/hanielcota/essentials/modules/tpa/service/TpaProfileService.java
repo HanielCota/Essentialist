@@ -1,9 +1,11 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.repository.TpaProfileRepository;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,6 +25,12 @@ public final class TpaProfileService {
     this.writer = writer;
   }
 
+  private static TpaProfile applyOrDefault(
+      @Nullable TpaProfile current, @NonNull java.util.function.UnaryOperator<TpaProfile> mutator) {
+    var base = current != null ? current : TpaProfile.defaults();
+    return mutator.apply(base);
+  }
+
   public void loadAll(@NonNull List<Entry> entries) {
     for (var entry : entries) {
       this.profiles.put(entry.playerId(), entry.profile());
@@ -34,24 +42,53 @@ public final class TpaProfileService {
   }
 
   public TpaProfile toggle(@NonNull UUID playerId, @NonNull TeleportRequestType type) {
-    var updated = this.profiles.compute(playerId, (id, current) -> toggled(current, type));
-
-    save(playerId, updated);
-    return updated;
+    return mutate(playerId, current -> current.toggled(type));
   }
 
   public TpaProfile recordSent(@NonNull UUID playerId) {
-    var updated = this.profiles.compute(playerId, (id, current) -> incremented(current));
-
-    save(playerId, updated);
-    return updated;
+    return mutate(playerId, TpaProfile::incrementSentRequests);
   }
 
   public TpaProfile recordReceived(@NonNull UUID playerId) {
-    var updated = this.profiles.compute(playerId, (id, current) -> receivedIncremented(current));
+    return mutate(playerId, TpaProfile::incrementReceivedRequests);
+  }
 
-    save(playerId, updated);
-    return updated;
+  public TpaProfile recordAcceptedOutgoing(@NonNull UUID playerId, @NonNull Duration latency) {
+    return mutate(playerId, current -> current.recordAcceptedOutgoing(latency));
+  }
+
+  public TpaProfile toggleAutoAcceptFavorites(@NonNull UUID playerId) {
+    return mutate(playerId, TpaProfile::toggledAutoAcceptFavorites);
+  }
+
+  public TpaProfile toggleSounds(@NonNull UUID playerId) {
+    return mutate(playerId, TpaProfile::toggledSounds);
+  }
+
+  public TpaProfile toggleAllowCrossWorld(@NonNull UUID playerId) {
+    return mutate(playerId, TpaProfile::toggledAllowCrossWorld);
+  }
+
+  public TpaProfile toggleNotifyWhenFavorited(@NonNull UUID playerId) {
+    return mutate(playerId, TpaProfile::toggledNotifyWhenFavorited);
+  }
+
+  public TpaProfile setDndUntil(@NonNull UUID playerId, long epochMs) {
+    return mutate(playerId, current -> current.withDndUntil(epochMs));
+  }
+
+  public TpaProfile cycleFavoriteOrdering(@NonNull UUID playerId) {
+    return mutate(
+        playerId,
+        current -> {
+          var nextOrdering = current.favoriteOrdering().next();
+          return current.withFavoriteOrdering(nextOrdering);
+        });
+  }
+
+  public TpaProfile setFavoriteOrdering(
+      @NonNull UUID playerId, @NonNull FavoriteOrdering ordering) {
+    return mutate(playerId, current -> current.withFavoriteOrdering(ordering));
   }
 
   public boolean accepts(@NonNull UUID playerId, @NonNull TeleportRequestType type) {
@@ -60,23 +97,19 @@ public final class TpaProfileService {
     return profile.accepts(type);
   }
 
-  private static TpaProfile toggled(
-      @Nullable TpaProfile current, @NonNull TeleportRequestType type) {
-    var base = current != null ? current : TpaProfile.defaults();
+  public boolean isDndActive(@NonNull UUID playerId) {
+    var profile = profile(playerId);
 
-    return base.toggled(type);
+    return profile.isDndActive(System.currentTimeMillis());
   }
 
-  private static TpaProfile incremented(@Nullable TpaProfile current) {
-    var base = current != null ? current : TpaProfile.defaults();
+  private TpaProfile mutate(
+      @NonNull UUID playerId, @NonNull java.util.function.UnaryOperator<TpaProfile> mutator) {
+    var updated =
+        this.profiles.compute(playerId, (id, current) -> applyOrDefault(current, mutator));
 
-    return base.incrementSentRequests();
-  }
-
-  private static TpaProfile receivedIncremented(@Nullable TpaProfile current) {
-    var base = current != null ? current : TpaProfile.defaults();
-
-    return base.incrementReceivedRequests();
+    save(playerId, updated);
+    return updated;
   }
 
   private void save(@NonNull UUID playerId, @NonNull TpaProfile profile) {
