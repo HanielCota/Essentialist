@@ -8,7 +8,7 @@ All notable changes to Essentialist are tracked here. Entries follow the structu
 
 - Configurable bootstrap as `BootstrapStage` chain. Subclass `EssentialsBootstrap` and override `stages(EssentialsPlugin)` to insert, reorder, or replace stages from an addon. `EssentialsBootstrap.defaultStages(plugin)` exposes the shipped sequence.
 - Architecture tests (`ArchitecturePackageTest`):
-  - cross-module imports must go through `service`/`domain`/`model`/`history` packages,
+  - cross-module imports must go through `service`/`domain`/`history` packages,
   - repositories must not import Bukkit beyond `Material`/`Location`,
   - only `core.api` may implement the public `*Api` facades.
 - Test coverage for the previously-untested core: `ModuleLifecycle`, `ModuleDependencyResolver`, `DefaultAsyncDatabaseWriter` (saturation + rejection + exception propagation), `SqliteDialect`, `MainThreadCallbacks`, and six `*ApiAdapter`s.
@@ -28,15 +28,12 @@ These were the ABI-breaking changes published before this changelog existed. The
 
 - `SqlDialect` interface + `SqliteDialect` implementation. Registered as a service. Every `*Table` class is now instance-based and takes a `SqlDialect` constructor argument.
 - Six domain facades on `EssentialsApi`: `homes()`, `warps()`, `mutes()`, `nicks()`, `vanish()`, `teleports()` — each returns `Optional<XxxApi>` so addons degrade gracefully when a module is disabled.
-- `@Internal` annotation (`com.hanielcota.essentials.api.Internal`) on bits of the API that addons must not depend on.
-
 #### Changed
 
+- **BREAKING:** Removed `EssentialsApi.plugin()` and `EssentialsApi.services()`. Addons must use the typed accessors instead.
 - **BREAKING:** `DefaultAsyncDatabaseWriter` now uses a bounded `LinkedBlockingQueue` (default capacity 10 000). Overflow surfaces via `RejectedExecutionException` on the returned `CompletableFuture`. The constructor accepts an optional capacity.
 - **BREAKING:** `*Table` classes (`SqlHomeTable`, `WarpTable`, `MuteTable`, `NickTable`, `SpawnTable`, `TpaHistoryTable`, `TeleportHistoryTable`) are now instance-based. Constructor takes a `SqlDialect`. The static `install(SqlExecutor)` became an instance method.
 - **BREAKING:** Repository classes that referenced `Table.UPSERT` constants (e.g. `SqlHomeRepository`, `MuteStore`, `NickStore`, `SpawnStore`, `WarpStore`) now take a table instance and use `table.upsert()` instead of a static constant.
-- `EssentialsApi.plugin()` and `EssentialsApi.services()` are now `@Internal` + `@Deprecated`. Addons should use the typed accessors instead.
-
 ### refactor: split AbstractModule into ModuleEnvironment + ModuleRegistrar (PR #57)
 
 #### Changed
@@ -105,7 +102,7 @@ If your addon imports any of the breaking changes above, here is the minimal pat
 ```
 
 ```diff
--var registry = essentialsApi.services();   // @Internal + @Deprecated
+-var registry = essentialsApi.services();
 -var nick = registry.find(NickService.class);
 +var nicks = essentialsApi.nicks();         // typed facade
 +nicks.flatMap(api -> api.nickOf(playerId)).ifPresent(...);

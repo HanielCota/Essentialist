@@ -15,13 +15,13 @@ import org.bukkit.entity.Player;
 
 /** Shared command helpers — request lookup, sending and replying to the requester. */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class TpaRequests {
+public final class TpaRequests {
 
   /**
    * Opens a new request from {@code sender} to {@code target}, refusing self-targets, and replies
-   * to the sender. Used by {@code /tpa} and {@code /tpahere}.
+   * to the sender. Used by {@code /tpa}, {@code /tpahere} and the favorites action menu.
    */
-  static void send(
+  public static void send(
       @NonNull TeleportRequestService service,
       @NonNull TpaMessages messages,
       @NonNull CommandActor actor,
@@ -37,12 +37,41 @@ final class TpaRequests {
       return;
     }
 
-    service.create(sender, target, type);
+    var created = service.create(sender, target, type);
+    if (created.isEmpty()) {
+      if (service.isBlockedBy(targetId, senderId)) {
+        sendBlockedByPlayerMessage(messages, actor, target);
+        return;
+      }
+      sendBlockedMessage(messages, actor, target, type);
+      return;
+    }
 
     var targetName = target.getName();
     var confirmationMsg = confirmationTemplate.replace("{player}", targetName);
 
     actor.sendSuccess(confirmationMsg);
+  }
+
+  private static void sendBlockedMessage(
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor,
+      @NonNull Player target,
+      @NonNull TeleportRequestType type) {
+    var targetName = target.getName();
+    var template =
+        type == TeleportRequestType.TPA ? messages.tpaDisabled() : messages.tpaHereDisabled();
+    var msg = template.replace("{player}", targetName);
+
+    actor.sendError(msg);
+  }
+
+  private static void sendBlockedByPlayerMessage(
+      @NonNull TpaMessages messages, @NonNull CommandActor actor, @NonNull Player target) {
+    var targetName = target.getName();
+    var msg = messages.blockedByPlayer().replace("{player}", targetName);
+
+    actor.sendError(msg);
   }
 
   /**

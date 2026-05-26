@@ -178,12 +178,12 @@ sub-packages. Pick the right one when adding a class — the
   Pure-behaviour services (`HealService`) and stateful services (`AfkService`)
   both live here. Persistence types are NOT allowed here — use `repository/`.
 - **`repository/`** — relational persistence, with `*Repository` for CRUD,
-  `*Table` for DDL/SQL constants, `*Cache` for in-memory mirrors. `*Store` is
-  deprecated naming; new code uses `*Repository`. Repositories must not
-  import Bukkit beyond `Material` / `Location`.
+  `*Table` for DDL/SQL constants, `*Cache` for in-memory mirrors. Do not add
+  `*Store` classes. Repositories must not import Bukkit beyond `Material` /
+  `Location`.
 - **`domain/`** — domain records and enums (`Home`, `Mute`, `TeleportRequest`).
-  `model/` is deprecated; new code uses `domain/`. Cross-module imports are
-  only allowed against `domain/`, `service/`, `history/`.
+  Do not add `model/` packages. Cross-module imports are only allowed against
+  `domain/`, `service/`, `history/`.
 - **`listener/`** — Bukkit `Listener` implementations. Thin — delegate to
   services.
 - **`menu/`** — `EssentialsMenu` subclasses and their `*ClickHandler`,
@@ -228,10 +228,9 @@ cheaper than adding an unjustified second one.
   - `@Subcommand` accepts only one name; use `@Alias` for additional names.
   - `CommandActor.uniqueId()` returns **`String`**, not `UUID`. Compare with
     `player.getUniqueId().toString()`.
-- **Paper 26.x — deprecated workstation openers**:
-  `Player#openWorkbench(Location, boolean)` and the others
-  (`openAnvil`/`openGrindstone`/`openStonecutter`/`openLoom`/`openCartographyTable`/`openSmithingTable`)
-  are deprecated. Use `MenuType.X.create(player)` + `player.openInventory(view)`.
+- **Paper 26.x workstation menus**:
+  use `MenuType.X.create(player)` + `player.openInventory(view)` for virtual
+  workstations.
 - **`@PlayerOnly`** on any command whose body calls
   `actor.unwrap(Player.class)`. Without it the console path throws an unfriendly
   `IllegalArgumentException` stack trace instead of the framework's clean
