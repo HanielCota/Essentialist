@@ -47,7 +47,7 @@ public record TpaFavoriteActionMenuConfig(
         "",
         "<gold>{player}",
         List.of("<gray>Escolha uma ação abaixo."),
-        29,
+        30,
         Material.ENDER_PEARL,
         "<yellow>Ir até {player}",
         List.of(
@@ -63,8 +63,8 @@ public record TpaFavoriteActionMenuConfig(
             "<gray>vir até você.",
             "",
             "<yellow>Clique para enviar."),
-        33,
-        Material.REDSTONE,
+        32,
+        Material.RED_DYE,
         "<red>Remover dos favoritos",
         List.of(
             "<gray>Tira <gold>{player}</gold> da",

@@ -90,7 +90,7 @@ public record TpaFavoritesMenuConfig(
             "<gray>Use o botão verde para salvar",
             "<gray>seu primeiro jogador."),
         47,
-        Material.WRITABLE_BOOK,
+        Material.EMERALD,
         "",
         "<green>Adicionar favorito",
         List.of(

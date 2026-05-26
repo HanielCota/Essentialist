@@ -40,8 +40,13 @@ public record TpaPendingMenuConfig(
     @Comment("Name of the deny-all button. Placeholder: {pending}.") String denyAllName,
     @Comment("Lore of the deny-all button. Placeholder: {pending}.") List<String> denyAllLore,
     @Comment("Label for a request where the requester wants to come to you.") String typeTpa,
-    @Comment("Label for a request where the requester wants you to go to them.")
-        String typeTpaHere) {
+    @Comment("Label for a request where the requester wants you to go to them.") String typeTpaHere,
+    @Comment(
+            "Placeholder shown in {origin_world} / {distance} when the requester logged out or is"
+                + " in another world.")
+        String unknownPlaceholder,
+    @Comment("Format for the {distance} value when known. Placeholder: {meters}.")
+        String distanceFormat) {
 
   public static TpaPendingMenuConfig defaults() {
     return new TpaPendingMenuConfig(
@@ -58,9 +63,7 @@ public record TpaPendingMenuConfig(
             "",
             "<gray>Expira em <white>{seconds}s</white>.",
             "",
-            "<green>Esquerdo <gray>→ aceitar",
-            "<red>Direito <gray>→ recusar",
-            "<red>Shift <gray>→ bloquear"),
+            "<yellow>Clique para escolher uma ação."),
         Material.BARRIER,
         "<red>Nenhum pedido por aqui",
         List.of(
@@ -89,6 +92,8 @@ public record TpaPendingMenuConfig(
             "",
             "<yellow>Clique para recusar."),
         "Quer ir até você",
-        "Quer chamar você");
+        "Quer chamar você",
+        "—",
+        "{meters}m");
   }
 }

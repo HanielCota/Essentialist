@@ -10,7 +10,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.TpaHelpInfoMenuConfig;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.List;
 import lombok.NonNull;
@@ -19,23 +19,21 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
- * Settings hub — navigation-only screen. Routes the viewer to one of three category sub-menus
- * (Privacy / Notifications / Behavior), shows the read-only cooldown info and links back to the
- * /tpa hub.
+ * Help/tutorial screen opened from the "Como funciona" slot in {@code TpaHelpMenu}. Shows three
+ * static cards (commands, examples, FAQ) plus a back button.
  */
 @RequiredArgsConstructor
-public final class TpaSettingsMenu implements EssentialsMenu {
+public final class TpaHelpInfoMenu implements EssentialsMenu {
 
-  public static final String ID = "essentials.tpa.settings";
+  public static final String ID = "essentials.tpa.help.info";
 
   private final ConfigHandle<TpaConfig> config;
 
-  static List<Integer> contentSlots(@NonNull TpaSettingsMenuConfig settings, int rows) {
+  static List<Integer> contentSlots(@NonNull TpaHelpInfoMenuConfig settings, int rows) {
     return List.of(
-        MenuLayouts.sanitizeSlot(settings.privacySlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(settings.notificationsSlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(settings.behaviorSlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(settings.cooldownSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.commandsSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.examplesSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.faqSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0));
   }
 
@@ -46,7 +44,7 @@ public final class TpaSettingsMenu implements EssentialsMenu {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    var settings = this.config.value().settingsMenu();
+    var settings = this.config.value().helpInfoMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
 
     var builder = MenuFramework.builder(ID, menus);
@@ -61,57 +59,40 @@ public final class TpaSettingsMenu implements EssentialsMenu {
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
-    var settings = this.config.value().settingsMenu();
+    var settings = this.config.value().helpInfoMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
 
     return List.of(
-        categorySlot(
-            settings.privacySlot(),
+        cardSlot(
+            settings.commandsSlot(),
             rows,
-            settings.privacyIcon(),
-            settings.privacyName(),
-            settings.privacyLore(),
-            TpaPrivacySettingsMenu.ID),
-        categorySlot(
-            settings.notificationsSlot(),
+            settings.commandsIcon(),
+            settings.commandsName(),
+            settings.commandsLore()),
+        cardSlot(
+            settings.examplesSlot(),
             rows,
-            settings.notificationsIcon(),
-            settings.notificationsName(),
-            settings.notificationsLore(),
-            TpaNotificationSettingsMenu.ID),
-        categorySlot(
-            settings.behaviorSlot(),
-            rows,
-            settings.behaviorIcon(),
-            settings.behaviorName(),
-            settings.behaviorLore(),
-            TpaBehaviorSettingsMenu.ID),
-        cooldownSlot(settings, rows),
+            settings.examplesIcon(),
+            settings.examplesName(),
+            settings.examplesLore()),
+        cardSlot(
+            settings.faqSlot(), rows, settings.faqIcon(), settings.faqName(), settings.faqLore()),
         backSlot(settings, rows));
   }
 
-  private SlotDefinition categorySlot(
+  private SlotDefinition cardSlot(
       int configuredSlot,
       int rows,
       @NonNull Material icon,
       @NonNull String name,
-      @NonNull List<String> lore,
-      @NonNull String targetMenuId) {
+      @NonNull List<String> lore) {
     var template = simpleTemplate(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(configuredSlot, rows, 0);
-
-    return SlotDefinition.of(safeSlot, template, click -> click.switchTo(targetMenuId));
-  }
-
-  private SlotDefinition cooldownSlot(@NonNull TpaSettingsMenuConfig settings, int rows) {
-    var template =
-        simpleTemplate(settings.cooldownIcon(), settings.cooldownName(), settings.cooldownLore());
-    var safeSlot = MenuLayouts.sanitizeSlot(settings.cooldownSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> {});
   }
 
-  private SlotDefinition backSlot(@NonNull TpaSettingsMenuConfig settings, int rows) {
+  private SlotDefinition backSlot(@NonNull TpaHelpInfoMenuConfig settings, int rows) {
     var template = simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 

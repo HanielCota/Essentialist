@@ -6,59 +6,71 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
- * Cycles DND timestamps through a fixed preset wheel:
+ * Cycles DND timestamps through a three-stage preset wheel:
  *
- * <pre>Off → 30 minutes → 1 hour → 4 hours → Off</pre>
+ * <pre>Off → Stage 1 → Stage 2 → Stage 3 → Off</pre>
  *
- * <p>Stage is inferred from how much time is left on the current DND, so the helper is stateless
- * even though {@link TpaProfile#dndUntilEpochMs()} is a single timestamp.
+ * <p>The actual durations live in config (see {@code TpaBehaviorSettingsMenuConfig} stage duration
+ * fields); callers pass a {@link Durations} bundle built from the snapshot they already hold so
+ * this helper stays stateless and config-free.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TpaDndCycle {
 
-  public static Stage stageOf(long dndUntilEpochMs, long nowEpochMs) {
+  public static Stage stageOf(long dndUntilEpochMs, long nowEpochMs, @NonNull Durations durations) {
     var remainingMs = dndUntilEpochMs - nowEpochMs;
     if (remainingMs <= 0) {
       return Stage.OFF;
     }
-    if (remainingMs <= Duration.ofMinutes(30).toMillis()) {
-      return Stage.THIRTY_MINUTES;
+    if (remainingMs <= durations.stage1().toMillis()) {
+      return Stage.STAGE_1;
     }
-    if (remainingMs <= Duration.ofHours(1).toMillis()) {
-      return Stage.ONE_HOUR;
+    if (remainingMs <= durations.stage2().toMillis()) {
+      return Stage.STAGE_2;
     }
-    return Stage.FOUR_HOURS;
+    return Stage.STAGE_3;
   }
 
-  public static long cycleTo(@NonNull Stage next, long nowEpochMs) {
+  public static long cycleTo(@NonNull Stage next, long nowEpochMs, @NonNull Durations durations) {
     if (next == Stage.OFF) {
       return 0L;
     }
-    return nowEpochMs + next.duration().toMillis();
+    return nowEpochMs + durationOf(next, durations).toMillis();
+  }
+
+  private static Duration durationOf(@NonNull Stage stage, @NonNull Durations durations) {
+    return switch (stage) {
+      case OFF -> Duration.ZERO;
+      case STAGE_1 -> durations.stage1();
+      case STAGE_2 -> durations.stage2();
+      case STAGE_3 -> durations.stage3();
+    };
   }
 
   public enum Stage {
     OFF,
-    THIRTY_MINUTES,
-    ONE_HOUR,
-    FOUR_HOURS;
+    STAGE_1,
+    STAGE_2,
+    STAGE_3;
 
     public Stage next() {
       return switch (this) {
-        case OFF -> THIRTY_MINUTES;
-        case THIRTY_MINUTES -> ONE_HOUR;
-        case ONE_HOUR -> FOUR_HOURS;
-        case FOUR_HOURS -> OFF;
+        case OFF -> STAGE_1;
+        case STAGE_1 -> STAGE_2;
+        case STAGE_2 -> STAGE_3;
+        case STAGE_3 -> OFF;
       };
     }
+  }
 
-    public Duration duration() {
-      return switch (this) {
-        case OFF -> Duration.ZERO;
-        case THIRTY_MINUTES -> Duration.ofMinutes(30);
-        case ONE_HOUR -> Duration.ofHours(1);
-        case FOUR_HOURS -> Duration.ofHours(4);
-      };
+  public record Durations(
+      @NonNull Duration stage1, @NonNull Duration stage2, @NonNull Duration stage3) {
+
+    public static Durations ofMinutes(int stage1Minutes, int stage2Minutes, int stage3Minutes) {
+      return new Durations(
+          Duration.ofMinutes(stage1Minutes),
+          Duration.ofMinutes(stage2Minutes),
+          Duration.ofMinutes(stage3Minutes));
     }
   }
 }

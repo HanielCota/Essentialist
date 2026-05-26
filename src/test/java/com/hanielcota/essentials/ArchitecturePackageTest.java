@@ -7,6 +7,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -39,6 +40,23 @@ class ArchitecturePackageTest {
   private static final Pattern IMPLEMENTS_PUBLIC_API =
       Pattern.compile(
           "implements\\s+(?:[\\w.]+\\.)?(HomesApi|WarpsApi|MutesApi|NicksApi|VanishApi|TeleportsApi)\\b");
+
+  private static final Map<String, Integer> TPA_COMPLEXITY_BUDGETS =
+      Map.ofEntries(
+          Map.entry("com/hanielcota/essentials/modules/tpa/TpaModule.java", 180),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaFavoritesMenu.java", 180),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaPendingActionMenu.java", 180),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaHelpMenu.java", 240),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaPendingMenu.java", 180),
+          Map.entry(
+              "com/hanielcota/essentials/modules/tpa/service/TeleportRequestService.java", 200),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaHistoryMenu.java", 240),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaFavoriteActionMenu.java", 240),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaBehaviorSettingsMenu.java", 230),
+          Map.entry(
+              "com/hanielcota/essentials/modules/tpa/menu/presentation/TpaFavoriteMenuRenderer.java",
+              220),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaProfileMenu.java", 220));
 
   @Test
   void persistenceTypesDoNotLiveInServicePackages() throws IOException {
@@ -121,6 +139,47 @@ class ArchitecturePackageTest {
           () ->
               "Only com.hanielcota.essentials.core.api may implement public *Api interfaces: "
                   + violations);
+    }
+  }
+
+  @Test
+  void complexTpaEntryPointsStayWithinSizeBudget() {
+    var violations =
+        TPA_COMPLEXITY_BUDGETS.entrySet().stream()
+            .filter(ArchitecturePackageTest::exceedsLineBudget)
+            .map(ArchitecturePackageTest::formatLineBudgetViolation)
+            .toList();
+
+    assertTrue(violations.isEmpty(), () -> "Oversized TPA entry points: " + violations);
+  }
+
+  @Test
+  void tpaBootstrapClassesLiveInBootstrapPackage() throws IOException {
+    try (var paths = walkMainJava()) {
+      var violations =
+          paths
+              .filter(ArchitecturePackageTest::isTpaBootstrapOutsideBootstrapPackage)
+              .map(ArchitecturePackageTest::relativePath)
+              .toList();
+
+      assertTrue(
+          violations.isEmpty(),
+          () -> "TPA bootstrap classes outside bootstrap package: " + violations);
+    }
+  }
+
+  @Test
+  void tpaMenuPresentationHelpersLiveInPresentationPackage() throws IOException {
+    try (var paths = walkMainJava()) {
+      var violations =
+          paths
+              .filter(ArchitecturePackageTest::isTpaMenuPresentationOutsidePresentationPackage)
+              .map(ArchitecturePackageTest::relativePath)
+              .toList();
+
+      assertTrue(
+          violations.isEmpty(),
+          () -> "TPA menu presentation helpers outside presentation package: " + violations);
     }
   }
 
@@ -216,6 +275,42 @@ class ArchitecturePackageTest {
 
   private static String relativePath(Path path) {
     return mainJavaRoot().relativize(path).toString().replace('\\', '/');
+  }
+
+  private static boolean isTpaBootstrapOutsideBootstrapPackage(Path path) {
+    var rel = relativePath(path);
+    var fileName = fileName(path);
+
+    return rel.startsWith("com/hanielcota/essentials/modules/tpa/")
+        && fileName.endsWith("Bootstrap.java")
+        && !rel.contains("/bootstrap/");
+  }
+
+  private static boolean isTpaMenuPresentationOutsidePresentationPackage(Path path) {
+    var rel = relativePath(path);
+    var fileName = fileName(path);
+    var presentationHelper =
+        fileName.endsWith("Renderer.java")
+            || fileName.endsWith("Browser.java")
+            || fileName.endsWith("StatsFormatter.java");
+
+    return rel.startsWith("com/hanielcota/essentials/modules/tpa/menu/")
+        && presentationHelper
+        && !rel.contains("/menu/presentation/");
+  }
+
+  private static boolean exceedsLineBudget(Map.Entry<String, Integer> budget) {
+    var path = mainJavaRoot().resolve(budget.getKey());
+    var lineCount = readLines(path).size();
+
+    return lineCount > budget.getValue();
+  }
+
+  private static String formatLineBudgetViolation(Map.Entry<String, Integer> budget) {
+    var path = mainJavaRoot().resolve(budget.getKey());
+    var lineCount = readLines(path).size();
+
+    return budget.getKey() + " has " + lineCount + " lines; budget is " + budget.getValue();
   }
 
   // Architecture tests must surface IO failures (unreadable files, missing source root) instead of

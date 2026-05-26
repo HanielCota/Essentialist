@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.command;
+package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import java.time.Duration;
