@@ -11,6 +11,7 @@ import com.hanielcota.essentials.modules.mute.command.MuteNotifier;
 import com.hanielcota.essentials.modules.mute.command.UnmuteCommand;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
 import com.hanielcota.essentials.modules.mute.listener.MuteChatListener;
+import com.hanielcota.essentials.modules.mute.listener.MuteCommandListener;
 import com.hanielcota.essentials.modules.mute.repository.MuteCache;
 import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import com.hanielcota.essentials.modules.mute.repository.MuteStore;
@@ -57,5 +58,6 @@ public final class MuteModule extends AbstractModule {
     registrar.command(new UnmuteCommand(service, notifier));
 
     registrar.listener(new MuteChatListener(config, service));
+    registrar.listener(new MuteCommandListener(config, service));
   }
 }
