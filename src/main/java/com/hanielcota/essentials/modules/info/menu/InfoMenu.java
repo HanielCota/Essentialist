@@ -4,22 +4,18 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
-import com.hanielcota.essentials.modules.info.menu.presentation.InfoEntry;
+import com.hanielcota.essentials.modules.info.menu.presentation.InfoMenuRenderer;
 import com.hanielcota.essentials.modules.info.menu.presentation.PlayerInfoEntries;
 import com.hanielcota.essentials.modules.info.menu.presentation.PluginInfoEntries;
 import com.hanielcota.essentials.modules.info.menu.presentation.ServerInfoEntries;
-import com.hanielcota.essentials.util.ComponentUtils;
-import java.util.ArrayList;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.List;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
@@ -27,50 +23,23 @@ import org.bukkit.entity.Player;
  * via {@link ClickContext#refresh()} — it never opens a separate menu, which keeps the framework's
  * navigation history and session intact.
  */
-@RequiredArgsConstructor
 public final class InfoMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.info";
 
   private final ConfigHandle<InfoConfig> config;
-  private final ServerInfoEntries serverEntries;
-  private final PlayerInfoEntries playerEntries;
-  private final PluginInfoEntries pluginEntries;
   private final InfoMenuState state;
+  private final InfoMenuRenderer renderer;
 
-  private static SlotDefinition entryItem(int slot, @NonNull InfoEntry entry) {
-    var icon = entry.icon();
-    var name = entry.name();
-    var lore = entry.lore();
-    var loreArray = lore.toArray(String[]::new);
-    var headOwner = entry.headOwner();
-
-    var builder = ItemTemplate.builder(icon);
-    builder = builder.name(name);
-    builder = builder.lore(loreArray);
-    builder = builder.italic(false);
-
-    if (headOwner != null) {
-      builder = builder.head(headOwner);
-    }
-
-    var template = builder.build();
-
-    return SlotDefinition.of(slot, template, click -> {});
-  }
-
-  private static ItemTemplate buildBackTemplate(@NonNull InfoConfig snap) {
-    var material = snap.backMaterial();
-    var name = snap.backName();
-    var lore = snap.backLore();
-    var loreArray = lore.toArray(String[]::new);
-
-    var builder = ItemTemplate.builder(material);
-    builder = builder.name(name);
-    builder = builder.lore(loreArray);
-    builder = builder.italic(false);
-
-    return builder.build();
+  public InfoMenu(
+      @NonNull ConfigHandle<InfoConfig> config,
+      @NonNull ServerInfoEntries serverEntries,
+      @NonNull PlayerInfoEntries playerEntries,
+      @NonNull PluginInfoEntries pluginEntries,
+      @NonNull InfoMenuState state) {
+    this.config = config;
+    this.state = state;
+    this.renderer = new InfoMenuRenderer(config, serverEntries, playerEntries, pluginEntries);
   }
 
   @Override
@@ -104,106 +73,9 @@ public final class InfoMenu implements EssentialsMenu {
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var viewerId = player.getUniqueId();
     var tab = this.state.tab(viewerId);
+    var target = this.state.resolveTarget(player);
 
-    return switch (tab) {
-      case CATEGORIES -> categorySlots();
-      case SERVER -> serverSlots();
-      case PLAYER -> playerSlots(player);
-      case ABOUT -> aboutSlots();
-    };
-  }
-
-  private List<SlotDefinition> serverSlots() {
-    var entries = this.serverEntries.entries();
-
-    return detailSlots(entries);
-  }
-
-  private List<SlotDefinition> aboutSlots() {
-    var entries = this.pluginEntries.entries();
-
-    return detailSlots(entries);
-  }
-
-  private List<SlotDefinition> playerSlots(@NonNull Player viewer) {
-    var target = this.state.resolveTarget(viewer);
-    var entries = this.playerEntries.entries(target);
-
-    return detailSlots(entries);
-  }
-
-  private List<SlotDefinition> categorySlots() {
-    var snap = this.config.value();
-
-    var serverSlot =
-        category(
-            snap.effectiveServerSlot(),
-            snap.serverMaterial(),
-            snap.serverName(),
-            snap.serverLore(),
-            InfoTab.SERVER);
-
-    var playerSlot =
-        category(
-            snap.effectivePlayerSlot(),
-            snap.playerMaterial(),
-            snap.playerName(),
-            snap.playerLore(),
-            InfoTab.PLAYER);
-
-    var aboutSlot =
-        category(
-            snap.effectiveAboutSlot(),
-            snap.aboutMaterial(),
-            snap.aboutName(),
-            snap.aboutLore(),
-            InfoTab.ABOUT);
-
-    return List.of(serverSlot, playerSlot, aboutSlot);
-  }
-
-  private List<SlotDefinition> detailSlots(@NonNull List<InfoEntry> entries) {
-    var snap = this.config.value();
-    var detailSlots = snap.effectiveDetailSlots();
-    var visibleEntries = Math.min(entries.size(), detailSlots.size());
-    var startIdx = (detailSlots.size() - visibleEntries) / 2;
-
-    var slots = new ArrayList<SlotDefinition>(visibleEntries + 1);
-
-    for (var i = 0; i < visibleEntries; i++) {
-      var targetSlot = detailSlots.get(startIdx + i);
-      var entry = entries.get(i);
-      var slotDef = entryItem(targetSlot, entry);
-
-      slots.add(slotDef);
-    }
-
-    var backSlot = snap.effectiveBackSlot();
-    var backTemplate = buildBackTemplate(snap);
-    var backDef =
-        SlotDefinition.of(backSlot, backTemplate, click -> switchTab(click, InfoTab.CATEGORIES));
-
-    slots.add(backDef);
-
-    return slots;
-  }
-
-  private SlotDefinition category(
-      int slot,
-      @NonNull Material icon,
-      @NonNull String name,
-      @NonNull List<String> lore,
-      @NonNull InfoTab target) {
-    var loreArray = lore.toArray(String[]::new);
-
-    var templateBuilder = ItemTemplate.builder(icon);
-    templateBuilder = templateBuilder.name(name);
-    templateBuilder = templateBuilder.lore(loreArray);
-    templateBuilder = templateBuilder.italic(false);
-
-    var template = templateBuilder.build();
-
-    return SlotDefinition.of(slot, template, click -> switchTab(click, target));
+    return this.renderer.slots(target, tab, this::switchTab);
   }
 
   private void switchTab(@NonNull ClickContext click, @NonNull InfoTab tab) {

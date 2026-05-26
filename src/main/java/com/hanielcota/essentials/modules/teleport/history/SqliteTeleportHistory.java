@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.teleport.history;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

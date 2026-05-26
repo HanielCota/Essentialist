@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.exception.ModuleLoadException;
+import com.hanielcota.essentials.module.environment.ModuleContext;
+import com.hanielcota.essentials.module.lifecycle.ModuleLifecycle;
+import com.hanielcota.essentials.module.registry.ModuleRegistry;
+import com.hanielcota.essentials.module.registry.ModuleState;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

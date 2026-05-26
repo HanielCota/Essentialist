@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.mute.config;
 
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.List;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;

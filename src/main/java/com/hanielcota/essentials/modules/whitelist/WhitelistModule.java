@@ -2,8 +2,8 @@ package com.hanielcota.essentials.modules.whitelist;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.whitelist.command.WhitelistCommand;
 import com.hanielcota.essentials.modules.whitelist.config.WhitelistConfig;
 import com.hanielcota.essentials.modules.whitelist.menu.WhitelistClickHandler;

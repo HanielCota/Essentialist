@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
-import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.shared.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -42,9 +42,9 @@ public record HomeMenuPlaceholders(
 
     return new HomeMenuPlaceholders(
         displayWorld,
-        Numbers.compact(x),
-        Numbers.compact(y),
-        Numbers.compact(z),
+        Numbers.display(x),
+        Numbers.display(y),
+        Numbers.display(z),
         directionOf(yaw),
         date,
         time,

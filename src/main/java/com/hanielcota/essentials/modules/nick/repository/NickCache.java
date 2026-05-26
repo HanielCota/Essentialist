@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.nick.repository;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
 import java.util.List;
 import java.util.Locale;

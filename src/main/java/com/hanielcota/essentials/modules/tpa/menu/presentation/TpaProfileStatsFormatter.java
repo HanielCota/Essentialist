@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import java.time.Duration;
+import java.util.Locale;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -50,7 +51,7 @@ public final class TpaProfileStatsFormatter {
       var asInt = (long) percent;
       return asInt + "%";
     }
-    return String.format(java.util.Locale.ROOT, "%.1f%%", percent);
+    return String.format(Locale.ROOT, "%.1f%%", percent);
   }
 
   private static String humanizeDuration(@NonNull Duration duration) {

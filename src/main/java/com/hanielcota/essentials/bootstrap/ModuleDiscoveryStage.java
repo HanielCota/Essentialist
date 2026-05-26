@@ -2,8 +2,8 @@ package com.hanielcota.essentials.bootstrap;
 
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.module.Module;
-import com.hanielcota.essentials.module.ModuleFilter;
-import com.hanielcota.essentials.module.ModuleManager;
+import com.hanielcota.essentials.module.discovery.ModuleFilter;
+import com.hanielcota.essentials.module.registration.ModuleManager;
 import java.util.ArrayList;
 import java.util.ServiceLoader;
 import lombok.NonNull;

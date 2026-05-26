@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.chat.channel;
 
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
-import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
+import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;
 import org.bukkit.entity.Player;

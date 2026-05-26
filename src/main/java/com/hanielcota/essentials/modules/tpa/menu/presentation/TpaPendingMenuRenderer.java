@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
@@ -16,11 +17,11 @@ import org.jspecify.annotations.Nullable;
 public final class TpaPendingMenuRenderer {
 
   public ItemTemplate backTemplate(@NonNull TpaPendingMenuConfig settings) {
-    return simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
   }
 
   public ItemTemplate emptyTemplate(@NonNull TpaPendingMenuConfig settings) {
-    return simpleTemplate(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
+    return MenuTemplates.simple(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
   }
 
   public ItemTemplate bulkTemplate(
@@ -32,7 +33,7 @@ public final class TpaPendingMenuRenderer {
     var name = nameTemplate.replace("{pending}", pendingText);
     var lore = replacePending(loreTemplate, pendingText);
 
-    return simpleTemplate(icon, name, lore);
+    return MenuTemplates.simple(icon, name, lore);
   }
 
   public ItemTemplate requestTemplate(
@@ -146,15 +147,5 @@ public final class TpaPendingMenuRenderer {
       lore.add(line.replace("{pending}", pendingText));
     }
     return lore;
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material icon, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(icon);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
   }
 }

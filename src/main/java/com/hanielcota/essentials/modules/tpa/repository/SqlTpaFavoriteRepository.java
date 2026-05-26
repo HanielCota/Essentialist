@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.repository;
 
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import java.sql.ResultSet;
 import java.sql.SQLException;

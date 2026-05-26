@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.compact.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.compact.config.CompactConfig;
-import com.hanielcota.essentials.util.ItemStacks;
+import com.hanielcota.essentials.shared.ItemStacks;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;

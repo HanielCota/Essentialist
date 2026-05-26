@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
 import com.hanielcota.essentials.modules.tpa.domain.Destination;
 import com.hanielcota.essentials.modules.tpa.domain.Participant;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;

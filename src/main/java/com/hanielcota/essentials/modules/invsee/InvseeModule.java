@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.invsee;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.invsee.command.InvseeCommand;
 import com.hanielcota.essentials.modules.invsee.config.InvseeConfig;
 import com.hanielcota.essentials.modules.invsee.listener.InvseeListener;

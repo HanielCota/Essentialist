@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.UnaryOperator;
 import lombok.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -26,7 +27,7 @@ public final class TpaProfileService {
   }
 
   private static TpaProfile applyOrDefault(
-      @Nullable TpaProfile current, @NonNull java.util.function.UnaryOperator<TpaProfile> mutator) {
+      @Nullable TpaProfile current, @NonNull UnaryOperator<TpaProfile> mutator) {
     var base = current != null ? current : TpaProfile.defaults();
     return mutator.apply(base);
   }
@@ -103,8 +104,7 @@ public final class TpaProfileService {
     return profile.isDndActive(System.currentTimeMillis());
   }
 
-  private TpaProfile mutate(
-      @NonNull UUID playerId, @NonNull java.util.function.UnaryOperator<TpaProfile> mutator) {
+  private TpaProfile mutate(@NonNull UUID playerId, @NonNull UnaryOperator<TpaProfile> mutator) {
     var updated =
         this.profiles.compute(playerId, (id, current) -> applyOrDefault(current, mutator));
 

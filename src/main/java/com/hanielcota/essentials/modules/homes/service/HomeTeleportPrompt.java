@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.homes.service;
 
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
-import com.hanielcota.essentials.util.ClickableMessage;
-import com.hanielcota.essentials.util.ClickableMessageSegment;
+import com.hanielcota.essentials.shared.ClickableMessage;
+import com.hanielcota.essentials.shared.ClickableMessageSegment;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;

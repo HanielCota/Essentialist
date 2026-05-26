@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.nick.repository;
 
-import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlTable;
+import com.hanielcota.essentials.database.schema.SqlDialect;
+import com.hanielcota.essentials.database.schema.SqlTable;
 import lombok.NonNull;
 
 public final class NickTable extends SqlTable {

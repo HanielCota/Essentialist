@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.config;
 
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.shared.Log;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;

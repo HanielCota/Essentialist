@@ -20,7 +20,7 @@ import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +28,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Hub shown when {@code /tpa} is invoked without a target. It renders the viewer profile,
@@ -117,7 +118,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
       @NonNull Player player,
       @NonNull TpaProfile profile,
       int pending,
-      @org.jspecify.annotations.Nullable String mostContacted,
+      @Nullable String mostContacted,
       @NonNull TpaHelpMenuConfig helpMenu,
       int rows) {
     var profileName =

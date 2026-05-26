@@ -7,7 +7,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.UUID;
 import lombok.NonNull;

@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.afk.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.afk.config.AfkConfig;
 import com.hanielcota.essentials.paper.AudienceProvider;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;

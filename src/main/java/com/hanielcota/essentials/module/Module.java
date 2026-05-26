@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.module;
 
+import com.hanielcota.essentials.module.environment.ModuleContext;
 import lombok.NonNull;
 
 public interface Module {

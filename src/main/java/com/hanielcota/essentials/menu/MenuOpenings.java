@@ -2,7 +2,7 @@ package com.hanielcota.essentials.menu;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.shared.Log;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

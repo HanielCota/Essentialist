@@ -10,6 +10,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoriteActionMenuConfig;
@@ -20,7 +21,7 @@ import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -64,16 +65,6 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
     if (!settings.targetHeadTexture().isBlank()) {
       builder.head(settings.targetHeadTexture());
     }
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
   }
 
   private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
@@ -146,7 +137,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
 
     var name = nameTemplate.replace("{player}", entry.favoriteName());
     var lore = replacePlayer(loreTemplate, entry.favoriteName());
-    var template = simpleTemplate(icon, name, lore);
+    var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(slot, rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> sendRequest(click, entry, type));
@@ -156,7 +147,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
       @NonNull TpaFavoriteActionMenuConfig settings, int rows, @NonNull TpaFavorite entry) {
     var name = settings.removeName().replace("{player}", entry.favoriteName());
     var lore = replacePlayer(settings.removeLore(), entry.favoriteName());
-    var template = simpleTemplate(settings.removeIcon(), name, lore);
+    var template = MenuTemplates.simple(settings.removeIcon(), name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.removeSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> removeFavorite(click, entry));
@@ -164,7 +155,8 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
 
   private SlotDefinition backSlotDefinition(
       @NonNull TpaFavoriteActionMenuConfig settings, int rows) {
-    var template = simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    var template =
+        MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, this::onBackClicked);

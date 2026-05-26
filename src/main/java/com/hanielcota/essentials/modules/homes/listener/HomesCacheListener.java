@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.listener;
 
 import com.hanielcota.essentials.modules.homes.repository.CachedHomeRepository;
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.shared.Log;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;

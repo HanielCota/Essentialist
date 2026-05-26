@@ -3,6 +3,7 @@ package com.hanielcota.essentials.command;
 import com.hanielcota.essentials.config.MessagePair;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.function.UnaryOperator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -28,12 +29,21 @@ public final class DualReply {
       @NonNull Player subject,
       @NonNull ActorFactory actors,
       @NonNull MessagePair messages) {
+    send(sender, subject, actors, messages, UnaryOperator.identity());
+  }
+
+  public static void send(
+      @NonNull CommandActor sender,
+      @NonNull Player subject,
+      @NonNull ActorFactory actors,
+      @NonNull MessagePair messages,
+      @NonNull UnaryOperator<String> formatter) {
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
     var target = actors.actorOf(subject);
 
-    var senderMsg = messages.forSender(self, name);
-    var targetMsg = messages.forTarget(name);
+    var senderMsg = formatter.apply(messages.forSender(self, name));
+    var targetMsg = formatter.apply(messages.forTarget(name));
 
     sender.sendDualMessage(target, senderMsg, targetMsg);
   }

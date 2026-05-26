@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.online;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.online.command.OnlineCommand;
 import com.hanielcota.essentials.modules.online.config.OnlineConfig;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;

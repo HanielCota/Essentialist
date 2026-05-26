@@ -7,7 +7,7 @@ import com.hanielcota.essentials.modules.chat.format.ChatFormatPipeline;
 import com.hanielcota.essentials.modules.chat.format.PlayerMessageStyler;
 import com.hanielcota.essentials.modules.chat.guard.ChatGuardPipeline;
 import com.hanielcota.essentials.paper.AudienceProvider;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

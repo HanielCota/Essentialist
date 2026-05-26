@@ -13,7 +13,7 @@ import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialPickerSection;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialIconRegistry;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;

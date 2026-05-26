@@ -3,15 +3,15 @@ package com.hanielcota.essentials.modules.tpa.menu;
 import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaHelpInfoMenuConfig;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -86,25 +86,17 @@ public final class TpaHelpInfoMenu implements EssentialsMenu {
       @NonNull Material icon,
       @NonNull String name,
       @NonNull List<String> lore) {
-    var template = simpleTemplate(icon, name, lore);
+    var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(configuredSlot, rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> {});
   }
 
   private SlotDefinition backSlot(@NonNull TpaHelpInfoMenuConfig settings, int rows) {
-    var template = simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    var template =
+        MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaHelpMenu.ID));
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
   }
 }

@@ -4,26 +4,25 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaBehaviorSettingsMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.service.TpaDndCycle;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
-import com.hanielcota.essentials.util.ComponentUtils;
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.ComponentUtils;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
@@ -81,7 +80,7 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
 
     var name = settings.autoAcceptName().replace("{state}", state);
     var lore = applyState(settings.autoAcceptLore(), state);
-    var template = simpleTemplate(material, name, lore);
+    var template = MenuTemplates.simple(material, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.autoAcceptSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, this::toggleAutoAccept);
@@ -99,14 +98,15 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
         Placeholders.format(settings.dndName(), "state", stateLabel, "remaining", remainingLabel);
     var lore = renderDndLore(settings, stateLabel, remainingLabel, stage);
     var icon = stage == TpaDndCycle.Stage.OFF ? settings.dndOffIcon() : settings.dndOnIcon();
-    var template = simpleTemplate(icon, name, lore);
+    var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.dndSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, this::cycleDnd);
   }
 
   private SlotDefinition backSlot(@NonNull TpaBehaviorSettingsMenuConfig settings, int rows) {
-    var template = simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    var template =
+        MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaSettingsMenu.ID));
@@ -204,15 +204,6 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
 
   private static String markActive(@NonNull String label, @NonNull String marker, boolean active) {
     return active ? label + marker : label;
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
   }
 
   private static List<String> applyState(@NonNull List<String> lore, @NonNull String state) {

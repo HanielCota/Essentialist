@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
@@ -12,12 +11,12 @@ import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -90,15 +89,15 @@ class TeleportRequestServiceTest {
   }
 
   private static TpaProfileService newProfileService() {
-    return new TpaProfileService(null, new NoopWriter());
+    return new TpaProfileService(null, NoopAsyncDatabaseWriter.INSTANCE);
   }
 
   private static TpaBlockService newBlockService() {
-    return new TpaBlockService(null, new NoopWriter());
+    return new TpaBlockService(null, NoopAsyncDatabaseWriter.INSTANCE);
   }
 
   private static TpaContactService newContactService() {
-    return new TpaContactService(null, new NoopWriter());
+    return new TpaContactService(null, NoopAsyncDatabaseWriter.INSTANCE);
   }
 
   private static TeleportRequestService newService(@NonNull TpaProfileService profiles) {
@@ -152,16 +151,6 @@ class TeleportRequestServiceTest {
     public List<TpaHistoryEntry> list(@NonNull UUID requester) {
       return List.of();
     }
-  }
-
-  private static final class NoopWriter implements AsyncDatabaseWriter {
-    @Override
-    public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
-      return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public void close() {}
   }
 
   private static final class EmptyPlayerProvider implements PlayerProvider {

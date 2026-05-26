@@ -4,7 +4,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
-import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.shared.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,9 +30,9 @@ public record BackEntryRenderer(ConfigHandle<BackConfig> config) {
     var x = location.getX();
     var y = location.getY();
     var z = location.getZ();
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
+    var xStr = Numbers.display(x);
+    var yStr = Numbers.display(y);
+    var zStr = Numbers.display(z);
 
     var loreTemplate = snap.itemLore();
     var lore = new String[loreTemplate.size()];

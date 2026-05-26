@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.nick.service;
 
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

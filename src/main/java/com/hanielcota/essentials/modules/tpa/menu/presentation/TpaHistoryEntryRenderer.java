@@ -5,7 +5,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.Destination;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
-import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.shared.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,9 +46,9 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
     }
 
     var world = destination.world();
-    var x = Numbers.compact(destination.x());
-    var y = Numbers.compact(destination.y());
-    var z = Numbers.compact(destination.z());
+    var x = Numbers.display(destination.x());
+    var y = Numbers.display(destination.y());
+    var z = Numbers.display(destination.z());
 
     return new Coordinates(world, x, y, z);
   }

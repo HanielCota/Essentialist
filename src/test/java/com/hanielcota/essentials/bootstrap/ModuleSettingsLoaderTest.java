@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.module.Module;
-import com.hanielcota.essentials.module.ModuleContext;
 import com.hanielcota.essentials.module.ModuleMetadata;
+import com.hanielcota.essentials.module.environment.ModuleContext;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;

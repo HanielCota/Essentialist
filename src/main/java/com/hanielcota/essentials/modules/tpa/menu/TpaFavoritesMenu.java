@@ -11,6 +11,7 @@ import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
+import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteBrowser;
@@ -20,7 +21,7 @@ import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -137,8 +138,7 @@ public final class TpaFavoritesMenu implements EssentialsMenu {
     return SlotDefinition.of(-1, template, click -> this.clicks.selectSuggestion(click, contact));
   }
 
-  private SlotDefinition orderingSlot(
-      @NonNull com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering ordering) {
+  private SlotDefinition orderingSlot(@NonNull FavoriteOrdering ordering) {
     var settings = this.config.value().favoritesMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
     var template = this.renderer.orderingTemplate(settings, ordering);

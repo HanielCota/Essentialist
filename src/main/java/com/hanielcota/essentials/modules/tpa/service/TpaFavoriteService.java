@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteRepository;
 import java.util.Comparator;

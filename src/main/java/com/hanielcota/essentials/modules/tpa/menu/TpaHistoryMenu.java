@@ -17,7 +17,7 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHistoryEntryRenderer;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;

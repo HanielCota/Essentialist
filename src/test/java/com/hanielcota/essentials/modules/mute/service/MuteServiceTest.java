@@ -3,16 +3,14 @@ package com.hanielcota.essentials.modules.mute.service;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.modules.mute.repository.MuteCache;
-import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
+import com.hanielcota.essentials.support.NoopMuteRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 
 class MuteServiceTest {
@@ -52,36 +50,6 @@ class MuteServiceTest {
   }
 
   private static MuteCache newCache() {
-    return new MuteCache(new NoopRepository(), new NoopWriter());
-  }
-
-  private static final class NoopRepository implements MuteRepository {
-    @Override
-    public List<Map.Entry<UUID, Mute>> listActive(@NonNull Instant now) {
-      return List.of();
-    }
-
-    @Override
-    public void save(@NonNull UUID id, @NonNull Mute mute) {}
-
-    @Override
-    public boolean delete(@NonNull UUID id) {
-      return false;
-    }
-
-    @Override
-    public int deleteExpired(@NonNull Instant now) {
-      return 0;
-    }
-  }
-
-  private static final class NoopWriter implements AsyncDatabaseWriter {
-    @Override
-    public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
-      return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public void close() {}
+    return new MuteCache(NoopMuteRepository.INSTANCE, NoopAsyncDatabaseWriter.INSTANCE);
   }
 }

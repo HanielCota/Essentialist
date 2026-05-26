@@ -1,12 +1,12 @@
 package com.hanielcota.essentials.modules.spawn;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
+import com.hanielcota.essentials.database.schema.SqlDialect;
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
 import com.hanielcota.essentials.module.ModuleMetadata;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.spawn.command.SetSpawnCommand;
 import com.hanielcota.essentials.modules.spawn.command.SpawnCommand;
 import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
@@ -25,9 +25,9 @@ import lombok.NonNull;
  * Server spawn point and the {@code /spawn} / {@code /setspawn} commands.
  *
  * <p>Persists the single spawn point in SQLite via {@link SqlSpawnRepository}; the SQL write is
- * queued on an {@link com.hanielcota.essentials.database.AsyncDatabaseWriter AsyncDatabaseWriter}
- * so {@code /setspawn} returns immediately. Warm-up and damage cancel logic comes from the shared
- * {@link DelayedTeleport} service registered by the {@code teleport} module.
+ * queued on an {@link com.hanielcota.essentials.database.async.AsyncDatabaseWriter
+ * AsyncDatabaseWriter} so {@code /setspawn} returns immediately. Warm-up and damage cancel logic
+ * comes from the shared {@link DelayedTeleport} service registered by the {@code teleport} module.
  */
 public final class SpawnModule extends AbstractModule {
 

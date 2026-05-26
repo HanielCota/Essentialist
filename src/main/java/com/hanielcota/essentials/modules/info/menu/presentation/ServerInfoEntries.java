@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.info.menu.presentation;
 
-import com.hanielcota.essentials.util.DurationFormatter;
+import com.hanielcota.essentials.shared.DurationFormatter;
 import java.lang.management.ManagementFactory;
 import java.time.Duration;
 import java.util.List;

@@ -6,9 +6,10 @@ import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.DeleteDialogSection;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -72,11 +73,7 @@ public final class DeleteHomeDialog implements EssentialsMenu {
     var material = menuSpec.deletePromptMaterial();
     var promptName = messages.deleteConfirmPrompt();
 
-    var builder = ItemTemplate.builder(material);
-    builder.name(promptName);
-    builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(material, promptName);
   }
 
   private @NonNull ItemTemplate yesButton(@NonNull HomesConfig configSnap) {
@@ -85,11 +82,7 @@ public final class DeleteHomeDialog implements EssentialsMenu {
     var material = menuSpec.deleteYesMaterial();
     var yesName = messages.deleteConfirmYes();
 
-    var builder = ItemTemplate.builder(material);
-    builder.name(yesName);
-    builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(material, yesName);
   }
 
   private @NonNull ItemTemplate noButton(@NonNull HomesConfig configSnap) {
@@ -98,10 +91,6 @@ public final class DeleteHomeDialog implements EssentialsMenu {
     var material = menuSpec.deleteNoMaterial();
     var noName = messages.deleteConfirmNo();
 
-    var builder = ItemTemplate.builder(material);
-    builder.name(noName);
-    builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(material, noName);
   }
 }

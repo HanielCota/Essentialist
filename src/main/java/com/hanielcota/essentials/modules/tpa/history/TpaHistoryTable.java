@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
-import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlExecutor;
-import com.hanielcota.essentials.database.SqlTable;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
+import com.hanielcota.essentials.database.schema.SqlDialect;
+import com.hanielcota.essentials.database.schema.SqlTable;
 import lombok.NonNull;
 
 public final class TpaHistoryTable extends SqlTable {

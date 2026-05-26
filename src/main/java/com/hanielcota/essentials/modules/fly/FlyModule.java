@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.fly;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.fly.command.FlyCommand;
 import com.hanielcota.essentials.modules.fly.command.FlyNotifier;
 import com.hanielcota.essentials.modules.fly.config.FlyConfig;

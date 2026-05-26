@@ -10,7 +10,6 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.MenuType;
 
 @Command(value = "rebolo", aliases = "grindstone")
@@ -24,10 +23,6 @@ public final class GrindstoneCommand {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor) {
-    var player = actor.unwrap(Player.class);
-
-    var menu = MenuType.GRINDSTONE.create(player);
-
-    player.openInventory(menu);
+    WorkstationOpener.open(actor, MenuType.GRINDSTONE);
   }
 }

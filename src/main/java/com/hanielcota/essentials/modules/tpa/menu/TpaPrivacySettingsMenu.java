@@ -4,23 +4,22 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPrivacySettingsMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
@@ -89,7 +88,7 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
         type == TeleportRequestType.TPA ? settings.receiveTpaLore() : settings.receiveTpaHereLore();
     var name = nameTemplate.replace("{state}", state);
     var lore = applyState(loreTemplate, state);
-    var template = simpleTemplate(material, name, lore);
+    var template = MenuTemplates.simple(material, name, lore);
 
     var configuredSlot =
         type == TeleportRequestType.TPA ? settings.receiveTpaSlot() : settings.receiveTpaHereSlot();
@@ -106,7 +105,7 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
 
     var name = settings.allowCrossWorldName().replace("{state}", state);
     var lore = applyState(settings.allowCrossWorldLore(), state);
-    var template = simpleTemplate(material, name, lore);
+    var template = MenuTemplates.simple(material, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.allowCrossWorldSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, this::toggleCrossWorld);
@@ -114,14 +113,16 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
 
   private SlotDefinition blockedSlot(@NonNull TpaPrivacySettingsMenuConfig settings, int rows) {
     var template =
-        simpleTemplate(settings.blockedIcon(), settings.blockedName(), settings.blockedLore());
+        MenuTemplates.simple(
+            settings.blockedIcon(), settings.blockedName(), settings.blockedLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.blockedSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaBlockedMenu.ID));
   }
 
   private SlotDefinition backSlot(@NonNull TpaPrivacySettingsMenuConfig settings, int rows) {
-    var template = simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    var template =
+        MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaSettingsMenu.ID));
@@ -137,15 +138,6 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
     var playerId = click.player().getUniqueId();
     this.profiles.toggleAllowCrossWorld(playerId);
     click.session().refresh();
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
   }
 
   private static List<String> applyState(@NonNull List<String> lore, @NonNull String state) {

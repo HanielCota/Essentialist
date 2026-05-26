@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.tpa.repository;
 
-import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlExecutor;
-import com.hanielcota.essentials.database.SqlTable;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
+import com.hanielcota.essentials.database.schema.SqlDialect;
+import com.hanielcota.essentials.database.schema.SqlTable;
 import java.util.List;
 import lombok.NonNull;
 

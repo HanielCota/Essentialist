@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.repository;
 
-import com.hanielcota.essentials.database.ResultMapper;
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.executor.ResultMapper;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +14,8 @@ import org.bukkit.Material;
  * Relational implementation of {@link HomeRepository}.
  *
  * <p>Primary key is {@code (player_id, name)} (case-insensitive on the name column via the
- * configured {@link com.hanielcota.essentials.database.SqlDialect}) so calls to {@link #save} act
- * as upsert per player+name pair.
+ * configured {@link com.hanielcota.essentials.database.schema.SqlDialect}) so calls to {@link
+ * #save} act as upsert per player+name pair.
  */
 @RequiredArgsConstructor
 public final class SqlHomeRepository implements HomeRepository {

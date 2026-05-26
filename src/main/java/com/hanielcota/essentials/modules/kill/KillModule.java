@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.kill;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.kill.command.KillCommand;
 import com.hanielcota.essentials.modules.kill.config.KillConfig;
 import com.hanielcota.essentials.paper.ActorFactory;

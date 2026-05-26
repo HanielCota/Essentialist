@@ -1,19 +1,12 @@
 package com.hanielcota.essentials.menu;
 
 import com.github.hanielcota.menuframework.api.MenuService;
-import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.bukkit.Material;
 
-/**
- * Registers previous/next page templates and wires them into a {@link PaginationConfig.Builder}.
- * The {@code NavigationRenderer} in the framework removes the enchantment glint automatically when
- * a button is at the edge of the page range, so the buttons get visual enable/disable for free.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PageNavigation {
 
@@ -30,8 +23,8 @@ public final class PageNavigation {
     var previousId = menuId + ".previous";
     var nextId = menuId + ".next";
 
-    var previousTemplate = button(material, previousName);
-    var nextTemplate = button(material, nextName);
+    var previousTemplate = MenuTemplates.simple(material, previousName);
+    var nextTemplate = MenuTemplates.simple(material, nextName);
 
     menus.registerTemplate(previousId, previousTemplate);
     menus.registerTemplate(nextId, nextTemplate);
@@ -44,13 +37,5 @@ public final class PageNavigation {
     pagination.previousTemplate(previousId);
     pagination.nextTemplate(nextId);
     pagination.hideDisabledNavigation(true);
-  }
-
-  private static ItemTemplate button(@NonNull Material material, @NonNull String name) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.italic(false);
-
-    return builder.build();
   }
 }

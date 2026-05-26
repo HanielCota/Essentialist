@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.broadcast;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.broadcast.command.BroadcastCommand;
 import com.hanielcota.essentials.modules.broadcast.config.BroadcastConfig;
 import com.hanielcota.essentials.modules.broadcast.service.BroadcastService;

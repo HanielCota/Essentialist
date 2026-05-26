@@ -2,8 +2,8 @@ package com.hanielcota.essentials.modules.list;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.list.command.ListCommand;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
 import com.hanielcota.essentials.modules.list.menu.ListEntryRenderer;

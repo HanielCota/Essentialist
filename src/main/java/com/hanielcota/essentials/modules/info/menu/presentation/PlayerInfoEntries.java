@@ -2,9 +2,9 @@ package com.hanielcota.essentials.modules.info.menu.presentation;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
+import com.hanielcota.essentials.shared.DurationFormatter;
+import com.hanielcota.essentials.shared.Numbers;
 import com.hanielcota.essentials.user.UserSessionService;
-import com.hanielcota.essentials.util.DurationFormatter;
-import com.hanielcota.essentials.util.Numbers;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -28,9 +28,9 @@ public final class PlayerInfoEntries {
   }
 
   private static String formatCoords(@NonNull Location location) {
-    var x = Numbers.compact(location.getX());
-    var y = Numbers.compact(location.getY());
-    var z = Numbers.compact(location.getZ());
+    var x = Numbers.display(location.getX());
+    var y = Numbers.display(location.getY());
+    var z = Numbers.display(location.getZ());
 
     return x + ", " + y + ", " + z;
   }

@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.vanish.config;
 
-import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.shared.Numbers;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -27,9 +27,9 @@ public final class VanishMessages {
       double x,
       double y,
       double z) {
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
+    var xStr = Numbers.display(x);
+    var yStr = Numbers.display(y);
+    var zStr = Numbers.display(z);
 
     var template = snap.itemLore();
     var lines = new ArrayList<String>(template.size());
@@ -48,9 +48,9 @@ public final class VanishMessages {
       double x,
       double y,
       double z) {
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
+    var xStr = Numbers.display(x);
+    var yStr = Numbers.display(y);
+    var zStr = Numbers.display(z);
 
     return formatLine(snap.teleported(), player, world, xStr, yStr, zStr);
   }

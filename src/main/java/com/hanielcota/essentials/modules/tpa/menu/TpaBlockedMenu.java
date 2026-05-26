@@ -10,10 +10,11 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaBlockedMenuConfig;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -60,12 +61,7 @@ public final class TpaBlockedMenu implements EssentialsMenu {
   }
 
   private static ItemTemplate emptyTemplate(@NonNull TpaBlockedMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.emptyIcon());
-    builder.name(settings.emptyName());
-    builder.lore(settings.emptyLore().toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
   }
 
   private static int backSlot(@NonNull TpaBlockedMenuConfig settings, int rows) {
@@ -73,12 +69,7 @@ public final class TpaBlockedMenu implements EssentialsMenu {
   }
 
   private static ItemTemplate backTemplate(@NonNull TpaBlockedMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.backIcon());
-    builder.name(settings.backName());
-    builder.lore(settings.backLore().toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
   }
 
   @Override

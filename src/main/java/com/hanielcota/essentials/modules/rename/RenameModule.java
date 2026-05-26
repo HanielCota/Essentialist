@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.rename;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.rename.command.RenameCommand;
 import com.hanielcota.essentials.modules.rename.config.RenameConfig;
 import com.hanielcota.essentials.modules.rename.service.RenameService;

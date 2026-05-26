@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.back.config;
 
-import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.shared.Numbers;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.NonNull;
@@ -64,9 +64,9 @@ public record BackConfig(
   }
 
   public String formatBack(@NonNull String world, double x, double y, double z) {
-    var xStr = Numbers.compact(x);
-    var yStr = Numbers.compact(y);
-    var zStr = Numbers.compact(z);
+    var xStr = Numbers.display(x);
+    var yStr = Numbers.display(y);
+    var zStr = Numbers.display(z);
 
     var withWorld = back.replace("{world}", world);
     var withX = withWorld.replace("{x}", xStr);

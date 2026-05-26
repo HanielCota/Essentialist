@@ -1,10 +1,11 @@
 package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public final class TpaPendingActionRenderer {
     var name = settings.acceptName().replace("{player}", requesterName);
     var lore = replacePlayer(settings.acceptLore(), requesterName);
 
-    return simpleTemplate(settings.acceptIcon(), name, lore);
+    return MenuTemplates.simple(settings.acceptIcon(), name, lore);
   }
 
   public ItemTemplate denyTemplate(
@@ -47,7 +48,7 @@ public final class TpaPendingActionRenderer {
     var name = settings.denyName().replace("{player}", requesterName);
     var lore = replacePlayer(settings.denyLore(), requesterName);
 
-    return simpleTemplate(settings.denyIcon(), name, lore);
+    return MenuTemplates.simple(settings.denyIcon(), name, lore);
   }
 
   public ItemTemplate blockTemplate(
@@ -56,11 +57,11 @@ public final class TpaPendingActionRenderer {
     var name = settings.blockName().replace("{player}", requesterName);
     var lore = replacePlayer(settings.blockLore(), requesterName);
 
-    return simpleTemplate(settings.blockIcon(), name, lore);
+    return MenuTemplates.simple(settings.blockIcon(), name, lore);
   }
 
   public ItemTemplate backTemplate(@NonNull TpaPendingActionMenuConfig settings) {
-    return simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
   }
 
   private static String targetName(
@@ -122,15 +123,5 @@ public final class TpaPendingActionRenderer {
       replaced.add(line.replace("{player}", player));
     }
     return replaced;
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
   }
 }

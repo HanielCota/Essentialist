@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.workstations;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.workstations.command.AnvilCommand;
 import com.hanielcota.essentials.modules.workstations.command.CartographyTableCommand;
 import com.hanielcota.essentials.modules.workstations.command.GrindstoneCommand;

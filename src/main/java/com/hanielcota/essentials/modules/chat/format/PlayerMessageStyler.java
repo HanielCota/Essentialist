@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.chat.format;
 
-import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
+import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

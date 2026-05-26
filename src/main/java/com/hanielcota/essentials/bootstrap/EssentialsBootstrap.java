@@ -3,7 +3,7 @@ package com.hanielcota.essentials.bootstrap;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.core.EssentialsCore;
-import com.hanielcota.essentials.database.DatabaseProvider;
+import com.hanielcota.essentials.database.connection.DatabaseProvider;
 import com.hanielcota.essentials.service.DefaultServiceRegistry;
 import com.hanielcota.essentials.service.ServiceRegistry;
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.hat;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.hat.command.HatCommand;
 import com.hanielcota.essentials.modules.hat.config.HatConfig;
 import com.hanielcota.essentials.modules.hat.service.HatService;

@@ -4,14 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
 import com.hanielcota.essentials.modules.nick.repository.NickCache;
-import com.hanielcota.essentials.modules.nick.repository.NickRepository;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
+import com.hanielcota.essentials.support.NoopNickRepository;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 
 class NickServiceTest {
@@ -83,36 +81,6 @@ class NickServiceTest {
   }
 
   private static NickCache newCache() {
-    return new NickCache(new NoopRepository(), new NoopWriter());
-  }
-
-  private static final class NoopRepository implements NickRepository {
-    @Override
-    public List<NickEntry> list() {
-      return List.of();
-    }
-
-    @Override
-    public void save(@NonNull NickEntry entry) {}
-
-    @Override
-    public boolean delete(@NonNull UUID id) {
-      return false;
-    }
-  }
-
-  /**
-   * Drops the work — tests only assert against the in-memory cache state, which the service mutates
-   * synchronously before delegating to the writer. Running the work would NPE on the null store
-   * passed in for these cache-only tests.
-   */
-  private static final class NoopWriter implements AsyncDatabaseWriter {
-    @Override
-    public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
-      return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public void close() {}
+    return new NickCache(NoopNickRepository.INSTANCE, NoopAsyncDatabaseWriter.INSTANCE);
   }
 }

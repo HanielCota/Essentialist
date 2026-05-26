@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.nick.config;
 
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.Placeholders;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;

@@ -5,7 +5,7 @@ import com.github.hanielcota.menuframework.api.DynamicContentProvider;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.PaginationConfig;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
