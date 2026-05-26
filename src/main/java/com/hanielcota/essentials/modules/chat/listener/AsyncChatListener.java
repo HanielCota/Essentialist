@@ -3,9 +3,9 @@ package com.hanielcota.essentials.modules.chat.listener;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.chat.channel.ChannelRouter;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
-import com.hanielcota.essentials.modules.chat.service.ChatFormatter;
-import com.hanielcota.essentials.modules.chat.service.ChatGuard;
-import com.hanielcota.essentials.modules.chat.service.PlayerMessageStyler;
+import com.hanielcota.essentials.modules.chat.format.ChatFormatPipeline;
+import com.hanielcota.essentials.modules.chat.format.PlayerMessageStyler;
+import com.hanielcota.essentials.modules.chat.guard.ChatGuardPipeline;
 import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;
@@ -21,29 +21,19 @@ import org.bukkit.event.Listener;
  * chat thread; everything inside this listener is allocation-conscious and avoids touching the main
  * thread.
  *
- * <p>Flow per message:
+ * <p>The listener is intentionally thin — every non-trivial responsibility lives in a collaborator:
  *
- * <ol>
- *   <li>Serialise the typed message to plain text (needed to seed anti-spam comparison).
- *   <li>Ask {@link ChannelRouter} which channel consumes it — either {@link
- *       com.hanielcota.essentials.modules.chat.channel.StaffChannel StaffChannel} (when the sender
- *       has persistent staff toggle active) or {@link
- *       com.hanielcota.essentials.modules.chat.channel.LocalChannel LocalChannel}.
- *   <li>Run {@link ChatGuard#shouldBlock} — cooldown + repeated-message checks live there. The
- *       guard already sends the configured warning to the sender on a block, so the listener just
- *       cancels and returns.
- *   <li>Touch the guard state — only after the message clears the checks, so a blocked attempt does
- *       not poison the next message's anti-spam comparison.
- *   <li>Let the channel filter {@link AsyncChatEvent#viewers()} (proximity, staff permission).
- *   <li>If the channel handles the "nobody else hears" case (local chat warning), cancel and
- *       return.
- *   <li>Style the player's message via {@link PlayerMessageStyler} (gated by {@code chat.color} /
- *       {@code chat.format}), then install a {@link ChatRenderer#viewerUnaware ViewerUnaware}
- *       renderer so Paper formats the component once per message and reuses it for every viewer.
- * </ol>
+ * <ul>
+ *   <li>{@link ChannelRouter} — decides which channel consumes the message.
+ *   <li>{@link ChatGuardPipeline} — cooldown + repeated-message + future checks.
+ *   <li>{@link PlayerMessageStyler} — applies {@code chat.color}/{@code chat.format} permissions to
+ *       the typed message.
+ *   <li>{@link ChatFormatPipeline} — final MiniMessage render (parse → placeholders → resolver →
+ *       render).
+ * </ul>
  *
  * <p>Priority {@link EventPriority#NORMAL} with {@code ignoreCancelled = true} so cancellers at
- * lower priorities (e.g. {@code MuteChatListener} at LOWEST) win and we don't waste a parse on a
+ * lower priorities (e.g. {@code MuteChatListener} at LOWEST) win and we do not waste a parse on a
  * silenced message.
  */
 @RequiredArgsConstructor
@@ -54,8 +44,8 @@ public final class AsyncChatListener implements Listener {
 
   private final ConfigHandle<ChatConfig> config;
   private final ChannelRouter router;
-  private final ChatFormatter formatter;
-  private final ChatGuard guard;
+  private final ChatFormatPipeline formatPipeline;
+  private final ChatGuardPipeline guards;
   private final PlayerMessageStyler styler;
 
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -69,12 +59,12 @@ public final class AsyncChatListener implements Listener {
     var channel = routed.channel();
     var routedMessage = routed.message();
 
-    if (this.guard.shouldBlock(sender, channel, routedMessage)) {
+    if (this.guards.shouldBlock(sender, channel, routedMessage)) {
       event.setCancelled(true);
       return;
     }
 
-    this.guard.touch(senderId, channel.id(), routedMessage);
+    this.guards.touch(senderId, channel.id(), routedMessage);
 
     channel.filterViewers(event, sender);
 
@@ -90,6 +80,6 @@ public final class AsyncChatListener implements Listener {
     event.renderer(
         ChatRenderer.viewerUnaware(
             (source, sourceDisplayName, ignored) ->
-                this.formatter.format(source, messageComponent, template)));
+                this.formatPipeline.format(source, messageComponent, template)));
   }
 }

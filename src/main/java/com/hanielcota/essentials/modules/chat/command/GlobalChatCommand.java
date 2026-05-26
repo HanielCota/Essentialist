@@ -24,9 +24,10 @@ import org.bukkit.entity.Player;
  * </ul>
  *
  * <p>Players reach the global channel only by typing the command — there is no prefix-based path.
- * {@code @PlayerOnly} because {@link com.hanielcota.essentials.modules.chat.service.ChatFormatter
- * ChatFormatter} needs a {@link Player} to resolve the {@code <player>} / {@code <world>} / {@code
- * <displayname>} placeholders.
+ * {@code @PlayerOnly} because {@link
+ * com.hanielcota.essentials.modules.chat.format.ChatFormatPipeline ChatFormatPipeline} needs a
+ * {@link Player} to resolve the {@code <player>} / {@code <world>} / {@code <displayname>}
+ * placeholders.
  */
 @Command(
     value = "g",

@@ -2,8 +2,8 @@ package com.hanielcota.essentials.modules.chat.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
+import com.hanielcota.essentials.modules.chat.format.ChatFormatPipeline;
 import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
-import com.hanielcota.essentials.modules.chat.service.ChatFormatter;
 import com.hanielcota.essentials.paper.AudienceProvider;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
@@ -14,20 +14,20 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 /**
- * Owns the side-effects of {@code /staffchat}: rendering the message through {@link ChatFormatter}
- * with the configured staff template, then fanning it out to every online player carrying {@link
- * ChatPermissions#STAFF_RECEIVE} plus the console and the sender themselves.
+ * Owns the side-effects of {@code /staffchat}: rendering the message through {@link
+ * ChatFormatPipeline} with the configured staff template, then fanning it out to every online
+ * player carrying {@link ChatPermissions#STAFF_RECEIVE} plus the console and the sender themselves.
  *
  * <p>The command path runs on the main thread (Bukkit dispatches commands on main), so iterating
  * {@link PlayerProvider#all()} and calling {@code hasPermission} is safe. We bypass {@code
  * AsyncChatEvent} entirely — this is a targeted broadcast, not regular chat, so the chat pipeline's
- * other listeners (mute, format, etc.) intentionally don't see it.
+ * other listeners (mute, format, etc.) intentionally do not see it.
  */
 @RequiredArgsConstructor
 public final class StaffChatNotifier {
 
   private final ConfigHandle<ChatConfig> config;
-  private final ChatFormatter formatter;
+  private final ChatFormatPipeline formatPipeline;
   private final PlayerProvider players;
   private final AudienceProvider audiences;
 
@@ -36,7 +36,7 @@ public final class StaffChatNotifier {
     var staff = snap.staff();
     var template = staff.format();
     var messageComponent = Component.text(body);
-    var rendered = this.formatter.format(sender, messageComponent, template);
+    var rendered = this.formatPipeline.format(sender, messageComponent, template);
 
     deliver(rendered, sender);
   }

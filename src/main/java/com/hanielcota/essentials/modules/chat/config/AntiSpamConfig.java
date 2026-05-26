@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.chat.config;
 
-import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -15,7 +14,7 @@ public record AntiSpamConfig(
             "Shown when a channel cooldown blocks the message. Placeholder: {seconds} — the"
                 + " whole number of seconds (rounded up) the sender must still wait.")
         String cooldownWarning,
-    @Comment("Shown when {@link #blockRepeated} cancels a duplicate message.")
+    @Comment("Shown when blockRepeated cancels a duplicate message. Empty drops silently.")
         String repeatedWarning) {
 
   public static AntiSpamConfig defaults() {
@@ -29,12 +28,5 @@ public record AntiSpamConfig(
     var secondsStr = String.valueOf(seconds);
 
     return cooldownWarning.replace("{seconds}", secondsStr);
-  }
-
-  public String repeatedWarningOrNull(@NonNull String defaultIfEmpty) {
-    if (repeatedWarning.isEmpty()) {
-      return defaultIfEmpty;
-    }
-    return repeatedWarning;
   }
 }

@@ -8,8 +8,8 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
  * <p>Channel layout: command-routed {@code global} (reached via {@code /g}), default {@code local}
  * chat limited by radius, and an opt-in {@code staff} channel reached via {@code /staffchat}. Each
  * channel carries its own MiniMessage template and cooldown — {@link com.hanielcota.essentials
- * .modules.chat.service.ChatFormatter ChatFormatter} caches the legacy-to-MiniMessage normalisation
- * per template, so even with three formats the hot path runs a single map lookup.
+ * .modules.chat.format.ChatTemplateCompiler ChatTemplateCompiler} caches the legacy-to-MiniMessage
+ * normalisation per template, so even with three formats the hot path runs a single map lookup.
  *
  * <p>{@link #antiSpam} groups the cross-channel guards (repeated-message blocking + cooldown
  * messages). Per-channel cooldown duration lives on each channel config; the {@code AntiSpamConfig}
