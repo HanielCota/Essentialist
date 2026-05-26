@@ -34,6 +34,7 @@ safer to load on live servers.
 | Staff tools | Kick, whitelist management, clear chat, online count, player information, titles, and action bar messages. |
 | Workstations | Virtual crafting table, anvil, grindstone, cartography table, smithing table, loom, and stonecutter. |
 | Menus | GUI screens for homes, back history, player information, vanish list, and whitelist management. |
+| Chat | Local proximity chat, global broadcast (`/g`), staff channel (`/staffchat`), per-channel cooldown, repeated-message anti-spam, permission-gated colour/format, optional PlaceholderAPI integration. |
 | Storage | SQLite-backed persistence for features that need durable player data. |
 | Messages | MiniMessage support for colors, gradients, hover text, and clickable actions. |
 
@@ -44,6 +45,12 @@ safer to load on live servers.
 | Server | Paper `1.21.11` or newer |
 | Java | JDK/JRE `25` or newer |
 | Database | SQLite, bundled locally |
+
+### Optional integrations
+
+| Plugin | What it adds |
+|:--|:--|
+| [PlaceholderAPI](https://wiki.placeholderapi.com/) | Resolves PAPI placeholders in chat formats (e.g. `%vault_prefix%`) and provides the values for the `<prefix>` / `<suffix>` tags. Detected at startup; no extra setup needed. Disable by setting `placeholders.prefix-placeholder` and `placeholders.suffix-placeholder` to empty strings in `chat.yml`. |
 
 ## Installation
 
@@ -142,6 +149,32 @@ additional `.others` permission, such as `essentials.fly.others`.
 | `/tear` | Opens a virtual loom. Alias: `/loom`. | `essentials.loom` |
 | `/cortador` | Opens a virtual stonecutter. Alias: `/stonecutter`. | `essentials.stonecutter` |
 
+### Chat
+
+Players type into the chat box for local proximity chat by default. Global broadcast and the staff channel are reached through explicit commands.
+
+| Command | Description | Permission |
+|:--|:--|:--|
+| `/g <message>` | Sends a message to the global channel. Alias: `/global`. | `chat.global.use` |
+| `/staffchat <message>` | Sends a one-shot staff message. Alias: `/sc`. | `chat.staff.use` |
+| `/staffchat toggle` | Toggles persistent staff chat for your session. | `chat.staff.use` |
+
+Additional permissions:
+
+| Permission | Grants |
+|:--|:--|
+| `chat.global.bypasscooldown` | Skip the `/g` cooldown. |
+| `chat.local.bypassrange` | Local chat reaches every world, regardless of distance. |
+| `chat.local.bypasscooldown` | Skip the local-channel cooldown. |
+| `chat.staff.receive` | See messages sent to the staff channel. |
+| `chat.staff.bypasscooldown` | Skip the staff-channel cooldown. |
+| `chat.bypassantispam` | Skip the repeated-message block. |
+| `chat.color` | Use colour codes (`&c`, `<red>`, `<#aabbcc>`) in your messages. |
+| `chat.format` | Use decoration codes (`&l`, `<bold>`, `<italic>`) in your messages. |
+| `chat.admin` | Use the `/chat` admin command. |
+
+`<click>`, `<hover>`, `<gradient>`, `<rainbow>`, and other dangerous MiniMessage tags are blocked in player input regardless of permission. Admin format templates (in `chat.yml`) keep the full tag set.
+
 ### Staff and Server
 
 | Command | Description | Permission |
@@ -152,6 +185,7 @@ additional `.others` permission, such as `essentials.fly.others`.
 | `/title [player] "title" ["subtitle"]` | Shows a title to a player. | `essentials.title` |
 | `/title broadcast "title" ["subtitle"]` | Shows a title to everyone. | `essentials.title.broadcast` |
 | `/clearchat` | Clears the public chat. | `essentials.clearchat` |
+| `/chat reload` | Reloads chat (and every other) module config. | `chat.reload` |
 | `/whitelist` | Opens the whitelist menu. | `essentials.whitelist` |
 | `/whitelist add <player>` | Adds a player to the whitelist. | `essentials.whitelist` |
 | `/whitelist remove <player>` | Removes a player from the whitelist. | `essentials.whitelist` |

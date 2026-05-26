@@ -5,8 +5,8 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 /**
  * Root config of the {@code chat} module.
  *
- * <p>Channel layout follows the spec: prefix-routed {@code global}, default {@code local} chat
- * limited by radius, and an opt-in {@code staff} channel reached via {@code /staffchat}. Each
+ * <p>Channel layout: command-routed {@code global} (reached via {@code /g}), default {@code local}
+ * chat limited by radius, and an opt-in {@code staff} channel reached via {@code /staffchat}. Each
  * channel carries its own MiniMessage template and cooldown — {@link com.hanielcota.essentials
  * .modules.chat.service.ChatFormatter ChatFormatter} caches the legacy-to-MiniMessage normalisation
  * per template, so even with three formats the hot path runs a single map lookup.
