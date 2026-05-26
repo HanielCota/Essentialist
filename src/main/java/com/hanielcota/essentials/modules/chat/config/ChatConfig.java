@@ -1,39 +1,32 @@
 package com.hanielcota.essentials.modules.chat.config;
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
-import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
  * Root config of the {@code chat} module.
  *
- * <p>{@link #format} is a MiniMessage template applied to every chat message. Placeholders
- * available out-of-the-box: {@code <player>} (sender username), {@code <displayname>} (sender
- * display name component), {@code <world>} (sender world name), {@code <message>} (the typed
- * message, inserted as a literal component to prevent format injection). Future PRs add {@code
- * <prefix>} / {@code <suffix>} once a permission-aware provider is wired in.
+ * <p>Channel layout follows the spec: prefix-routed {@code global}, default {@code local} chat
+ * limited by radius, and an opt-in {@code staff} channel reached via {@code /staffchat}. Each
+ * channel carries its own MiniMessage template — {@link com.hanielcota.essentials.modules.chat
+ * .service.ChatFormatter ChatFormatter} caches the legacy-to-MiniMessage normalisation per
+ * template, so even with three formats the hot path runs a single map lookup.
  *
- * <p>{@link #acceptLegacyAmpersand} controls whether {@code &}-prefixed legacy colour codes in the
- * format string are converted to MiniMessage tags at reload time. The conversion is done once per
- * reload — the hot path never re-scans for {@code &} codes.
+ * <p>The player's typed message is always inserted via {@link
+ * net.kyori.adventure.text.minimessage.tag.Tag#inserting Tag.inserting}, so tags typed into chat
+ * stay literal — players cannot inject {@code <click>} or {@code <hover>} regardless of channel.
  */
 @ConfigSerializable
 public record ChatConfig(
-    @Comment(
-            "MiniMessage template applied to every chat message. Placeholders: <player>,"
-                + " <displayname>, <world>, <message>. The <message> tag is inserted as a literal"
-                + " component so players cannot inject MiniMessage tags via their chat input.")
-        String format,
-    @Comment(
-            "Accept legacy ampersand colour codes (&c, &l, etc.) in the format string alongside"
-                + " MiniMessage tags. Conversion happens once at reload, never on the chat hot"
-                + " path.")
-        boolean acceptLegacyAmpersand,
+    GlobalChannelConfig global,
+    LocalChannelConfig local,
+    StaffChannelConfig staff,
     ChatMessages messages) {
 
   public static ChatConfig defaults() {
     return new ChatConfig(
-        "<gray><player></gray> <dark_gray>»</dark_gray> <white><message></white>",
-        true,
+        GlobalChannelConfig.defaults(),
+        LocalChannelConfig.defaults(),
+        StaffChannelConfig.defaults(),
         ChatMessages.defaults());
   }
 }
