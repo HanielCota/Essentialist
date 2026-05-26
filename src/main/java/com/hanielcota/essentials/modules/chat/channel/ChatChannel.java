@@ -6,11 +6,11 @@ import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 /**
- * Identifies a delivery destination for a chat message — who hears it, and what template formats
- * it. {@code sealed} so the {@link
- * com.hanielcota.essentials.modules.chat.listener.AsyncChatListener AsyncChatListener} switch over
- * channel kinds is exhaustively type-checked; adding a new channel means amending this hierarchy
- * and the router, never a stringly-typed lookup.
+ * Identifies a delivery destination for a chat message — who hears it, what template formats it,
+ * and how long the sender must wait before another message on this channel. {@code sealed} so the
+ * {@link com.hanielcota.essentials.modules.chat.listener.AsyncChatListener AsyncChatListener}
+ * switch over channel kinds is exhaustively type-checked; adding a new channel means amending this
+ * hierarchy and the router, never a stringly-typed lookup.
  *
  * <p>{@link #filterViewers} mutates {@link AsyncChatEvent#viewers()} on the async chat thread —
  * Paper documents this as thread-safe for the duration of the event. Implementations may read
@@ -21,6 +21,10 @@ public sealed interface ChatChannel permits GlobalChannel, LocalChannel, StaffCh
   String id();
 
   String template(@NonNull ChatConfig config);
+
+  int cooldownSeconds(@NonNull ChatConfig config);
+
+  String bypassCooldownPermission();
 
   void filterViewers(@NonNull AsyncChatEvent event, @NonNull Player sender);
 

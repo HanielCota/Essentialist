@@ -3,7 +3,9 @@ package com.hanielcota.essentials.modules.chat.channel;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import java.util.UUID;
 import lombok.NonNull;
+import net.kyori.adventure.audience.Audience;
 import org.bukkit.entity.Player;
 
 /**
@@ -26,12 +28,22 @@ public final class StaffChannel implements ChatChannel {
   }
 
   @Override
+  public int cooldownSeconds(@NonNull ChatConfig config) {
+    return config.staff().cooldownSeconds();
+  }
+
+  @Override
+  public String bypassCooldownPermission() {
+    return ChatPermissions.STAFF_BYPASS_COOLDOWN;
+  }
+
+  @Override
   public void filterViewers(@NonNull AsyncChatEvent event, @NonNull Player sender) {
     var senderId = sender.getUniqueId();
     event.viewers().removeIf(audience -> shouldRemove(audience, senderId));
   }
 
-  private static boolean shouldRemove(@NonNull Object audience, @NonNull java.util.UUID senderId) {
+  private static boolean shouldRemove(@NonNull Audience audience, @NonNull UUID senderId) {
     if (!(audience instanceof Player viewer)) {
       return false;
     }

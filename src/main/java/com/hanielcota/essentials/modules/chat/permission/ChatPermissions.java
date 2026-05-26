@@ -14,14 +14,17 @@ public final class ChatPermissions {
   public static final String RELOAD = "chat.reload";
 
   public static final String GLOBAL_USE = "chat.global.use";
+  public static final String GLOBAL_BYPASS_COOLDOWN = "chat.global.bypasscooldown";
 
   public static final String LOCAL_BYPASS_RANGE = "chat.local.bypassrange";
+  public static final String LOCAL_BYPASS_COOLDOWN = "chat.local.bypasscooldown";
 
   public static final String STAFF_USE = "chat.staff.use";
   public static final String STAFF_RECEIVE = "chat.staff.receive";
+  public static final String STAFF_BYPASS_COOLDOWN = "chat.staff.bypasscooldown";
 
-  // Reserved for PR 3 (anti-spam / cooldown):
-  //   chat.global.bypasscooldown
+  public static final String BYPASS_ANTISPAM = "chat.bypassantispam";
+
   // Reserved for PR 4 (format/colour):
   //   chat.color, chat.format
 }
