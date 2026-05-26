@@ -31,8 +31,8 @@ import lombok.NonNull;
 
 /**
  * Chat module wiring: formatting + local/staff routing via {@link AsyncChatListener}, global
- * delivery via {@code /g}. PR 5 dropped the {@code !}-prefix path; the channel router now picks
- * between staff (toggle) and local only — global is reached exclusively through the command.
+ * delivery via {@code /g}. The channel router picks between staff (toggle active) and local; global
+ * is reached exclusively through the command.
  */
 public final class ChatModule extends AbstractModule {
 

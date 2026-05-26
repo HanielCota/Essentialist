@@ -23,11 +23,10 @@ import org.bukkit.entity.Player;
  *   <li>{@code /g} with no message — prints usage.
  * </ul>
  *
- * <p>Routing change vs PR 4: there is no {@code !}-prefix path any more. Players reach the global
- * channel only by typing the command, mirroring the {@code /staffchat} pattern. {@code @PlayerOnly}
- * because {@link com.hanielcota.essentials.modules.chat.service.ChatFormatter ChatFormatter} needs
- * a {@link Player} to resolve the {@code <player>} / {@code <world>} / {@code <displayname>}
- * placeholders.
+ * <p>Players reach the global channel only by typing the command — there is no prefix-based path.
+ * {@code @PlayerOnly} because {@link com.hanielcota.essentials.modules.chat.service.ChatFormatter
+ * ChatFormatter} needs a {@link Player} to resolve the {@code <player>} / {@code <world>} / {@code
+ * <displayname>} placeholders.
  */
 @Command(
     value = "g",
