@@ -43,3 +43,4 @@ com.hanielcota.essentials.modules.afk.AfkModule
 com.hanielcota.essentials.modules.seen.SeenModule
 com.hanielcota.essentials.modules.list.ListModule
 com.hanielcota.essentials.modules.silencer.SilencerModule
+com.hanielcota.essentials.modules.chat.ChatModule
