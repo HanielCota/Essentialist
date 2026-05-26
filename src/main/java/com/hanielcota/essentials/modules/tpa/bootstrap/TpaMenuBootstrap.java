@@ -87,6 +87,7 @@ public final class TpaMenuBootstrap {
             this.config,
             requestService,
             shared.acceptHandler(),
+            shared.replyNotifier(),
             shared.callbacks(),
             shared.actors());
     var clickHandler = new TpaPendingClickHandler(selections, bulkActions);
