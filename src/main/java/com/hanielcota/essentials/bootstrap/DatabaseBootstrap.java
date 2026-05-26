@@ -1,15 +1,15 @@
 package com.hanielcota.essentials.bootstrap;
 
 import com.hanielcota.essentials.EssentialsPlugin;
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.database.DatabaseProvider;
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriterFactory;
-import com.hanielcota.essentials.database.DefaultSqlExecutor;
-import com.hanielcota.essentials.database.SqlConnectionFactory;
-import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlExecutor;
-import com.hanielcota.essentials.database.SqliteDatabase;
-import com.hanielcota.essentials.database.SqliteDialect;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.DefaultAsyncDatabaseWriterFactory;
+import com.hanielcota.essentials.database.connection.DatabaseProvider;
+import com.hanielcota.essentials.database.connection.SqlConnectionFactory;
+import com.hanielcota.essentials.database.executor.DefaultSqlExecutor;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
+import com.hanielcota.essentials.database.schema.SqlDialect;
+import com.hanielcota.essentials.database.sqlite.SqliteDatabase;
+import com.hanielcota.essentials.database.sqlite.SqliteDialect;
 import com.hanielcota.essentials.exception.PluginException;
 import java.io.IOException;
 import java.nio.file.Files;

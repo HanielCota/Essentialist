@@ -2,7 +2,7 @@ package com.hanielcota.essentials.bootstrap;
 
 import com.hanielcota.essentials.exception.ConfigurationException;
 import com.hanielcota.essentials.module.Module;
-import com.hanielcota.essentials.module.ModuleSettings;
+import com.hanielcota.essentials.module.discovery.ModuleSettings;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,201 +1,165 @@
 package com.hanielcota.essentials.modules.tpa.domain;
 
 import java.time.Duration;
-import java.util.EnumMap;
 import java.util.Map;
 import lombok.NonNull;
 
 public record TpaProfile(
-    @NonNull Map<TeleportRequestType, Boolean> receiveByType,
-    long sentRequests,
-    long receivedRequests,
-    long acceptedSent,
-    long acceptCount,
-    long totalAcceptLatencyMs,
-    boolean autoAcceptFavorites,
-    boolean soundsEnabled,
-    boolean allowCrossWorld,
-    boolean notifyWhenFavorited,
-    long dndUntilEpochMs,
-    @NonNull FavoriteOrdering favoriteOrdering) {
+    @NonNull TpaPrivacySettings privacy,
+    @NonNull TpaStats stats,
+    @NonNull TpaPreferences preferences) {
+
+  public TpaProfile(
+      @NonNull Map<TeleportRequestType, Boolean> receiveByType,
+      long sentRequests,
+      long receivedRequests,
+      long acceptedSent,
+      long acceptCount,
+      long totalAcceptLatencyMs,
+      boolean autoAcceptFavorites,
+      boolean soundsEnabled,
+      boolean allowCrossWorld,
+      boolean notifyWhenFavorited,
+      long dndUntilEpochMs,
+      @NonNull FavoriteOrdering favoriteOrdering) {
+    this(
+        new TpaPrivacySettings(receiveByType, allowCrossWorld, dndUntilEpochMs),
+        new TpaStats(
+            sentRequests, receivedRequests, acceptedSent, acceptCount, totalAcceptLatencyMs),
+        new TpaPreferences(
+            autoAcceptFavorites, soundsEnabled, notifyWhenFavorited, favoriteOrdering));
+  }
 
   public static TpaProfile defaults() {
-    var receive = new EnumMap<TeleportRequestType, Boolean>(TeleportRequestType.class);
-    receive.put(TeleportRequestType.TPA, true);
-    receive.put(TeleportRequestType.TPAHERE, true);
-
     return new TpaProfile(
-        Map.copyOf(receive), 0, 0, 0, 0, 0, false, true, true, true, 0, FavoriteOrdering.NAME);
+        TpaPrivacySettings.defaults(), TpaStats.empty(), TpaPreferences.defaults());
   }
 
   public boolean accepts(@NonNull TeleportRequestType type) {
-    return this.receiveByType.getOrDefault(type, false);
+    return this.privacy.accepts(type);
   }
 
   public boolean isDndActive(long nowEpochMs) {
-    return this.dndUntilEpochMs > nowEpochMs;
+    return this.privacy.isDndActive(nowEpochMs);
   }
 
   public TpaProfile toggled(@NonNull TeleportRequestType type) {
-    var next = new EnumMap<>(this.receiveByType);
-    var current = next.getOrDefault(type, false);
-    next.put(type, !current);
+    var nextPrivacy = this.privacy.toggled(type);
 
-    return copy().receiveByType(Map.copyOf(next)).build();
+    return withPrivacy(nextPrivacy);
   }
 
   public TpaProfile incrementSentRequests() {
-    return copy().sentRequests(this.sentRequests + 1).build();
+    var nextStats = this.stats.incrementSentRequests();
+
+    return withStats(nextStats);
   }
 
   public TpaProfile incrementReceivedRequests() {
-    return copy().receivedRequests(this.receivedRequests + 1).build();
+    var nextStats = this.stats.incrementReceivedRequests();
+
+    return withStats(nextStats);
   }
 
   public TpaProfile recordAcceptedOutgoing(@NonNull Duration latency) {
-    var latencyMs = Math.max(0L, latency.toMillis());
-    var nextAcceptedSent = this.acceptedSent + 1;
-    var nextAcceptCount = this.acceptCount + 1;
-    var nextTotalLatency = this.totalAcceptLatencyMs + latencyMs;
+    var nextStats = this.stats.recordAcceptedOutgoing(latency);
 
-    return copy()
-        .acceptedSent(nextAcceptedSent)
-        .acceptCount(nextAcceptCount)
-        .totalAcceptLatencyMs(nextTotalLatency)
-        .build();
+    return withStats(nextStats);
   }
 
   public TpaProfile toggledAutoAcceptFavorites() {
-    return copy().autoAcceptFavorites(!this.autoAcceptFavorites).build();
+    var nextPreferences = this.preferences.toggledAutoAcceptFavorites();
+
+    return withPreferences(nextPreferences);
   }
 
   public TpaProfile toggledSounds() {
-    return copy().soundsEnabled(!this.soundsEnabled).build();
+    var nextPreferences = this.preferences.toggledSounds();
+
+    return withPreferences(nextPreferences);
   }
 
   public TpaProfile toggledAllowCrossWorld() {
-    return copy().allowCrossWorld(!this.allowCrossWorld).build();
+    var nextPrivacy = this.privacy.toggledAllowCrossWorld();
+
+    return withPrivacy(nextPrivacy);
   }
 
   public TpaProfile toggledNotifyWhenFavorited() {
-    return copy().notifyWhenFavorited(!this.notifyWhenFavorited).build();
+    var nextPreferences = this.preferences.toggledNotifyWhenFavorited();
+
+    return withPreferences(nextPreferences);
   }
 
   public TpaProfile withDndUntil(long epochMs) {
-    return copy().dndUntilEpochMs(epochMs).build();
+    var nextPrivacy = this.privacy.withDndUntil(epochMs);
+
+    return withPrivacy(nextPrivacy);
   }
 
   public TpaProfile withFavoriteOrdering(@NonNull FavoriteOrdering ordering) {
-    return copy().favoriteOrdering(ordering).build();
+    var nextPreferences = this.preferences.withFavoriteOrdering(ordering);
+
+    return withPreferences(nextPreferences);
   }
 
-  private Builder copy() {
-    return new Builder(this);
+  public Map<TeleportRequestType, Boolean> receiveByType() {
+    return this.privacy.receiveByType();
   }
 
-  private static final class Builder {
-    private Map<TeleportRequestType, Boolean> receiveByType;
-    private long sentRequests;
-    private long receivedRequests;
-    private long acceptedSent;
-    private long acceptCount;
-    private long totalAcceptLatencyMs;
-    private boolean autoAcceptFavorites;
-    private boolean soundsEnabled;
-    private boolean allowCrossWorld;
-    private boolean notifyWhenFavorited;
-    private long dndUntilEpochMs;
-    private FavoriteOrdering favoriteOrdering;
+  public long sentRequests() {
+    return this.stats.sentRequests();
+  }
 
-    private Builder(TpaProfile source) {
-      this.receiveByType = source.receiveByType;
-      this.sentRequests = source.sentRequests;
-      this.receivedRequests = source.receivedRequests;
-      this.acceptedSent = source.acceptedSent;
-      this.acceptCount = source.acceptCount;
-      this.totalAcceptLatencyMs = source.totalAcceptLatencyMs;
-      this.autoAcceptFavorites = source.autoAcceptFavorites;
-      this.soundsEnabled = source.soundsEnabled;
-      this.allowCrossWorld = source.allowCrossWorld;
-      this.notifyWhenFavorited = source.notifyWhenFavorited;
-      this.dndUntilEpochMs = source.dndUntilEpochMs;
-      this.favoriteOrdering = source.favoriteOrdering;
-    }
+  public long receivedRequests() {
+    return this.stats.receivedRequests();
+  }
 
-    private Builder receiveByType(Map<TeleportRequestType, Boolean> value) {
-      this.receiveByType = value;
-      return this;
-    }
+  public long acceptedSent() {
+    return this.stats.acceptedSent();
+  }
 
-    private Builder sentRequests(long value) {
-      this.sentRequests = value;
-      return this;
-    }
+  public long acceptCount() {
+    return this.stats.acceptCount();
+  }
 
-    private Builder receivedRequests(long value) {
-      this.receivedRequests = value;
-      return this;
-    }
+  public long totalAcceptLatencyMs() {
+    return this.stats.totalAcceptLatencyMs();
+  }
 
-    private Builder acceptedSent(long value) {
-      this.acceptedSent = value;
-      return this;
-    }
+  public boolean autoAcceptFavorites() {
+    return this.preferences.autoAcceptFavorites();
+  }
 
-    private Builder acceptCount(long value) {
-      this.acceptCount = value;
-      return this;
-    }
+  public boolean soundsEnabled() {
+    return this.preferences.soundsEnabled();
+  }
 
-    private Builder totalAcceptLatencyMs(long value) {
-      this.totalAcceptLatencyMs = value;
-      return this;
-    }
+  public boolean allowCrossWorld() {
+    return this.privacy.allowCrossWorld();
+  }
 
-    private Builder autoAcceptFavorites(boolean value) {
-      this.autoAcceptFavorites = value;
-      return this;
-    }
+  public boolean notifyWhenFavorited() {
+    return this.preferences.notifyWhenFavorited();
+  }
 
-    private Builder soundsEnabled(boolean value) {
-      this.soundsEnabled = value;
-      return this;
-    }
+  public long dndUntilEpochMs() {
+    return this.privacy.dndUntilEpochMs();
+  }
 
-    private Builder allowCrossWorld(boolean value) {
-      this.allowCrossWorld = value;
-      return this;
-    }
+  public FavoriteOrdering favoriteOrdering() {
+    return this.preferences.favoriteOrdering();
+  }
 
-    private Builder notifyWhenFavorited(boolean value) {
-      this.notifyWhenFavorited = value;
-      return this;
-    }
+  private TpaProfile withPrivacy(@NonNull TpaPrivacySettings value) {
+    return new TpaProfile(value, this.stats, this.preferences);
+  }
 
-    private Builder dndUntilEpochMs(long value) {
-      this.dndUntilEpochMs = value;
-      return this;
-    }
+  private TpaProfile withStats(@NonNull TpaStats value) {
+    return new TpaProfile(this.privacy, value, this.preferences);
+  }
 
-    private Builder favoriteOrdering(FavoriteOrdering value) {
-      this.favoriteOrdering = value;
-      return this;
-    }
-
-    private TpaProfile build() {
-      return new TpaProfile(
-          this.receiveByType,
-          this.sentRequests,
-          this.receivedRequests,
-          this.acceptedSent,
-          this.acceptCount,
-          this.totalAcceptLatencyMs,
-          this.autoAcceptFavorites,
-          this.soundsEnabled,
-          this.allowCrossWorld,
-          this.notifyWhenFavorited,
-          this.dndUntilEpochMs,
-          this.favoriteOrdering);
-    }
+  private TpaProfile withPreferences(@NonNull TpaPreferences value) {
+    return new TpaProfile(this.privacy, this.stats, value);
   }
 }

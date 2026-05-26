@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.title;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.title.command.TitleCommand;
 import com.hanielcota.essentials.modules.title.config.TitleConfig;
 import com.hanielcota.essentials.modules.title.service.TitleService;

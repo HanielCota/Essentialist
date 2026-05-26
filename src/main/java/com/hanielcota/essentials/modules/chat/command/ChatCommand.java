@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.chat.command;
 
 import com.hanielcota.essentials.config.ConfigService;
-import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
+import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;

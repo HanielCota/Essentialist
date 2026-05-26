@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.smelt.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.smelt.config.SmeltConfig;
-import com.hanielcota.essentials.util.ItemStacks;
+import com.hanielcota.essentials.shared.ItemStacks;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

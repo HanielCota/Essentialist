@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.socialspy;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.socialspy.command.SocialSpyCommand;
 import com.hanielcota.essentials.modules.socialspy.command.SocialSpyNotifier;
 import com.hanielcota.essentials.modules.socialspy.config.SocialSpyConfig;

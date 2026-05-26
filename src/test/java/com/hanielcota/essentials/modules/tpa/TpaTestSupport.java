@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.tpa;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
@@ -16,6 +15,7 @@ import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import io.github.hanielcota.commandframework.core.ActorKind;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.lang.reflect.Proxy;
@@ -62,15 +62,15 @@ public final class TpaTestSupport {
   }
 
   public static TpaProfileService profiles() {
-    return new TpaProfileService(null, new NoopWriter());
+    return new TpaProfileService(null, NoopAsyncDatabaseWriter.INSTANCE);
   }
 
   public static TpaBlockService blocks() {
-    return new TpaBlockService(null, new NoopWriter());
+    return new TpaBlockService(null, NoopAsyncDatabaseWriter.INSTANCE);
   }
 
   public static TpaContactService contacts() {
-    return new TpaContactService(null, new NoopWriter());
+    return new TpaContactService(null, NoopAsyncDatabaseWriter.INSTANCE);
   }
 
   public static Player player(@NonNull TestPlayerState state) {
@@ -397,19 +397,6 @@ public final class TpaTestSupport {
     @Override
     public TpaConfig value() {
       return TpaConfig.defaults();
-    }
-  }
-
-  public static final class NoopWriter implements AsyncDatabaseWriter {
-    @Override
-    public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
-      work.run();
-      return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public void close() {
-      // no-op test stub
     }
   }
 }

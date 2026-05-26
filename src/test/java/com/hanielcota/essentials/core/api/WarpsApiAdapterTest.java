@@ -4,16 +4,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.warps.domain.Warp;
 import com.hanielcota.essentials.modules.warps.repository.WarpCache;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
+import org.bukkit.plugin.Plugin;
 import org.junit.jupiter.api.Test;
 
 class WarpsApiAdapterTest {
@@ -26,10 +29,11 @@ class WarpsApiAdapterTest {
     cache.put(warp("Zulu"));
     cache.put(warp("Alpha"));
 
-    var adapter = new WarpsApiAdapter(new WarpService(null, cache, new NoopWriter()));
+    var adapter =
+        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
 
     var names = adapter.warps().stream().map(Warp::name).toList();
-    assertEquals(java.util.List.of("Alpha", "Zulu"), names);
+    assertEquals(List.of("Alpha", "Zulu"), names);
   }
 
   @Test
@@ -37,7 +41,8 @@ class WarpsApiAdapterTest {
     var cache = new WarpCache();
     cache.put(warp("Spawn"));
 
-    var adapter = new WarpsApiAdapter(new WarpService(null, cache, new NoopWriter()));
+    var adapter =
+        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
 
     assertTrue(adapter.findWarp("SPAWN").isPresent());
     assertTrue(adapter.findWarp("spawn").isPresent());
@@ -48,7 +53,8 @@ class WarpsApiAdapterTest {
     var cache = new WarpCache();
     cache.put(warp("Vip"));
 
-    var adapter = new WarpsApiAdapter(new WarpService(null, cache, new NoopWriter()));
+    var adapter =
+        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
 
     assertFalse(adapter.canUse(new StubPermissible(Set.of()), "Vip"));
     assertTrue(adapter.canUse(new StubPermissible(Set.of("essentials.warp.use.vip")), "Vip"));
@@ -61,12 +67,13 @@ class WarpsApiAdapterTest {
     cache.put(warp("Public"));
     cache.put(warp("Vip"));
 
-    var adapter = new WarpsApiAdapter(new WarpService(null, cache, new NoopWriter()));
+    var adapter =
+        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
 
     var viewer = new StubPermissible(Set.of("essentials.warp.use.public"));
     var visible = adapter.visibleTo(viewer).stream().map(Warp::name).toList();
 
-    assertEquals(java.util.List.of("Public"), visible);
+    assertEquals(List.of("Public"), visible);
   }
 
   private static Warp warp(@NonNull String name) {
@@ -87,7 +94,7 @@ class WarpsApiAdapterTest {
     }
 
     @Override
-    public boolean isPermissionSet(@NonNull org.bukkit.permissions.Permission perm) {
+    public boolean isPermissionSet(@NonNull Permission perm) {
       return isPermissionSet(perm.getName());
     }
 
@@ -97,36 +104,34 @@ class WarpsApiAdapterTest {
     }
 
     @Override
-    public boolean hasPermission(@NonNull org.bukkit.permissions.Permission perm) {
+    public boolean hasPermission(@NonNull Permission perm) {
       return hasPermission(perm.getName());
     }
 
     @Override
-    public org.bukkit.permissions.PermissionAttachment addAttachment(
-        @NonNull org.bukkit.plugin.Plugin plugin, @NonNull String name, boolean value) {
+    public PermissionAttachment addAttachment(
+        @NonNull Plugin plugin, @NonNull String name, boolean value) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public org.bukkit.permissions.PermissionAttachment addAttachment(
-        @NonNull org.bukkit.plugin.Plugin plugin) {
+    public PermissionAttachment addAttachment(@NonNull Plugin plugin) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public org.bukkit.permissions.PermissionAttachment addAttachment(
-        @NonNull org.bukkit.plugin.Plugin plugin, @NonNull String name, boolean value, int ticks) {
+    public PermissionAttachment addAttachment(
+        @NonNull Plugin plugin, @NonNull String name, boolean value, int ticks) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public org.bukkit.permissions.PermissionAttachment addAttachment(
-        @NonNull org.bukkit.plugin.Plugin plugin, int ticks) {
+    public PermissionAttachment addAttachment(@NonNull Plugin plugin, int ticks) {
       throw new UnsupportedOperationException();
     }
 
     @Override
-    public void removeAttachment(@NonNull org.bukkit.permissions.PermissionAttachment attachment) {}
+    public void removeAttachment(@NonNull PermissionAttachment attachment) {}
 
     @Override
     public void recalculatePermissions() {}
@@ -143,15 +148,5 @@ class WarpsApiAdapterTest {
 
     @Override
     public void setOp(boolean value) {}
-  }
-
-  private static final class NoopWriter implements AsyncDatabaseWriter {
-    @Override
-    public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
-      return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public void close() {}
   }
 }

@@ -1,6 +1,15 @@
 package com.hanielcota.essentials.module;
 
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.module.environment.DefaultModuleEnvironment;
+import com.hanielcota.essentials.module.environment.ModuleContext;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.environment.ModuleServices;
+import com.hanielcota.essentials.module.lifecycle.ModuleCloseables;
+import com.hanielcota.essentials.module.lifecycle.ModuleListeners;
+import com.hanielcota.essentials.module.lifecycle.ModuleMenus;
+import com.hanielcota.essentials.module.registration.DefaultModuleRegistrar;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
+import com.hanielcota.essentials.shared.Log;
 import lombok.NonNull;
 
 /**

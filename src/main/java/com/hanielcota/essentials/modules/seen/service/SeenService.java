@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.seen.service;
 import com.hanielcota.essentials.modules.nick.service.NickService;
 import com.hanielcota.essentials.modules.seen.domain.SeenLine;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.util.DurationFormatter;
+import com.hanielcota.essentials.shared.DurationFormatter;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;

@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.kick;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.kick.command.KickCommand;
 import com.hanielcota.essentials.modules.kick.config.KickConfig;
 import lombok.NonNull;

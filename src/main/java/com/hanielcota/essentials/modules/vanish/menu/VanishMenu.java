@@ -7,6 +7,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.config.VanishMenuLayout;
@@ -38,15 +39,9 @@ public final class VanishMenu implements EssentialsMenu {
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull VanishConfig snap) {
     var material = snap.infoMaterial();
     var name = snap.infoName();
-    var loreList = snap.infoLore();
-    var loreArray = loreList.toArray(String[]::new);
+    var lore = snap.infoLore();
 
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(loreArray);
-    builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(material, name, lore);
   }
 
   @Override

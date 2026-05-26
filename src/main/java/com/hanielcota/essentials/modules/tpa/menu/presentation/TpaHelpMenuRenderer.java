@@ -5,7 +5,7 @@ import com.hanielcota.essentials.modules.tpa.config.menu.TpaHelpMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.enderchest;
 
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.enderchest.command.EnderChestCommand;
 import com.hanielcota.essentials.modules.enderchest.config.EnderChestConfig;
 import com.hanielcota.essentials.modules.enderchest.listener.EnderChestQuitListener;

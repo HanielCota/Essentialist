@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.exception.ModuleLoadException;
+import com.hanielcota.essentials.module.discovery.ModuleDependencyResolver;
+import com.hanielcota.essentials.module.environment.ModuleContext;
 import java.util.List;
 import java.util.Set;
 import lombok.NonNull;

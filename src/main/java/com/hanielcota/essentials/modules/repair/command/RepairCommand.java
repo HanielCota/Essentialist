@@ -69,12 +69,6 @@ public record RepairCommand(
 
     var messages = snap.whenAllRepaired();
     var count = Integer.toString(repaired);
-    var target = this.actors.actorOf(subject);
-    var selfBase = messages.forSender(self, name);
-    var selfMessage = selfBase.replace("{count}", count);
-    var targetBase = messages.forTarget(name);
-    var targetMessage = targetBase.replace("{count}", count);
-
-    sender.sendDualMessage(target, selfMessage, targetMessage);
+    DualReply.send(sender, subject, this.actors, messages, line -> line.replace("{count}", count));
   }
 }

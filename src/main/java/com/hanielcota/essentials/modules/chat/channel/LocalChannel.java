@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.chat.channel;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
-import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
+import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.util.UUID;
 import lombok.NonNull;

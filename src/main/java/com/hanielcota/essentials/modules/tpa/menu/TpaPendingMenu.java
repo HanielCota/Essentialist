@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
+import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -15,9 +16,10 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -77,8 +79,7 @@ public final class TpaPendingMenu implements EssentialsMenu {
       @NonNull String nameTemplate,
       @NonNull List<String> loreTemplate,
       int pending,
-      @NonNull java.util.function.Consumer<com.github.hanielcota.menuframework.api.ClickContext>
-              handler) {
+      @NonNull Consumer<ClickContext> handler) {
     var template = this.renderer.bulkTemplate(icon, nameTemplate, loreTemplate, pending);
     var safeSlot = MenuLayouts.sanitizeSlot(configuredSlot, rows, 0);
     return SlotDefinition.of(safeSlot, template, handler::accept);

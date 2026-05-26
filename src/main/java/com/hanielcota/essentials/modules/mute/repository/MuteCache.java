@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.mute.repository;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import java.time.Instant;
 import java.util.List;

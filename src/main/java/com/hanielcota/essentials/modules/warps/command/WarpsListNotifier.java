@@ -3,9 +3,9 @@ package com.hanielcota.essentials.modules.warps.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.domain.Warp;
-import com.hanielcota.essentials.util.ClickableMessage;
-import com.hanielcota.essentials.util.ClickableMessageSegment;
-import com.hanielcota.essentials.util.Numbers;
+import com.hanielcota.essentials.shared.ClickableMessage;
+import com.hanielcota.essentials.shared.ClickableMessageSegment;
+import com.hanielcota.essentials.shared.Numbers;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.List;
 import java.util.function.Consumer;
@@ -48,9 +48,9 @@ public final class WarpsListNotifier {
     var warpName = warp.name();
     var worldName = warp.world();
 
-    var compactX = Numbers.compact(warp.x());
-    var compactY = Numbers.compact(warp.y());
-    var compactZ = Numbers.compact(warp.z());
+    var compactX = Numbers.display(warp.x());
+    var compactY = Numbers.display(warp.y());
+    var compactZ = Numbers.display(warp.z());
 
     var withName = template.replace("{name}", warpName);
     var withWorld = withName.replace("{world}", worldName);

@@ -9,6 +9,7 @@ import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
 import java.time.Duration;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -104,7 +105,7 @@ public final class TpaFavoritePromptOrchestrator {
     notifyTargetIfOptedIn(player, targetId);
   }
 
-  private void notifyTargetIfOptedIn(@NonNull Player owner, @NonNull java.util.UUID targetId) {
+  private void notifyTargetIfOptedIn(@NonNull Player owner, @NonNull UUID targetId) {
     var targetProfile = this.profiles.profile(targetId);
     if (!targetProfile.notifyWhenFavorited()) {
       return;

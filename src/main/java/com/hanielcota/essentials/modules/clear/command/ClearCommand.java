@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.clear.command;
 
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.clear.config.ClearConfig;
@@ -45,14 +46,6 @@ public record ClearCommand(
 
     var messages = snap.whenCleared();
     var count = Integer.toString(removed);
-    var target = this.actors.actorOf(subject);
-
-    var selfBase = messages.forSender(self, name);
-    var selfMessage = selfBase.replace("{count}", count);
-
-    var targetBase = messages.forTarget(name);
-    var targetMessage = targetBase.replace("{count}", count);
-
-    sender.sendDualMessage(target, selfMessage, targetMessage);
+    DualReply.send(sender, subject, this.actors, messages, line -> line.replace("{count}", count));
   }
 }

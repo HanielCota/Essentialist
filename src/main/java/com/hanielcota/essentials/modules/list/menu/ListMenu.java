@@ -6,6 +6,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
 import com.hanielcota.essentials.modules.list.service.ListService;
@@ -14,7 +15,6 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 
 @RequiredArgsConstructor
 public final class ListMenu implements EssentialsMenu {
@@ -29,15 +29,8 @@ public final class ListMenu implements EssentialsMenu {
     var material = snap.infoMaterial();
     var name = snap.infoName();
     var lore = snap.infoLore();
-    var loreArray = lore.toArray(String[]::new);
 
-    var builder = ItemTemplate.builder(material);
-    builder = builder.name(name);
-    builder = builder.lore(loreArray);
-    builder = builder.flags(ItemFlag.HIDE_ATTRIBUTES);
-    builder = builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.info(material, name, lore);
   }
 
   @Override

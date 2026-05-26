@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.actionbar.service;
 
 import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;

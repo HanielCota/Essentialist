@@ -1,11 +1,11 @@
 package com.hanielcota.essentials.modules.mute;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
+import com.hanielcota.essentials.database.schema.SqlDialect;
 import com.hanielcota.essentials.module.AbstractModule;
-import com.hanielcota.essentials.module.ModuleEnvironment;
-import com.hanielcota.essentials.module.ModuleRegistrar;
+import com.hanielcota.essentials.module.environment.ModuleEnvironment;
+import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.mute.command.MuteCommand;
 import com.hanielcota.essentials.modules.mute.command.MuteNotifier;
 import com.hanielcota.essentials.modules.mute.command.UnmuteCommand;

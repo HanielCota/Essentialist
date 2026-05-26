@@ -9,6 +9,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaProfileMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
@@ -17,8 +18,8 @@ import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaProfileStatsFo
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
-import com.hanielcota.essentials.util.ComponentUtils;
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.ComponentUtils;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 /** Stats-only sub-menu opened from the profile slot in {@code TpaHelpMenu}. */
 @RequiredArgsConstructor
@@ -118,7 +120,7 @@ public final class TpaProfileMenu implements EssentialsMenu {
     var sent = Long.toString(profile.sentRequests());
     var name = settings.sentName().replace("{sent}", sent);
     var lore = replace(settings.sentLore(), "{sent}", sent);
-    var template = simpleTemplate(settings.sentIcon(), name, lore);
+    var template = MenuTemplates.simple(settings.sentIcon(), name, lore);
 
     var safeSlot = MenuLayouts.sanitizeSlot(settings.sentSlot(), rows, 0);
     return SlotDefinition.of(safeSlot, template, click -> {});
@@ -134,7 +136,7 @@ public final class TpaProfileMenu implements EssentialsMenu {
     for (var line : settings.receivedLore()) {
       lore.add(Placeholders.format(line, values));
     }
-    var template = simpleTemplate(settings.receivedIcon(), name, lore);
+    var template = MenuTemplates.simple(settings.receivedIcon(), name, lore);
 
     var safeSlot = MenuLayouts.sanitizeSlot(settings.receivedSlot(), rows, 0);
     return SlotDefinition.of(safeSlot, template, click -> {});
@@ -146,7 +148,7 @@ public final class TpaProfileMenu implements EssentialsMenu {
     var rate = TpaProfileStatsFormatter.acceptRate(profile, fallback);
     var name = settings.acceptRateName().replace("{accept_rate}", rate);
     var lore = replace(settings.acceptRateLore(), "{accept_rate}", rate);
-    var template = simpleTemplate(settings.acceptRateIcon(), name, lore);
+    var template = MenuTemplates.simple(settings.acceptRateIcon(), name, lore);
 
     var safeSlot = MenuLayouts.sanitizeSlot(settings.acceptRateSlot(), rows, 0);
     return SlotDefinition.of(safeSlot, template, click -> {});
@@ -158,40 +160,30 @@ public final class TpaProfileMenu implements EssentialsMenu {
     var avg = TpaProfileStatsFormatter.averageAccept(profile, fallback);
     var name = settings.avgResponseName().replace("{avg_accept}", avg);
     var lore = replace(settings.avgResponseLore(), "{avg_accept}", avg);
-    var template = simpleTemplate(settings.avgResponseIcon(), name, lore);
+    var template = MenuTemplates.simple(settings.avgResponseIcon(), name, lore);
 
     var safeSlot = MenuLayouts.sanitizeSlot(settings.avgResponseSlot(), rows, 0);
     return SlotDefinition.of(safeSlot, template, click -> {});
   }
 
   private SlotDefinition mostContactedSlot(
-      @NonNull TpaProfileMenuConfig settings,
-      int rows,
-      @org.jspecify.annotations.Nullable String mostContacted) {
+      @NonNull TpaProfileMenuConfig settings, int rows, @Nullable String mostContacted) {
     var fallback = settings.statsFallback();
     var label = TpaProfileStatsFormatter.mostContactedName(mostContacted, fallback);
     var name = settings.mostContactedName().replace("{most_contacted}", label);
     var lore = replace(settings.mostContactedLore(), "{most_contacted}", label);
-    var template = simpleTemplate(settings.mostContactedIcon(), name, lore);
+    var template = MenuTemplates.simple(settings.mostContactedIcon(), name, lore);
 
     var safeSlot = MenuLayouts.sanitizeSlot(settings.mostContactedSlot(), rows, 0);
     return SlotDefinition.of(safeSlot, template, click -> {});
   }
 
   private SlotDefinition backSlot(@NonNull TpaProfileMenuConfig settings, int rows) {
-    var template = simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    var template =
+        MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaHelpMenu.ID));
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
   }
 
   private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {

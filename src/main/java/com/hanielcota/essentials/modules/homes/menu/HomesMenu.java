@@ -9,13 +9,14 @@ import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuSection;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -39,14 +40,8 @@ public final class HomesMenu implements EssentialsMenu {
     var infoMaterial = menuSpec.infoMaterial();
     var infoName = menuSpec.infoName();
     var infoLore = menuSpec.infoLore();
-    var loreArray = infoLore.toArray(String[]::new);
 
-    var builder = ItemTemplate.builder(infoMaterial);
-    builder.name(infoName);
-    builder.lore(loreArray);
-    builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(infoMaterial, infoName, infoLore);
   }
 
   @Override

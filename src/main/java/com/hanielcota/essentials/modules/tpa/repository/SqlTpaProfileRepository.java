@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.repository;
 
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.executor.SqlExecutor;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;

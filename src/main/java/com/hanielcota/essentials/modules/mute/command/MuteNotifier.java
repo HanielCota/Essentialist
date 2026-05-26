@@ -4,7 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.paper.ActorFactory;
-import com.hanielcota.essentials.util.DurationFormatter;
+import com.hanielcota.essentials.shared.DurationFormatter;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.time.Duration;
 import java.time.Instant;

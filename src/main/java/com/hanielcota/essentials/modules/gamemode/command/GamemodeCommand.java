@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.gamemode.command;
 
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.gamemode.config.GamemodeConfig;
@@ -46,10 +47,6 @@ public record GamemodeCommand(
     }
 
     var messages = snap.whenUpdated(mode);
-    var target = this.actors.actorOf(subject);
-    var selfMessage = messages.forSender(self, name);
-    var targetMessage = messages.forTarget(name);
-
-    sender.sendDualMessage(target, selfMessage, targetMessage);
+    DualReply.send(sender, subject, this.actors, messages);
   }
 }

@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.scheduler;
 
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.shared.Log;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;

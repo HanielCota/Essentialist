@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.clearchat.service;
 
 import com.hanielcota.essentials.paper.AudienceProvider;
-import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.shared.ComponentUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;

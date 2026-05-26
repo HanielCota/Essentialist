@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import org.junit.jupiter.api.Test;
 
 class TpaSendOrchestratorTest {
@@ -22,7 +23,7 @@ class TpaSendOrchestratorTest {
     players.add(target);
     var profiles = TpaTestSupport.profiles();
     profiles.toggleAutoAcceptFavorites(target.getUniqueId());
-    var favorites = new TpaFavoriteService(null, new TpaTestSupport.NoopWriter());
+    var favorites = new TpaFavoriteService(null, NoopAsyncDatabaseWriter.INSTANCE);
     favorites.add(target.getUniqueId(), requester.getUniqueId(), requester.getName());
     var service =
         TpaTestSupport.service(

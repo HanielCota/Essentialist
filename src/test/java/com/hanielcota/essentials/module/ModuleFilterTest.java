@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.hanielcota.essentials.exception.ModuleLoadException;
+import com.hanielcota.essentials.module.discovery.ModuleFilter;
+import com.hanielcota.essentials.module.discovery.ModuleSettings;
+import com.hanielcota.essentials.module.environment.ModuleContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

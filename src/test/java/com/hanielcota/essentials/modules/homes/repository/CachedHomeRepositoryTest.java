@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 
@@ -129,9 +130,9 @@ class CachedHomeRepositoryTest {
     private final Queue<Runnable> tasks = new ArrayDeque<>();
 
     @Override
-    public java.util.concurrent.CompletableFuture<Void> submit(String operation, Runnable work) {
+    public CompletableFuture<Void> submit(String operation, Runnable work) {
       tasks.add(work);
-      return java.util.concurrent.CompletableFuture.completedFuture(null);
+      return CompletableFuture.completedFuture(null);
     }
 
     int pending() {

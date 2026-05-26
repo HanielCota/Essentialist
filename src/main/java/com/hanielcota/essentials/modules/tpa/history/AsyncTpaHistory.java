@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.history;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;

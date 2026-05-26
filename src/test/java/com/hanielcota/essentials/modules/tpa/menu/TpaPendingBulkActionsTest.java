@@ -8,8 +8,11 @@ import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
+import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
+import java.util.List;
 import lombok.NonNull;
+import org.bukkit.entity.Player;
 import org.junit.jupiter.api.Test;
 
 class TpaPendingBulkActionsTest {
@@ -94,11 +97,10 @@ class TpaPendingBulkActionsTest {
         messages(fixture, secondRequester).stream().anyMatch(msg -> msg.contains("recusou")));
   }
 
-  private static java.util.List<String> messages(
-      @NonNull Fixture fixture, @NonNull org.bukkit.entity.Player player) {
+  private static List<String> messages(@NonNull Fixture fixture, @NonNull Player player) {
     var actor = fixture.actors.actor(player);
     if (actor == null) {
-      return java.util.List.of();
+      return List.of();
     }
     return actor.messages();
   }
@@ -122,7 +124,7 @@ class TpaPendingBulkActionsTest {
   }
 
   private record Fixture(
-      com.hanielcota.essentials.modules.tpa.service.TeleportRequestService service,
+      TeleportRequestService service,
       TpaTestSupport.RecordingPlayerProvider players,
       TpaTestSupport.RecordingActorFactory actors,
       TpaPendingBulkActions bulk) {}

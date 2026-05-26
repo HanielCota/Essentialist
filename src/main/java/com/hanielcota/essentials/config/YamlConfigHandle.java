@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.config;
 
 import com.hanielcota.essentials.exception.ConfigurationException;
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.shared.Log;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

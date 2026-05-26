@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.homes.repository;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
+import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.List;
 import java.util.Optional;

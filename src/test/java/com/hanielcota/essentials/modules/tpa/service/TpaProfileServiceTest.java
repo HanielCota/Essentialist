@@ -4,13 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 
 class TpaProfileServiceTest {
@@ -84,16 +82,6 @@ class TpaProfileServiceTest {
   }
 
   private static TpaProfileService newService() {
-    return new TpaProfileService(null, new NoopWriter());
-  }
-
-  private static final class NoopWriter implements AsyncDatabaseWriter {
-    @Override
-    public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
-      return CompletableFuture.completedFuture(null);
-    }
-
-    @Override
-    public void close() {}
+    return new TpaProfileService(null, NoopAsyncDatabaseWriter.INSTANCE);
   }
 }

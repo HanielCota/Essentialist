@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.homes.config.menu;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeMenuPlaceholders;
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;

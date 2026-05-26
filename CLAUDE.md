@@ -204,7 +204,7 @@ sub-packages. Pick the right one when adding a class — the
 A module may carry sub-packages outside this canonical set when a sub-domain
 grows past a handful of cohesive classes that share one responsibility.
 Examples already in tree: `chat/channel/`, `chat/format/`, `chat/guard/`,
-`chat/placeholder/`, `chat/permission/` (each is its own pipeline stage);
+`chat/placeholder/` (each is its own pipeline stage);
 `homes/rename/` (orchestrator + notifier + sessions + timer + messages for
 one flow); `tpa/bootstrap/` (per-area `*Bootstrap` factories, enforced by the
 arch test).
@@ -233,6 +233,15 @@ Rules:
 When in doubt, prefer the simplest one that fits — a class can be just
 `<Module>Service` if it has only one job. Renaming an existing class is
 cheaper than adding an unjustified second one.
+
+## Core package layout
+
+- **`database/`** has no Java files at the root. Keep shared database
+  infrastructure under `async/`, `connection/`, `executor/`, `schema/`, or the
+  concrete engine package such as `sqlite/`.
+- **`module/`** root is limited to the public module API:
+  `Module`, `AbstractModule`, `ModuleMetadata`. Internals live under
+  `environment/`, `lifecycle/`, `registry/`, `registration/`, or `discovery/`.
 
 ## Architectural rules
 

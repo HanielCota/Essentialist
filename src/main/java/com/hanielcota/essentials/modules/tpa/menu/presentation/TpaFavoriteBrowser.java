@@ -10,6 +10,7 @@ import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +48,7 @@ public final class TpaFavoriteBrowser {
   private List<TpaFavorite> sortByRecent(
       @NonNull UUID viewerId, @NonNull List<TpaFavorite> entries) {
     var ownerContacts = this.contacts.top(viewerId, Integer.MAX_VALUE);
-    var lastUsedByTarget = new java.util.HashMap<UUID, Long>(ownerContacts.size());
+    var lastUsedByTarget = new HashMap<UUID, Long>(ownerContacts.size());
     for (var contact : ownerContacts) {
       lastUsedByTarget.put(contact.targetId(), contact.lastUsedAtEpochMs());
     }

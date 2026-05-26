@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.chat.placeholder;
 
-import com.hanielcota.essentials.util.Log;
+import com.hanielcota.essentials.shared.Log;
 import java.lang.reflect.Method;
 import lombok.NonNull;
 import org.bukkit.Bukkit;

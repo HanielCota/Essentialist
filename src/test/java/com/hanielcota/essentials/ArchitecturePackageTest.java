@@ -44,6 +44,9 @@ class ArchitecturePackageTest {
           "TpaProfileRepository",
           "SqlTpaProfileRepository");
 
+  private static final Set<String> MODULE_ROOT_TYPES =
+      Set.of("AbstractModule.java", "Module.java", "ModuleMetadata.java");
+
   // Pattern: `import com.hanielcota.essentials.modules.<module>.` — captures the imported module.
   private static final Pattern CROSS_MODULE_IMPORT =
       Pattern.compile("^import com\\.hanielcota\\.essentials\\.modules\\.(\\w+)\\.");
@@ -82,6 +85,20 @@ class ArchitecturePackageTest {
 
       assertTrue(
           violations.isEmpty(), () -> "Persistence types in service packages: " + violations);
+    }
+  }
+
+  @Test
+  void persistenceNamedTypesDoNotLiveInServicePackages() throws IOException {
+    try (var paths = walkMainJava()) {
+      var violations =
+          paths
+              .filter(ArchitecturePackageTest::isNamedPersistenceTypeInServicePackage)
+              .map(ArchitecturePackageTest::relativePath)
+              .toList();
+
+      assertTrue(
+          violations.isEmpty(), () -> "Named persistence types in service packages: " + violations);
     }
   }
 
@@ -200,6 +217,36 @@ class ArchitecturePackageTest {
     }
   }
 
+  @Test
+  void databaseInfrastructureLivesInNamedSubpackages() throws IOException {
+    try (var paths = walkMainJava()) {
+      var violations =
+          paths
+              .filter(ArchitecturePackageTest::isDatabaseInfrastructureInRootPackage)
+              .map(ArchitecturePackageTest::relativePath)
+              .toList();
+
+      assertTrue(
+          violations.isEmpty(),
+          () -> "Database infrastructure should live in named subpackages: " + violations);
+    }
+  }
+
+  @Test
+  void moduleInternalsLiveInNamedSubpackages() throws IOException {
+    try (var paths = walkMainJava()) {
+      var violations =
+          paths
+              .filter(ArchitecturePackageTest::isModuleInternalInRootPackage)
+              .map(ArchitecturePackageTest::relativePath)
+              .toList();
+
+      assertTrue(
+          violations.isEmpty(),
+          () -> "Module internals should live in named subpackages: " + violations);
+    }
+  }
+
   private static Stream<Path> walkMainJava() throws IOException {
     return Files.walk(mainJavaRoot())
         .filter(Files::isRegularFile)
@@ -210,6 +257,14 @@ class ArchitecturePackageTest {
     var typeName = fileName(path).replace(".java", "");
 
     return relativePath(path).contains("/service/") && PERSISTENCE_TYPES.contains(typeName);
+  }
+
+  private static boolean isNamedPersistenceTypeInServicePackage(Path path) {
+    var typeName = fileName(path).replace(".java", "");
+    var persistenceName =
+        typeName.endsWith("Repository") || typeName.endsWith("Table") || typeName.endsWith("Cache");
+
+    return relativePath(path).contains("/service/") && persistenceName;
   }
 
   private static boolean isDomainValueTypeInServicePackage(Path path) {
@@ -319,6 +374,35 @@ class ArchitecturePackageTest {
     }
 
     return modulePresentationPackageExists(path);
+  }
+
+  private static boolean isDatabaseInfrastructureInRootPackage(Path path) {
+    var rel = relativePath(path);
+
+    if (!rel.startsWith("com/hanielcota/essentials/database/")) {
+      return false;
+    }
+
+    var databasePrefix = "com/hanielcota/essentials/database/";
+    var afterDatabasePackage = rel.substring(databasePrefix.length());
+
+    return !afterDatabasePackage.contains("/");
+  }
+
+  private static boolean isModuleInternalInRootPackage(Path path) {
+    var rel = relativePath(path);
+
+    if (!rel.startsWith("com/hanielcota/essentials/module/")) {
+      return false;
+    }
+
+    var modulePrefix = "com/hanielcota/essentials/module/";
+    var afterModulePackage = rel.substring(modulePrefix.length());
+    if (afterModulePackage.contains("/")) {
+      return false;
+    }
+
+    return !MODULE_ROOT_TYPES.contains(afterModulePackage);
   }
 
   private static boolean modulePresentationPackageExists(Path path) {

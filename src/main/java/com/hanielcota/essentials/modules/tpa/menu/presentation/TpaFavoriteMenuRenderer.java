@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
@@ -40,11 +41,11 @@ public final class TpaFavoriteMenuRenderer {
   }
 
   public ItemTemplate backTemplate(@NonNull TpaFavoritesMenuConfig settings) {
-    return simpleTemplate(settings.backIcon(), settings.backName(), settings.backLore());
+    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
   }
 
   public ItemTemplate emptyTemplate(@NonNull TpaFavoritesMenuConfig settings) {
-    return simpleTemplate(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
+    return MenuTemplates.simple(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
   }
 
   public ItemTemplate orderingTemplate(
@@ -53,7 +54,7 @@ public final class TpaFavoriteMenuRenderer {
     var name = settings.orderingName().replace("{state}", stateLabel);
     var lore = renderOrderingLore(settings, stateLabel, ordering);
 
-    return simpleTemplate(settings.orderingIcon(), name, lore);
+    return MenuTemplates.simple(settings.orderingIcon(), name, lore);
   }
 
   public ItemTemplate favoriteTemplate(
@@ -198,14 +199,5 @@ public final class TpaFavoriteMenuRenderer {
       replaced.add(withCount);
     }
     return replaced;
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material icon, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(icon);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
   }
 }

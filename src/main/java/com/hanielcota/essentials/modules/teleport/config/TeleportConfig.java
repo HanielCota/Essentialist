@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.teleport.config;
 
-import com.hanielcota.essentials.util.Numbers;
-import com.hanielcota.essentials.util.Placeholders;
+import com.hanielcota.essentials.shared.Numbers;
+import com.hanielcota.essentials.shared.Placeholders;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -65,9 +65,9 @@ public record TeleportConfig(
   }
 
   public String formatToPos(double x, double y, double z) {
-    var compactX = Numbers.compact(x);
-    var compactY = Numbers.compact(y);
-    var compactZ = Numbers.compact(z);
+    var compactX = Numbers.display(x);
+    var compactY = Numbers.display(y);
+    var compactZ = Numbers.display(z);
 
     return Placeholders.format(toPos, "x", compactX, "y", compactY, "z", compactZ);
   }
