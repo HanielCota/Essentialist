@@ -24,9 +24,7 @@ class TpaMenuPaginationTest {
             settings.historySlot(),
             settings.settingsSlot(),
             settings.favoritesSlot(),
-            settings.outgoingSlot(),
-            settings.dndSlot(),
-            settings.lastContactedSlot()),
+            settings.outgoingSlot()),
         slots);
   }
 
@@ -54,14 +52,10 @@ class TpaMenuPaginationTest {
 
     assertEquals(
         List.of(
-            settings.receiveTpaSlot(),
-            settings.receiveTpaHereSlot(),
-            settings.autoAcceptSlot(),
-            settings.soundsSlot(),
-            settings.allowCrossWorldSlot(),
-            settings.notifyWhenFavoritedSlot(),
+            settings.privacySlot(),
+            settings.notificationsSlot(),
+            settings.behaviorSlot(),
             settings.cooldownSlot(),
-            settings.blockedSlot(),
             settings.backSlot()),
         slots);
   }

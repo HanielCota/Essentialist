@@ -24,7 +24,13 @@ public record TpaConfig(
     TpaBlockedMenuConfig blockedMenu,
     TpaSettingsMenuConfig settingsMenu,
     TpaFavoritesMenuConfig favoritesMenu,
-    TpaFavoriteActionMenuConfig favoriteActionMenu) {
+    TpaFavoriteActionMenuConfig favoriteActionMenu,
+    TpaPendingActionMenuConfig pendingActionMenu,
+    TpaPrivacySettingsMenuConfig privacySettingsMenu,
+    TpaNotificationSettingsMenuConfig notificationSettingsMenu,
+    TpaBehaviorSettingsMenuConfig behaviorSettingsMenu,
+    TpaProfileMenuConfig profileMenu,
+    TpaHelpInfoMenuConfig helpInfoMenu) {
 
   public static TpaConfig defaults() {
     return new TpaConfig(
@@ -37,7 +43,13 @@ public record TpaConfig(
         TpaBlockedMenuConfig.defaults(),
         TpaSettingsMenuConfig.defaults(),
         TpaFavoritesMenuConfig.defaults(),
-        TpaFavoriteActionMenuConfig.defaults());
+        TpaFavoriteActionMenuConfig.defaults(),
+        TpaPendingActionMenuConfig.defaults(),
+        TpaPrivacySettingsMenuConfig.defaults(),
+        TpaNotificationSettingsMenuConfig.defaults(),
+        TpaBehaviorSettingsMenuConfig.defaults(),
+        TpaProfileMenuConfig.defaults(),
+        TpaHelpInfoMenuConfig.defaults());
   }
 
   /** Configured request lifetime, clamped to a sane minimum. */

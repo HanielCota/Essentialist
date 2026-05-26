@@ -33,17 +33,23 @@ import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteChatListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteSessionCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaHistoryMenuCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaQuitListener;
+import com.hanielcota.essentials.modules.tpa.menu.TpaBehaviorSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaBlockedMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaFavoriteActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaFavoritesMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaHelpInfoMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHubClickHandler;
+import com.hanielcota.essentials.modules.tpa.menu.TpaNotificationSettingsMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaPendingActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaPrivacySettingsMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaProfileMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaBlockRepository;
@@ -61,6 +67,7 @@ import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
+import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -109,7 +116,9 @@ public final class TpaModule extends AbstractModule {
         favorites,
         contacts,
         dispatcher);
-    registerPendingMenu(env, registrar, config, runtime.requestService(), blocks, shared);
+    var pendingSelections = new TpaPendingSelections();
+    registerPendingMenu(
+        env, registrar, config, runtime.requestService(), blocks, shared, pendingSelections);
     registerSettingsMenu(registrar, config, profiles);
     registerBlockedMenu(registrar, config, blocks);
     registerFavoritesMenu(env, registrar, config, favorites, contacts, profiles, favoriteRuntime);
@@ -127,7 +136,8 @@ public final class TpaModule extends AbstractModule {
         dispatcher,
         shared);
 
-    var quitListener = new TpaQuitListener(runtime.requestService(), runtime.notifier());
+    var quitListener =
+        new TpaQuitListener(runtime.requestService(), runtime.notifier(), pendingSelections);
     registrar.listener(quitListener);
   }
 
@@ -276,13 +286,13 @@ public final class TpaModule extends AbstractModule {
       TpaFavoriteService favorites,
       TpaContactService contacts,
       TpaSendOrchestrator dispatcher) {
-    var playerProvider = env.service(PlayerProvider.class);
     var actors = env.service(ActorFactory.class);
-    var clickHandler =
-        new TpaHubClickHandler(config, requests, profiles, playerProvider, actors, dispatcher);
+    var clickHandler = new TpaHubClickHandler(config, requests, actors);
     var menu = new TpaHelpMenu(config, profiles, requests, favorites, contacts, clickHandler);
-
     registrar.menu(menu);
+
+    registrar.menu(new TpaProfileMenu(config, profiles, requests, contacts));
+    registrar.menu(new TpaHelpInfoMenu(config));
   }
 
   private FavoriteRuntime favoriteRuntime(
@@ -360,32 +370,36 @@ public final class TpaModule extends AbstractModule {
       ConfigHandle<TpaConfig> config,
       TeleportRequestService requestService,
       TpaBlockService blocks,
-      TpaShared shared) {
+      TpaShared shared,
+      TpaPendingSelections selections) {
     var bulkActions =
         new TpaPendingBulkActions(
             config, requestService, shared.acceptHandler(), shared.callbacks(), shared.actors());
-    var clickHandler =
-        new TpaPendingClickHandler(
+    var clickHandler = new TpaPendingClickHandler(selections, bulkActions);
+    var menu = new TpaPendingMenu(config, requestService, clickHandler, shared.players());
+    registrar.menu(menu);
+
+    var actionMenu =
+        new TpaPendingActionMenu(
             config,
             requestService,
+            blocks,
+            selections,
             shared.acceptHandler(),
             shared.replyNotifier(),
             shared.callbacks(),
-            shared.actors(),
-            blocks,
-            bulkActions);
-    var menu = new TpaPendingMenu(config, requestService, clickHandler, shared.players());
-
-    registrar.menu(menu);
+            shared.actors());
+    registrar.menu(actionMenu);
   }
 
   private void registerSettingsMenu(
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
       TpaProfileService profiles) {
-    var menu = new TpaSettingsMenu(config, profiles);
-
-    registrar.menu(menu);
+    registrar.menu(new TpaSettingsMenu(config));
+    registrar.menu(new TpaPrivacySettingsMenu(config, profiles));
+    registrar.menu(new TpaNotificationSettingsMenu(config, profiles));
+    registrar.menu(new TpaBehaviorSettingsMenu(config, profiles));
   }
 
   private void registerBlockedMenu(

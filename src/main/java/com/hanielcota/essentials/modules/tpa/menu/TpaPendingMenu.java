@@ -58,22 +58,25 @@ public final class TpaPendingMenu implements EssentialsMenu {
     }
   }
 
-  private static String originWorld(@Nullable Player requester) {
+  private static String originWorld(
+      @Nullable Player requester, @NonNull TpaPendingMenuConfig settings) {
     if (requester == null) {
-      return "—";
+      return settings.unknownPlaceholder();
     }
     return requester.getWorld().getName();
   }
 
-  private static String distance(@Nullable Player requester, @NonNull Player viewer) {
+  private static String distance(
+      @Nullable Player requester, @NonNull Player viewer, @NonNull TpaPendingMenuConfig settings) {
     if (requester == null) {
-      return "—";
+      return settings.unknownPlaceholder();
     }
     if (!requester.getWorld().getUID().equals(viewer.getWorld().getUID())) {
-      return "—";
+      return settings.unknownPlaceholder();
     }
     var meters = requester.getLocation().distance(viewer.getLocation());
-    return Math.round(meters) + "m";
+    var metersText = Long.toString(Math.round(meters));
+    return settings.distanceFormat().replace("{meters}", metersText);
   }
 
   private static long secondsLeft(@NonNull TeleportRequest request) {
@@ -229,11 +232,12 @@ public final class TpaPendingMenu implements EssentialsMenu {
       @NonNull TeleportRequest request,
       @Nullable Player requester,
       @NonNull Player viewer) {
+    var settings = this.config.value().pendingMenu();
     var requesterName = request.requester().name();
     var type = requestTypeLabel(request.type());
     var seconds = Long.toString(secondsLeft(request));
-    var originWorld = originWorld(requester);
-    var distance = distance(requester, viewer);
+    var originWorld = originWorld(requester, settings);
+    var distance = distance(requester, viewer, settings);
 
     return raw.replace("{player}", requesterName)
         .replace("{type}", type)

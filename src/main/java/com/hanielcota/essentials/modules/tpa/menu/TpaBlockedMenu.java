@@ -100,7 +100,7 @@ public final class TpaBlockedMenu implements EssentialsMenu {
     builder.slot(
         backSlot(settings, rows),
         backTemplate(settings),
-        click -> click.switchTo(TpaSettingsMenu.ID));
+        click -> click.switchTo(TpaPrivacySettingsMenu.ID));
 
     var menu = builder.build();
     menu.register();
