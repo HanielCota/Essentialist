@@ -56,14 +56,15 @@ public final class TpaSendOrchestrator {
       return;
     }
 
-    var created = this.service.create(sender, target, type);
+    var autoAccept = shouldAutoAccept(targetId, senderId);
+    var created = this.service.create(sender, target, type, !autoAccept);
     if (created.isEmpty()) {
       handleRefusal(requesterActor, sender, target, senderId, targetId, type, messages);
       return;
     }
 
     var request = created.get();
-    if (shouldAutoAccept(targetId, senderId)) {
+    if (autoAccept) {
       autoAccept(request, target);
       return;
     }

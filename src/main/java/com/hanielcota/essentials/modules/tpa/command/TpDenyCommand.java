@@ -40,7 +40,11 @@ public record TpDenyCommand(
     }
 
     var request = resolved.get();
-    this.service.deny(request);
+    var denied = this.service.deny(request);
+    if (!denied) {
+      actor.sendError(messages.noIncoming());
+      return;
+    }
 
     var deniedSelfTemplate = messages.deniedSelf();
     var requesterName = request.requester().name();

@@ -52,13 +52,16 @@ public final class TeleportRequestService {
     this.executor = new TeleportRequestExecutor(players);
   }
 
-  /**
-   * Registers a new request — replacing (and recording as cancelled) any request the requester
-   * already had outstanding — and prompts the target. The previous target, if still online, is
-   * notified that the request was replaced so they don't keep staring at a stale clickable prompt.
-   */
   public Optional<TeleportRequest> create(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
+    return create(requester, target, type, true);
+  }
+
+  public Optional<TeleportRequest> create(
+      @NonNull Player requester,
+      @NonNull Player target,
+      @NonNull TeleportRequestType type,
+      boolean notifyTarget) {
     var targetId = target.getUniqueId();
     var requesterId = requester.getUniqueId();
     var accepted = this.policy.canCreate(requester, target, type);
@@ -80,7 +83,9 @@ public final class TeleportRequestService {
 
     this.store.add(request);
     this.recorder.recordCreated(requesterId, targetId);
-    this.notifier.sendPrompt(target, request);
+    if (notifyTarget) {
+      this.notifier.sendPrompt(target, request);
+    }
 
     return Optional.of(request);
   }
@@ -113,13 +118,6 @@ public final class TeleportRequestService {
     return this.store.incomingFrom(target, requesterName);
   }
 
-  /**
-   * Claims the accept synchronously: removes the request from the store and verifies both parties
-   * are still online. Returns {@link AcceptResult#ACCEPTED} when the caller may proceed to {@link
-   * #dispatchTeleport(TeleportRequest)}; the caller is expected to notify the accepter and
-   * requester immediately on {@code ACCEPTED} so the chat reply does not wait for the async
-   * teleport to finish.
-   */
   public AcceptResult tryAccept(@NonNull TeleportRequest request) {
     if (!this.store.remove(request)) {
       return AcceptResult.NOT_FOUND;
@@ -138,10 +136,6 @@ public final class TeleportRequestService {
     return AcceptResult.ACCEPTED;
   }
 
-  /**
-   * Performs the async teleport for an already-claimed request and records the terminal status in
-   * history. Resolves to {@code true} on success, {@code false} on teleport failure.
-   */
   public CompletableFuture<Boolean> dispatchTeleport(@NonNull TeleportRequest request) {
     var pending = this.executor.execute(request);
     return pending.thenApply(execution -> this.recorder.recordExecution(request, execution));

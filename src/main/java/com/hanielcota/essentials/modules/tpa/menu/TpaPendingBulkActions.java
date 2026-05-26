@@ -3,8 +3,10 @@ package com.hanielcota.essentials.modules.tpa.menu;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.paper.ActorFactory;
@@ -24,6 +26,7 @@ public final class TpaPendingBulkActions {
   private final ConfigHandle<TpaConfig> config;
   private final TeleportRequestService service;
   private final TpAcceptResultHandler acceptHandler;
+  private final TpaRequestReplyNotifier replyNotifier;
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
 
@@ -40,7 +43,7 @@ public final class TpaPendingBulkActions {
       return;
     }
 
-    var accepted = claimAndDispatch(pending, actor);
+    var accepted = claimAndDispatch(requestsToAccept(pending), actor);
 
     var countText = Integer.toString(accepted);
     var summary = messages.acceptedAllMessage().replace("{count}", countText);
@@ -63,7 +66,10 @@ public final class TpaPendingBulkActions {
     }
 
     for (var request : pending) {
-      this.service.deny(request);
+      var denied = this.service.deny(request);
+      if (denied) {
+        this.replyNotifier.notifyDenied(request, messages.denied());
+      }
     }
 
     var countText = Integer.toString(pending.size());
@@ -81,6 +87,8 @@ public final class TpaPendingBulkActions {
       if (claim != AcceptResult.ACCEPTED) {
         continue;
       }
+      var messages = this.config.value().messages();
+      this.replyNotifier.notifyAccepted(request, messages.accepted());
       var pendingTeleport = this.service.dispatchTeleport(request);
       this.callbacks.hop(
           pendingTeleport,
@@ -89,5 +97,14 @@ public final class TpaPendingBulkActions {
       accepted++;
     }
     return accepted;
+  }
+
+  private static List<TeleportRequest> requestsToAccept(@NonNull List<TeleportRequest> pending) {
+    for (var request : pending) {
+      if (request.type() == TeleportRequestType.TPAHERE) {
+        return List.of(request);
+      }
+    }
+    return pending;
   }
 }
