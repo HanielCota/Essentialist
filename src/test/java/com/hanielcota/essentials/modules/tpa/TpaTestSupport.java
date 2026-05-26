@@ -416,7 +416,9 @@ public final class TpaTestSupport {
     }
 
     @Override
-    public void reload() {}
+    public void reload() {
+      // no-op test stub
+    }
 
     @Override
     public AutoCloseable onReload(@NonNull java.util.function.Consumer<TpaConfig> listener) {
@@ -432,6 +434,8 @@ public final class TpaTestSupport {
     }
 
     @Override
-    public void close() {}
+    public void close() {
+      // no-op test stub
+    }
   }
 }
