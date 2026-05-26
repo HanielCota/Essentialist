@@ -14,8 +14,10 @@ import com.hanielcota.essentials.modules.chat.command.StaffChatCommand;
 import com.hanielcota.essentials.modules.chat.command.StaffChatNotifier;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.listener.AsyncChatListener;
-import com.hanielcota.essentials.modules.chat.listener.StaffChatQuitListener;
+import com.hanielcota.essentials.modules.chat.listener.ChatPlayerCleanupListener;
+import com.hanielcota.essentials.modules.chat.service.AntiSpamService;
 import com.hanielcota.essentials.modules.chat.service.ChatFormatter;
+import com.hanielcota.essentials.modules.chat.service.CooldownService;
 import com.hanielcota.essentials.modules.chat.service.StaffChatToggleService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.AudienceProvider;
@@ -23,9 +25,8 @@ import com.hanielcota.essentials.paper.PlayerProvider;
 import lombok.NonNull;
 
 /**
- * Chat formatting plus the three channels of PR 2 — global (prefix-routed), local (proximity), and
- * staff (permission-gated + persistent toggle via {@code /staffchat toggle}). Cooldowns/anti-spam,
- * PlaceholderAPI, and permission-based formatting arrive in PR 3 and PR 4.
+ * Chat formatting + channels (PR 2) + cooldown / repeated-message anti-spam (PR 3). PlaceholderAPI
+ * and permission-based formatting come in PR 4.
  */
 public final class ChatModule extends AbstractModule {
 
@@ -43,6 +44,8 @@ public final class ChatModule extends AbstractModule {
 
     var formatter = new ChatFormatter();
     var toggleService = new StaffChatToggleService();
+    var cooldowns = new CooldownService();
+    var antiSpam = new AntiSpamService();
 
     var globalChannel = new GlobalChannel();
     var localChannel = new LocalChannel(config);
@@ -57,7 +60,7 @@ public final class ChatModule extends AbstractModule {
     registrar.command(new ChatCommand(configs, chatNotifier));
     registrar.command(new StaffChatCommand(toggleService, staffNotifier));
 
-    registrar.listener(new AsyncChatListener(config, router, formatter));
-    registrar.listener(new StaffChatQuitListener(toggleService));
+    registrar.listener(new AsyncChatListener(config, router, formatter, cooldowns, antiSpam));
+    registrar.listener(new ChatPlayerCleanupListener(toggleService, cooldowns, antiSpam));
   }
 }

@@ -14,12 +14,17 @@ public record LocalChannelConfig(
             "Shown to the sender when no one is within range to hear them. Set to empty to"
                 + " silently drop the message.")
         String noListenerWarning,
+    @Comment(
+            "Cooldown in seconds between messages on this channel. 0 disables. Players with"
+                + " chat.local.bypasscooldown ignore the cooldown.")
+        int cooldownSeconds,
     @Comment("MiniMessage format template for the local channel.") String format) {
 
   public static LocalChannelConfig defaults() {
     return new LocalChannelConfig(
         100.0,
         "<gray>Ninguém te escutou aqui perto.",
+        0,
         "<gray><player></gray> <dark_gray>»</dark_gray> <white><message></white>");
   }
 

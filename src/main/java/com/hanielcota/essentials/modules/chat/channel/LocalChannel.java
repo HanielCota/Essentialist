@@ -4,9 +4,13 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
 import io.papermc.paper.event.player.AsyncChatEvent;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 /**
@@ -15,9 +19,9 @@ import org.bukkit.entity.Player;
  * hear the message. {@link ChatPermissions#LOCAL_BYPASS_RANGE} skips the filter so admins always
  * broadcast.
  *
- * <p>Distance check uses {@link org.bukkit.Location#distanceSquared(org.bukkit.Location)} against
- * the pre-squared radius — avoids a square root per viewer. The sender is always retained because
- * Paper expects the sender's own client to see what they typed.
+ * <p>Distance check uses {@link Location#distanceSquared(Location)} against the pre-squared radius
+ * — avoids a square root per viewer. The sender is always retained because Paper expects the
+ * sender's own client to see what they typed.
  *
  * <p>If after filtering no other player remains, {@link #handleEmptyViewers} sends a configurable
  * warning to the sender and returns {@code true} so the listener cancels the broadcast.
@@ -39,6 +43,16 @@ public final class LocalChannel implements ChatChannel {
   @Override
   public String template(@NonNull ChatConfig snap) {
     return snap.local().format();
+  }
+
+  @Override
+  public int cooldownSeconds(@NonNull ChatConfig snap) {
+    return snap.local().cooldownSeconds();
+  }
+
+  @Override
+  public String bypassCooldownPermission() {
+    return ChatPermissions.LOCAL_BYPASS_COOLDOWN;
   }
 
   @Override
@@ -81,10 +95,10 @@ public final class LocalChannel implements ChatChannel {
   }
 
   private static boolean shouldRemove(
-      Object audience,
-      @NonNull java.util.UUID senderId,
-      @NonNull org.bukkit.World senderWorld,
-      @NonNull org.bukkit.Location senderLocation,
+      @NonNull Audience audience,
+      @NonNull UUID senderId,
+      @NonNull World senderWorld,
+      @NonNull Location senderLocation,
       double radiusSquared) {
     if (!(audience instanceof Player viewer)) {
       return false;

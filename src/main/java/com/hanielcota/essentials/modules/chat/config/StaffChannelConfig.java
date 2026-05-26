@@ -9,16 +9,19 @@ public record StaffChannelConfig(
             "MiniMessage format template for the staff channel. Only players with"
                 + " chat.staff.receive see messages on this channel.")
         String format,
-    @Comment("Shown to a staff member when toggling persistent staff chat ON. Placeholder: none.")
-        String toggleOn,
+    @Comment(
+            "Cooldown in seconds between messages on this channel. 0 disables. Players with"
+                + " chat.staff.bypasscooldown ignore the cooldown.")
+        int cooldownSeconds,
+    @Comment("Shown to a staff member when toggling persistent staff chat ON.") String toggleOn,
     @Comment("Shown to a staff member when toggling persistent staff chat OFF.") String toggleOff,
-    @Comment("Shown when /staffchat is used without a message and toggle status is reported.")
-        String usage) {
+    @Comment("Shown when /staffchat is used without a message.") String usage) {
 
   public static StaffChannelConfig defaults() {
     return new StaffChannelConfig(
         "<dark_red>[S]</dark_red> <gold><player></gold> <dark_gray>»</dark_gray>"
             + " <yellow><message></yellow>",
+        0,
         "<green>Staff chat persistente ATIVADO.",
         "<green>Staff chat persistente DESATIVADO.",
         "<yellow>Use <gray>/staffchat <mensagem></gray> ou <gray>/staffchat toggle</gray>.");

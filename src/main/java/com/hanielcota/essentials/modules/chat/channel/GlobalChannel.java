@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.chat.channel;
 
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
+import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -22,6 +23,16 @@ public final class GlobalChannel implements ChatChannel {
   @Override
   public String template(@NonNull ChatConfig config) {
     return config.global().format();
+  }
+
+  @Override
+  public int cooldownSeconds(@NonNull ChatConfig config) {
+    return config.global().cooldownSeconds();
+  }
+
+  @Override
+  public String bypassCooldownPermission() {
+    return ChatPermissions.GLOBAL_BYPASS_COOLDOWN;
   }
 
   @Override
