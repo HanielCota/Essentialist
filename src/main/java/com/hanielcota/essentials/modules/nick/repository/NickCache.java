@@ -9,14 +9,14 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 
-public final class NickCacheStore {
+public final class NickCache {
 
   private final NickStore store;
   private final AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, NickEntry> byId = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, UUID> idByLowerNick = new ConcurrentHashMap<>();
 
-  public NickCacheStore(@NonNull NickStore store, @NonNull AsyncDatabaseWriter writer) {
+  public NickCache(@NonNull NickStore store, @NonNull AsyncDatabaseWriter writer) {
     this.store = store;
     this.writer = writer;
   }

@@ -2,10 +2,10 @@ package com.hanielcota.essentials.modules.tpa.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
@@ -25,7 +25,7 @@ public final class TpaPendingBulkActions {
 
   private final ConfigHandle<TpaConfig> config;
   private final TeleportRequestService service;
-  private final TpAcceptResultHandler acceptHandler;
+  private final TpAcceptOutcomeHandler acceptHandler;
   private final TpaRequestReplyNotifier replyNotifier;
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
@@ -84,7 +84,7 @@ public final class TpaPendingBulkActions {
     var accepted = 0;
     for (var request : pending) {
       var claim = this.service.tryAccept(request);
-      if (claim != AcceptResult.ACCEPTED) {
+      if (claim != AcceptOutcome.ACCEPTED) {
         continue;
       }
       var messages = this.config.value().messages();

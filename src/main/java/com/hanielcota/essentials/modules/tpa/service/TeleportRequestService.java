@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.tpa.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.Participant;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
@@ -119,9 +119,9 @@ public final class TeleportRequestService {
     return this.store.incomingFrom(target, requesterName);
   }
 
-  public AcceptResult tryAccept(@NonNull TeleportRequest request) {
-    if (!this.store.remove(request)) {
-      return AcceptResult.NOT_FOUND;
+  public AcceptOutcome tryAccept(@NonNull TeleportRequest request) {
+    if (!this.store.delete(request)) {
+      return AcceptOutcome.NOT_FOUND;
     }
 
     var requesterId = request.requester().id();
@@ -131,10 +131,10 @@ public final class TeleportRequestService {
 
     if (!requesterOnline || !targetOnline) {
       this.recorder.recordTerminal(request, TeleportRequestStatus.CANCELLED);
-      return AcceptResult.REQUESTER_OFFLINE;
+      return AcceptOutcome.REQUESTER_OFFLINE;
     }
 
-    return AcceptResult.ACCEPTED;
+    return AcceptOutcome.ACCEPTED;
   }
 
   public CompletableFuture<Boolean> dispatchTeleport(@NonNull TeleportRequest request) {
@@ -154,7 +154,7 @@ public final class TeleportRequestService {
 
   /** Expires a request and notifies the requester. Called by {@link TeleportRequestExpiry}. */
   public void expire(@NonNull TeleportRequest request) {
-    if (!this.store.remove(request)) {
+    if (!this.store.delete(request)) {
       return;
     }
 
@@ -183,7 +183,7 @@ public final class TeleportRequestService {
 
   /** Removes a request and writes its terminal state to history in one step. */
   private boolean resolve(@NonNull TeleportRequest request, @NonNull TeleportRequestStatus status) {
-    if (!this.store.remove(request)) {
+    if (!this.store.delete(request)) {
       return false;
     }
 

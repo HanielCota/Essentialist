@@ -2,9 +2,10 @@ package com.hanielcota.essentials.modules.tpa.history;
 
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.SqlTable;
 import lombok.NonNull;
 
-public final class TpaHistoryTable {
+public final class TpaHistoryTable extends SqlTable {
 
   static final String INSERT =
       """
@@ -35,30 +36,47 @@ public final class TpaHistoryTable {
       ON tpa_history (requester_id, created_at DESC)\
       """;
 
-  private final String createTable;
-
   public TpaHistoryTable(@NonNull SqlDialect dialect) {
-    var pkColumn = dialect.autoIncrementPrimaryKey("id");
-    this.createTable =
-        "CREATE TABLE IF NOT EXISTS tpa_history (\n"
-            + "  "
-            + pkColumn
-            + ",\n"
-            + "  requester_id TEXT NOT NULL,\n"
-            + "  target_id TEXT NOT NULL,\n"
-            + "  target_name TEXT NOT NULL,\n"
-            + "  type TEXT NOT NULL,\n"
-            + "  status TEXT NOT NULL,\n"
-            + "  created_at INTEGER NOT NULL,\n"
-            + "  resolved_at INTEGER NOT NULL,\n"
-            + "  world TEXT,\n"
-            + "  x REAL,\n"
-            + "  y REAL,\n"
-            + "  z REAL\n"
-            + ")";
+    super(
+        dialect,
+        "tpa_history",
+        buildCreateTable(dialect),
+        "requester_id",
+        "target_id",
+        "target_name",
+        "type",
+        "status",
+        "created_at",
+        "resolved_at",
+        "world",
+        "x",
+        "y",
+        "z");
   }
 
+  private static String buildCreateTable(@NonNull SqlDialect dialect) {
+    var pkColumn = dialect.autoIncrementPrimaryKey("id");
+    return "CREATE TABLE IF NOT EXISTS tpa_history (\n"
+        + "  "
+        + pkColumn
+        + ",\n"
+        + "  requester_id TEXT NOT NULL,\n"
+        + "  target_id TEXT NOT NULL,\n"
+        + "  target_name TEXT NOT NULL,\n"
+        + "  type TEXT NOT NULL,\n"
+        + "  status TEXT NOT NULL,\n"
+        + "  created_at INTEGER NOT NULL,\n"
+        + "  resolved_at INTEGER NOT NULL,\n"
+        + "  world TEXT,\n"
+        + "  x REAL,\n"
+        + "  y REAL,\n"
+        + "  z REAL\n"
+        + ")";
+  }
+
+  @Override
   public void install(@NonNull SqlExecutor executor) {
-    executor.ddl(this.createTable, CREATE_INDEX);
+    super.install(executor);
+    executor.ddl(CREATE_INDEX);
   }
 }

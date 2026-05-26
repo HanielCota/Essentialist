@@ -19,7 +19,14 @@ final class TeleportExecutor {
     // the entity's owning thread, so the callback fires on the same thread the sync teleport would
     // have used.
     var teleport = player.teleportAsync(destination);
-    teleport.thenAccept(success -> onTeleportComplete(success, callback));
+    teleport.whenComplete(
+        (success, error) -> {
+          if (error != null) {
+            callback.onFailed();
+            return;
+          }
+          onTeleportComplete(success, callback);
+        });
   }
 
   private void onTeleportComplete(Boolean success, @NonNull DelayedTeleport.Callback callback) {

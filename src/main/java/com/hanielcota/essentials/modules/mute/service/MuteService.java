@@ -32,7 +32,7 @@ public final class MuteService {
   private static @Nullable Duration tryParseDuration(@NonNull String input) {
     try {
       return TimeParser.parse(input);
-    } catch (RuntimeException ignored) {
+    } catch (IllegalArgumentException ignored) {
       return null;
     }
   }

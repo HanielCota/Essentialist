@@ -35,7 +35,7 @@ class TpaSendOrchestratorTest {
     var config = new TpaTestSupport.StaticConfigHandle();
     var actors = new TpaTestSupport.RecordingActorFactory();
     var acceptHandler =
-        new TpAcceptResultHandler(config, new TpaRequestReplyNotifier(actors, players));
+        new TpAcceptOutcomeHandler(config, new TpaRequestReplyNotifier(actors, players));
     var callbacks = new MainThreadCallbacks(new TpaTestSupport.DirectScheduler());
     var dispatcher =
         new TpaSendOrchestrator(

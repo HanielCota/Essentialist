@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
-import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import java.util.EnumMap;
@@ -17,17 +17,17 @@ import lombok.RequiredArgsConstructor;
  * be reported without making the success messages wait for the async teleport to land).
  */
 @RequiredArgsConstructor
-public final class TpAcceptResultHandler {
+public final class TpAcceptOutcomeHandler {
 
   private final ConfigHandle<TpaConfig> config;
   private final TpaRequestReplyNotifier replyNotifier;
-  private final Map<AcceptResult, ResultRoute> routes = buildRoutes();
+  private final Map<AcceptOutcome, ResultRoute> routes = buildRoutes();
 
-  private Map<AcceptResult, ResultRoute> buildRoutes() {
-    var map = new EnumMap<AcceptResult, ResultRoute>(AcceptResult.class);
-    map.put(AcceptResult.ACCEPTED, this::notifyAccepted);
-    map.put(AcceptResult.REQUESTER_OFFLINE, this::notifyRequesterOffline);
-    map.put(AcceptResult.NOT_FOUND, this::notifyNotFound);
+  private Map<AcceptOutcome, ResultRoute> buildRoutes() {
+    var map = new EnumMap<AcceptOutcome, ResultRoute>(AcceptOutcome.class);
+    map.put(AcceptOutcome.ACCEPTED, this::notifyAccepted);
+    map.put(AcceptOutcome.REQUESTER_OFFLINE, this::notifyRequesterOffline);
+    map.put(AcceptOutcome.NOT_FOUND, this::notifyNotFound);
     return Map.copyOf(map);
   }
 
@@ -40,7 +40,9 @@ public final class TpAcceptResultHandler {
   }
 
   public void handleClaim(
-      @NonNull AcceptResult result, @NonNull TeleportRequest request, @NonNull CommandActor actor) {
+      @NonNull AcceptOutcome result,
+      @NonNull TeleportRequest request,
+      @NonNull CommandActor actor) {
     var snap = this.config.value();
     var messages = snap.messages();
 

@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 public record TpAcceptCommand(
     ConfigHandle<TpaConfig> config,
     TeleportRequestService service,
-    TpAcceptResultHandler resultHandler,
+    TpAcceptOutcomeHandler resultHandler,
     TpaIncomingResolver incomingResolver,
     MainThreadCallbacks callbacks) {
 
@@ -44,7 +44,7 @@ public record TpAcceptCommand(
 
     this.resultHandler.handleClaim(claim, request, actor);
 
-    if (claim != AcceptResult.ACCEPTED) {
+    if (claim != AcceptOutcome.ACCEPTED) {
       return;
     }
 

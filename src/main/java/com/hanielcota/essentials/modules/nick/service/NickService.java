@@ -1,20 +1,20 @@
 package com.hanielcota.essentials.modules.nick.service;
 
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
-import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
+import com.hanielcota.essentials.modules.nick.repository.NickCache;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 
 /**
  * Thin facade for the nickname system. In-memory caching and persistence coordination are delegated
- * to {@link NickCacheStore}.
+ * to {@link NickCache}.
  */
 public final class NickService {
 
-  private final NickCacheStore cache;
+  private final NickCache cache;
 
-  public NickService(@NonNull NickCacheStore cache) {
+  public NickService(@NonNull NickCache cache) {
     this.cache = cache;
   }
 

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
-import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
@@ -114,7 +114,7 @@ class TpaPendingBulkActionsTest {
     var config = new TpaTestSupport.StaticConfigHandle();
     var actors = new TpaTestSupport.RecordingActorFactory();
     var replyNotifier = new TpaRequestReplyNotifier(actors, players);
-    var acceptHandler = new TpAcceptResultHandler(config, replyNotifier);
+    var acceptHandler = new TpAcceptOutcomeHandler(config, replyNotifier);
     var callbacks = new MainThreadCallbacks(new TpaTestSupport.DirectScheduler());
     var bulk =
         new TpaPendingBulkActions(config, service, acceptHandler, replyNotifier, callbacks, actors);

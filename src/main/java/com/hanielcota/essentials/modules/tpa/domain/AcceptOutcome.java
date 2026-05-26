@@ -6,7 +6,7 @@ package com.hanielcota.essentials.modules.tpa.domain;
  * separately by {@link TeleportRequestService#dispatchTeleport(TeleportRequest)} so the accepter
  * and requester can be notified immediately, before the async teleport completes.
  */
-public enum AcceptResult {
+public enum AcceptOutcome {
   ACCEPTED,
   NOT_FOUND,
   REQUESTER_OFFLINE

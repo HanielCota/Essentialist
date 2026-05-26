@@ -9,7 +9,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
-import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaPendingActionMenuConfig;
@@ -40,7 +40,7 @@ public final class TpaPendingActionMenu implements EssentialsMenu {
       @NonNull TeleportRequestService service,
       @NonNull TpaBlockService blocks,
       @NonNull TpaPendingSelections selections,
-      @NonNull TpAcceptResultHandler acceptHandler,
+      @NonNull TpAcceptOutcomeHandler acceptHandler,
       @NonNull TpaRequestReplyNotifier replyNotifier,
       @NonNull MainThreadCallbacks callbacks,
       @NonNull ActorFactory actors) {

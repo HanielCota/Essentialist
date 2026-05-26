@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.tpa.bootstrap;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.module.ModuleEnvironment;
 import com.hanielcota.essentials.module.ModuleRegistrar;
-import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaFavoriteNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.command.TpaIncomingResolver;
@@ -64,7 +64,7 @@ public final class TpaRuntimeBootstrap {
     var players = this.env.service(PlayerProvider.class);
     var callbacks = this.env.service(MainThreadCallbacks.class);
     var replyNotifier = new TpaRequestReplyNotifier(actors, players);
-    var acceptHandler = new TpAcceptResultHandler(this.config, replyNotifier);
+    var acceptHandler = new TpAcceptOutcomeHandler(this.config, replyNotifier);
     var incomingResolver = new TpaIncomingResolver(this.config, requestService);
 
     return new TpaShared(
@@ -125,6 +125,6 @@ public final class TpaRuntimeBootstrap {
       PlayerProvider players,
       MainThreadCallbacks callbacks,
       TpaRequestReplyNotifier replyNotifier,
-      TpAcceptResultHandler acceptHandler,
+      TpAcceptOutcomeHandler acceptHandler,
       TpaIncomingResolver incomingResolver) {}
 }
