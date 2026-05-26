@@ -11,7 +11,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaNotificationSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaNotificationSettingsMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.util.ComponentUtils;

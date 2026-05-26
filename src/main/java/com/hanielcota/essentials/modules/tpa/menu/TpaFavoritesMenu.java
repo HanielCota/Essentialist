@@ -10,7 +10,7 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaFavoritesMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteBrowser;

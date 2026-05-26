@@ -2,10 +2,10 @@ package com.hanielcota.essentials.modules.tpa.menu;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.hanielcota.essentials.modules.tpa.config.TpaBlockedMenuConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaHelpMenuConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaPendingMenuConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaBlockedMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaHelpMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaSettingsMenuConfig;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

@@ -9,7 +9,7 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
-import com.hanielcota.essentials.modules.tpa.repository.RequestStore;
+import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.List;
 import java.util.Optional;
@@ -22,13 +22,13 @@ import org.bukkit.entity.Player;
  * Application service for the teleport-request use cases: create, accept, deny, cancel, expire.
  *
  * <p>Sole responsibility: orchestration. It owns no state and renders no messages — it delegates
- * storage to {@link RequestStore}, persistence to {@link TpaHistory} and player-facing notices to
- * {@link TpaNotifier}.
+ * storage to {@link RequestRepository}, persistence to {@link TpaHistory} and player-facing notices
+ * to {@link TpaNotifier}.
  */
 public final class TeleportRequestService {
 
   private final ConfigHandle<TpaConfig> config;
-  private final RequestStore store;
+  private final RequestRepository store;
   private final TpaNotifier notifier;
   private final PlayerProvider players;
   private final TpaRequestPolicy policy;
@@ -37,7 +37,7 @@ public final class TeleportRequestService {
 
   public TeleportRequestService(
       @NonNull ConfigHandle<TpaConfig> config,
-      @NonNull RequestStore store,
+      @NonNull RequestRepository store,
       @NonNull TpaHistory history,
       @NonNull TpaNotifier notifier,
       @NonNull PlayerProvider players,

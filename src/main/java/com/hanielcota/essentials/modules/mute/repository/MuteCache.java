@@ -12,12 +12,12 @@ import lombok.NonNull;
 
 public final class MuteCache {
 
-  private final MuteStore store;
+  private final MuteRepository repository;
   private final AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, Mute> cache = new ConcurrentHashMap<>();
 
-  public MuteCache(@NonNull MuteStore store, @NonNull AsyncDatabaseWriter writer) {
-    this.store = store;
+  public MuteCache(@NonNull MuteRepository repository, @NonNull AsyncDatabaseWriter writer) {
+    this.repository = repository;
     this.writer = writer;
   }
 
@@ -40,7 +40,7 @@ public final class MuteCache {
 
     var removed = this.cache.remove(id, mute);
     if (removed) {
-      Runnable persist = () -> this.store.delete(id);
+      Runnable persist = () -> this.repository.delete(id);
       this.writer.submit("delete expired mute", persist);
     }
 
@@ -50,7 +50,7 @@ public final class MuteCache {
   public void apply(@NonNull UUID id, @NonNull Mute mute) {
     this.cache.put(id, mute);
 
-    Runnable persist = () -> this.store.save(id, mute);
+    Runnable persist = () -> this.repository.save(id, mute);
     this.writer.submit("save mute", persist);
   }
 
@@ -60,7 +60,7 @@ public final class MuteCache {
       return false;
     }
 
-    Runnable persist = () -> this.store.delete(id);
+    Runnable persist = () -> this.repository.delete(id);
     this.writer.submit("delete mute", persist);
 
     return true;

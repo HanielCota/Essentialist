@@ -13,11 +13,11 @@ import java.util.UUID;
 import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 
-class RequestRepositoryTest {
+class InMemoryRequestRepositoryTest {
 
   @Test
   void addThenIncomingForReturnsTheRequest() {
-    var repo = new RequestRepository();
+    var repo = new InMemoryRequestRepository();
     var requester = new Participant(UUID.randomUUID(), "Alice");
     var target = new Participant(UUID.randomUUID(), "Bob");
     var request =
@@ -32,7 +32,7 @@ class RequestRepositoryTest {
 
   @Test
   void addingASecondRequestFromTheSameRequesterEvictsTheFirst() {
-    var repo = new RequestRepository();
+    var repo = new InMemoryRequestRepository();
     var requester = new Participant(UUID.randomUUID(), "Alice");
     var firstTarget = new Participant(UUID.randomUUID(), "Bob");
     var secondTarget = new Participant(UUID.randomUUID(), "Carol");
@@ -51,7 +51,7 @@ class RequestRepositoryTest {
 
   @Test
   void removeReturnsFalseOnSecondCall() {
-    var repo = new RequestRepository();
+    var repo = new InMemoryRequestRepository();
     var request = sampleRequest();
     repo.add(request);
 
@@ -61,7 +61,7 @@ class RequestRepositoryTest {
 
   @Test
   void incomingFromMatchesNameCaseInsensitively() {
-    var repo = new RequestRepository();
+    var repo = new InMemoryRequestRepository();
     var requester = new Participant(UUID.randomUUID(), "Alice");
     var target = new Participant(UUID.randomUUID(), "Bob");
     repo.add(
@@ -74,7 +74,7 @@ class RequestRepositoryTest {
 
   @Test
   void expiredAtListsOnlyRequestsPastTheirWindow() {
-    var repo = new RequestRepository();
+    var repo = new InMemoryRequestRepository();
     var requester = new Participant(UUID.randomUUID(), "Alice");
     var target = new Participant(UUID.randomUUID(), "Bob");
 
@@ -91,7 +91,7 @@ class RequestRepositoryTest {
 
   @Test
   void involvingFindsBothRequesterAndTargetRoles() {
-    var repo = new RequestRepository();
+    var repo = new InMemoryRequestRepository();
     var alice = new Participant(UUID.randomUUID(), "Alice");
     var bob = new Participant(UUID.randomUUID(), "Bob");
     var carol = new Participant(UUID.randomUUID(), "Carol");

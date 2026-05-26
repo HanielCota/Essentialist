@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.hanielcota.essentials.modules.tpa.config.TpaPendingActionMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.util.Placeholders;

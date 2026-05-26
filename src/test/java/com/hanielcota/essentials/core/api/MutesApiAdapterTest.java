@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.modules.mute.repository.MuteCache;
-import com.hanielcota.essentials.modules.mute.repository.MuteStore;
+import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import java.time.Instant;
 import java.util.List;
@@ -21,7 +21,7 @@ class MutesApiAdapterTest {
 
   @Test
   void isMutedFollowsActiveMute() {
-    var cache = new MuteCache(new NoopStore(), new NoopWriter());
+    var cache = new MuteCache(new NoopRepository(), new NoopWriter());
     var id = UUID.randomUUID();
     cache.loadAll(List.of(Map.entry(id, Mute.permanent())));
 
@@ -34,7 +34,7 @@ class MutesApiAdapterTest {
 
   @Test
   void activeMuteExposesTheUnderlyingMuteWhenPresent() {
-    var cache = new MuteCache(new NoopStore(), new NoopWriter());
+    var cache = new MuteCache(new NoopRepository(), new NoopWriter());
     var id = UUID.randomUUID();
     var mute = Mute.permanent();
     cache.loadAll(List.of(Map.entry(id, mute)));
@@ -45,7 +45,7 @@ class MutesApiAdapterTest {
     assertEquals(mute, adapter.activeMute(id).orElseThrow());
   }
 
-  private static final class NoopStore implements MuteStore {
+  private static final class NoopRepository implements MuteRepository {
     @Override
     public List<Map.Entry<UUID, Mute>> listActive(@NonNull Instant now) {
       return List.of();

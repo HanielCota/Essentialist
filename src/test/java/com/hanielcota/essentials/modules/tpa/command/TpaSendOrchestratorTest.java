@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
-import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
+import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class TpaSendOrchestratorTest {
     favorites.add(target.getUniqueId(), requester.getUniqueId(), requester.getName());
     var service =
         TpaTestSupport.service(
-            new RequestRepository(),
+            new InMemoryRequestRepository(),
             new TpaTestSupport.RecordingHistory(),
             players,
             profiles,

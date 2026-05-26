@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.hanielcota.essentials.modules.tpa.config.TpaPendingMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import java.time.Duration;

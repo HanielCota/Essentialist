@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
-import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
+import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import org.junit.jupiter.api.Test;
 
 class TpDenyCommandTest {
@@ -18,7 +18,7 @@ class TpDenyCommandTest {
     players.add(requester);
     var service =
         TpaTestSupport.service(
-            new RequestRepository(),
+            new InMemoryRequestRepository(),
             new TpaTestSupport.RecordingHistory(),
             players,
             TpaTestSupport.profiles(),

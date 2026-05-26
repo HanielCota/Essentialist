@@ -12,7 +12,7 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.config.TpaFavoriteActionMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoriteActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
