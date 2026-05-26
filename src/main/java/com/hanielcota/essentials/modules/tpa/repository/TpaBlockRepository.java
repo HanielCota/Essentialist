@@ -11,7 +11,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class TpaBlockRepository {
+public final class TpaBlockRepository implements TpaBlockStore {
 
   private final SqlExecutor sqlExecutor;
   private final TpaBlockTable table;

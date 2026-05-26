@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
  * otherwise the value is epoch millis.
  */
 @RequiredArgsConstructor
-public final class MuteRepository {
+public final class MuteRepository implements MuteStore {
 
   private final SqlExecutor sqlExecutor;
   private final MuteTable table;

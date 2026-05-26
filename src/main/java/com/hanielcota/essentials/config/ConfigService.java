@@ -9,6 +9,4 @@ public interface ConfigService {
       @NonNull String name, @NonNull Class<T> type, @NonNull Supplier<T> defaults);
 
   ReloadReport reloadAll();
-
-  AutoCloseable onReload(@NonNull Runnable callback);
 }

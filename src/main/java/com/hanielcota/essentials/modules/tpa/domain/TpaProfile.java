@@ -1,11 +1,12 @@
 package com.hanielcota.essentials.modules.tpa.domain;
 
 import java.time.Duration;
+import java.util.EnumMap;
+import java.util.Map;
 import lombok.NonNull;
 
 public record TpaProfile(
-    boolean receiveTpa,
-    boolean receiveTpaHere,
+    @NonNull Map<TeleportRequestType, Boolean> receiveByType,
     long sentRequests,
     long receivedRequests,
     long acceptedSent,
@@ -19,15 +20,16 @@ public record TpaProfile(
     @NonNull FavoriteOrdering favoriteOrdering) {
 
   public static TpaProfile defaults() {
+    var receive = new EnumMap<TeleportRequestType, Boolean>(TeleportRequestType.class);
+    receive.put(TeleportRequestType.TPA, true);
+    receive.put(TeleportRequestType.TPAHERE, true);
+
     return new TpaProfile(
-        true, true, 0, 0, 0, 0, 0, false, true, true, true, 0, FavoriteOrdering.NAME);
+        Map.copyOf(receive), 0, 0, 0, 0, 0, false, true, true, true, 0, FavoriteOrdering.NAME);
   }
 
   public boolean accepts(@NonNull TeleportRequestType type) {
-    return switch (type) {
-      case TPA -> this.receiveTpa;
-      case TPAHERE -> this.receiveTpaHere;
-    };
+    return this.receiveByType.getOrDefault(type, false);
   }
 
   public boolean isDndActive(long nowEpochMs) {
@@ -35,10 +37,11 @@ public record TpaProfile(
   }
 
   public TpaProfile toggled(@NonNull TeleportRequestType type) {
-    return switch (type) {
-      case TPA -> copy().receiveTpa(!this.receiveTpa).build();
-      case TPAHERE -> copy().receiveTpaHere(!this.receiveTpaHere).build();
-    };
+    var next = new EnumMap<>(this.receiveByType);
+    var current = next.getOrDefault(type, false);
+    next.put(type, !current);
+
+    return copy().receiveByType(Map.copyOf(next)).build();
   }
 
   public TpaProfile incrementSentRequests() {
@@ -91,8 +94,7 @@ public record TpaProfile(
   }
 
   private static final class Builder {
-    private boolean receiveTpa;
-    private boolean receiveTpaHere;
+    private Map<TeleportRequestType, Boolean> receiveByType;
     private long sentRequests;
     private long receivedRequests;
     private long acceptedSent;
@@ -106,8 +108,7 @@ public record TpaProfile(
     private FavoriteOrdering favoriteOrdering;
 
     private Builder(TpaProfile source) {
-      this.receiveTpa = source.receiveTpa;
-      this.receiveTpaHere = source.receiveTpaHere;
+      this.receiveByType = source.receiveByType;
       this.sentRequests = source.sentRequests;
       this.receivedRequests = source.receivedRequests;
       this.acceptedSent = source.acceptedSent;
@@ -121,13 +122,8 @@ public record TpaProfile(
       this.favoriteOrdering = source.favoriteOrdering;
     }
 
-    private Builder receiveTpa(boolean value) {
-      this.receiveTpa = value;
-      return this;
-    }
-
-    private Builder receiveTpaHere(boolean value) {
-      this.receiveTpaHere = value;
+    private Builder receiveByType(Map<TeleportRequestType, Boolean> value) {
+      this.receiveByType = value;
       return this;
     }
 
@@ -188,8 +184,7 @@ public record TpaProfile(
 
     private TpaProfile build() {
       return new TpaProfile(
-          this.receiveTpa,
-          this.receiveTpaHere,
+          this.receiveByType,
           this.sentRequests,
           this.receivedRequests,
           this.acceptedSent,

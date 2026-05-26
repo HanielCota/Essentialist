@@ -9,8 +9,6 @@ public interface Scheduler {
 
   void runSync(@NonNull Runnable task);
 
-  void runAsync(@NonNull Runnable task);
-
   /**
    * Executor that hops back to the main (global region) thread. Use it as the second arg of {@link
    * java.util.concurrent.CompletableFuture#thenAcceptAsync(java.util.function.Consumer, Executor)}
@@ -36,18 +34,4 @@ public interface Scheduler {
   Task runLater(@NonNull Runnable task, @NonNull Duration delay);
 
   Task runTimer(@NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period);
-
-  /**
-   * Runs {@code task} asynchronously after {@code delay}. Unlike {@link #runLater}, the delay is
-   * wall-clock, not tick-bound — appropriate for I/O work (DB, HTTP) that must not touch a region
-   * thread.
-   */
-  Task runAsyncLater(@NonNull Runnable task, @NonNull Duration delay);
-
-  /**
-   * Runs {@code task} asynchronously every {@code period} after {@code initialDelay}. Wall-clock
-   * scheduling, like {@link #runAsyncLater}.
-   */
-  Task runAsyncTimer(
-      @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period);
 }

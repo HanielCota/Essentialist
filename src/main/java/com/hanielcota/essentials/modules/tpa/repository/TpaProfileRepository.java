@@ -2,18 +2,21 @@ package com.hanielcota.essentials.modules.tpa.repository;
 
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class TpaProfileRepository {
+public final class TpaProfileRepository implements TpaProfileStore {
 
   private final SqlExecutor sqlExecutor;
   private final TpaProfileTable table;
@@ -22,8 +25,10 @@ public final class TpaProfileRepository {
     var playerIdRaw = rs.getString("player_id");
     var playerId = UUID.fromString(playerIdRaw);
 
-    var receiveTpa = rs.getInt("receive_tpa") != 0;
-    var receiveTpaHere = rs.getInt("receive_tpahere") != 0;
+    var receiveByType = new EnumMap<TeleportRequestType, Boolean>(TeleportRequestType.class);
+    receiveByType.put(TeleportRequestType.TPA, rs.getInt("receive_tpa") != 0);
+    receiveByType.put(TeleportRequestType.TPAHERE, rs.getInt("receive_tpahere") != 0);
+
     var sentRequests = rs.getLong("sent_requests");
     var receivedRequests = rs.getLong("received_requests");
     var acceptedSent = rs.getLong("accepted_sent");
@@ -38,8 +43,7 @@ public final class TpaProfileRepository {
 
     var profile =
         new TpaProfile(
-            receiveTpa,
-            receiveTpaHere,
+            Map.copyOf(receiveByType),
             sentRequests,
             receivedRequests,
             acceptedSent,
@@ -72,8 +76,9 @@ public final class TpaProfileRepository {
 
   public void save(@NonNull UUID playerId, @NonNull TpaProfile profile) {
     var playerIdRaw = playerId.toString();
-    var receiveTpa = profile.receiveTpa() ? 1 : 0;
-    var receiveTpaHere = profile.receiveTpaHere() ? 1 : 0;
+    var receiveByType = profile.receiveByType();
+    var receiveTpa = mapReceive(receiveByType, TeleportRequestType.TPA);
+    var receiveTpaHere = mapReceive(receiveByType, TeleportRequestType.TPAHERE);
     var sentRequests = profile.sentRequests();
     var receivedRequests = profile.receivedRequests();
     var acceptedSent = profile.acceptedSent();
@@ -104,5 +109,10 @@ public final class TpaProfileRepository {
         dndUntilMs,
         favoriteOrdering,
         updatedAt);
+  }
+
+  private static int mapReceive(
+      @NonNull Map<TeleportRequestType, Boolean> map, @NonNull TeleportRequestType type) {
+    return map.getOrDefault(type, false) ? 1 : 0;
   }
 }

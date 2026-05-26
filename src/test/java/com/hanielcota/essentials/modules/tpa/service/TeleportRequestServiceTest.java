@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import lombok.NonNull;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -142,14 +141,6 @@ class TeleportRequestServiceTest {
     @Override
     public TpaConfig value() {
       return TpaConfig.defaults();
-    }
-
-    @Override
-    public void reload() {}
-
-    @Override
-    public AutoCloseable onReload(@NonNull Consumer<TpaConfig> listener) {
-      return () -> {};
     }
   }
 

@@ -10,7 +10,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class TpaContactRepository {
+public final class TpaContactRepository implements TpaContactStore {
 
   private final SqlExecutor sqlExecutor;
   private final TpaContactTable table;

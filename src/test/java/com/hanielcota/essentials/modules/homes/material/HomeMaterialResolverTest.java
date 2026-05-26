@@ -21,14 +21,6 @@ class HomeMaterialResolverTest {
       public HomesConfig value() {
         return value;
       }
-
-      @Override
-      public void reload() {}
-
-      @Override
-      public AutoCloseable onReload(java.util.function.Consumer<HomesConfig> listener) {
-        return () -> {};
-      }
     };
   }
 

@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
-import com.hanielcota.essentials.modules.tpa.repository.TpaContactRepository;
+import com.hanielcota.essentials.modules.tpa.repository.TpaContactStore;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +18,12 @@ import org.jspecify.annotations.Nullable;
  */
 public final class TpaContactService {
 
-  private final @Nullable TpaContactRepository repository;
+  private final @Nullable TpaContactStore repository;
   private final AsyncDatabaseWriter writer;
   private final Map<UUID, Map<UUID, TpaContact>> contacts = new ConcurrentHashMap<>();
 
   public TpaContactService(
-      @Nullable TpaContactRepository repository, @NonNull AsyncDatabaseWriter writer) {
+      @Nullable TpaContactStore repository, @NonNull AsyncDatabaseWriter writer) {
     this.repository = repository;
     this.writer = writer;
   }

@@ -10,9 +10,7 @@ import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import lombok.NonNull;
@@ -25,7 +23,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class CommandBootstrap {
 
   private final @NonNull JavaPlugin plugin;
-  private final @NonNull List<Consumer<PaperCommandFramework.Builder>> customizers;
 
   // Tab-completes enchantment names (without the `minecraft:` namespace) by prefix.
   private static SuggestionProvider<Enchantment> enchantmentSuggestions() {
@@ -69,10 +66,6 @@ public final class CommandBootstrap {
     builder.suggestionProvider("enchantments", enchantmentProvider);
 
     registerExceptionHandlers(builder);
-
-    for (var customizer : this.customizers) {
-      customizer.accept(builder);
-    }
 
     return builder.build();
   }

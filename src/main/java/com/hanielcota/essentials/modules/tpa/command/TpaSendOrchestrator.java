@@ -117,8 +117,7 @@ public final class TpaSendOrchestrator {
       sendError(requesterActor, messages.crossWorldRefused(), target.getName());
       return;
     }
-    var template =
-        type == TeleportRequestType.TPA ? messages.tpaDisabled() : messages.tpaHereDisabled();
+    var template = messages.disabledFor(type);
     sendError(requesterActor, template, target.getName());
   }
 }

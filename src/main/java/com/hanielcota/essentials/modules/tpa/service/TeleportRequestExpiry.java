@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
-import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
+import com.hanielcota.essentials.modules.tpa.repository.RequestStore;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
 import java.time.Duration;
@@ -21,7 +21,7 @@ public final class TeleportRequestExpiry {
   private static final Duration INTERVAL = Duration.ofSeconds(1);
 
   private final Scheduler scheduler;
-  private final RequestRepository store;
+  private final RequestStore store;
   private final TeleportRequestService service;
 
   private Task task;

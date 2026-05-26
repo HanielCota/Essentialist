@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.modules.tpa.domain.Destination;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
-import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
@@ -34,9 +33,9 @@ final class TeleportRequestExecutor {
       return CompletableFuture.completedFuture(TeleportExecution.failed());
     }
 
-    var toTarget = request.type() == TeleportRequestType.TPA;
-    var mover = toTarget ? requester : target;
-    var benchmark = toTarget ? target : requester;
+    var type = request.type();
+    var mover = type.mover(requester, target);
+    var benchmark = type.destination(requester, target);
     var landing = benchmark.getLocation();
 
     var pending = mover.teleportAsync(landing);

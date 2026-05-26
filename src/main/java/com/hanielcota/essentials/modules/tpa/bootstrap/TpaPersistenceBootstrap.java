@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.bootstrap;
 
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.ModuleEnvironment;
@@ -36,7 +36,8 @@ public final class TpaPersistenceBootstrap {
     table.install(executor);
 
     var sqliteBacked = new SqliteTpaHistory(executor);
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaHistory");
+    var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("TpaHistory");
     this.registrar.closeable(writer);
 
     return new AsyncTpaHistory(sqliteBacked, writer);
@@ -46,7 +47,8 @@ public final class TpaPersistenceBootstrap {
     var executor = this.env.service(SqlExecutor.class);
     var table = profileTable(executor);
     var repository = new TpaProfileRepository(executor, table);
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaProfiles");
+    var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("TpaProfiles");
     this.registrar.closeable(writer);
 
     var service = new TpaProfileService(repository, writer);
@@ -60,7 +62,8 @@ public final class TpaPersistenceBootstrap {
     var executor = this.env.service(SqlExecutor.class);
     var table = blockTable(executor);
     var repository = new TpaBlockRepository(executor, table);
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaBlocks");
+    var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("TpaBlocks");
     this.registrar.closeable(writer);
 
     var service = new TpaBlockService(repository, writer);
@@ -74,7 +77,8 @@ public final class TpaPersistenceBootstrap {
     var executor = this.env.service(SqlExecutor.class);
     var table = favoriteTable(executor);
     var repository = new TpaFavoriteRepository(executor, table);
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaFavorites");
+    var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("TpaFavorites");
     this.registrar.closeable(writer);
 
     var service = new TpaFavoriteService(repository, writer);
@@ -88,7 +92,8 @@ public final class TpaPersistenceBootstrap {
     var executor = this.env.service(SqlExecutor.class);
     var table = contactTable(executor);
     var repository = new TpaContactRepository(executor, table);
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaContacts");
+    var writerFactory = this.env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("TpaContacts");
     this.registrar.closeable(writer);
 
     var service = new TpaContactService(repository, writer);

@@ -35,21 +35,11 @@ public interface ModuleRegistrar {
   /**
    * Loads a config and registers {@code service} under its concrete runtime class in one call.
    * Convenience overload for the common case where the service has no public interface and callers
-   * look it up as {@code service(ConcreteService.class)}. If you need to publish the service under
-   * an interface or supertype, use {@link #configure(String, Class, Supplier, Class, Object)}
-   * instead.
+   * look it up as {@code service(ConcreteService.class)}.
    */
   <C, S> ConfigHandle<C> configure(
       @NonNull String name,
       @NonNull Class<C> configType,
       @NonNull Supplier<C> defaults,
-      @NonNull S service);
-
-  /** Loads a config and registers {@code service} under the explicit {@code serviceType}. */
-  <C, S> ConfigHandle<C> configure(
-      @NonNull String name,
-      @NonNull Class<C> configType,
-      @NonNull Supplier<C> defaults,
-      @NonNull Class<S> serviceType,
       @NonNull S service);
 }

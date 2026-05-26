@@ -26,12 +26,12 @@ public final class InvseeViewBuilder {
       @NonNull Player target, @NonNull String title, @NonNull UUID targetId) {
     var holder = new InvseeHolder(targetId);
     var titleComponent = ComponentUtils.mini(title);
-    var view = Bukkit.createInventory(holder, InvseeService.SIZE, titleComponent);
+    var view = Bukkit.createInventory(holder, InvseeLayout.SIZE, titleComponent);
     holder.inventory(view);
 
     var source = target.getInventory();
     var storage = source.getStorageContents();
-    for (var slot = 0; slot < InvseeService.STORAGE_SLOTS; slot++) {
+    for (var slot = 0; slot < InvseeLayout.STORAGE_SLOTS; slot++) {
       view.setItem(slot, storage[slot]);
     }
 
@@ -41,13 +41,13 @@ public final class InvseeViewBuilder {
     var boots = source.getBoots();
     var offhand = source.getItemInOffHand();
 
-    view.setItem(InvseeService.HELMET_SLOT, helmet);
-    view.setItem(InvseeService.CHESTPLATE_SLOT, chestplate);
-    view.setItem(InvseeService.LEGGINGS_SLOT, leggings);
-    view.setItem(InvseeService.BOOTS_SLOT, boots);
-    view.setItem(InvseeService.OFFHAND_SLOT, offhand);
+    view.setItem(InvseeLayout.HELMET_SLOT, helmet);
+    view.setItem(InvseeLayout.CHESTPLATE_SLOT, chestplate);
+    view.setItem(InvseeLayout.LEGGINGS_SLOT, leggings);
+    view.setItem(InvseeLayout.BOOTS_SLOT, boots);
+    view.setItem(InvseeLayout.OFFHAND_SLOT, offhand);
 
-    for (var slot = InvseeService.FIRST_LOCKED_SLOT; slot < InvseeService.SIZE; slot++) {
+    for (var slot = InvseeLayout.FIRST_LOCKED_SLOT; slot < InvseeLayout.SIZE; slot++) {
       view.setItem(slot, FILLER);
     }
 

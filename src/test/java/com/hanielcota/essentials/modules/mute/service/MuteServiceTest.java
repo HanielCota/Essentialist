@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
+import com.hanielcota.essentials.modules.mute.repository.MuteStore;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -17,44 +18,62 @@ class MuteServiceTest {
 
   @Test
   void loadAllPopulatesActiveMutes() {
-    var service = newService();
+    var cache = newCache();
     var id = UUID.randomUUID();
-    service.loadAll(List.of(Map.entry(id, Mute.permanent())));
+    cache.loadAll(List.of(Map.entry(id, Mute.permanent())));
 
+    var service = new MuteService(cache);
     assertTrue(service.activeMute(id).isPresent());
   }
 
   @Test
   void expiredMuteIsEvictedOnRead() {
-    var service = newService();
+    var cache = newCache();
     var id = UUID.randomUUID();
     var past = Instant.now().minusSeconds(60);
-    service.loadAll(List.of(Map.entry(id, Mute.until(past))));
+    cache.loadAll(List.of(Map.entry(id, Mute.until(past))));
 
+    var service = new MuteService(cache);
     assertFalse(service.activeMute(id).isPresent());
-    // Second read confirms the eviction stuck — same answer, no NPE on stale entry.
     assertFalse(service.activeMute(id).isPresent());
   }
 
   @Test
   void unmuteReturnsTrueOnlyWhenSomethingWasRemoved() {
-    var service = newService();
+    var cache = newCache();
     var id = UUID.randomUUID();
-    service.loadAll(List.of(Map.entry(id, Mute.permanent())));
+    cache.loadAll(List.of(Map.entry(id, Mute.permanent())));
 
+    var service = new MuteService(cache);
     assertTrue(service.unmute(id));
     assertFalse(service.unmute(id));
     assertFalse(service.activeMute(id).isPresent());
   }
 
-  private static MuteService newService() {
-    return new MuteService(null, new NoopWriter());
+  private static MuteCache newCache() {
+    return new MuteCache(new NoopStore(), new NoopWriter());
   }
 
-  /**
-   * Drops the work — tests only assert against the in-memory cache, which the service mutates
-   * synchronously before delegating to the writer.
-   */
+  private static final class NoopStore implements MuteStore {
+    @Override
+    public List<Map.Entry<UUID, Mute>> listActive(@NonNull Instant now) {
+      return List.of();
+    }
+
+    @Override
+    public void save(@NonNull UUID id, @NonNull Mute mute) {}
+
+    @Override
+    public boolean delete(@NonNull UUID id) {
+      return false;
+    }
+
+    @Override
+    public int deleteExpired(@NonNull Instant now) {
+      return 0;
+    }
+  }
+
   private static final class NoopWriter implements AsyncDatabaseWriter {
     @Override
     public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {

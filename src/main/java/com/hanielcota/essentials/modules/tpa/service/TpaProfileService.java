@@ -4,7 +4,7 @@ import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
-import com.hanielcota.essentials.modules.tpa.repository.TpaProfileRepository;
+import com.hanielcota.essentials.modules.tpa.repository.TpaProfileStore;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +15,12 @@ import org.jspecify.annotations.Nullable;
 
 public final class TpaProfileService {
 
-  private final @Nullable TpaProfileRepository repository;
+  private final @Nullable TpaProfileStore repository;
   private final AsyncDatabaseWriter writer;
   private final Map<UUID, TpaProfile> profiles = new ConcurrentHashMap<>();
 
   public TpaProfileService(
-      @Nullable TpaProfileRepository repository, @NonNull AsyncDatabaseWriter writer) {
+      @Nullable TpaProfileStore repository, @NonNull AsyncDatabaseWriter writer) {
     this.repository = repository;
     this.writer = writer;
   }
