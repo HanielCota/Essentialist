@@ -1,13 +1,14 @@
-package com.hanielcota.essentials.modules.homes.name;
+package com.hanielcota.essentials.modules.homes.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 
-class HomeNameResolverTest {
+class HomeMaterialResolverTest {
 
   private static ConfigHandle<HomesConfig> config(HomesConfig value) {
     return new ConfigHandle<>() {
@@ -25,15 +26,18 @@ class HomeNameResolverTest {
 
   @Test
   void usesConfiguredDefaultWhenArgumentIsBlank() {
-    var resolver = new HomeNameResolver(config(HomesConfig.defaults()), new HomeNameValidator());
+    var resolver = new HomeMaterialResolver(config(HomesConfig.defaults()));
 
-    assertEquals("home", resolver.resolve(""));
+    assertEquals(Material.RED_BED, resolver.resolve(""));
   }
 
   @Test
-  void rejectsInvalidNamesAfterDefaultResolution() {
-    var resolver = new HomeNameResolver(config(HomesConfig.defaults()), new HomeNameValidator());
+  void rejectsUnknownOrNonItemMaterials() {
+    var resolver =
+        new HomeMaterialResolver(
+            config(HomesConfig.defaults()), material -> material != Material.AIR);
 
-    assertNull(resolver.resolve("<red>base"));
+    assertNull(resolver.resolve("not_a_material"));
+    assertNull(resolver.resolve("air"));
   }
 }

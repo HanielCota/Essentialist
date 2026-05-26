@@ -5,10 +5,12 @@ import com.hanielcota.essentials.modules.tpa.config.TpaHelpMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
+import com.hanielcota.essentials.util.Placeholders;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -76,15 +78,19 @@ public final class TpaHelpMenuRenderer {
     var mostContactedText =
         TpaProfileStatsFormatter.mostContactedName(mostContacted, statsFallback);
 
-    return raw.replace("{player}", playerName)
-        .replace("{sent}", sent)
-        .replace("{received}", received)
-        .replace("{pending}", pendingRequests)
-        .replace("{receive_tpa}", receiveTpa)
-        .replace("{receive_tpahere}", receiveTpaHere)
-        .replace("{accept_rate}", acceptRate)
-        .replace("{avg_accept}", avgAccept)
-        .replace("{most_contacted}", mostContactedText);
+    var values =
+        Map.of(
+            "player", playerName,
+            "sent", sent,
+            "received", received,
+            "pending", pendingRequests,
+            "receive_tpa", receiveTpa,
+            "receive_tpahere", receiveTpaHere,
+            "accept_rate", acceptRate,
+            "avg_accept", avgAccept,
+            "most_contacted", mostContactedText);
+
+    return Placeholders.format(raw, values);
   }
 
   public List<String> replacePending(@NonNull List<String> lore, int pending) {
@@ -142,11 +148,8 @@ public final class TpaHelpMenuRenderer {
       @NonNull String targetName,
       @NonNull String typeLabel,
       @NonNull String seconds) {
-    return helpMenu
-        .outgoingName()
-        .replace("{target}", targetName)
-        .replace("{type}", typeLabel)
-        .replace("{seconds}", seconds);
+    return Placeholders.format(
+        helpMenu.outgoingName(), "target", targetName, "type", typeLabel, "seconds", seconds);
   }
 
   private static List<String> outgoingLore(
@@ -154,11 +157,8 @@ public final class TpaHelpMenuRenderer {
       @NonNull String targetName,
       @NonNull String typeLabel,
       @NonNull String seconds) {
-    return helpMenu.outgoingLore().stream()
-        .map(line -> line.replace("{target}", targetName))
-        .map(line -> line.replace("{type}", typeLabel))
-        .map(line -> line.replace("{seconds}", seconds))
-        .toList();
+    var values = Map.of("target", targetName, "type", typeLabel, "seconds", seconds);
+    return helpMenu.outgoingLore().stream().map(line -> Placeholders.format(line, values)).toList();
   }
 
   private static void applyOutgoingHead(

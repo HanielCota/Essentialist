@@ -4,10 +4,12 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.modules.tpa.config.TpaPendingActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
+import com.hanielcota.essentials.util.Placeholders;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import org.bukkit.Material;
 
@@ -66,11 +68,8 @@ public final class TpaPendingActionRenderer {
       @NonNull String requesterName,
       @NonNull String typeLabel,
       @NonNull String seconds) {
-    return settings
-        .targetName()
-        .replace("{player}", requesterName)
-        .replace("{type}", typeLabel)
-        .replace("{seconds}", seconds);
+    return Placeholders.format(
+        settings.targetName(), "player", requesterName, "type", typeLabel, "seconds", seconds);
   }
 
   private static void applyTargetHead(
@@ -109,12 +108,10 @@ public final class TpaPendingActionRenderer {
       @NonNull String player,
       @NonNull String type,
       @NonNull String seconds) {
+    var values = Map.of("player", player, "type", type, "seconds", seconds);
     var replaced = new ArrayList<String>(lines.size());
     for (var line : lines) {
-      var withPlayer = line.replace("{player}", player);
-      var withType = withPlayer.replace("{type}", type);
-      var withSeconds = withType.replace("{seconds}", seconds);
-      replaced.add(withSeconds);
+      replaced.add(Placeholders.format(line, values));
     }
     return replaced;
   }

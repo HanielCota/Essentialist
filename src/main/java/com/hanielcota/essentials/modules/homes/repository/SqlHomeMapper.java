@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.repository;
 
 import com.hanielcota.essentials.modules.homes.domain.Home;
-import com.hanielcota.essentials.modules.homes.material.HomeMaterials;
+import com.hanielcota.essentials.modules.homes.service.HomeMaterials;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;

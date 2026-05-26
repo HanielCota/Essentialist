@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.info.presentation;
+package com.hanielcota.essentials.modules.info.menu.presentation;
 
 import com.hanielcota.essentials.util.DurationFormatter;
 import java.lang.management.ManagementFactory;

@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.mute.config;
 
+import com.hanielcota.essentials.util.Placeholders;
 import java.util.List;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -64,9 +65,7 @@ public record MuteConfig(
   }
 
   public String formatMutedSenderTimed(@NonNull String player, @NonNull String time) {
-    var withPlayer = mutedSenderTimed.replace("{player}", player);
-
-    return withPlayer.replace("{time}", time);
+    return Placeholders.format(mutedSenderTimed, "player", player, "time", time);
   }
 
   public String formatMutedTargetTimed(@NonNull String time) {

@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.homes.rename;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.name.HomeNameValidator;
+import com.hanielcota.essentials.modules.homes.service.HomeNameValidator;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
