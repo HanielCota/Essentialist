@@ -4,5 +4,6 @@ main: com.hanielcota.essentials.EssentialsPlugin
 api-version: '${apiVersion}'
 folia-supported: true
 load: STARTUP
+softdepend: [PlaceholderAPI]
 author: HanielCota
 website: https://github.com/HanielCota
