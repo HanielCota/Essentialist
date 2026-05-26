@@ -10,8 +10,8 @@ import lombok.NonNull;
  *
  * <pre>Off → Stage 1 → Stage 2 → Stage 3 → Off</pre>
  *
- * <p>The actual durations live in config (see {@code TpaHelpMenuConfig#dndStage1Minutes} and
- * siblings); callers pass a {@link Durations} bundle built from the snapshot they already hold so
+ * <p>The actual durations live in config (see {@code TpaBehaviorSettingsMenuConfig} stage duration
+ * fields); callers pass a {@link Durations} bundle built from the snapshot they already hold so
  * this helper stays stateless and config-free.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

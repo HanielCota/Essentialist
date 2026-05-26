@@ -11,7 +11,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
  */
 @ConfigSerializable
 public record TpaPendingActionMenuConfig(
-    @Comment("Pending action menu title. Placeholder: {player}.") String title,
+    @Comment("Pending action menu title.") String title,
     @Comment("Pending action menu rows (1-6).") int rows,
     @Comment("Slot of the requester head shown at the top.") int targetSlot,
     @Comment("Material of the target item.") Material targetIcon,
@@ -44,7 +44,7 @@ public record TpaPendingActionMenuConfig(
 
   public static TpaPendingActionMenuConfig defaults() {
     return new TpaPendingActionMenuConfig(
-        "Pedido de {player}",
+        "Pedido pendente",
         5,
         13,
         Material.PLAYER_HEAD,

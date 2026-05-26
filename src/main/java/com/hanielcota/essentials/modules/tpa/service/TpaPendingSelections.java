@@ -11,7 +11,7 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>The menu framework has no per-session arbitrary payload, so the click handler stores the
  * selected request here before switching to {@code TpaPendingActionMenu}, and the action menu reads
- * it back on each render. Cleaned up on back-click, action, and viewer quit.
+ * it back on each render. Cleaned up on back-click, action, inventory close, and viewer quit.
  */
 public final class TpaPendingSelections {
 

@@ -11,7 +11,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
  */
 @ConfigSerializable
 public record TpaProfileMenuConfig(
-    @Comment("Profile menu title. Placeholder: {player}.") String title,
+    @Comment("Profile menu title.") String title,
     @Comment("Profile menu rows (1-6).") int rows,
     @Comment("Label used when a stat has no data yet.") String statsFallback,
     @Comment("Slot of the player head item.") int headSlot,
@@ -53,7 +53,7 @@ public record TpaProfileMenuConfig(
 
   public static TpaProfileMenuConfig defaults() {
     return new TpaProfileMenuConfig(
-        "Perfil de {player}",
+        "Perfil TPA",
         3,
         "<gray>—",
         4,

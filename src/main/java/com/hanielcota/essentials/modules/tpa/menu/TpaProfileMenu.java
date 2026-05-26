@@ -9,11 +9,11 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
-import com.hanielcota.essentials.modules.tpa.command.TpaProfileStatsFormatter;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaProfileMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaProfileStatsFormatter;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
@@ -59,7 +59,7 @@ public final class TpaProfileMenu implements EssentialsMenu {
 
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
-    builder.title(ComponentUtils.mini(settings.title().replace("{player}", "")));
+    builder.title(ComponentUtils.mini(settings.title()));
     builder.pagination(
         PaginationConfig.builder().contentSlots(contentSlots(settings, rows)).build());
     builder.dynamicContent(this::buildSlots);

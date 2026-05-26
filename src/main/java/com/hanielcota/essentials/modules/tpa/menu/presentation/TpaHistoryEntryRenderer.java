@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.menu;
+package com.hanielcota.essentials.modules.tpa.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;

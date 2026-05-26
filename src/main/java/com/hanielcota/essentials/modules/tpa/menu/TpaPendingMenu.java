@@ -12,19 +12,16 @@ import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaPendingMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
-import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.jspecify.annotations.Nullable;
 
 @RequiredArgsConstructor
 public final class TpaPendingMenu implements EssentialsMenu {
@@ -35,6 +32,7 @@ public final class TpaPendingMenu implements EssentialsMenu {
   private final TeleportRequestService requests;
   private final TpaPendingClickHandler clicks;
   private final PlayerProvider players;
+  private final TpaPendingMenuRenderer renderer = new TpaPendingMenuRenderer();
 
   static List<Integer> contentSlots(@NonNull TpaPendingMenuConfig settings, int rows) {
     var fallback = MenuLayouts.fallbackContentSlots(rows, Math.min(7, MenuLayouts.slotCount(rows)));
@@ -42,61 +40,8 @@ public final class TpaPendingMenu implements EssentialsMenu {
     return MenuLayouts.sanitizeSlots(settings.contentSlots(), rows, fallback);
   }
 
-  private static void applyHead(
-      @NonNull ItemTemplate.Builder builder,
-      @NonNull TpaPendingMenuConfig settings,
-      @NonNull TeleportRequest request) {
-    if (settings.requestIcon() != Material.PLAYER_HEAD) {
-      return;
-    }
-    if (settings.requestUsePlayerHead()) {
-      builder.head(request.requester().id());
-      return;
-    }
-    if (!settings.requestHeadTexture().isBlank()) {
-      builder.head(settings.requestHeadTexture());
-    }
-  }
-
-  private static String originWorld(
-      @Nullable Player requester, @NonNull TpaPendingMenuConfig settings) {
-    if (requester == null) {
-      return settings.unknownPlaceholder();
-    }
-    return requester.getWorld().getName();
-  }
-
-  private static String distance(
-      @Nullable Player requester, @NonNull Player viewer, @NonNull TpaPendingMenuConfig settings) {
-    if (requester == null) {
-      return settings.unknownPlaceholder();
-    }
-    if (!requester.getWorld().getUID().equals(viewer.getWorld().getUID())) {
-      return settings.unknownPlaceholder();
-    }
-    var meters = requester.getLocation().distance(viewer.getLocation());
-    var metersText = Long.toString(Math.round(meters));
-    return settings.distanceFormat().replace("{meters}", metersText);
-  }
-
-  private static long secondsLeft(@NonNull TeleportRequest request) {
-    var now = Instant.now();
-    var remaining = Duration.between(now, request.window().expiresAt()).toSeconds();
-
-    return Math.max(0, remaining);
-  }
-
   private static int backSlot(@NonNull TpaPendingMenuConfig settings, int rows) {
     return MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
-  }
-
-  private static ItemTemplate backTemplate(@NonNull TpaPendingMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.backIcon());
-    builder.name(settings.backName());
-    builder.lore(settings.backLore().toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
   }
 
   @Override
@@ -117,7 +62,9 @@ public final class TpaPendingMenu implements EssentialsMenu {
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
     builder.slot(
-        backSlot(settings, rows), backTemplate(settings), click -> click.switchTo(TpaHelpMenu.ID));
+        backSlot(settings, rows),
+        this.renderer.backTemplate(settings),
+        click -> click.switchTo(TpaHelpMenu.ID));
 
     var menu = builder.build();
     menu.register();
@@ -132,19 +79,9 @@ public final class TpaPendingMenu implements EssentialsMenu {
       int pending,
       @NonNull java.util.function.Consumer<com.github.hanielcota.menuframework.api.ClickContext>
               handler) {
-    var pendingText = Integer.toString(pending);
-    var name = nameTemplate.replace("{pending}", pendingText);
-    var lore = new ArrayList<String>(loreTemplate.size());
-    for (var line : loreTemplate) {
-      lore.add(line.replace("{pending}", pendingText));
-    }
-    var builder = ItemTemplate.builder(icon);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
+    var template = this.renderer.bulkTemplate(icon, nameTemplate, loreTemplate, pending);
     var safeSlot = MenuLayouts.sanitizeSlot(configuredSlot, rows, 0);
-    return SlotDefinition.of(safeSlot, builder.build(), handler::accept);
+    return SlotDefinition.of(safeSlot, template, handler::accept);
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
@@ -191,7 +128,9 @@ public final class TpaPendingMenu implements EssentialsMenu {
     var slots = contentSlots(settings, rows);
     var center = slots.get(slots.size() / 2);
 
-    return List.of(SlotDefinition.of(center, emptyTemplate(settings), click -> {}));
+    var template = this.renderer.emptyTemplate(settings);
+
+    return List.of(SlotDefinition.of(center, template, click -> {}));
   }
 
   private SlotDefinition requestSlot(@NonNull TeleportRequest request, @NonNull Player viewer) {
@@ -203,64 +142,7 @@ public final class TpaPendingMenu implements EssentialsMenu {
   private ItemTemplate requestTemplate(@NonNull TeleportRequest request, @NonNull Player viewer) {
     var settings = this.config.value().pendingMenu();
     var requesterPlayer = this.players.online(request.requester().id()).orElse(null);
-    var name = applyRequestPlaceholders(settings.requestName(), request, requesterPlayer, viewer);
-    var lore = applyRequestPlaceholders(settings.requestLore(), request, requesterPlayer, viewer);
 
-    var builder = ItemTemplate.builder(settings.requestIcon());
-    applyHead(builder, settings, request);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  private List<String> applyRequestPlaceholders(
-      @NonNull List<String> lines,
-      @NonNull TeleportRequest request,
-      @Nullable Player requester,
-      @NonNull Player viewer) {
-    var replaced = new ArrayList<String>(lines.size());
-    for (var line : lines) {
-      replaced.add(applyRequestPlaceholders(line, request, requester, viewer));
-    }
-    return replaced;
-  }
-
-  private String applyRequestPlaceholders(
-      @NonNull String raw,
-      @NonNull TeleportRequest request,
-      @Nullable Player requester,
-      @NonNull Player viewer) {
-    var settings = this.config.value().pendingMenu();
-    var requesterName = request.requester().name();
-    var type = requestTypeLabel(request.type());
-    var seconds = Long.toString(secondsLeft(request));
-    var originWorld = originWorld(requester, settings);
-    var distance = distance(requester, viewer, settings);
-
-    return raw.replace("{player}", requesterName)
-        .replace("{type}", type)
-        .replace("{seconds}", seconds)
-        .replace("{origin_world}", originWorld)
-        .replace("{distance}", distance);
-  }
-
-  private String requestTypeLabel(@NonNull TeleportRequestType type) {
-    var settings = this.config.value().pendingMenu();
-
-    return switch (type) {
-      case TPA -> settings.typeTpa();
-      case TPAHERE -> settings.typeTpaHere();
-    };
-  }
-
-  private ItemTemplate emptyTemplate(@NonNull TpaPendingMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.emptyIcon());
-    builder.name(settings.emptyName());
-    builder.lore(settings.emptyLore().toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
+    return this.renderer.requestTemplate(settings, request, requesterPlayer, viewer);
   }
 }

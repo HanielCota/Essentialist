@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
-import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.List;
@@ -29,12 +28,10 @@ public final class TeleportRequestService {
 
   private final ConfigHandle<TpaConfig> config;
   private final RequestRepository store;
-  private final TpaHistory history;
   private final TpaNotifier notifier;
   private final PlayerProvider players;
-  private final TpaProfileService profiles;
-  private final TpaBlockService blocks;
-  private final TpaContactService contacts;
+  private final TpaRequestPolicy policy;
+  private final TpaRequestRecorder recorder;
   private final TeleportRequestExecutor executor;
 
   public TeleportRequestService(
@@ -48,12 +45,10 @@ public final class TeleportRequestService {
       @NonNull TpaContactService contacts) {
     this.config = config;
     this.store = store;
-    this.history = history;
     this.notifier = notifier;
     this.players = players;
-    this.profiles = profiles;
-    this.blocks = blocks;
-    this.contacts = contacts;
+    this.policy = new TpaRequestPolicy(profiles, blocks);
+    this.recorder = new TpaRequestRecorder(history, profiles, contacts);
     this.executor = new TeleportRequestExecutor(players);
   }
 
@@ -65,20 +60,9 @@ public final class TeleportRequestService {
   public Optional<TeleportRequest> create(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
     var targetId = target.getUniqueId();
-    if (!this.profiles.accepts(targetId, type)) {
-      return Optional.empty();
-    }
-
     var requesterId = requester.getUniqueId();
-    if (this.blocks.isBlocked(targetId, requesterId)) {
-      return Optional.empty();
-    }
-
-    if (this.profiles.isDndActive(targetId)) {
-      return Optional.empty();
-    }
-
-    if (refusedDueToCrossWorld(requester, target, targetId)) {
+    var accepted = this.policy.canCreate(requester, target, type);
+    if (!accepted) {
       return Optional.empty();
     }
 
@@ -95,8 +79,7 @@ public final class TeleportRequestService {
     var request = TeleportRequest.open(requesterParticipant, targetParticipant, type, lifetime);
 
     this.store.add(request);
-    this.profiles.recordSent(requesterId);
-    this.profiles.recordReceived(targetId);
+    this.recorder.recordCreated(requesterId, targetId);
     this.notifier.sendPrompt(target, request);
 
     return Optional.of(request);
@@ -113,25 +96,15 @@ public final class TeleportRequestService {
   }
 
   public boolean isBlockedBy(@NonNull UUID blockerId, @NonNull UUID requesterId) {
-    return this.blocks.isBlocked(blockerId, requesterId);
+    return this.policy.isBlockedBy(blockerId, requesterId);
   }
 
   public boolean isDndActive(@NonNull UUID targetId) {
-    return this.profiles.isDndActive(targetId);
+    return this.policy.isDndActive(targetId);
   }
 
   public boolean isCrossWorldRefused(@NonNull Player requester, @NonNull Player target) {
-    return refusedDueToCrossWorld(requester, target, target.getUniqueId());
-  }
-
-  private boolean refusedDueToCrossWorld(
-      @NonNull Player requester, @NonNull Player target, @NonNull UUID targetId) {
-    var targetProfile = this.profiles.profile(targetId);
-    if (targetProfile.allowCrossWorld()) {
-      return false;
-    }
-    var sameWorld = requester.getWorld().getUID().equals(target.getWorld().getUID());
-    return !sameWorld;
+    return this.policy.isCrossWorldRefused(requester, target);
   }
 
   /** A specific pending request to {@code target} from the named requester, case-insensitive. */
@@ -158,8 +131,7 @@ public final class TeleportRequestService {
     var targetOnline = this.players.online(targetId).isPresent();
 
     if (!requesterOnline || !targetOnline) {
-      var cancelled = TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED);
-      this.history.push(cancelled);
+      this.recorder.recordTerminal(request, TeleportRequestStatus.CANCELLED);
       return AcceptResult.REQUESTER_OFFLINE;
     }
 
@@ -172,12 +144,12 @@ public final class TeleportRequestService {
    */
   public CompletableFuture<Boolean> dispatchTeleport(@NonNull TeleportRequest request) {
     var pending = this.executor.execute(request);
-    return pending.thenApply(execution -> recordExecution(request, execution));
+    return pending.thenApply(execution -> this.recorder.recordExecution(request, execution));
   }
 
-  /** Denies a request. */
-  public void deny(@NonNull TeleportRequest request) {
-    resolve(request, TeleportRequestStatus.DENIED);
+  /** Denies a request. Returns false when it was already resolved or expired. */
+  public boolean deny(@NonNull TeleportRequest request) {
+    return resolve(request, TeleportRequestStatus.DENIED);
   }
 
   /** Cancels a request (the requester withdrew it). */
@@ -191,8 +163,7 @@ public final class TeleportRequestService {
       return;
     }
 
-    var entry = TpaHistoryEntry.of(request, TeleportRequestStatus.EXPIRED);
-    this.history.push(entry);
+    this.recorder.recordTerminal(request, TeleportRequestStatus.EXPIRED);
 
     this.notifier.notifyExpired(request);
   }
@@ -215,40 +186,13 @@ public final class TeleportRequestService {
     this.notifier.notifyPartnerLeft(previous, requesterId, requesterName);
   }
 
-  private boolean recordExecution(
-      @NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
-    if (!execution.succeeded()) {
-      var cancelledEntry = TpaHistoryEntry.of(request, TeleportRequestStatus.CANCELLED);
-      this.history.push(cancelledEntry);
+  /** Removes a request and writes its terminal state to history in one step. */
+  private boolean resolve(@NonNull TeleportRequest request, @NonNull TeleportRequestStatus status) {
+    if (!this.store.remove(request)) {
       return false;
     }
 
-    var destination = execution.optionalDestination().orElseThrow();
-    var acceptedEntry = TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, destination);
-
-    this.history.push(acceptedEntry);
-    recordAcceptedOutgoingStats(request, acceptedEntry);
+    this.recorder.recordTerminal(request, status);
     return true;
-  }
-
-  private void recordAcceptedOutgoingStats(
-      @NonNull TeleportRequest request, @NonNull TpaHistoryEntry entry) {
-    var requesterId = request.requester().id();
-    var target = request.target();
-    var latencyMs = Math.max(0L, entry.resolvedAt() - entry.createdAt());
-    var latency = java.time.Duration.ofMillis(latencyMs);
-
-    this.profiles.recordAcceptedOutgoing(requesterId, latency);
-    this.contacts.recordContact(requesterId, target.id(), target.name());
-  }
-
-  /** Removes a request and writes its terminal state to history in one step. */
-  private void resolve(@NonNull TeleportRequest request, @NonNull TeleportRequestStatus status) {
-    if (!this.store.remove(request)) {
-      return;
-    }
-
-    var entry = TpaHistoryEntry.of(request, status);
-    this.history.push(entry);
   }
 }
