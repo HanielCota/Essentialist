@@ -2,9 +2,10 @@ package com.hanielcota.essentials.modules.homes.repository;
 
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.SqlTable;
 import lombok.NonNull;
 
-public final class SqlHomeTable {
+public final class SqlHomeTable extends SqlTable {
 
   static final String DELETE =
       """
@@ -43,52 +44,48 @@ public final class SqlHomeTable {
       ALTER TABLE homes ADD COLUMN material TEXT NOT NULL DEFAULT 'RED_BED'\
       """;
 
-  private final String upsert;
-  private final String createTable;
   private final String hasMaterialColumn;
 
   public SqlHomeTable(@NonNull SqlDialect dialect) {
-    this.upsert =
-        dialect.upsertInto(
-            "homes",
-            "player_id",
-            "name",
-            "world",
-            "x",
-            "y",
-            "z",
-            "yaw",
-            "pitch",
-            "material",
-            "created_at");
-
-    var caseInsensitive = dialect.caseInsensitiveTextSuffix();
-    this.createTable =
-        "CREATE TABLE IF NOT EXISTS homes (\n"
-            + "  player_id TEXT NOT NULL,\n"
-            + "  name TEXT NOT NULL"
-            + caseInsensitive
-            + ",\n"
-            + "  world TEXT NOT NULL,\n"
-            + "  x REAL NOT NULL,\n"
-            + "  y REAL NOT NULL,\n"
-            + "  z REAL NOT NULL,\n"
-            + "  yaw REAL NOT NULL,\n"
-            + "  pitch REAL NOT NULL,\n"
-            + "  material TEXT NOT NULL DEFAULT 'RED_BED',\n"
-            + "  created_at INTEGER NOT NULL,\n"
-            + "  PRIMARY KEY (player_id, name)\n"
-            + ")";
-
+    super(
+        dialect,
+        "homes",
+        buildCreateTable(dialect),
+        "player_id",
+        "name",
+        "world",
+        "x",
+        "y",
+        "z",
+        "yaw",
+        "pitch",
+        "material",
+        "created_at");
     this.hasMaterialColumn = dialect.columnExistsQuery();
   }
 
-  String upsert() {
-    return this.upsert;
+  private static String buildCreateTable(@NonNull SqlDialect dialect) {
+    var caseInsensitive = dialect.caseInsensitiveTextSuffix();
+    return "CREATE TABLE IF NOT EXISTS homes (\n"
+        + "  player_id TEXT NOT NULL,\n"
+        + "  name TEXT NOT NULL"
+        + caseInsensitive
+        + ",\n"
+        + "  world TEXT NOT NULL,\n"
+        + "  x REAL NOT NULL,\n"
+        + "  y REAL NOT NULL,\n"
+        + "  z REAL NOT NULL,\n"
+        + "  yaw REAL NOT NULL,\n"
+        + "  pitch REAL NOT NULL,\n"
+        + "  material TEXT NOT NULL DEFAULT 'RED_BED',\n"
+        + "  created_at INTEGER NOT NULL,\n"
+        + "  PRIMARY KEY (player_id, name)\n"
+        + ")";
   }
 
+  @Override
   public void install(@NonNull SqlExecutor sqlExecutor) {
-    sqlExecutor.ddl(this.createTable);
+    super.install(sqlExecutor);
     migrateMaterialColumn(sqlExecutor);
   }
 

@@ -1,10 +1,10 @@
 package com.hanielcota.essentials.modules.tpa.repository;
 
 import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.SqlTable;
 import lombok.NonNull;
 
-public final class TpaFavoriteTable {
+public final class TpaFavoriteTable extends SqlTable {
 
   static final String SELECT_ALL =
       """
@@ -28,19 +28,14 @@ public final class TpaFavoriteTable {
       )
       """;
 
-  private final String upsert;
-
   public TpaFavoriteTable(@NonNull SqlDialect dialect) {
-    this.upsert =
-        dialect.upsertInto(
-            "tpa_favorites", "owner_id", "favorite_id", "favorite_name", "updated_at");
-  }
-
-  String upsert() {
-    return this.upsert;
-  }
-
-  public void install(@NonNull SqlExecutor executor) {
-    executor.ddl(CREATE_TABLE);
+    super(
+        dialect,
+        "tpa_favorites",
+        CREATE_TABLE,
+        "owner_id",
+        "favorite_id",
+        "favorite_name",
+        "updated_at");
   }
 }

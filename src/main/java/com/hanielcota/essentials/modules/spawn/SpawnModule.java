@@ -14,6 +14,7 @@ import com.hanielcota.essentials.modules.spawn.listener.SpawnJoinListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnRespawnListener;
 import com.hanielcota.essentials.modules.spawn.listener.SpawnVoidListener;
 import com.hanielcota.essentials.modules.spawn.repository.SpawnRepository;
+import com.hanielcota.essentials.modules.spawn.repository.SpawnStore;
 import com.hanielcota.essentials.modules.spawn.repository.SpawnTable;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
@@ -48,6 +49,7 @@ public final class SpawnModule extends AbstractModule {
     registrar.closeable(writer);
 
     var spawnService = new SpawnService(store, writer);
+    registrar.provide(SpawnStore.class, store);
     registrar.provide(SpawnService.class, spawnService);
 
     var delayed = env.service(DelayedTeleport.class);

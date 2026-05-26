@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  * upserts the single row by binding {@code singleton = 1} explicitly.
  */
 @RequiredArgsConstructor
-public final class SpawnRepository {
+public final class SpawnRepository implements SpawnStore {
 
   private static final int SINGLETON_KEY = 1;
 

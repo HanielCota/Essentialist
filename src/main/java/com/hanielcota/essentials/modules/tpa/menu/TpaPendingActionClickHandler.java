@@ -2,10 +2,10 @@ package com.hanielcota.essentials.modules.tpa.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.command.TpAcceptResultHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
@@ -22,7 +22,7 @@ final class TpaPendingActionClickHandler {
   private final @NonNull TeleportRequestService service;
   private final @NonNull TpaBlockService blocks;
   private final @NonNull TpaPendingSelections selections;
-  private final @NonNull TpAcceptResultHandler acceptHandler;
+  private final @NonNull TpAcceptOutcomeHandler acceptHandler;
   private final @NonNull TpaRequestReplyNotifier replyNotifier;
   private final @NonNull MainThreadCallbacks callbacks;
   private final @NonNull ActorFactory actors;
@@ -36,7 +36,7 @@ final class TpaPendingActionClickHandler {
     this.acceptHandler.handleClaim(claim, request, actor);
     this.selections.clear(viewerId);
 
-    if (claim != AcceptResult.ACCEPTED) {
+    if (claim != AcceptOutcome.ACCEPTED) {
       click.switchTo(TpaPendingMenu.ID);
       return;
     }

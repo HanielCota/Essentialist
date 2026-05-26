@@ -55,8 +55,8 @@ class RequestRepositoryTest {
     var request = sampleRequest();
     repo.add(request);
 
-    assertTrue(repo.remove(request));
-    assertFalse(repo.remove(request));
+    assertTrue(repo.delete(request));
+    assertFalse(repo.delete(request));
   }
 
   @Test

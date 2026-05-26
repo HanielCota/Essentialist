@@ -73,7 +73,7 @@ public final class RequestRepository implements RequestStore {
   }
 
   /** Removes a request. Returns {@code false} when it was already gone. */
-  public boolean remove(@NonNull TeleportRequest request) {
+  public boolean delete(@NonNull TeleportRequest request) {
     var requestId = request.id();
     if (this.byId.remove(requestId) == null) {
       return false;

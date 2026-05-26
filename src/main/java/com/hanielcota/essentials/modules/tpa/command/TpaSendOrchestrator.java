@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
-import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
@@ -30,7 +30,7 @@ public final class TpaSendOrchestrator {
   private final TeleportRequestService service;
   private final TpaFavoriteService favorites;
   private final TpaProfileService profiles;
-  private final TpAcceptResultHandler acceptHandler;
+  private final TpAcceptOutcomeHandler acceptHandler;
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
 
@@ -86,7 +86,7 @@ public final class TpaSendOrchestrator {
     var claim = this.service.tryAccept(request);
     this.acceptHandler.handleClaim(claim, request, targetActor);
 
-    if (claim != AcceptResult.ACCEPTED) {
+    if (claim != AcceptOutcome.ACCEPTED) {
       return;
     }
 

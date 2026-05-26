@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
-import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
+import com.hanielcota.essentials.modules.nick.repository.NickCache;
 import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import com.hanielcota.essentials.modules.nick.service.NickService;
 import java.util.List;
@@ -50,8 +50,8 @@ class NicksApiAdapterTest {
     assertTrue(adapter.nickOf(UUID.randomUUID()).isEmpty());
   }
 
-  private static NickCacheStore newCache() {
-    return new NickCacheStore(new NoopStore(), new NoopWriter());
+  private static NickCache newCache() {
+    return new NickCache(new NoopStore(), new NoopWriter());
   }
 
   private static final class NoopStore implements NickStore {

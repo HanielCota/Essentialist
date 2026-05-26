@@ -1,10 +1,10 @@
 package com.hanielcota.essentials.modules.mute.repository;
 
 import com.hanielcota.essentials.database.SqlDialect;
-import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.SqlTable;
 import lombok.NonNull;
 
-public final class MuteTable {
+public final class MuteTable extends SqlTable {
 
   static final String DELETE =
       """
@@ -32,17 +32,7 @@ public final class MuteTable {
       )
       """;
 
-  private final String upsert;
-
   public MuteTable(@NonNull SqlDialect dialect) {
-    this.upsert = dialect.upsertInto("mutes", "player_id", "expires_at", "created_at");
-  }
-
-  String upsert() {
-    return this.upsert;
-  }
-
-  public void install(@NonNull SqlExecutor executor) {
-    executor.ddl(CREATE_TABLE);
+    super(dialect, "mutes", CREATE_TABLE, "player_id", "expires_at", "created_at");
   }
 }

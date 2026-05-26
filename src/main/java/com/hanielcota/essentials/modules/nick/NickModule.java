@@ -11,7 +11,7 @@ import com.hanielcota.essentials.modules.nick.command.NickNotifier;
 import com.hanielcota.essentials.modules.nick.command.RealNameCommand;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
 import com.hanielcota.essentials.modules.nick.listener.NickJoinListener;
-import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
+import com.hanielcota.essentials.modules.nick.repository.NickCache;
 import com.hanielcota.essentials.modules.nick.repository.NickRepository;
 import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import com.hanielcota.essentials.modules.nick.repository.NickTable;
@@ -43,7 +43,7 @@ public final class NickModule extends AbstractModule {
     var writer = writerFactory.create("Nicks");
     registrar.closeable(writer);
 
-    var cache = new NickCacheStore(store, writer);
+    var cache = new NickCache(store, writer);
     cache.loadAll(existing);
 
     var service = new NickService(cache);

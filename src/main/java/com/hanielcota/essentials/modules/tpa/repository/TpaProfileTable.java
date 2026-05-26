@@ -2,10 +2,11 @@ package com.hanielcota.essentials.modules.tpa.repository;
 
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.SqlTable;
 import java.util.List;
 import lombok.NonNull;
 
-public final class TpaProfileTable {
+public final class TpaProfileTable extends SqlTable {
 
   static final String SELECT_ALL =
       """
@@ -74,37 +75,34 @@ public final class TpaProfileTable {
               "ALTER TABLE tpa_profiles ADD COLUMN favorite_ordering TEXT NOT NULL"
                   + " DEFAULT 'NAME'"));
 
-  private final String upsert;
   private final String columnExistsQuery;
 
   public TpaProfileTable(@NonNull SqlDialect dialect) {
-    this.upsert =
-        dialect.upsertInto(
-            "tpa_profiles",
-            "player_id",
-            "receive_tpa",
-            "receive_tpahere",
-            "sent_requests",
-            "received_requests",
-            "accepted_sent",
-            "accept_count",
-            "total_accept_latency_ms",
-            "auto_accept_favorites",
-            "sounds_enabled",
-            "allow_cross_world",
-            "notify_when_favorited",
-            "dnd_until_ms",
-            "favorite_ordering",
-            "updated_at");
+    super(
+        dialect,
+        "tpa_profiles",
+        CREATE_TABLE,
+        "player_id",
+        "receive_tpa",
+        "receive_tpahere",
+        "sent_requests",
+        "received_requests",
+        "accepted_sent",
+        "accept_count",
+        "total_accept_latency_ms",
+        "auto_accept_favorites",
+        "sounds_enabled",
+        "allow_cross_world",
+        "notify_when_favorited",
+        "dnd_until_ms",
+        "favorite_ordering",
+        "updated_at");
     this.columnExistsQuery = dialect.columnExistsQuery();
   }
 
-  String upsert() {
-    return this.upsert;
-  }
-
+  @Override
   public void install(@NonNull SqlExecutor executor) {
-    executor.ddl(CREATE_TABLE);
+    super.install(executor);
     for (var migration : MIGRATIONS) {
       runMigration(executor, migration);
     }

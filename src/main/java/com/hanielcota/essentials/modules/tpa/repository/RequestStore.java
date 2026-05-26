@@ -11,7 +11,7 @@ public interface RequestStore {
 
   void add(@NonNull TeleportRequest request);
 
-  boolean remove(@NonNull TeleportRequest request);
+  boolean delete(@NonNull TeleportRequest request);
 
   List<TeleportRequest> incomingFor(@NonNull UUID target);
 

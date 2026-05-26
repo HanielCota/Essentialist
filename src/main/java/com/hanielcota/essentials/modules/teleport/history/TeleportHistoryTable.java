@@ -2,9 +2,10 @@ package com.hanielcota.essentials.modules.teleport.history;
 
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
+import com.hanielcota.essentials.database.SqlTable;
 import lombok.NonNull;
 
-public final class TeleportHistoryTable {
+public final class TeleportHistoryTable extends SqlTable {
 
   static final String INSERT =
       """
@@ -41,27 +42,41 @@ public final class TeleportHistoryTable {
       ON teleport_history(player_id, created_at)\
       """;
 
-  private final String createTable;
-
   public TeleportHistoryTable(@NonNull SqlDialect dialect) {
-    var pkColumn = dialect.autoIncrementPrimaryKey("id");
-    this.createTable =
-        "CREATE TABLE IF NOT EXISTS teleport_history (\n"
-            + "  "
-            + pkColumn
-            + ",\n"
-            + "  player_id TEXT NOT NULL,\n"
-            + "  world TEXT NOT NULL,\n"
-            + "  x REAL NOT NULL,\n"
-            + "  y REAL NOT NULL,\n"
-            + "  z REAL NOT NULL,\n"
-            + "  yaw REAL NOT NULL,\n"
-            + "  pitch REAL NOT NULL,\n"
-            + "  created_at INTEGER NOT NULL\n"
-            + ")";
+    super(
+        dialect,
+        "teleport_history",
+        buildCreateTable(dialect),
+        "player_id",
+        "world",
+        "x",
+        "y",
+        "z",
+        "yaw",
+        "pitch",
+        "created_at");
   }
 
+  private static String buildCreateTable(@NonNull SqlDialect dialect) {
+    var pkColumn = dialect.autoIncrementPrimaryKey("id");
+    return "CREATE TABLE IF NOT EXISTS teleport_history (\n"
+        + "  "
+        + pkColumn
+        + ",\n"
+        + "  player_id TEXT NOT NULL,\n"
+        + "  world TEXT NOT NULL,\n"
+        + "  x REAL NOT NULL,\n"
+        + "  y REAL NOT NULL,\n"
+        + "  z REAL NOT NULL,\n"
+        + "  yaw REAL NOT NULL,\n"
+        + "  pitch REAL NOT NULL,\n"
+        + "  created_at INTEGER NOT NULL\n"
+        + ")";
+  }
+
+  @Override
   public void install(@NonNull SqlExecutor executor) {
-    executor.ddl(this.createTable, CREATE_INDEX);
+    super.install(executor);
+    executor.ddl(CREATE_INDEX);
   }
 }
