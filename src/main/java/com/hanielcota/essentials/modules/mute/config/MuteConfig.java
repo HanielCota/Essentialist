@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.mute.config;
 
+import java.util.List;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -25,7 +26,12 @@ public record MuteConfig(
     @Comment("Shown when the target carries essentials.mute.exempt. Placeholder: {player}.")
         String exempt,
     @Comment("Shown when the duration argument cannot be parsed. Placeholder: {duration}.")
-        String invalidDuration) {
+        String invalidDuration,
+    @Comment(
+            "Commands a muted player cannot run (names without the leading slash). Matched case-"
+                + "insensitively against the first token, with any namespace prefix stripped (so "
+                + "\"me\" also catches \"minecraft:me\").")
+        List<String> blockedCommands) {
 
   public static MuteConfig defaults() {
     return new MuteConfig(
@@ -40,7 +46,17 @@ public record MuteConfig(
         "<red>Você não pode silenciar a si mesmo.",
         "<red><gold>{player}</gold> não está silenciado.",
         "<red><gold>{player}</gold> não pode ser silenciado.",
-        "<red>Duração inválida: <gold>{duration}</gold>.");
+        "<red>Duração inválida: <gold>{duration}</gold>.",
+        List.of("me", "tell", "w", "whisper", "msg", "say", "r", "reply"));
+  }
+
+  public boolean isBlockedCommand(@NonNull String commandName) {
+    for (var blocked : this.blockedCommands) {
+      if (blocked.equalsIgnoreCase(commandName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public String formatMutedSender(@NonNull String player) {
