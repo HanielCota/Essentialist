@@ -10,6 +10,8 @@ import com.hanielcota.essentials.modules.chat.channel.LocalChannel;
 import com.hanielcota.essentials.modules.chat.channel.StaffChannel;
 import com.hanielcota.essentials.modules.chat.command.ChatCommand;
 import com.hanielcota.essentials.modules.chat.command.ChatNotifier;
+import com.hanielcota.essentials.modules.chat.command.GlobalChatCommand;
+import com.hanielcota.essentials.modules.chat.command.GlobalChatNotifier;
 import com.hanielcota.essentials.modules.chat.command.StaffChatCommand;
 import com.hanielcota.essentials.modules.chat.command.StaffChatNotifier;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
@@ -18,6 +20,7 @@ import com.hanielcota.essentials.modules.chat.listener.ChatPlayerCleanupListener
 import com.hanielcota.essentials.modules.chat.placeholder.PlaceholderApiBridge;
 import com.hanielcota.essentials.modules.chat.service.AntiSpamService;
 import com.hanielcota.essentials.modules.chat.service.ChatFormatter;
+import com.hanielcota.essentials.modules.chat.service.ChatGuard;
 import com.hanielcota.essentials.modules.chat.service.CooldownService;
 import com.hanielcota.essentials.modules.chat.service.PlayerMessageStyler;
 import com.hanielcota.essentials.modules.chat.service.StaffChatToggleService;
@@ -27,19 +30,9 @@ import com.hanielcota.essentials.paper.PlayerProvider;
 import lombok.NonNull;
 
 /**
- * Chat formatting + channels (PR 2) + cooldown / anti-spam (PR 3) + PlaceholderAPI integration and
- * permission-based player message styling (PR 4).
- *
- * <p>PR 4 wires three new pieces:
- *
- * <ul>
- *   <li>{@link PlaceholderApiBridge} — reflective adapter; reports {@code isAvailable() == false}
- *       when PAPI is missing so callers cheaply skip placeholder work.
- *   <li>{@link PlayerMessageStyler} — converts the player's chat input into a styled {@link
- *       net.kyori.adventure.text.Component} gated by {@code chat.color} / {@code chat.format}.
- *   <li>{@link ChatFormatter} now consumes the bridge to PAPI-expand the cached template and
- *       resolve {@code <prefix>} / {@code <suffix>} through the configurable placeholder keys.
- * </ul>
+ * Chat module wiring: formatting + local/staff routing via {@link AsyncChatListener}, global
+ * delivery via {@code /g}. PR 5 dropped the {@code !}-prefix path; the channel router now picks
+ * between staff (toggle) and local only — global is reached exclusively through the command.
  */
 public final class ChatModule extends AbstractModule {
 
@@ -61,22 +54,24 @@ public final class ChatModule extends AbstractModule {
     var toggleService = new StaffChatToggleService();
     var cooldowns = new CooldownService();
     var antiSpam = new AntiSpamService();
+    var guard = new ChatGuard(config, cooldowns, antiSpam);
 
     var globalChannel = new GlobalChannel();
     var localChannel = new LocalChannel(config);
     var staffChannel = new StaffChannel();
 
-    var router =
-        new ChannelRouter(config, toggleService, globalChannel, localChannel, staffChannel);
+    var router = new ChannelRouter(toggleService, localChannel, staffChannel);
 
     var chatNotifier = new ChatNotifier(config, actors);
     var staffNotifier = new StaffChatNotifier(config, formatter, players, audiences);
+    var globalNotifier =
+        new GlobalChatNotifier(config, formatter, styler, guard, globalChannel, audiences);
 
     registrar.command(new ChatCommand(configs, chatNotifier));
+    registrar.command(new GlobalChatCommand(globalNotifier));
     registrar.command(new StaffChatCommand(toggleService, staffNotifier));
 
-    registrar.listener(
-        new AsyncChatListener(config, router, formatter, cooldowns, antiSpam, styler));
+    registrar.listener(new AsyncChatListener(config, router, formatter, guard, styler));
     registrar.listener(new ChatPlayerCleanupListener(toggleService, cooldowns, antiSpam));
   }
 }
