@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
+import com.hanielcota.essentials.modules.mute.repository.MuteCache;
 import com.hanielcota.essentials.modules.mute.repository.MuteStore;
 import java.time.Instant;
 import java.util.List;

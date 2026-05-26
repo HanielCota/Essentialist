@@ -1,6 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.service;
-
-import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
+package com.hanielcota.essentials.modules.tpa.domain;
 
 /**
  * Synchronous outcome of {@link TeleportRequestService#tryAccept(TeleportRequest)}: whether the

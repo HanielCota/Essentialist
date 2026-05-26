@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
+import com.hanielcota.essentials.modules.invsee.domain.InvseeLayout;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

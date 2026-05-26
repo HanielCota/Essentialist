@@ -1,5 +1,7 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
+import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeLayout;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.UUID;
 import lombok.AccessLevel;

@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.nick.service;
+package com.hanielcota.essentials.modules.nick.domain;
 
 import lombok.NonNull;
 

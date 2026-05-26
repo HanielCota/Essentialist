@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.msg.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
-import com.hanielcota.essentials.modules.msg.service.MsgDispatcher;
 import com.hanielcota.essentials.modules.msg.service.MsgService;
 import com.hanielcota.essentials.paper.PlayerNames;
 import com.hanielcota.essentials.paper.PlayerProvider;

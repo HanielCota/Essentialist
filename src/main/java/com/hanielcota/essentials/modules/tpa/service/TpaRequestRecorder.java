@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
+import com.hanielcota.essentials.modules.tpa.domain.TeleportExecution;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;

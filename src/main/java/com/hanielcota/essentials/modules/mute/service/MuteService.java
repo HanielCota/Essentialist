@@ -1,6 +1,8 @@
 package com.hanielcota.essentials.modules.mute.service;
 
 import com.hanielcota.essentials.modules.mute.domain.Mute;
+import com.hanielcota.essentials.modules.mute.domain.MuteOutcome;
+import com.hanielcota.essentials.modules.mute.repository.MuteCache;
 import io.github.hanielcota.commandframework.core.util.TimeParser;
 import java.time.Duration;
 import java.time.Instant;

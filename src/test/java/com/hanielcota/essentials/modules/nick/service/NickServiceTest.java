@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
+import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
 import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import java.util.List;
 import java.util.UUID;

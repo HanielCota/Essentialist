@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.core.api;
 
 import com.hanielcota.essentials.api.TeleportsApi;
-import com.hanielcota.essentials.modules.teleport.service.TeleportOutcome;
+import com.hanielcota.essentials.modules.teleport.domain.TeleportOutcome;
 import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;

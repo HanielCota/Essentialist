@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.invsee.service;
+package com.hanielcota.essentials.modules.invsee.domain;
 
 public final class InvseeLayout {
 

@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.invsee.listener;
 
-import com.hanielcota.essentials.modules.invsee.service.InvseeHolder;
-import com.hanielcota.essentials.modules.invsee.service.InvseeLayout;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeLayout;
 import com.hanielcota.essentials.modules.invsee.service.InvseeSynchronizer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

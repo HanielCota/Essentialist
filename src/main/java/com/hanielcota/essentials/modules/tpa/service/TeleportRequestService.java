@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.tpa.service;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.domain.Participant;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;

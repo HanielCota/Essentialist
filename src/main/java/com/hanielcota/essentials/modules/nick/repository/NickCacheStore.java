@@ -1,8 +1,7 @@
-package com.hanielcota.essentials.modules.nick.service;
+package com.hanielcota.essentials.modules.nick.repository;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
-import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -28,18 +27,18 @@ public final class NickCacheStore {
     }
   }
 
-  Optional<NickEntry> nickFor(@NonNull UUID id) {
+  public Optional<NickEntry> nickFor(@NonNull UUID id) {
     var entry = this.byId.get(id);
     return Optional.ofNullable(entry);
   }
 
-  Optional<UUID> idByNick(@NonNull String nickname) {
+  public Optional<UUID> idByNick(@NonNull String nickname) {
     var key = nickname.toLowerCase(Locale.ROOT);
     var id = this.idByLowerNick.get(key);
     return Optional.ofNullable(id);
   }
 
-  boolean isTakenByOther(@NonNull String nickname, @NonNull UUID self) {
+  public boolean isTakenByOther(@NonNull String nickname, @NonNull UUID self) {
     var key = nickname.toLowerCase(Locale.ROOT);
     var owner = this.idByLowerNick.get(key);
 
@@ -50,7 +49,7 @@ public final class NickCacheStore {
     return !owner.equals(self);
   }
 
-  void set(@NonNull UUID id, @NonNull String nickname, @NonNull String realName) {
+  public void set(@NonNull UUID id, @NonNull String nickname, @NonNull String realName) {
     var entry = new NickEntry(id, nickname, realName);
     cacheInsert(entry);
 
@@ -58,7 +57,7 @@ public final class NickCacheStore {
     this.writer.submit("save nick", persist);
   }
 
-  boolean reset(@NonNull UUID id) {
+  public boolean reset(@NonNull UUID id) {
     var previous = cacheRemove(id);
     if (previous == null) {
       return false;

@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.mute.command;
 
 import com.hanielcota.essentials.command.Senders;
-import com.hanielcota.essentials.modules.mute.service.MuteOutcome;
+import com.hanielcota.essentials.modules.mute.domain.MuteOutcome;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;

@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.teleport.service;
 
+import com.hanielcota.essentials.modules.teleport.domain.PendingTeleport;
 import com.hanielcota.essentials.scheduler.Task;
 import java.util.Map;
 import java.util.UUID;

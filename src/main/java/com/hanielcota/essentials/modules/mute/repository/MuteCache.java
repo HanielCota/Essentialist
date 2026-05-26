@@ -1,8 +1,7 @@
-package com.hanielcota.essentials.modules.mute.service;
+package com.hanielcota.essentials.modules.mute.repository;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
-import com.hanielcota.essentials.modules.mute.repository.MuteStore;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,7 @@ public final class MuteCache {
     }
   }
 
-  Optional<Mute> activeMute(@NonNull UUID id) {
+  public Optional<Mute> activeMute(@NonNull UUID id) {
     var mute = this.cache.get(id);
     if (mute == null) {
       return Optional.empty();
@@ -48,14 +47,14 @@ public final class MuteCache {
     return Optional.empty();
   }
 
-  void apply(@NonNull UUID id, @NonNull Mute mute) {
+  public void apply(@NonNull UUID id, @NonNull Mute mute) {
     this.cache.put(id, mute);
 
     Runnable persist = () -> this.store.save(id, mute);
     this.writer.submit("save mute", persist);
   }
 
-  boolean remove(@NonNull UUID id) {
+  public boolean remove(@NonNull UUID id) {
     var previous = this.cache.remove(id);
     if (previous == null) {
       return false;

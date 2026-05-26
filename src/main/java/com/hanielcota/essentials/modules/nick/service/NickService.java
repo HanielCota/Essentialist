@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.nick.service;
 
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
+import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
