@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
+import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
@@ -33,9 +34,25 @@ public final class TpaFavoritePromptOrchestrator {
   private final TpaFavoriteNotifier notifier;
   private final PlayerProvider players;
   private final Scheduler scheduler;
+  private final TpaProfileService profiles;
 
   private static boolean isCancel(@NonNull String input) {
     return input.equalsIgnoreCase("cancel") || input.equalsIgnoreCase("cancelar");
+  }
+
+  private static boolean isSameAs(@NonNull Player player, @NonNull OfflinePlayer target) {
+    var playerId = player.getUniqueId();
+    var targetId = target.getUniqueId();
+
+    return playerId.equals(targetId);
+  }
+
+  private static String nameOf(@NonNull OfflinePlayer offline, @NonNull String fallback) {
+    var name = offline.getName();
+    if (name == null || name.isBlank()) {
+      return fallback;
+    }
+    return name;
   }
 
   public void prompt(@NonNull Player player) {
@@ -84,6 +101,19 @@ public final class TpaFavoritePromptOrchestrator {
       return;
     }
     this.notifier.sendAdded(player, targetName);
+    notifyTargetIfOptedIn(player, targetId);
+  }
+
+  private void notifyTargetIfOptedIn(@NonNull Player owner, @NonNull java.util.UUID targetId) {
+    var targetProfile = this.profiles.profile(targetId);
+    if (!targetProfile.notifyWhenFavorited()) {
+      return;
+    }
+
+    this.players
+        .online(targetId)
+        .ifPresent(
+            onlineTarget -> this.notifier.sendFavoritedNotification(onlineTarget, owner.getName()));
   }
 
   public void handleTimeout(@NonNull Player player) {
@@ -105,20 +135,5 @@ public final class TpaFavoritePromptOrchestrator {
     }
 
     return this.scheduler.runOnEntityLater(player, onTimeout, timeout);
-  }
-
-  private static boolean isSameAs(@NonNull Player player, @NonNull OfflinePlayer target) {
-    var playerId = player.getUniqueId();
-    var targetId = target.getUniqueId();
-
-    return playerId.equals(targetId);
-  }
-
-  private static String nameOf(@NonNull OfflinePlayer offline, @NonNull String fallback) {
-    var name = offline.getName();
-    if (name == null || name.isBlank()) {
-      return fallback;
-    }
-    return name;
   }
 }

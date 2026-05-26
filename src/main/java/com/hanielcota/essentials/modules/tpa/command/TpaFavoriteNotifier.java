@@ -17,6 +17,12 @@ public final class TpaFavoriteNotifier {
 
   private final ConfigHandle<TpaConfig> config;
 
+  private static void sendMini(@NonNull Player player, @NonNull String raw) {
+    var component = ComponentUtils.mini(raw);
+
+    player.sendMessage(component);
+  }
+
   public void sendPrompt(@NonNull Player player, long seconds) {
     var messages = this.config.value().messages();
     var template = messages.favoritePrompt();
@@ -86,9 +92,11 @@ public final class TpaFavoriteNotifier {
     sendMini(player, timeoutText);
   }
 
-  private static void sendMini(@NonNull Player player, @NonNull String raw) {
-    var component = ComponentUtils.mini(raw);
+  public void sendFavoritedNotification(@NonNull Player target, @NonNull String ownerName) {
+    var messages = this.config.value().messages();
+    var template = messages.favoriteNotifyTarget();
+    var text = template.replace("{player}", ownerName);
 
-    player.sendMessage(component);
+    sendMini(target, text);
   }
 }

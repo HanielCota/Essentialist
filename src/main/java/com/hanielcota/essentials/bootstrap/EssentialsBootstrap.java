@@ -43,19 +43,6 @@ public class EssentialsBootstrap {
         new EnableModulesStage());
   }
 
-  public final EssentialsCore start() {
-    var services = new DefaultServiceRegistry();
-    var context = new StageContext(this.plugin, services);
-    var stages = stages(this.plugin);
-
-    return runStages(stages, context);
-  }
-
-  /** Override in a subclass to customise the stage sequence. Defaults to {@link #defaultStages}. */
-  protected List<BootstrapStage> stages(EssentialsPlugin plugin) {
-    return defaultStages(plugin);
-  }
-
   private static EssentialsCore runStages(List<BootstrapStage> stages, StageContext context) {
     var completed = new ArrayList<BootstrapStage>(stages.size());
 
@@ -110,5 +97,18 @@ public class EssentialsBootstrap {
     } catch (RuntimeException e) {
       primary.addSuppressed(e);
     }
+  }
+
+  public final EssentialsCore start() {
+    var services = new DefaultServiceRegistry();
+    var context = new StageContext(this.plugin, services);
+    var stages = stages(this.plugin);
+
+    return runStages(stages, context);
+  }
+
+  /** Override in a subclass to customise the stage sequence. Defaults to {@link #defaultStages}. */
+  protected List<BootstrapStage> stages(EssentialsPlugin plugin) {
+    return defaultStages(plugin);
   }
 }

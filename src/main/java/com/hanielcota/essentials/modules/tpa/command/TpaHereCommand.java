@@ -22,7 +22,10 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "5s")
 @Description("Pede para outro jogador se teleportar até você.")
 @Syntax("/tpahere <jogador>")
-public record TpaHereCommand(ConfigHandle<TpaConfig> config, TeleportRequestService service) {
+public record TpaHereCommand(
+    ConfigHandle<TpaConfig> config,
+    TeleportRequestService service,
+    TpaSendOrchestrator dispatcher) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @OnlinePlayer @NonNull Player target) {
@@ -32,6 +35,6 @@ public record TpaHereCommand(ConfigHandle<TpaConfig> config, TeleportRequestServ
     var confirmationTemplate = messages.requestSentHere();
     var type = TeleportRequestType.TPAHERE;
 
-    TpaRequests.send(this.service, messages, actor, target, type, confirmationTemplate);
+    this.dispatcher.send(actor, target, type, confirmationTemplate);
   }
 }

@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ClickableMessage;
 import com.hanielcota.essentials.util.ComponentUtils;
@@ -12,12 +13,16 @@ import org.bukkit.entity.Player;
 
 /**
  * Sends the teleport-request messages that fall outside a command's own reply: the clickable prompt
- * to the target, the expiry notice and the disconnect notice.
+ * to the target, the expiry notice and the disconnect notice. Plays a notification sound on the
+ * prompt when the target has it enabled in their profile.
  *
  * <p>Sole responsibility: present these out-of-band TPA events to players. Direct command replies
  * stay in the command classes.
  */
-public record TpaNotifier(ConfigHandle<TpaConfig> config, PlayerProvider players) {
+public record TpaNotifier(
+    ConfigHandle<TpaConfig> config, PlayerProvider players, TpaProfileService profiles) {
+
+  private static final String PROMPT_SOUND_KEY = "minecraft:entity.experience_orb.pickup";
 
   public void sendPrompt(@NonNull Player target, @NonNull TeleportRequest request) {
     var snap = this.config.value();
@@ -49,6 +54,15 @@ public record TpaNotifier(ConfigHandle<TpaConfig> config, PlayerProvider players
     builder.append(denyLabel, slot -> slot.runCommand(denyCommand).hover(denyHover));
 
     builder.send(target);
+    playPromptSound(target);
+  }
+
+  private void playPromptSound(@NonNull Player target) {
+    var profile = this.profiles.profile(target.getUniqueId());
+    if (!profile.soundsEnabled()) {
+      return;
+    }
+    target.playSound(target.getLocation(), PROMPT_SOUND_KEY, 1.0f, 1.2f);
   }
 
   public void notifyExpired(@NonNull TeleportRequest request) {

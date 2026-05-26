@@ -35,6 +35,52 @@ public final class TpaBlockedMenu implements EssentialsMenu {
     return MenuLayouts.sanitizeSlots(settings.contentSlots(), rows, fallback);
   }
 
+  private static void applyHead(
+      @NonNull ItemTemplate.Builder builder,
+      @NonNull TpaBlockedMenuConfig settings,
+      @NonNull TpaBlockService.Entry entry) {
+    if (settings.blockedIcon() != Material.PLAYER_HEAD) {
+      return;
+    }
+    if (settings.blockedUsePlayerHead()) {
+      builder.head(entry.blockedId());
+      return;
+    }
+    if (!settings.blockedHeadTexture().isBlank()) {
+      builder.head(settings.blockedHeadTexture());
+    }
+  }
+
+  private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
+    var replaced = new ArrayList<String>(lines.size());
+    for (var line : lines) {
+      replaced.add(line.replace("{player}", player));
+    }
+    return replaced;
+  }
+
+  private static ItemTemplate emptyTemplate(@NonNull TpaBlockedMenuConfig settings) {
+    var builder = ItemTemplate.builder(settings.emptyIcon());
+    builder.name(settings.emptyName());
+    builder.lore(settings.emptyLore().toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  private static int backSlot(@NonNull TpaBlockedMenuConfig settings, int rows) {
+    return MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
+  }
+
+  private static ItemTemplate backTemplate(@NonNull TpaBlockedMenuConfig settings) {
+    var builder = ItemTemplate.builder(settings.backIcon());
+    builder.name(settings.backName());
+    builder.lore(settings.backLore().toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -105,52 +151,6 @@ public final class TpaBlockedMenu implements EssentialsMenu {
     applyHead(builder, settings, entry);
     builder.name(name);
     builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  private static void applyHead(
-      @NonNull ItemTemplate.Builder builder,
-      @NonNull TpaBlockedMenuConfig settings,
-      @NonNull TpaBlockService.Entry entry) {
-    if (settings.blockedIcon() != Material.PLAYER_HEAD) {
-      return;
-    }
-    if (settings.blockedUsePlayerHead()) {
-      builder.head(entry.blockedId());
-      return;
-    }
-    if (!settings.blockedHeadTexture().isBlank()) {
-      builder.head(settings.blockedHeadTexture());
-    }
-  }
-
-  private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
-    var replaced = new ArrayList<String>(lines.size());
-    for (var line : lines) {
-      replaced.add(line.replace("{player}", player));
-    }
-    return replaced;
-  }
-
-  private static ItemTemplate emptyTemplate(@NonNull TpaBlockedMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.emptyIcon());
-    builder.name(settings.emptyName());
-    builder.lore(settings.emptyLore().toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  private static int backSlot(@NonNull TpaBlockedMenuConfig settings, int rows) {
-    return MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
-  }
-
-  private static ItemTemplate backTemplate(@NonNull TpaBlockedMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.backIcon());
-    builder.name(settings.backName());
-    builder.lore(settings.backLore().toArray(String[]::new));
     builder.italic(false);
 
     return builder.build();

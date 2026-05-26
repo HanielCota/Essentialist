@@ -30,7 +30,8 @@ public record TpaCommand(
     ConfigHandle<TpaConfig> config,
     TeleportRequestService service,
     PlayerProvider players,
-    MenuService menus) {
+    MenuService menus,
+    TpaSendOrchestrator dispatcher) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") @NonNull String targetName) {
@@ -56,6 +57,6 @@ public record TpaCommand(
     var confirmationTemplate = messages.requestSent();
     var type = TeleportRequestType.TPA;
 
-    TpaRequests.send(this.service, messages, actor, target, type, confirmationTemplate);
+    this.dispatcher.send(actor, target, type, confirmationTemplate);
   }
 }

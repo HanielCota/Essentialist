@@ -18,6 +18,9 @@ import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -35,6 +38,11 @@ public final class TpaSettingsMenu implements EssentialsMenu {
     return List.of(
         MenuLayouts.sanitizeSlot(settings.receiveTpaSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.receiveTpaHereSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.autoAcceptSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.soundsSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.allowCrossWorldSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.notifyWhenFavoritedSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(settings.cooldownSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.blockedSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0));
   }
@@ -97,6 +105,47 @@ public final class TpaSettingsMenu implements EssentialsMenu {
     return List.of(
         toggleSlot(settings, rows, profile, TeleportRequestType.TPA),
         toggleSlot(settings, rows, profile, TeleportRequestType.TPAHERE),
+        booleanToggleSlot(
+            settings,
+            rows,
+            playerId,
+            profile,
+            TpaProfile::autoAcceptFavorites,
+            settings.autoAcceptName(),
+            settings.autoAcceptLore(),
+            settings.autoAcceptSlot(),
+            this.profiles::toggleAutoAcceptFavorites),
+        booleanToggleSlot(
+            settings,
+            rows,
+            playerId,
+            profile,
+            TpaProfile::soundsEnabled,
+            settings.soundsName(),
+            settings.soundsLore(),
+            settings.soundsSlot(),
+            this.profiles::toggleSounds),
+        booleanToggleSlot(
+            settings,
+            rows,
+            playerId,
+            profile,
+            TpaProfile::allowCrossWorld,
+            settings.allowCrossWorldName(),
+            settings.allowCrossWorldLore(),
+            settings.allowCrossWorldSlot(),
+            this.profiles::toggleAllowCrossWorld),
+        booleanToggleSlot(
+            settings,
+            rows,
+            playerId,
+            profile,
+            TpaProfile::notifyWhenFavorited,
+            settings.notifyWhenFavoritedName(),
+            settings.notifyWhenFavoritedLore(),
+            settings.notifyWhenFavoritedSlot(),
+            this.profiles::toggleNotifyWhenFavorited),
+        cooldownSlot(settings, rows),
         blockedSlot(settings, rows),
         backSlot(settings, rows));
   }
@@ -126,6 +175,36 @@ public final class TpaSettingsMenu implements EssentialsMenu {
     return SlotDefinition.of(safeSlot, template, click -> toggle(click, type));
   }
 
+  private SlotDefinition booleanToggleSlot(
+      @NonNull TpaSettingsMenuConfig settings,
+      int rows,
+      @NonNull UUID playerId,
+      @NonNull TpaProfile profile,
+      @NonNull Predicate<TpaProfile> reader,
+      @NonNull String nameTemplate,
+      @NonNull List<String> loreTemplate,
+      int configuredSlot,
+      @NonNull Consumer<UUID> toggler) {
+    var enabled = reader.test(profile);
+    var state = enabled ? settings.enabledLabel() : settings.disabledLabel();
+    var material = enabled ? settings.enabledIcon() : settings.disabledIcon();
+
+    var name = nameTemplate.replace("{state}", state);
+    var lore = applyState(loreTemplate, state);
+    var template = template(material, name, lore);
+    var safeSlot = MenuLayouts.sanitizeSlot(configuredSlot, rows, 0);
+
+    return SlotDefinition.of(safeSlot, template, click -> applyToggle(click, playerId, toggler));
+  }
+
+  private SlotDefinition cooldownSlot(@NonNull TpaSettingsMenuConfig settings, int rows) {
+    var template =
+        template(settings.cooldownIcon(), settings.cooldownName(), settings.cooldownLore());
+    var safeSlot = MenuLayouts.sanitizeSlot(settings.cooldownSlot(), rows, 0);
+
+    return SlotDefinition.of(safeSlot, template, click -> {});
+  }
+
   private SlotDefinition backSlot(@NonNull TpaSettingsMenuConfig settings, int rows) {
     var template = template(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
@@ -145,6 +224,12 @@ public final class TpaSettingsMenu implements EssentialsMenu {
     var playerId = player.getUniqueId();
 
     this.profiles.toggle(playerId, type);
+    click.session().refresh();
+  }
+
+  private void applyToggle(
+      @NonNull ClickContext click, @NonNull UUID playerId, @NonNull Consumer<UUID> toggler) {
+    toggler.accept(playerId);
     click.session().refresh();
   }
 }

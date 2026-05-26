@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.listener;
 
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
+import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public final class TpaQuitListener implements Listener {
     var quitterName = player.getName();
 
     var affected = this.service.cancelAllOf(quitterId);
-    for (var request : affected) {
+    for (TeleportRequest request : affected) {
       this.notifier.notifyPartnerLeft(request, quitterId, quitterName);
     }
   }

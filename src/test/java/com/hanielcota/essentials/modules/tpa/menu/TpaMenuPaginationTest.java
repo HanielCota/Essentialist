@@ -23,7 +23,10 @@ class TpaMenuPaginationTest {
             settings.pendingSlot(),
             settings.historySlot(),
             settings.settingsSlot(),
-            settings.favoritesSlot()),
+            settings.favoritesSlot(),
+            settings.outgoingSlot(),
+            settings.dndSlot(),
+            settings.lastContactedSlot()),
         slots);
   }
 
@@ -36,6 +39,15 @@ class TpaMenuPaginationTest {
   }
 
   @Test
+  void pendingMenuConfigExposesBulkAndBackSlots() {
+    var settings = TpaPendingMenuConfig.defaults();
+
+    assertEquals(47, settings.acceptAllSlot());
+    assertEquals(51, settings.denyAllSlot());
+    assertEquals(49, settings.backSlot());
+  }
+
+  @Test
   void settingsMenuContentSlotsCoverEveryDynamicToggleItem() {
     var settings = TpaSettingsMenuConfig.defaults();
     var slots = TpaSettingsMenu.contentSlots(settings, settings.rows());
@@ -44,6 +56,11 @@ class TpaMenuPaginationTest {
         List.of(
             settings.receiveTpaSlot(),
             settings.receiveTpaHereSlot(),
+            settings.autoAcceptSlot(),
+            settings.soundsSlot(),
+            settings.allowCrossWorldSlot(),
+            settings.notifyWhenFavoritedSlot(),
+            settings.cooldownSlot(),
             settings.blockedSlot(),
             settings.backSlot()),
         slots);

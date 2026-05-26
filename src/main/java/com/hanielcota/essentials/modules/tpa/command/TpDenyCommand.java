@@ -4,8 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.paper.ActorFactory;
-import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -26,8 +24,8 @@ import org.bukkit.entity.Player;
 public record TpDenyCommand(
     ConfigHandle<TpaConfig> config,
     TeleportRequestService service,
-    ActorFactory actors,
-    PlayerProvider players) {
+    TpaIncomingResolver incomingResolver,
+    TpaRequestReplyNotifier replyNotifier) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
@@ -36,7 +34,7 @@ public record TpDenyCommand(
 
     var sender = actor.unwrap(Player.class);
 
-    var resolved = TpaRequests.resolveIncoming(this.service, sender, requester, messages, actor);
+    var resolved = this.incomingResolver.resolve(sender, requester, actor);
     if (resolved.isEmpty()) {
       return;
     }
@@ -51,6 +49,6 @@ public record TpDenyCommand(
     actor.sendSuccess(deniedMsg);
 
     var deniedTemplate = messages.denied();
-    TpaRequests.replyRequester(this.actors, this.players, request, deniedTemplate, false);
+    this.replyNotifier.notifyDenied(request, deniedTemplate);
   }
 }

@@ -10,7 +10,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
-import com.hanielcota.essentials.modules.tpa.command.TpaRequests;
+import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaFavoriteActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
@@ -39,6 +39,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
   private final TeleportRequestService requests;
   private final PlayerProvider players;
   private final ActorFactory actors;
+  private final TpaSendOrchestrator dispatcher;
 
   static List<Integer> contentSlots(@NonNull TpaFavoriteActionMenuConfig settings, int rows) {
     return List.of(
@@ -47,6 +48,40 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
         MenuLayouts.sanitizeSlot(settings.tpaHereSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.removeSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0));
+  }
+
+  private static void applyTargetHead(
+      @NonNull ItemTemplate.Builder builder,
+      @NonNull TpaFavoriteActionMenuConfig settings,
+      @NonNull TpaFavorite entry) {
+    if (settings.targetIcon() != Material.PLAYER_HEAD) {
+      return;
+    }
+    if (settings.targetUsePlayerHead()) {
+      builder.head(entry.favoriteId());
+      return;
+    }
+    if (!settings.targetHeadTexture().isBlank()) {
+      builder.head(settings.targetHeadTexture());
+    }
+  }
+
+  private static ItemTemplate simpleTemplate(
+      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
+    var builder = ItemTemplate.builder(material);
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
+    var replaced = new ArrayList<String>(lines.size());
+    for (var line : lines) {
+      replaced.add(line.replace("{player}", player));
+    }
+    return replaced;
   }
 
   @Override
@@ -155,7 +190,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
 
     click.close();
     this.selections.clear(viewer.getUniqueId());
-    TpaRequests.send(this.requests, messages, actor, target, type, confirmationTemplate);
+    this.dispatcher.send(actor, target, type, confirmationTemplate);
   }
 
   private void removeFavorite(@NonNull ClickContext click, @NonNull TpaFavorite entry) {
@@ -192,39 +227,5 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
     builder.italic(false);
 
     return builder.build();
-  }
-
-  private static void applyTargetHead(
-      @NonNull ItemTemplate.Builder builder,
-      @NonNull TpaFavoriteActionMenuConfig settings,
-      @NonNull TpaFavorite entry) {
-    if (settings.targetIcon() != Material.PLAYER_HEAD) {
-      return;
-    }
-    if (settings.targetUsePlayerHead()) {
-      builder.head(entry.favoriteId());
-      return;
-    }
-    if (!settings.targetHeadTexture().isBlank()) {
-      builder.head(settings.targetHeadTexture());
-    }
-  }
-
-  private static ItemTemplate simpleTemplate(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
-    var replaced = new ArrayList<String>(lines.size());
-    for (var line : lines) {
-      replaced.add(line.replace("{player}", player));
-    }
-    return replaced;
   }
 }
