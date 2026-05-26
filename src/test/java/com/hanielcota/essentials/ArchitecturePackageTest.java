@@ -88,7 +88,7 @@ class ArchitecturePackageTest {
 
   @Test
   void modulesOnlyImportSiblingModulesViaServiceClasses() throws IOException {
-    // Allowed cross-module imports: anything in another module's `service`, `domain`, `model`,
+    // Allowed cross-module imports: anything in another module's `service`, `domain`,
     // or `history` package (those are the inter-module API surfaces). Importing another module's
     // `command`, `listener`, `menu`, `repository`, `config` is a contract violation.
     try (var paths = walkMainJava()) {
@@ -101,7 +101,8 @@ class ArchitecturePackageTest {
       assertTrue(
           violations.isEmpty(),
           () ->
-              "Cross-module imports must go through service/domain/model packages: " + violations);
+              "Cross-module imports must go through service/domain/history packages: "
+                  + violations);
     }
   }
 

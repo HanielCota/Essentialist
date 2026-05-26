@@ -6,8 +6,10 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
  * Root config of the {@code /tpa} module: the request lifetime plus three sections — {@link
- * TpaMessages} (every chat line), {@link TpaMenuConfig} (the {@code /tpahistory} inventory) and
- * {@link TpaHelpMenuConfig} (the {@code /tpa} help menu shown when the command has no target).
+ * TpaMessages} (every chat line), {@link TpaMenuConfig} (the {@code /tpahistory} inventory), {@link
+ * TpaHelpMenuConfig} (the {@code /tpa} hub), {@link TpaPendingMenuConfig} (incoming requests),
+ * {@link TpaBlockedMenuConfig} (specific blocked players) and {@link TpaSettingsMenuConfig}
+ * (per-player receive toggles).
  */
 @ConfigSerializable
 public record TpaConfig(
@@ -15,11 +17,20 @@ public record TpaConfig(
         int requestExpirySeconds,
     TpaMessages messages,
     TpaMenuConfig menu,
-    TpaHelpMenuConfig helpMenu) {
+    TpaHelpMenuConfig helpMenu,
+    TpaPendingMenuConfig pendingMenu,
+    TpaBlockedMenuConfig blockedMenu,
+    TpaSettingsMenuConfig settingsMenu) {
 
   public static TpaConfig defaults() {
     return new TpaConfig(
-        60, TpaMessages.defaults(), TpaMenuConfig.defaults(), TpaHelpMenuConfig.defaults());
+        60,
+        TpaMessages.defaults(),
+        TpaMenuConfig.defaults(),
+        TpaHelpMenuConfig.defaults(),
+        TpaPendingMenuConfig.defaults(),
+        TpaBlockedMenuConfig.defaults(),
+        TpaSettingsMenuConfig.defaults());
   }
 
   /** Configured request lifetime, clamped to a sane minimum. */

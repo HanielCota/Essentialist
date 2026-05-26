@@ -55,14 +55,14 @@ public record TpaMenuConfig(
         List.of(
             "<gray>Nenhum pedido recente.",
             "",
-            "<yellow>/tpa [jogador] <gray>pede teleporte até alguém",
-            "<yellow>/tpahere [jogador] <gray>chama alguém até você"),
+            "<yellow>/tpa [jogador] <gray>para ir até alguém",
+            "<yellow>/tpahere [jogador] <gray>para chamar alguém"),
         "<green>Aceito",
         "<red>Recusado",
         "<gray>Expirado",
         "<yellow>Cancelado",
-        "Ir até o jogador",
-        "Trazer o jogador");
+        "Você foi até o jogador",
+        "Você chamou o jogador");
   }
 
   /** Configured time pattern, falling back to a safe default when malformed. */

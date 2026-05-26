@@ -122,18 +122,6 @@ public final class EssentialsCore implements EssentialsApi {
     return this.services.find(TeleportService.class).map(TeleportsApiAdapter::new);
   }
 
-  @Override
-  @SuppressWarnings("deprecation")
-  public EssentialsPlugin plugin() {
-    return this.plugin;
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public ServiceRegistry services() {
-    return this.services;
-  }
-
   private ModuleContext newContext() {
     return new ModuleContext(this.plugin, this.services);
   }

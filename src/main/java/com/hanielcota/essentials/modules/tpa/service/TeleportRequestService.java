@@ -32,6 +32,8 @@ public final class TeleportRequestService {
   private final TpaHistory history;
   private final TpaNotifier notifier;
   private final PlayerProvider players;
+  private final TpaProfileService profiles;
+  private final TpaBlockService blocks;
   private final TeleportRequestExecutor executor;
 
   public TeleportRequestService(
@@ -39,12 +41,16 @@ public final class TeleportRequestService {
       @NonNull RequestRepository store,
       @NonNull TpaHistory history,
       @NonNull TpaNotifier notifier,
-      @NonNull PlayerProvider players) {
+      @NonNull PlayerProvider players,
+      @NonNull TpaProfileService profiles,
+      @NonNull TpaBlockService blocks) {
     this.config = config;
     this.store = store;
     this.history = history;
     this.notifier = notifier;
     this.players = players;
+    this.profiles = profiles;
+    this.blocks = blocks;
     this.executor = new TeleportRequestExecutor(players);
   }
 
@@ -53,9 +59,18 @@ public final class TeleportRequestService {
    * already had outstanding — and prompts the target. The previous target, if still online, is
    * notified that the request was replaced so they don't keep staring at a stale clickable prompt.
    */
-  public TeleportRequest create(
+  public Optional<TeleportRequest> create(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
+    var targetId = target.getUniqueId();
+    if (!this.profiles.accepts(targetId, type)) {
+      return Optional.empty();
+    }
+
     var requesterId = requester.getUniqueId();
+    if (this.blocks.isBlocked(targetId, requesterId)) {
+      return Optional.empty();
+    }
+
     var requesterName = requester.getName();
 
     var existing = this.store.outgoingOf(requesterId);
@@ -69,9 +84,11 @@ public final class TeleportRequestService {
     var request = TeleportRequest.open(requesterParticipant, targetParticipant, type, lifetime);
 
     this.store.add(request);
+    this.profiles.recordSent(requesterId);
+    this.profiles.recordReceived(targetId);
     this.notifier.sendPrompt(target, request);
 
-    return request;
+    return Optional.of(request);
   }
 
   /** The target's pending requests, newest first. */
@@ -82,6 +99,10 @@ public final class TeleportRequestService {
   /** The requester's single outstanding request, if any. */
   public Optional<TeleportRequest> outgoing(@NonNull UUID requester) {
     return this.store.outgoingOf(requester);
+  }
+
+  public boolean isBlockedBy(@NonNull UUID blockerId, @NonNull UUID requesterId) {
+    return this.blocks.isBlocked(blockerId, requesterId);
   }
 
   /** A specific pending request to {@code target} from the named requester, case-insensitive. */

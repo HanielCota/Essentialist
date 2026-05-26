@@ -51,12 +51,21 @@ public record TpaMessages(
     @Comment(
             "/tpahistory <jogador> confirmation sent before opening the menu. "
                 + "Placeholders: {player}.")
-        String viewingOther) {
+        String viewingOther,
+    @Comment("/tpa blocked because target disabled incoming /tpa. Placeholders: {player}.")
+        String tpaDisabled,
+    @Comment("/tpahere blocked because target disabled incoming /tpahere. Placeholders: {player}.")
+        String tpaHereDisabled,
+    @Comment("Shown when the target blocked this requester. Placeholders: {player}.")
+        String blockedByPlayer,
+    @Comment("/tpablock confirmation. Placeholders: {player}.") String blockedPlayer,
+    @Comment("/tpaunblock confirmation. Placeholders: {player}.") String unblockedPlayer,
+    @Comment("Shown when a player tries to block themselves.") String blockSelf) {
 
   public static TpaMessages defaults() {
     return new TpaMessages(
-        "<green>Pedido de teleporte enviado para <gold>{player}</gold>.",
-        "<green>Pedido enviado — <gold>{player}</gold> teleportará até você.",
+        "<green>Pedido enviado para ir até <gold>{player}</gold>.",
+        "<green>Pedido enviado para chamar <gold>{player}</gold> até você.",
         "<red>Você não pode enviar um pedido de teleporte para si mesmo.",
         "<red>Você não tem nenhum pedido pendente para cancelar.",
         "<yellow>Pedido de teleporte para <gold>{player}</gold> cancelado.",
@@ -73,8 +82,8 @@ public record TpaMessages(
         "<green>Clique para aceitar o pedido de <gold>{player}</gold>.",
         "<red>Clique para recusar o pedido de <gold>{player}</gold>.",
         "<red>Você não tem nenhum pedido de teleporte pendente.",
-        "<red>Você tem vários pedidos. Use <gold>/tpaccept <jogador></gold> ou "
-            + "<gold>/tpdeny <jogador></gold>.",
+        "<red>Você tem vários pedidos. Use <gold>/tpaccept <jogador></gold> para aceitar "
+            + "ou <gold>/tpdeny <jogador></gold> para recusar.",
         "<green>Você aceitou o pedido de <gold>{player}</gold>.",
         "<yellow>Você recusou o pedido de <gold>{player}</gold>.",
         "<red>O pedido de teleporte foi cancelado — <gold>{player}</gold> saiu do servidor.",
@@ -82,7 +91,13 @@ public record TpaMessages(
         "<red><gold>{player}</gold> ainda não enviou nenhum pedido de teleporte.",
         "<red>Você não tem permissão para ver o histórico de outros jogadores.",
         "<red>O jogador <gold>{player}</gold> nunca entrou neste servidor.",
-        "<gray>Mostrando o histórico de teleportes de <gold>{player}</gold>.");
+        "<gray>Mostrando o histórico de teleportes de <gold>{player}</gold>.",
+        "<red><gold>{player}</gold> não permite que outros jogadores teleportem até ele.",
+        "<red><gold>{player}</gold> não permite ser chamado até outros jogadores.",
+        "<red><gold>{player}</gold> não está recebendo pedidos seus.",
+        "<green>Você bloqueou pedidos de TPA de <gold>{player}</gold>.",
+        "<green>Você desbloqueou pedidos de TPA de <gold>{player}</gold>.",
+        "<red>Você não pode bloquear pedidos de TPA de si mesmo.");
   }
 
   /** The request line shown to the target, picked by {@code type}. */
