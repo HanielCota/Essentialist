@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.teleport.service;
+package com.hanielcota.essentials.modules.teleport.domain;
 
 /**
  * Result of a teleport attempt. Pre-flight rejections ({@link #SELF_TARGET}, {@link

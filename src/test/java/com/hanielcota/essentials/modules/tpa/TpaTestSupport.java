@@ -361,11 +361,6 @@ public final class TpaTestSupport {
     }
 
     @Override
-    public void runAsync(@NonNull Runnable task) {
-      task.run();
-    }
-
-    @Override
     public Executor mainExecutor() {
       return Runnable::run;
     }
@@ -391,17 +386,6 @@ public final class TpaTestSupport {
         @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period) {
       return Task.noop();
     }
-
-    @Override
-    public Task runAsyncLater(@NonNull Runnable task, @NonNull Duration delay) {
-      return Task.noop();
-    }
-
-    @Override
-    public Task runAsyncTimer(
-        @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period) {
-      return Task.noop();
-    }
   }
 
   public static final class StaticConfigHandle implements ConfigHandle<TpaConfig> {
@@ -413,16 +397,6 @@ public final class TpaTestSupport {
     @Override
     public TpaConfig value() {
       return TpaConfig.defaults();
-    }
-
-    @Override
-    public void reload() {
-      // no-op test stub
-    }
-
-    @Override
-    public AutoCloseable onReload(@NonNull java.util.function.Consumer<TpaConfig> listener) {
-      return () -> {};
     }
   }
 

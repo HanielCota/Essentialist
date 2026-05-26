@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
+import com.hanielcota.essentials.modules.invsee.domain.InvseeLayout;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -17,17 +18,17 @@ public final class InvseeWriteback {
   public static void apply(@NonNull Player target, @NonNull Inventory view) {
     var inv = target.getInventory();
 
-    var storage = new ItemStack[InvseeService.STORAGE_SLOTS];
-    for (var slot = 0; slot < InvseeService.STORAGE_SLOTS; slot++) {
+    var storage = new ItemStack[InvseeLayout.STORAGE_SLOTS];
+    for (var slot = 0; slot < InvseeLayout.STORAGE_SLOTS; slot++) {
       storage[slot] = view.getItem(slot);
     }
     inv.setStorageContents(storage);
 
-    var helmet = view.getItem(InvseeService.HELMET_SLOT);
-    var chestplate = view.getItem(InvseeService.CHESTPLATE_SLOT);
-    var leggings = view.getItem(InvseeService.LEGGINGS_SLOT);
-    var boots = view.getItem(InvseeService.BOOTS_SLOT);
-    var offhand = view.getItem(InvseeService.OFFHAND_SLOT);
+    var helmet = view.getItem(InvseeLayout.HELMET_SLOT);
+    var chestplate = view.getItem(InvseeLayout.CHESTPLATE_SLOT);
+    var leggings = view.getItem(InvseeLayout.LEGGINGS_SLOT);
+    var boots = view.getItem(InvseeLayout.BOOTS_SLOT);
+    var offhand = view.getItem(InvseeLayout.OFFHAND_SLOT);
 
     inv.setHelmet(helmet);
     inv.setChestplate(chestplate);

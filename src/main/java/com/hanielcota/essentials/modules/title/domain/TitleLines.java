@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.title.service;
+package com.hanielcota.essentials.modules.title.domain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,9 @@ import lombok.NonNull;
  * provides the subtitle. Anything outside quotes is ignored. A message with no leading quote is
  * taken as the title with an empty subtitle.
  */
-record TitleLines(String title, String subtitle) {
+public record TitleLines(String title, String subtitle) {
 
-  static TitleLines parse(@NonNull String message) {
+  public static TitleLines parse(@NonNull String message) {
     var trimmed = message.strip();
     if (!trimmed.startsWith("\"")) {
       return new TitleLines(trimmed, "");

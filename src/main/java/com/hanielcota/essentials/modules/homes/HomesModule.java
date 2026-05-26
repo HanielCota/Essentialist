@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes;
 
 import com.github.hanielcota.menuframework.api.MenuService;
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
@@ -86,7 +86,8 @@ public final class HomesModule extends AbstractModule {
     homeTable.install(sqlExecutor);
     var sqlRepository = new SqlHomeRepository(sqlExecutor, homeTable);
     var cache = new HomeCache();
-    var asyncWriter = new DefaultAsyncDatabaseWriter("Essentialist-Homes");
+    var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
+    var asyncWriter = writerFactory.create("Homes");
     var repository = new CachedHomeRepository(sqlRepository, asyncWriter, cache);
     IntSupplier defaultLimit = () -> config.value().defaultLimit();
     var limits = new HomeLimitResolver(defaultLimit);

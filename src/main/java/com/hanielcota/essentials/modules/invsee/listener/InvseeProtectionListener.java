@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.invsee.listener;
 
-import com.hanielcota.essentials.modules.invsee.service.InvseeHolder;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
 import com.hanielcota.essentials.modules.invsee.service.InvseeService;
 import java.util.UUID;
 import lombok.NonNull;

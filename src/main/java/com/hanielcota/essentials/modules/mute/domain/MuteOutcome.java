@@ -1,6 +1,5 @@
-package com.hanielcota.essentials.modules.mute.service;
+package com.hanielcota.essentials.modules.mute.domain;
 
-import com.hanielcota.essentials.modules.mute.domain.Mute;
 import lombok.NonNull;
 
 /**

@@ -2,8 +2,8 @@ package com.hanielcota.essentials.modules.nick.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
-import com.hanielcota.essentials.modules.nick.service.NickResetOutcome;
-import com.hanielcota.essentials.modules.nick.service.NickSetOutcome;
+import com.hanielcota.essentials.modules.nick.domain.NickResetOutcome;
+import com.hanielcota.essentials.modules.nick.domain.NickSetOutcome;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;

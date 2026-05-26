@@ -5,6 +5,9 @@ import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
 import com.hanielcota.essentials.paper.ActorFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.inventory.ClickType;
@@ -22,33 +25,41 @@ public final class HomeClickHandler {
   private final ActorFactory actors;
   private final HomesActionTarget target;
   private final HomeRenameOrchestrator rename;
+  private final List<Route> routes = buildRoutes();
+
+  private List<Route> buildRoutes() {
+    var list = new ArrayList<Route>();
+    list.add(new Route(ClickType::isShiftClick, this::handleRename));
+    list.add(
+        new Route(
+            type -> type == ClickType.DROP || type == ClickType.CONTROL_DROP,
+            (click, home) -> openSubMenuFor(click, home.name(), MaterialCategoryMenu.ID)));
+    list.add(
+        new Route(
+            ClickType::isRightClick,
+            (click, home) -> openSubMenuFor(click, home.name(), DeleteHomeDialog.ID)));
+    return List.copyOf(list);
+  }
 
   public void handle(@NonNull ClickContext click, @NonNull Home home) {
     var type = click.clickType();
-    var player = click.player();
-    var homeName = home.name();
 
-    if (type.isShiftClick()) {
-      click.close();
-      this.rename.prompt(player, homeName);
-      return;
-    }
-
-    var isDrop = type == ClickType.DROP || type == ClickType.CONTROL_DROP;
-    if (isDrop) {
-      openSubMenuFor(click, homeName, MaterialCategoryMenu.ID);
-      return;
-    }
-
-    if (type.isRightClick()) {
-      openSubMenuFor(click, homeName, DeleteHomeDialog.ID);
-      return;
+    for (var route : this.routes) {
+      if (route.predicate.test(type)) {
+        route.action.handle(click, home);
+        return;
+      }
     }
 
     click.close();
 
-    var actor = this.actors.actorOf(player);
-    this.teleporter.teleport(player, home, actor);
+    var actor = this.actors.actorOf(click.player());
+    this.teleporter.teleport(click.player(), home, actor);
+  }
+
+  private void handleRename(@NonNull ClickContext click, @NonNull Home home) {
+    click.close();
+    this.rename.prompt(click.player(), home.name());
   }
 
   private void openSubMenuFor(
@@ -58,5 +69,12 @@ public final class HomeClickHandler {
 
     this.target.set(uuid, homeName);
     click.switchTo(menuId);
+  }
+
+  private record Route(@NonNull Predicate<ClickType> predicate, @NonNull HomeAction action) {}
+
+  @FunctionalInterface
+  private interface HomeAction {
+    void handle(@NonNull ClickContext click, @NonNull Home home);
   }
 }

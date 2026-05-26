@@ -61,9 +61,15 @@ public final class TpaHelpMenuRenderer {
     var sent = Long.toString(profile.sentRequests());
     var received = Long.toString(profile.receivedRequests());
     var pendingRequests = Integer.toString(pending);
-    var receiveTpa = profile.receiveTpa() ? settings.enabledLabel() : settings.disabledLabel();
+    var receiveByType = profile.receiveByType();
+    var receiveTpa =
+        receiveByType.getOrDefault(TeleportRequestType.TPA, false)
+            ? settings.enabledLabel()
+            : settings.disabledLabel();
     var receiveTpaHere =
-        profile.receiveTpaHere() ? settings.enabledLabel() : settings.disabledLabel();
+        receiveByType.getOrDefault(TeleportRequestType.TPAHERE, false)
+            ? settings.enabledLabel()
+            : settings.disabledLabel();
     var statsFallback = settings.statsFallback();
     var acceptRate = TpaProfileStatsFormatter.acceptRate(profile, statsFallback);
     var avgAccept = TpaProfileStatsFormatter.averageAccept(profile, statsFallback);

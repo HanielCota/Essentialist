@@ -83,11 +83,6 @@ class MainThreadCallbacksTest {
     }
 
     @Override
-    public void runAsync(@NonNull Runnable task) {
-      task.run();
-    }
-
-    @Override
     public void runOnEntity(@NonNull Entity entity, @NonNull Runnable task) {
       task.run();
     }
@@ -105,17 +100,6 @@ class MainThreadCallbacksTest {
 
     @Override
     public Task runTimer(
-        @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period) {
-      return Task.noop();
-    }
-
-    @Override
-    public Task runAsyncLater(@NonNull Runnable task, @NonNull Duration delay) {
-      return Task.noop();
-    }
-
-    @Override
-    public Task runAsyncTimer(
         @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period) {
       return Task.noop();
     }

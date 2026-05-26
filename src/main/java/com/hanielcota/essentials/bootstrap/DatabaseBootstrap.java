@@ -1,7 +1,9 @@
 package com.hanielcota.essentials.bootstrap;
 
 import com.hanielcota.essentials.EssentialsPlugin;
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.DatabaseProvider;
+import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriterFactory;
 import com.hanielcota.essentials.database.DefaultSqlExecutor;
 import com.hanielcota.essentials.database.SqlConnectionFactory;
 import com.hanielcota.essentials.database.SqlDialect;
@@ -50,5 +52,7 @@ final class DatabaseBootstrap implements BootstrapStage {
     services.register(SqlExecutor.class, sqlExecutor);
 
     services.register(SqlDialect.class, new SqliteDialect());
+
+    services.register(AsyncDatabaseWriter.Factory.class, new DefaultAsyncDatabaseWriterFactory());
   }
 }

@@ -2,19 +2,16 @@ package com.hanielcota.essentials.bootstrap;
 
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.command.CommandBootstrap;
-import com.hanielcota.essentials.module.ModuleManager;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.FrameworkActorFactory;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
-import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Builds the {@link PaperCommandFramework}, applies every enabled module's command customizer, and
- * publishes the framework as a service. Mirroring already-registered infrastructure services to the
- * framework's dependency table is a separate stage ({@link CommandMirrorStage}) so it runs after
- * the rest of the registry has filled up.
+ * Builds the {@link PaperCommandFramework} and publishes the framework as a service. Mirroring
+ * already-registered infrastructure services to the framework's dependency table is a separate
+ * stage ({@link CommandMirrorStage}) so it runs after the rest of the registry has filled up.
  */
 @RequiredArgsConstructor
 final class CommandSystemBootstrap implements BootstrapStage {
@@ -29,17 +26,8 @@ final class CommandSystemBootstrap implements BootstrapStage {
   @Override
   public void start(@NonNull StageContext context) {
     var services = context.services();
-    var modules = services.resolve(ModuleManager.class);
 
-    var allModules = modules.all();
-    var modulesStream = allModules.stream();
-
-    var customizers =
-        modulesStream
-            .map(module -> (Consumer<PaperCommandFramework.Builder>) module::customizeCommands)
-            .toList();
-
-    var commandBootstrap = new CommandBootstrap(this.plugin, customizers);
+    var commandBootstrap = new CommandBootstrap(this.plugin);
     var framework = commandBootstrap.createFramework();
 
     services.register(PaperCommandFramework.class, framework);

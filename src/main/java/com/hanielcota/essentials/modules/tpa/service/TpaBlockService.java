@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
-import com.hanielcota.essentials.modules.tpa.repository.TpaBlockRepository;
+import com.hanielcota.essentials.modules.tpa.repository.TpaBlockStore;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +12,11 @@ import org.jspecify.annotations.Nullable;
 
 public final class TpaBlockService {
 
-  private final @Nullable TpaBlockRepository repository;
+  private final @Nullable TpaBlockStore repository;
   private final AsyncDatabaseWriter writer;
   private final Map<UUID, Map<UUID, String>> blocked = new ConcurrentHashMap<>();
 
-  public TpaBlockService(
-      @Nullable TpaBlockRepository repository, @NonNull AsyncDatabaseWriter writer) {
+  public TpaBlockService(@Nullable TpaBlockStore repository, @NonNull AsyncDatabaseWriter writer) {
     this.repository = repository;
     this.writer = writer;
   }

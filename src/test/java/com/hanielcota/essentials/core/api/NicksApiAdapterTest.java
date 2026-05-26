@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
+import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
+import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import com.hanielcota.essentials.modules.nick.service.NickService;
 import java.util.List;
 import java.util.UUID;
@@ -16,11 +18,12 @@ class NicksApiAdapterTest {
 
   @Test
   void nickOfReturnsTheCachedEntry() {
-    var service = newService();
+    var cache = newCache();
     var id = UUID.randomUUID();
     var entry = new NickEntry(id, "Ace", "RealName");
-    service.loadAll(List.of(entry));
+    cache.loadAll(List.of(entry));
 
+    var service = new NickService(cache);
     var adapter = new NicksApiAdapter(service);
 
     assertEquals(entry, adapter.nickOf(id).orElseThrow());
@@ -28,10 +31,11 @@ class NicksApiAdapterTest {
 
   @Test
   void idByNickIsCaseInsensitive() {
-    var service = newService();
+    var cache = newCache();
     var id = UUID.randomUUID();
-    service.loadAll(List.of(new NickEntry(id, "Ace", "RealName")));
+    cache.loadAll(List.of(new NickEntry(id, "Ace", "RealName")));
 
+    var service = new NickService(cache);
     var adapter = new NicksApiAdapter(service);
 
     assertEquals(id, adapter.idByNick("ACE").orElseThrow());
@@ -40,14 +44,29 @@ class NicksApiAdapterTest {
 
   @Test
   void unknownIdYieldsEmpty() {
-    var service = newService();
+    var service = new NickService(newCache());
     var adapter = new NicksApiAdapter(service);
 
     assertTrue(adapter.nickOf(UUID.randomUUID()).isEmpty());
   }
 
-  private static NickService newService() {
-    return new NickService(null, new NoopWriter());
+  private static NickCacheStore newCache() {
+    return new NickCacheStore(new NoopStore(), new NoopWriter());
+  }
+
+  private static final class NoopStore implements NickStore {
+    @Override
+    public List<NickEntry> list() {
+      return List.of();
+    }
+
+    @Override
+    public void save(@NonNull NickEntry entry) {}
+
+    @Override
+    public boolean delete(@NonNull UUID id) {
+      return false;
+    }
   }
 
   private static final class NoopWriter implements AsyncDatabaseWriter {

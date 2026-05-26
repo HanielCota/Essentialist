@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.title.service;
+package com.hanielcota.essentials.modules.title.domain;
 
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.UUID;

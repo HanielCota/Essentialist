@@ -1,6 +1,7 @@
-package com.hanielcota.essentials.modules.msg.service;
+package com.hanielcota.essentials.modules.msg.command;
 
-import com.hanielcota.essentials.modules.msg.command.MsgNotifier;
+import com.hanielcota.essentials.modules.msg.service.MsgService;
+import com.hanielcota.essentials.modules.msg.service.SocialSpyBridge;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;

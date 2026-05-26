@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.NonNull;
@@ -25,7 +24,6 @@ public final class YamlConfigService implements ConfigService {
 
   private final Path baseDir;
   private final Map<String, YamlConfigHandle<?>> handles = new ConcurrentHashMap<>();
-  private final CopyOnWriteArrayList<Runnable> reloadCallbacks = new CopyOnWriteArrayList<>();
 
   private static String errorMessageOf(@NonNull RuntimeException e) {
     var message = e.getMessage();
@@ -88,20 +86,6 @@ public final class YamlConfigService implements ConfigService {
       }
     }
 
-    for (var callback : this.reloadCallbacks) {
-      try {
-        callback.run();
-      } catch (RuntimeException e) {
-        LOG.warn(e, "Reload callback failed");
-      }
-    }
-
     return new ReloadReport(snapshot.size(), failures);
-  }
-
-  @Override
-  public AutoCloseable onReload(@NonNull Runnable callback) {
-    this.reloadCallbacks.add(callback);
-    return () -> this.reloadCallbacks.remove(callback);
   }
 }

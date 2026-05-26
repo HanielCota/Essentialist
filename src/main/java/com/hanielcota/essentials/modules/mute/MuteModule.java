@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.mute;
 
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
@@ -11,7 +11,9 @@ import com.hanielcota.essentials.modules.mute.command.MuteNotifier;
 import com.hanielcota.essentials.modules.mute.command.UnmuteCommand;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
 import com.hanielcota.essentials.modules.mute.listener.MuteChatListener;
+import com.hanielcota.essentials.modules.mute.repository.MuteCache;
 import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
+import com.hanielcota.essentials.modules.mute.repository.MuteStore;
 import com.hanielcota.essentials.modules.mute.repository.MuteTable;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import com.hanielcota.essentials.paper.ActorFactory;
@@ -37,11 +39,15 @@ public final class MuteModule extends AbstractModule {
     store.deleteExpired(now);
     var existing = store.listActive(now);
 
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-Mutes");
+    var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("Mutes");
     registrar.closeable(writer);
 
-    var service = new MuteService(store, writer);
-    service.loadAll(existing);
+    var cache = new MuteCache(store, writer);
+    cache.loadAll(existing);
+
+    var service = new MuteService(cache);
+    registrar.provide(MuteStore.class, store);
     registrar.provide(MuteService.class, service);
 
     var actors = env.service(ActorFactory.class);

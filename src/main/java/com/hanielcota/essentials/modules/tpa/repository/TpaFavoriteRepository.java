@@ -11,7 +11,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class TpaFavoriteRepository {
+public final class TpaFavoriteRepository implements TpaFavoriteStore {
 
   private final SqlExecutor sqlExecutor;
   private final TpaFavoriteTable table;

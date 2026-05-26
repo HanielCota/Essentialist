@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.invsee.service;
+package com.hanielcota.essentials.modules.invsee.domain;
 
 import java.util.UUID;
 import lombok.NonNull;

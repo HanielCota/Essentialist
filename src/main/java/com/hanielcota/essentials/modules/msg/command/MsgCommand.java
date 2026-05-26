@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.msg.command;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
-import com.hanielcota.essentials.modules.msg.service.MsgDispatcher;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;

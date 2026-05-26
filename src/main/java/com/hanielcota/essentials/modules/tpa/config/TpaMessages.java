@@ -160,4 +160,10 @@ public record TpaMessages(
     var withPlayer = line.replace("{player}", player);
     return withPlayer.replace("{seconds}", secondsStr);
   }
+
+  /** The "disabled" message for the given {@code type}, shown when the target refuses that kind. */
+  public String disabledFor(@NonNull TeleportRequestType type) {
+    var isHere = type == TeleportRequestType.TPAHERE;
+    return isHere ? this.tpaHereDisabled : this.tpaDisabled;
+  }
 }

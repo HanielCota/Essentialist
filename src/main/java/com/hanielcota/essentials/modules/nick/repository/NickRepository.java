@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  * case-insensitive collation so {@code /realname} lookups and uniqueness checks ignore case.
  */
 @RequiredArgsConstructor
-public final class NickRepository {
+public final class NickRepository implements NickStore {
 
   private final SqlExecutor sqlExecutor;
   private final NickTable table;

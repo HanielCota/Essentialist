@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.title.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.title.config.TitleConfig;
+import com.hanielcota.essentials.modules.title.domain.TitleLines;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.time.Duration;

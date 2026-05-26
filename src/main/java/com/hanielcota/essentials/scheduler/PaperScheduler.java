@@ -3,7 +3,6 @@ package com.hanielcota.essentials.scheduler;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import java.time.Duration;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import org.bukkit.entity.Entity;
@@ -27,15 +26,6 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
   @Override
   public Executor mainExecutor() {
     return this::runSync;
-  }
-
-  @Override
-  public void runAsync(@NonNull Runnable task) {
-    var server = this.plugin.getServer();
-    var scheduler = server.getAsyncScheduler();
-    var adaptedTask = adapt(task);
-
-    scheduler.runNow(this.plugin, adaptedTask);
   }
 
   @Override
@@ -86,44 +76,6 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var ticksPeriod = Ticks.fromDuration(period);
 
     var handle = scheduler.runAtFixedRate(this.plugin, adaptedTask, ticksInitialDelay, ticksPeriod);
-    if (handle == null) {
-      return Task.noop();
-    }
-    return new ScheduledTaskHandle(handle);
-  }
-
-  @Override
-  public Task runAsyncLater(@NonNull Runnable task, @NonNull Duration delay) {
-    var server = this.plugin.getServer();
-    var scheduler = server.getAsyncScheduler();
-    var adaptedTask = adapt(task);
-
-    // Paper's AsyncScheduler.runDelayed rejects delay == 0; clamp to 1ms so a zero-delay caller
-    // gets near-immediate execution instead of an IllegalArgumentException.
-    var millisDelay = Math.max(1L, delay.toMillis());
-    var timeUnit = TimeUnit.MILLISECONDS;
-
-    var handle = scheduler.runDelayed(this.plugin, adaptedTask, millisDelay, timeUnit);
-    if (handle == null) {
-      return Task.noop();
-    }
-    return new ScheduledTaskHandle(handle);
-  }
-
-  @Override
-  public Task runAsyncTimer(
-      @NonNull Runnable task, @NonNull Duration initialDelay, @NonNull Duration period) {
-    var server = this.plugin.getServer();
-    var scheduler = server.getAsyncScheduler();
-    var adaptedTask = adapt(task);
-
-    var millisInitialDelay = Math.max(0L, initialDelay.toMillis());
-    var millisPeriod = Math.max(1L, period.toMillis());
-    var timeUnit = TimeUnit.MILLISECONDS;
-
-    var handle =
-        scheduler.runAtFixedRate(
-            this.plugin, adaptedTask, millisInitialDelay, millisPeriod, timeUnit);
     if (handle == null) {
       return Task.noop();
     }

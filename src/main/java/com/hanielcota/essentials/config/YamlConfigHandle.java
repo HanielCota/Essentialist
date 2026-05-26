@@ -5,9 +5,7 @@ import com.hanielcota.essentials.util.Log;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,6 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
   private final @NonNull Supplier<T> defaults;
 
   private final AtomicReference<T> ref = new AtomicReference<>();
-  private final CopyOnWriteArrayList<Consumer<T>> reloadListeners = new CopyOnWriteArrayList<>();
 
   @Override
   public String name() {
@@ -45,28 +42,9 @@ final class YamlConfigHandle<T> implements ConfigHandle<T> {
     return this.ref.get();
   }
 
-  @Override
-  public void reload() {
-    refresh();
-  }
-
-  @Override
-  public AutoCloseable onReload(@NonNull Consumer<T> listener) {
-    this.reloadListeners.add(listener);
-    return () -> this.reloadListeners.remove(listener);
-  }
-
   void refresh() {
     var updatedValue = readFromDisk();
     this.ref.set(updatedValue);
-
-    for (var listener : this.reloadListeners) {
-      try {
-        listener.accept(updatedValue);
-      } catch (RuntimeException e) {
-        LOG.warn(e, "Reload listener on {} failed", this.name);
-      }
-    }
   }
 
   Class<T> type() {

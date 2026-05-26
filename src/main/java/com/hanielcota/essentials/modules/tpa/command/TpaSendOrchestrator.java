@@ -3,9 +3,9 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
-import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
@@ -117,8 +117,7 @@ public final class TpaSendOrchestrator {
       sendError(requesterActor, messages.crossWorldRefused(), target.getName());
       return;
     }
-    var template =
-        type == TeleportRequestType.TPA ? messages.tpaDisabled() : messages.tpaHereDisabled();
+    var template = messages.disabledFor(type);
     sendError(requesterActor, template, target.getName());
   }
 }

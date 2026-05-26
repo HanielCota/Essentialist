@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.nick;
 
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
@@ -11,7 +11,9 @@ import com.hanielcota.essentials.modules.nick.command.NickNotifier;
 import com.hanielcota.essentials.modules.nick.command.RealNameCommand;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
 import com.hanielcota.essentials.modules.nick.listener.NickJoinListener;
+import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
 import com.hanielcota.essentials.modules.nick.repository.NickRepository;
+import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import com.hanielcota.essentials.modules.nick.repository.NickTable;
 import com.hanielcota.essentials.modules.nick.service.NickOperationService;
 import com.hanielcota.essentials.modules.nick.service.NickService;
@@ -37,11 +39,15 @@ public final class NickModule extends AbstractModule {
     var store = new NickRepository(executor, table);
     var existing = store.list();
 
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-Nicks");
+    var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("Nicks");
     registrar.closeable(writer);
 
-    var service = new NickService(store, writer);
-    service.loadAll(existing);
+    var cache = new NickCacheStore(store, writer);
+    cache.loadAll(existing);
+
+    var service = new NickService(cache);
+    registrar.provide(NickStore.class, store);
     registrar.provide(NickService.class, service);
 
     var actors = env.service(ActorFactory.class);

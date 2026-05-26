@@ -3,9 +3,11 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
+import com.hanielcota.essentials.modules.tpa.domain.AcceptResult;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
-import com.hanielcota.essentials.modules.tpa.service.AcceptResult;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.EnumMap;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -19,16 +21,32 @@ public final class TpAcceptResultHandler {
 
   private final ConfigHandle<TpaConfig> config;
   private final TpaRequestReplyNotifier replyNotifier;
+  private final Map<AcceptResult, ResultRoute> routes = buildRoutes();
+
+  private Map<AcceptResult, ResultRoute> buildRoutes() {
+    var map = new EnumMap<AcceptResult, ResultRoute>(AcceptResult.class);
+    map.put(AcceptResult.ACCEPTED, this::notifyAccepted);
+    map.put(AcceptResult.REQUESTER_OFFLINE, this::notifyRequesterOffline);
+    map.put(AcceptResult.NOT_FOUND, this::notifyNotFound);
+    return Map.copyOf(map);
+  }
+
+  @FunctionalInterface
+  private interface ResultRoute {
+    void handle(
+        @NonNull TeleportRequest request,
+        @NonNull TpaMessages messages,
+        @NonNull CommandActor actor);
+  }
 
   public void handleClaim(
       @NonNull AcceptResult result, @NonNull TeleportRequest request, @NonNull CommandActor actor) {
     var snap = this.config.value();
     var messages = snap.messages();
 
-    switch (result) {
-      case ACCEPTED -> notifyAccepted(request, messages, actor);
-      case REQUESTER_OFFLINE -> notifyRequesterOffline(request, messages, actor);
-      case NOT_FOUND -> actor.sendError(messages.noIncoming());
+    var route = this.routes.get(result);
+    if (route != null) {
+      route.handle(request, messages, actor);
     }
   }
 
@@ -66,5 +84,12 @@ public final class TpAcceptResultHandler {
     var offlineMsg = requesterOfflineTemplate.replace("{player}", requesterName);
 
     actor.sendError(offlineMsg);
+  }
+
+  private void notifyNotFound(
+      @NonNull TeleportRequest request,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor) {
+    actor.sendError(messages.noIncoming());
   }
 }

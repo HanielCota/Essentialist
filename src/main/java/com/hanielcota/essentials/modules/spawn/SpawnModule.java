@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.spawn;
 
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
@@ -43,7 +43,8 @@ public final class SpawnModule extends AbstractModule {
     table.install(executor);
 
     var store = new SpawnRepository(executor, table);
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-Spawn");
+    var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("Spawn");
     registrar.closeable(writer);
 
     var spawnService = new SpawnService(store, writer);

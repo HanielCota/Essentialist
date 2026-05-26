@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.invsee.listener;
 
-import com.hanielcota.essentials.modules.invsee.service.InvseeHolder;
-import com.hanielcota.essentials.modules.invsee.service.InvseeService;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeLayout;
 import com.hanielcota.essentials.modules.invsee.service.InvseeSynchronizer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public final class InvseeListener implements Listener {
     var clickedInventory = event.getClickedInventory();
     var clickedSlot = event.getSlot();
 
-    if (clickedInventory == top && clickedSlot >= InvseeService.FIRST_LOCKED_SLOT) {
+    if (clickedInventory == top && clickedSlot >= InvseeLayout.FIRST_LOCKED_SLOT) {
       event.setCancelled(true);
       return;
     }
@@ -55,7 +55,7 @@ public final class InvseeListener implements Listener {
     var rawSlots = event.getRawSlots();
 
     for (var rawSlot : rawSlots) {
-      if (rawSlot < topSize && rawSlot >= InvseeService.FIRST_LOCKED_SLOT) {
+      if (rawSlot < topSize && rawSlot >= InvseeLayout.FIRST_LOCKED_SLOT) {
         event.setCancelled(true);
         return;
       }

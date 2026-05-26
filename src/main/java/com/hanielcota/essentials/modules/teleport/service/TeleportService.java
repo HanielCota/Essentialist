@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.teleport.service;
 
+import com.hanielcota.essentials.modules.teleport.domain.TeleportOutcome;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.Location;

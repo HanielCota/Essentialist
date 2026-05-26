@@ -19,7 +19,7 @@ import lombok.NonNull;
  * <p>{@code byId} is the source of truth; the two index maps are kept in sync with it so command
  * lookups never scan.
  */
-public final class RequestRepository {
+public final class RequestRepository implements RequestStore {
 
   private static final Comparator<TeleportRequest> NEWEST_FIRST =
       Comparator.comparing(RequestRepository::createdAt).reversed();

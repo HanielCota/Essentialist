@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
-import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteRepository;
+import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteStore;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +13,12 @@ import org.jspecify.annotations.Nullable;
 
 public final class TpaFavoriteService {
 
-  private final @Nullable TpaFavoriteRepository repository;
+  private final @Nullable TpaFavoriteStore repository;
   private final AsyncDatabaseWriter writer;
   private final Map<UUID, Map<UUID, String>> favorites = new ConcurrentHashMap<>();
 
   public TpaFavoriteService(
-      @Nullable TpaFavoriteRepository repository, @NonNull AsyncDatabaseWriter writer) {
+      @Nullable TpaFavoriteStore repository, @NonNull AsyncDatabaseWriter writer) {
     this.repository = repository;
     this.writer = writer;
   }

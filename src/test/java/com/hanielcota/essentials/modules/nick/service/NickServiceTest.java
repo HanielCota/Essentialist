@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
+import com.hanielcota.essentials.modules.nick.repository.NickCacheStore;
+import com.hanielcota.essentials.modules.nick.repository.NickStore;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -65,18 +67,38 @@ class NickServiceTest {
 
   @Test
   void loadAllPopulatesBothLookups() {
-    var service = newService();
+    var cache = newCache();
     var first = UUID.randomUUID();
     var second = UUID.randomUUID();
 
-    service.loadAll(List.of(new NickEntry(first, "A", "x"), new NickEntry(second, "B", "y")));
+    cache.loadAll(List.of(new NickEntry(first, "A", "x"), new NickEntry(second, "B", "y")));
 
+    var service = new NickService(cache);
     assertEquals(first, service.idByNick("a").orElseThrow());
     assertEquals(second, service.idByNick("b").orElseThrow());
   }
 
   private static NickService newService() {
-    return new NickService(null, new NoopWriter());
+    return new NickService(newCache());
+  }
+
+  private static NickCacheStore newCache() {
+    return new NickCacheStore(new NoopStore(), new NoopWriter());
+  }
+
+  private static final class NoopStore implements NickStore {
+    @Override
+    public List<NickEntry> list() {
+      return List.of();
+    }
+
+    @Override
+    public void save(@NonNull NickEntry entry) {}
+
+    @Override
+    public boolean delete(@NonNull UUID id) {
+      return false;
+    }
   }
 
   /**

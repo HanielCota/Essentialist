@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
+import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

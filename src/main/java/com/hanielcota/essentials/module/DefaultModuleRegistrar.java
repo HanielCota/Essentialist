@@ -61,16 +61,4 @@ final class DefaultModuleRegistrar implements ModuleRegistrar {
 
     return handle;
   }
-
-  @Override
-  public <C, S> ConfigHandle<C> configure(
-      @NonNull String name,
-      @NonNull Class<C> configType,
-      @NonNull Supplier<C> defaults,
-      @NonNull Class<S> serviceType,
-      @NonNull S service) {
-    var handle = this.env.config(name, configType, defaults);
-    provide(serviceType, service);
-    return handle;
-  }
 }

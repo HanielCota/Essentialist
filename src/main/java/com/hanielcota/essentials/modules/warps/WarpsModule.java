@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.warps;
 
-import com.hanielcota.essentials.database.DefaultAsyncDatabaseWriter;
+import com.hanielcota.essentials.database.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.SqlDialect;
 import com.hanielcota.essentials.database.SqlExecutor;
 import com.hanielcota.essentials.module.AbstractModule;
@@ -17,6 +17,7 @@ import com.hanielcota.essentials.modules.warps.command.WarpsListNotifier;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
 import com.hanielcota.essentials.modules.warps.repository.WarpCache;
 import com.hanielcota.essentials.modules.warps.repository.WarpRepository;
+import com.hanielcota.essentials.modules.warps.repository.WarpStore;
 import com.hanielcota.essentials.modules.warps.repository.WarpTable;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import java.util.Set;
@@ -51,10 +52,12 @@ public final class WarpsModule extends AbstractModule {
     var existingWarps = store.list();
     cache.loadAll(existingWarps);
 
-    var writer = new DefaultAsyncDatabaseWriter("Essentialist-Warps");
+    var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
+    var writer = writerFactory.create("Warps");
     registrar.closeable(writer);
 
     var warpService = new WarpService(store, cache, writer);
+    registrar.provide(WarpStore.class, store);
     registrar.provide(WarpService.class, warpService);
 
     var delayed = env.service(DelayedTeleport.class);

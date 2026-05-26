@@ -27,4 +27,9 @@ public interface AsyncDatabaseWriter extends AutoCloseable {
 
   @Override
   void close();
+
+  /** Factory that creates per-module writers wired to a shared thread pool. */
+  interface Factory {
+    AsyncDatabaseWriter create(@NonNull String name);
+  }
 }

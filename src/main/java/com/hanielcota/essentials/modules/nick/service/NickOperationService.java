@@ -2,6 +2,8 @@ package com.hanielcota.essentials.modules.nick.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
+import com.hanielcota.essentials.modules.nick.domain.NickResetOutcome;
+import com.hanielcota.essentials.modules.nick.domain.NickSetOutcome;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;

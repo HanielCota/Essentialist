@@ -10,19 +10,10 @@ import org.bukkit.inventory.Inventory;
  * Thin facade for the /invsee feature: acquires the single-viewer lock via {@link InvseeLocks},
  * delegates GUI assembly to {@link InvseeViewBuilder} and the writeback to {@link InvseeWriteback}.
  *
- * <p>Slot constants are exposed here so listeners (e.g. {@code InvseeListener}) can reason about
- * locked-slot ranges without depending on the implementation classes.
+ * <p>Inventory slot layout constants live in {@link InvseeLayout} so listeners can reason about
+ * locked-slot ranges without depending on the service.
  */
 public final class InvseeService {
-
-  public static final int SIZE = 45;
-  public static final int STORAGE_SLOTS = 36;
-  public static final int HELMET_SLOT = 36;
-  public static final int CHESTPLATE_SLOT = 37;
-  public static final int LEGGINGS_SLOT = 38;
-  public static final int BOOTS_SLOT = 39;
-  public static final int OFFHAND_SLOT = 40;
-  public static final int FIRST_LOCKED_SLOT = 41;
 
   private final InvseeLocks locks = new InvseeLocks();
 

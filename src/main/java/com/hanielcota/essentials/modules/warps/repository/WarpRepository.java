@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
  * Spawn} and {@code /warp SPAWN} hit the same row.
  */
 @RequiredArgsConstructor
-public final class WarpRepository {
+public final class WarpRepository implements WarpStore {
 
   private final SqlExecutor sqlExecutor;
   private final WarpTable table;

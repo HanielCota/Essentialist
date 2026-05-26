@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.teleport.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
-import com.hanielcota.essentials.modules.teleport.service.TeleportOutcome;
+import com.hanielcota.essentials.modules.teleport.domain.TeleportOutcome;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;

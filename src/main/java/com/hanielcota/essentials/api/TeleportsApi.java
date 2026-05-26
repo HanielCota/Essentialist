@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.api;
 
-import com.hanielcota.essentials.modules.teleport.service.TeleportOutcome;
+import com.hanielcota.essentials.modules.teleport.domain.TeleportOutcome;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
