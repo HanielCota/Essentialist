@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.material;
+package com.hanielcota.essentials.modules.homes.service;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

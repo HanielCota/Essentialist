@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.teleport;
+package com.hanielcota.essentials.modules.homes.service;
 
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.util.ClickableMessage;

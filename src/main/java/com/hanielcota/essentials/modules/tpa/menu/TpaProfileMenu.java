@@ -18,8 +18,10 @@ import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.util.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -127,10 +129,10 @@ public final class TpaProfileMenu implements EssentialsMenu {
     var received = Long.toString(profile.receivedRequests());
     var pendingText = Integer.toString(pending);
     var name = settings.receivedName().replace("{received}", received);
+    var values = Map.of("received", received, "pending", pendingText);
     var lore = new ArrayList<String>(settings.receivedLore().size());
     for (var line : settings.receivedLore()) {
-      var withReceived = line.replace("{received}", received);
-      lore.add(withReceived.replace("{pending}", pendingText));
+      lore.add(Placeholders.format(line, values));
     }
     var template = simpleTemplate(settings.receivedIcon(), name, lore);
 

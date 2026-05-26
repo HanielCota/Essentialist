@@ -16,9 +16,11 @@ import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.service.TpaDndCycle;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.util.ComponentUtils;
+import com.hanielcota.essentials.util.Placeholders;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -94,7 +96,7 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
     var remainingLabel = stageRemaining(settings, profile, now);
 
     var name =
-        settings.dndName().replace("{state}", stateLabel).replace("{remaining}", remainingLabel);
+        Placeholders.format(settings.dndName(), "state", stateLabel, "remaining", remainingLabel);
     var lore = renderDndLore(settings, stateLabel, remainingLabel, stage);
     var icon = stage == TpaDndCycle.Stage.OFF ? settings.dndOffIcon() : settings.dndOnIcon();
     var template = simpleTemplate(icon, name, lore);
@@ -168,8 +170,9 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
       return settings.dndRemainingHours().replace("{hours}", hoursText);
     }
     var minutesText = Long.toString(mins);
-    var withHours = settings.dndRemainingHoursMinutes().replace("{hours}", hoursText);
-    return withHours.replace("{minutes}", minutesText);
+
+    return Placeholders.format(
+        settings.dndRemainingHoursMinutes(), "hours", hoursText, "minutes", minutesText);
   }
 
   private static List<String> renderDndLore(
@@ -177,14 +180,14 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
       @NonNull String stateLabel,
       @NonNull String remainingLabel,
       @NonNull TpaDndCycle.Stage current) {
+    var values = Map.of("state", stateLabel, "remaining", remainingLabel);
     var lines = new ArrayList<String>(settings.dndLore().size() + 4);
     for (var template : settings.dndLore()) {
       if (template.contains("{options}")) {
         lines.addAll(dndOptions(settings, current));
         continue;
       }
-      var withState = template.replace("{state}", stateLabel);
-      lines.add(withState.replace("{remaining}", remainingLabel));
+      lines.add(Placeholders.format(template, values));
     }
     return lines;
   }

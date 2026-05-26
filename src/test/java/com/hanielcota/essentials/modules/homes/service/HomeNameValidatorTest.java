@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.name;
+package com.hanielcota.essentials.modules.homes.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

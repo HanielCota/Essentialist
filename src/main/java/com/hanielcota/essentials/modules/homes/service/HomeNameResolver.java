@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.name;
+package com.hanielcota.essentials.modules.homes.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;

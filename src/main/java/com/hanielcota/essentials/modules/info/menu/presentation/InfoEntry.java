@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.info.presentation;
+package com.hanielcota.essentials.modules.info.menu.presentation;
 
 import java.util.List;
 import java.util.UUID;

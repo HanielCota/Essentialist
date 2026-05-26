@@ -169,17 +169,21 @@ class ArchitecturePackageTest {
   }
 
   @Test
-  void tpaMenuPresentationHelpersLiveInPresentationPackage() throws IOException {
+  void menuPresentationHelpersLiveInPresentationPackage() throws IOException {
+    // For any module that already owns a `menu/presentation/` package, every renderer/browser/
+    // stats-formatter under `menu/` must live inside `menu/presentation/`. Modules without an
+    // existing `presentation/` (back/list/vanish/whitelist) keep their single EntryRenderer in
+    // `menu/` — the sub-package is only justified once rendering helpers multiply.
     try (var paths = walkMainJava()) {
       var violations =
           paths
-              .filter(ArchitecturePackageTest::isTpaMenuPresentationOutsidePresentationPackage)
+              .filter(ArchitecturePackageTest::isMenuPresentationHelperOutsidePresentationPackage)
               .map(ArchitecturePackageTest::relativePath)
               .toList();
 
       assertTrue(
           violations.isEmpty(),
-          () -> "TPA menu presentation helpers outside presentation package: " + violations);
+          () -> "Menu presentation helpers outside presentation package: " + violations);
     }
   }
 
@@ -286,7 +290,7 @@ class ArchitecturePackageTest {
         && !rel.contains("/bootstrap/");
   }
 
-  private static boolean isTpaMenuPresentationOutsidePresentationPackage(Path path) {
+  private static boolean isMenuPresentationHelperOutsidePresentationPackage(Path path) {
     var rel = relativePath(path);
     var fileName = fileName(path);
     var presentationHelper =
@@ -294,9 +298,23 @@ class ArchitecturePackageTest {
             || fileName.endsWith("Browser.java")
             || fileName.endsWith("StatsFormatter.java");
 
-    return rel.startsWith("com/hanielcota/essentials/modules/tpa/menu/")
-        && presentationHelper
-        && !rel.contains("/menu/presentation/");
+    if (!presentationHelper) {
+      return false;
+    }
+    if (!rel.contains("/menu/") || rel.contains("/menu/presentation/")) {
+      return false;
+    }
+
+    return modulePresentationPackageExists(path);
+  }
+
+  private static boolean modulePresentationPackageExists(Path path) {
+    var rel = relativePath(path);
+    var menuIndex = rel.indexOf("/menu/");
+    var modulePrefix = rel.substring(0, menuIndex);
+    var presentationDir = mainJavaRoot().resolve(modulePrefix + "/menu/presentation");
+
+    return Files.isDirectory(presentationDir);
   }
 
   private static boolean exceedsLineBudget(Map.Entry<String, Integer> budget) {

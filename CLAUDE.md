@@ -162,8 +162,12 @@ good wrapping for chains; defend against it by exploding before it has to.
 - **Switch with `default -> throw`** for exhaustive enums when the missing
   branch is a bug.
 - **Text blocks for SQL**.
-- **`.replace("{token}", value)`** over Placeholders / MiniMessage TagResolver
-  when the substitution is a fixed-name token.
+- **Template substitution**: a single `{token}` swap is fine as
+  `template.replace("{token}", value)`. For two or more tokens in the same
+  template, use `Placeholders.format(template, "k1", v1, "k2", v2, ...)` (or
+  the `Map` overload for 4+) — one single-pass walk instead of N chained
+  `String.replace` allocations, and the keys stay co-located so a missed token
+  is obvious. Prefer this over MiniMessage `TagResolver` for fixed-name tokens.
 
 ## Module package layout
 
@@ -194,6 +198,24 @@ sub-packages. Pick the right one when adding a class — the
 - **`history/`** — append-only persistence specific to histories (teleport,
   tpa). Distinct from `repository/` because the access pattern is different
   (push-only + tail-read).
+
+### Nominal sub-packages
+
+A module may carry sub-packages outside this canonical set when a sub-domain
+grows past a handful of cohesive classes that share one responsibility.
+Examples already in tree: `chat/channel/`, `chat/format/`, `chat/guard/`,
+`chat/placeholder/`, `chat/permission/` (each is its own pipeline stage);
+`homes/rename/` (orchestrator + notifier + sessions + timer + messages for
+one flow); `tpa/bootstrap/` (per-area `*Bootstrap` factories, enforced by the
+arch test).
+
+Rules:
+- Two-class rule: a nominal sub-package needs at least two cohesive classes.
+  One `*Resolver` or one `*Helper` belongs in `service/`, not its own folder.
+- The cross-module import rule still applies — only `service/`, `domain/`,
+  `history/` are importable from other modules. Don't import into a nominal
+  sub-package from outside the module.
+- When in doubt, flatten. A renamed file is cheaper than a stale folder.
 
 ### Naming conventions for orchestration
 

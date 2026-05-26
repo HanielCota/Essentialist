@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.homes.menu;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
-import com.hanielcota.essentials.modules.homes.teleport.HomeTeleporter;
+import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
 import com.hanielcota.essentials.paper.ActorFactory;
 import java.util.ArrayList;
 import java.util.List;

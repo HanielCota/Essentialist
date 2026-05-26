@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.nick.config;
 
+import com.hanielcota.essentials.util.Placeholders;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -51,9 +52,7 @@ public record NickConfig(
   }
 
   public String formatNickSetOther(@NonNull String player, @NonNull String nick) {
-    var withPlayer = nickSetOther.replace("{player}", player);
-
-    return withPlayer.replace("{nick}", nick);
+    return Placeholders.format(nickSetOther, "player", player, "nick", nick);
   }
 
   public String formatNickResetOther(@NonNull String player) {
@@ -65,9 +64,7 @@ public record NickConfig(
   }
 
   public String formatRealNameOf(@NonNull String nick, @NonNull String player) {
-    var withNick = realNameOf.replace("{nick}", nick);
-
-    return withNick.replace("{player}", player);
+    return Placeholders.format(realNameOf, "nick", nick, "player", player);
   }
 
   public String formatUnknownNick(@NonNull String nick) {
@@ -77,8 +74,7 @@ public record NickConfig(
   public String formatInvalidLength() {
     var minStr = Integer.toString(minLength);
     var maxStr = Integer.toString(maxLength);
-    var withMin = invalidLength.replace("{min}", minStr);
 
-    return withMin.replace("{max}", maxStr);
+    return Placeholders.format(invalidLength, "min", minStr, "max", maxStr);
   }
 }
