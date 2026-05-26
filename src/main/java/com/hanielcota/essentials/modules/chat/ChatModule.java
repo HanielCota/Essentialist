@@ -15,9 +15,11 @@ import com.hanielcota.essentials.modules.chat.command.StaffChatNotifier;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.listener.AsyncChatListener;
 import com.hanielcota.essentials.modules.chat.listener.ChatPlayerCleanupListener;
+import com.hanielcota.essentials.modules.chat.placeholder.PlaceholderApiBridge;
 import com.hanielcota.essentials.modules.chat.service.AntiSpamService;
 import com.hanielcota.essentials.modules.chat.service.ChatFormatter;
 import com.hanielcota.essentials.modules.chat.service.CooldownService;
+import com.hanielcota.essentials.modules.chat.service.PlayerMessageStyler;
 import com.hanielcota.essentials.modules.chat.service.StaffChatToggleService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.AudienceProvider;
@@ -25,8 +27,19 @@ import com.hanielcota.essentials.paper.PlayerProvider;
 import lombok.NonNull;
 
 /**
- * Chat formatting + channels (PR 2) + cooldown / repeated-message anti-spam (PR 3). PlaceholderAPI
- * and permission-based formatting come in PR 4.
+ * Chat formatting + channels (PR 2) + cooldown / anti-spam (PR 3) + PlaceholderAPI integration and
+ * permission-based player message styling (PR 4).
+ *
+ * <p>PR 4 wires three new pieces:
+ *
+ * <ul>
+ *   <li>{@link PlaceholderApiBridge} — reflective adapter; reports {@code isAvailable() == false}
+ *       when PAPI is missing so callers cheaply skip placeholder work.
+ *   <li>{@link PlayerMessageStyler} — converts the player's chat input into a styled {@link
+ *       net.kyori.adventure.text.Component} gated by {@code chat.color} / {@code chat.format}.
+ *   <li>{@link ChatFormatter} now consumes the bridge to PAPI-expand the cached template and
+ *       resolve {@code <prefix>} / {@code <suffix>} through the configurable placeholder keys.
+ * </ul>
  */
 public final class ChatModule extends AbstractModule {
 
@@ -42,7 +55,9 @@ public final class ChatModule extends AbstractModule {
     var audiences = env.service(AudienceProvider.class);
     var players = env.service(PlayerProvider.class);
 
-    var formatter = new ChatFormatter();
+    var papi = new PlaceholderApiBridge();
+    var formatter = new ChatFormatter(config, papi);
+    var styler = new PlayerMessageStyler();
     var toggleService = new StaffChatToggleService();
     var cooldowns = new CooldownService();
     var antiSpam = new AntiSpamService();
@@ -60,7 +75,8 @@ public final class ChatModule extends AbstractModule {
     registrar.command(new ChatCommand(configs, chatNotifier));
     registrar.command(new StaffChatCommand(toggleService, staffNotifier));
 
-    registrar.listener(new AsyncChatListener(config, router, formatter, cooldowns, antiSpam));
+    registrar.listener(
+        new AsyncChatListener(config, router, formatter, cooldowns, antiSpam, styler));
     registrar.listener(new ChatPlayerCleanupListener(toggleService, cooldowns, antiSpam));
   }
 }

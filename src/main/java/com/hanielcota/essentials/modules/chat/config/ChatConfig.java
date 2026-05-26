@@ -25,6 +25,7 @@ public record ChatConfig(
     LocalChannelConfig local,
     StaffChannelConfig staff,
     AntiSpamConfig antiSpam,
+    PlaceholderConfig placeholders,
     ChatMessages messages) {
 
   public static ChatConfig defaults() {
@@ -33,6 +34,7 @@ public record ChatConfig(
         LocalChannelConfig.defaults(),
         StaffChannelConfig.defaults(),
         AntiSpamConfig.defaults(),
+        PlaceholderConfig.defaults(),
         ChatMessages.defaults());
   }
 }

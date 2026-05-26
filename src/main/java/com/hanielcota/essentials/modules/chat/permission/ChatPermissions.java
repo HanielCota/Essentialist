@@ -25,6 +25,6 @@ public final class ChatPermissions {
 
   public static final String BYPASS_ANTISPAM = "chat.bypassantispam";
 
-  // Reserved for PR 4 (format/colour):
-  //   chat.color, chat.format
+  public static final String CHAT_COLOR = "chat.color";
+  public static final String CHAT_FORMAT = "chat.format";
 }

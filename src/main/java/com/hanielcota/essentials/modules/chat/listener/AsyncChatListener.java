@@ -9,12 +9,12 @@ import com.hanielcota.essentials.modules.chat.permission.ChatPermissions;
 import com.hanielcota.essentials.modules.chat.service.AntiSpamService;
 import com.hanielcota.essentials.modules.chat.service.ChatFormatter;
 import com.hanielcota.essentials.modules.chat.service.CooldownService;
+import com.hanielcota.essentials.modules.chat.service.PlayerMessageStyler;
 import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
@@ -40,6 +40,8 @@ import org.bukkit.event.Listener;
  *       blocked message does not poison the next attempt's anti-spam comparison.
  *   <li>Let the channel filter {@link AsyncChatEvent#viewers()} (proximity, staff permission, ...).
  *   <li>If the channel decides nobody else can hear (local chat warning), cancel and return.
+ *   <li>Style the player's message via {@link PlayerMessageStyler} — colours/decorations only if
+ *       the sender has the respective permission, literal otherwise.
  *   <li>Install a {@link ChatRenderer#viewerUnaware ViewerUnaware} renderer so Paper formats the
  *       component once and reuses it for every viewer.
  * </ol>
@@ -60,6 +62,7 @@ public final class AsyncChatListener implements Listener {
   private final ChatFormatter formatter;
   private final CooldownService cooldowns;
   private final AntiSpamService antiSpam;
+  private final PlayerMessageStyler styler;
 
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
   public void onChat(@NonNull AsyncChatEvent event) {
@@ -96,7 +99,7 @@ public final class AsyncChatListener implements Listener {
     }
 
     var template = channel.template(snap);
-    var messageComponent = messageComponentFor(typedMessage, plainMessage, routedMessage);
+    var messageComponent = this.styler.style(sender, routedMessage);
 
     event.renderer(
         ChatRenderer.viewerUnaware(
@@ -159,22 +162,5 @@ public final class AsyncChatListener implements Listener {
     sender.sendMessage(component);
 
     return true;
-  }
-
-  /**
-   * Returns the component we feed into the formatter. When the router stripped a prefix, we fall
-   * back to a plain text component of the stripped body — the original typed component would still
-   * carry the {@code !}. When nothing was stripped, we keep the typed component as-is so future
-   * styling (PR 4, {@code chat.color}) flows through untouched.
-   */
-  private static Component messageComponentFor(
-      @NonNull Component typedMessage,
-      @NonNull String plainMessage,
-      @NonNull String routedMessage) {
-    if (routedMessage.equals(plainMessage)) {
-      return typedMessage;
-    }
-
-    return Component.text(routedMessage);
   }
 }
