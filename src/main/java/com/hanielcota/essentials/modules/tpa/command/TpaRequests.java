@@ -15,13 +15,13 @@ import org.bukkit.entity.Player;
 
 /** Shared command helpers — request lookup, sending and replying to the requester. */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class TpaRequests {
+public final class TpaRequests {
 
   /**
    * Opens a new request from {@code sender} to {@code target}, refusing self-targets, and replies
-   * to the sender. Used by {@code /tpa} and {@code /tpahere}.
+   * to the sender. Used by {@code /tpa}, {@code /tpahere} and the favorites action menu.
    */
-  static void send(
+  public static void send(
       @NonNull TeleportRequestService service,
       @NonNull TpaMessages messages,
       @NonNull CommandActor actor,

@@ -15,6 +15,8 @@ import com.hanielcota.essentials.modules.tpa.command.TpCancelCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpDenyCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaBlockCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaCommand;
+import com.hanielcota.essentials.modules.tpa.command.TpaFavoriteNotifier;
+import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.command.TpaHereCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryPresenter;
@@ -24,9 +26,13 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.SqliteTpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryTable;
+import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteChatListener;
+import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteSessionCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaHistoryMenuCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaQuitListener;
 import com.hanielcota.essentials.modules.tpa.menu.TpaBlockedMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaFavoriteActionMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaFavoritesMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
@@ -37,11 +43,16 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaBlockRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaBlockTable;
+import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteRepository;
+import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteTable;
 import com.hanielcota.essentials.modules.tpa.repository.TpaProfileRepository;
 import com.hanielcota.essentials.modules.tpa.repository.TpaProfileTable;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExpiry;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
+import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
+import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
+import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -73,12 +84,16 @@ public final class TpaModule extends AbstractModule {
     var history = history(env, registrar);
     var profiles = profiles(env, registrar);
     var blocks = blocks(env, registrar);
+    var favorites = favorites(env, registrar);
     var runtime = requestRuntime(env, registrar, config, history, profiles, blocks);
+    var favoriteRuntime = favoriteRuntime(env, registrar, config, favorites);
     var menuState = registerHistoryMenu(registrar, config, history);
-    registerHelpMenu(registrar, config, profiles, runtime.requestService());
+    registerHelpMenu(registrar, config, profiles, runtime.requestService(), favorites);
     registerPendingMenu(env, registrar, config, runtime.requestService());
     registerSettingsMenu(registrar, config, profiles);
     registerBlockedMenu(registrar, config, blocks);
+    registerFavoritesMenu(registrar, config, favorites, favoriteRuntime);
+    registerFavoriteActionMenu(env, registrar, config, favorites, favoriteRuntime, runtime);
 
     registerCommands(env, registrar, config, history, runtime.requestService(), blocks, menuState);
 
@@ -134,6 +149,23 @@ public final class TpaModule extends AbstractModule {
     return service;
   }
 
+  private TpaFavoriteService favorites(
+      @NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
+    var executor = env.service(SqlExecutor.class);
+    var dialect = env.service(SqlDialect.class);
+    var table = new TpaFavoriteTable(dialect);
+    table.install(executor);
+
+    var repository = new TpaFavoriteRepository(executor, table);
+    var writer = new DefaultAsyncDatabaseWriter("Essentialist-TpaFavorites");
+    registrar.closeable(writer);
+
+    var service = new TpaFavoriteService(repository, writer);
+    service.loadAll(repository.listAll());
+
+    return service;
+  }
+
   private TpaRuntime requestRuntime(
       @NonNull ModuleEnvironment env,
       @NonNull ModuleRegistrar registrar,
@@ -158,8 +190,65 @@ public final class TpaModule extends AbstractModule {
       @NonNull ModuleRegistrar registrar,
       ConfigHandle<TpaConfig> config,
       TpaProfileService profiles,
-      TeleportRequestService requests) {
-    var menu = new TpaHelpMenu(config, profiles, requests);
+      TeleportRequestService requests,
+      TpaFavoriteService favorites) {
+    var menu = new TpaHelpMenu(config, profiles, requests, favorites);
+
+    registrar.menu(menu);
+  }
+
+  private FavoriteRuntime favoriteRuntime(
+      @NonNull ModuleEnvironment env,
+      @NonNull ModuleRegistrar registrar,
+      ConfigHandle<TpaConfig> config,
+      TpaFavoriteService favorites) {
+    var sessions = new TpaFavoriteSessions();
+    var selections = new TpaFavoriteSelections();
+    var notifier = new TpaFavoriteNotifier(config);
+    var playerProvider = env.service(PlayerProvider.class);
+    var scheduler = env.service(Scheduler.class);
+    var orchestrator =
+        new TpaFavoritePromptOrchestrator(
+            config, favorites, sessions, notifier, playerProvider, scheduler);
+
+    var chatListener = new TpaFavoriteChatListener(orchestrator, sessions);
+    registrar.listener(chatListener);
+
+    var cleanupListener = new TpaFavoriteSessionCleanupListener(sessions, selections);
+    registrar.listener(cleanupListener);
+
+    return new FavoriteRuntime(selections, orchestrator);
+  }
+
+  private void registerFavoritesMenu(
+      @NonNull ModuleRegistrar registrar,
+      ConfigHandle<TpaConfig> config,
+      TpaFavoriteService favorites,
+      FavoriteRuntime favoriteRuntime) {
+    var menu =
+        new TpaFavoritesMenu(
+            config, favorites, favoriteRuntime.selections(), favoriteRuntime.orchestrator());
+
+    registrar.menu(menu);
+  }
+
+  private void registerFavoriteActionMenu(
+      @NonNull ModuleEnvironment env,
+      @NonNull ModuleRegistrar registrar,
+      ConfigHandle<TpaConfig> config,
+      TpaFavoriteService favorites,
+      FavoriteRuntime favoriteRuntime,
+      TpaRuntime runtime) {
+    var playerProvider = env.service(PlayerProvider.class);
+    var actors = env.service(ActorFactory.class);
+    var menu =
+        new TpaFavoriteActionMenu(
+            config,
+            favorites,
+            favoriteRuntime.selections(),
+            runtime.requestService(),
+            playerProvider,
+            actors);
 
     registrar.menu(menu);
   }
@@ -250,4 +339,7 @@ public final class TpaModule extends AbstractModule {
   }
 
   private record TpaRuntime(TeleportRequestService requestService, TpaNotifier notifier) {}
+
+  private record FavoriteRuntime(
+      TpaFavoriteSelections selections, TpaFavoritePromptOrchestrator orchestrator) {}
 }

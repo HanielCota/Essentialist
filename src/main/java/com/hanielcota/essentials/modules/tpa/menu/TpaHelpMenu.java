@@ -14,6 +14,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaHelpMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.util.ComponentUtils;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
   private final ConfigHandle<TpaConfig> config;
   private final TpaProfileService profiles;
   private final TeleportRequestService requests;
+  private final TpaFavoriteService favorites;
 
   static List<Integer> contentSlots(@NonNull TpaHelpMenuConfig helpMenu, int rows) {
     return List.of(
@@ -46,7 +48,8 @@ public final class TpaHelpMenu implements EssentialsMenu {
         MenuLayouts.sanitizeSlot(helpMenu.tpaSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(helpMenu.pendingSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(helpMenu.historySlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(helpMenu.settingsSlot(), rows, 0));
+        MenuLayouts.sanitizeSlot(helpMenu.settingsSlot(), rows, 0),
+        MenuLayouts.sanitizeSlot(helpMenu.favoritesSlot(), rows, 0));
   }
 
   private static ItemTemplate template(
@@ -138,6 +141,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
     var playerId = player.getUniqueId();
     var profile = this.profiles.profile(playerId);
     var pending = this.requests.incoming(playerId).size();
+    var favoriteCount = this.favorites.favoritesOf(playerId).size();
 
     var slots = new ArrayList<SlotDefinition>();
     slots.add(profileSlot(player, profile, pending, helpMenu, rows));
@@ -145,6 +149,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
     slots.add(pendingSlot(helpMenu, pending, rows));
     slots.add(historySlot(helpMenu, rows));
     slots.add(settingsSlot(helpMenu, rows));
+    slots.add(favoritesSlot(helpMenu, favoriteCount, rows));
 
     return slots;
   }
@@ -232,6 +237,26 @@ public final class TpaHelpMenu implements EssentialsMenu {
     return SlotDefinition.of(safeSlot, template, this::openSettings);
   }
 
+  private SlotDefinition favoritesSlot(
+      @NonNull TpaHelpMenuConfig helpMenu, int favoriteCount, int rows) {
+    var countText = Integer.toString(favoriteCount);
+    var name = helpMenu.favoritesName().replace("{favorites}", countText);
+    var lore = replaceFavorites(helpMenu.favoritesLore(), favoriteCount);
+    var template = template(helpMenu.favoritesIcon(), helpMenu.favoritesHeadTexture(), name, lore);
+    var safeSlot = MenuLayouts.sanitizeSlot(helpMenu.favoritesSlot(), rows, 0);
+
+    return SlotDefinition.of(safeSlot, template, this::openFavorites);
+  }
+
+  private static List<String> replaceFavorites(@NonNull List<String> lore, int favoriteCount) {
+    var replaced = new ArrayList<String>(lore.size());
+    var countText = Integer.toString(favoriteCount);
+    for (var line : lore) {
+      replaced.add(line.replace("{favorites}", countText));
+    }
+    return replaced;
+  }
+
   private void openHistory(@NonNull ClickContext click) {
     click.switchTo(TpaHistoryMenu.ID);
   }
@@ -242,5 +267,9 @@ public final class TpaHelpMenu implements EssentialsMenu {
 
   private void openSettings(@NonNull ClickContext click) {
     click.switchTo(TpaSettingsMenu.ID);
+  }
+
+  private void openFavorites(@NonNull ClickContext click) {
+    click.switchTo(TpaFavoritesMenu.ID);
   }
 }

@@ -60,7 +60,27 @@ public record TpaMessages(
         String blockedByPlayer,
     @Comment("/tpablock confirmation. Placeholders: {player}.") String blockedPlayer,
     @Comment("/tpaunblock confirmation. Placeholders: {player}.") String unblockedPlayer,
-    @Comment("Shown when a player tries to block themselves.") String blockSelf) {
+    @Comment("Shown when a player tries to block themselves.") String blockSelf,
+    @Comment("Prompt sent when the player clicks the add-favorite button. Placeholders: {seconds}.")
+        String favoritePrompt,
+    @Comment("Favorite added confirmation. Placeholders: {player}.") String favoriteAdded,
+    @Comment("Favorite removed confirmation. Placeholders: {player}.") String favoriteRemoved,
+    @Comment(
+            "Shown when the player tried to add a favorite they already had. Placeholders:"
+                + " {player}.")
+        String favoriteAlready,
+    @Comment("Shown when the typed name does not look like a valid Minecraft nickname.")
+        String favoriteInvalidName,
+    @Comment("Shown when the favorite-add prompt times out.") String favoritePromptTimeout,
+    @Comment("Shown when the player cancels the favorite-add prompt.")
+        String favoritePromptCancelled,
+    @Comment("Shown when a player tries to favorite themselves.") String favoriteSelf,
+    @Comment(
+            "Shown when the typed name does not match any known online or offline player. "
+                + "Placeholders: {player}.")
+        String favoriteUnknownPlayer,
+    @Comment("Shown when the chosen favorite is not online right now. Placeholders: {player}.")
+        String favoriteOffline) {
 
   public static TpaMessages defaults() {
     return new TpaMessages(
@@ -97,7 +117,18 @@ public record TpaMessages(
         "<red><gold>{player}</gold> não está recebendo pedidos seus.",
         "<green>Você bloqueou pedidos de TPA de <gold>{player}</gold>.",
         "<green>Você desbloqueou pedidos de TPA de <gold>{player}</gold>.",
-        "<red>Você não pode bloquear pedidos de TPA de si mesmo.");
+        "<red>Você não pode bloquear pedidos de TPA de si mesmo.",
+        "<yellow>Digite no chat o nick do jogador que deseja adicionar aos favoritos. "
+            + "<gray>(<white>{seconds}s</white>, digite <white>cancelar</white> para abortar)",
+        "<green>Você adicionou <gold>{player}</gold> aos favoritos.",
+        "<yellow>Você removeu <gold>{player}</gold> dos favoritos.",
+        "<red><gold>{player}</gold> já está nos seus favoritos.",
+        "<red>Nick inválido. Use apenas letras, números e _.",
+        "<red>Você não digitou nada a tempo — adição de favorito cancelada.",
+        "<yellow>Adição de favorito cancelada.",
+        "<red>Você não pode adicionar a si mesmo como favorito.",
+        "<red>O jogador <gold>{player}</gold> nunca entrou neste servidor.",
+        "<red><gold>{player}</gold> não está online no momento.");
   }
 
   /** The request line shown to the target, picked by {@code type}. */

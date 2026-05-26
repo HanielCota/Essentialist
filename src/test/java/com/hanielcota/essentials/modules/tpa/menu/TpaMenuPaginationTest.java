@@ -22,7 +22,8 @@ class TpaMenuPaginationTest {
             settings.tpaSlot(),
             settings.pendingSlot(),
             settings.historySlot(),
-            settings.settingsSlot()),
+            settings.settingsSlot(),
+            settings.favoritesSlot()),
         slots);
   }
 

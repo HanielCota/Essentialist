@@ -48,6 +48,14 @@ public record TpaHelpMenuConfig(
         String settingsHeadTexture,
     @Comment("Name of the settings shortcut.") String settingsName,
     @Comment("Lore of the settings shortcut.") List<String> settingsLore,
+    @Comment("Slot of the favorites shortcut — clicking opens the favorites menu.")
+        int favoritesSlot,
+    @Comment("Material of the favorites shortcut.") Material favoritesIcon,
+    @Comment("Custom head texture for the favorites shortcut when material is PLAYER_HEAD.")
+        String favoritesHeadTexture,
+    @Comment("Name of the favorites shortcut. Placeholder: {favorites}.") String favoritesName,
+    @Comment("Lore of the favorites shortcut. Placeholder: {favorites}.")
+        List<String> favoritesLore,
     @Comment("Label used for enabled settings.") String enabledLabel,
     @Comment("Label used for disabled settings.") String disabledLabel) {
 
@@ -115,6 +123,16 @@ public record TpaHelpMenuConfig(
             "<gray>você até eles.",
             "",
             "<yellow>Clique para configurar."),
+        14,
+        Material.NETHER_STAR,
+        "",
+        "<gold>Favoritos",
+        List.of(
+            "<gray>Atalhos rápidos de TPA para",
+            "<gray>seus jogadores favoritos.",
+            "<gray>Salvos: <white>{favorites}",
+            "",
+            "<yellow>Clique para abrir."),
         "<green>Ligado",
         "<red>Desligado");
   }
