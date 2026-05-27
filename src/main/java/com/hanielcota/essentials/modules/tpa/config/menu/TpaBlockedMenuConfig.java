@@ -32,22 +32,17 @@ public record TpaBlockedMenuConfig(
         Material.PLAYER_HEAD,
         true,
         "",
-        "<red>{player}",
-        List.of(
-            "<gray>Este jogador não pode",
-            "<gray>te enviar pedidos de TPA.",
-            "",
-            "<yellow>Clique para desbloquear."),
+        "{player}",
+        List.of("Este jogador não pode te enviar pedidos de TPA.", "", "Clique para desbloquear."),
         Material.BARRIER,
-        "<green>Ninguém bloqueado",
+        "Ninguém bloqueado",
         List.of(
-            "<gray>Sua lista está vazia.",
+            "Sua lista de bloqueios está vazia.",
             "",
-            "<gray>Use <yellow>/tpablock <jogador>",
-            "<gray>para bloquear alguém."),
+            "Use /tpablock <jogador> para bloquear alguém."),
         40,
         Material.ARROW,
-        "<yellow>Voltar",
-        List.of("<gray>Retorna às configurações."));
+        "Voltar",
+        List.of("Volta para as configurações."));
   }
 }

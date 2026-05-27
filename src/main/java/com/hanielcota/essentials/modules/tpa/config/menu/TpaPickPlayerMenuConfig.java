@@ -44,35 +44,34 @@ public record TpaPickPlayerMenuConfig(
 
   public static TpaPickPlayerMenuConfig defaults() {
     return new TpaPickPlayerMenuConfig(
-        "<gold>Escolha um jogador",
+        "Escolha um jogador",
         6,
         List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34),
         Material.PLAYER_HEAD,
         true,
         "",
-        "<gold>{player}",
-        List.of("<gray>Clique para abrir as ações", "<gray>de TPA com este jogador."),
+        "{player}",
+        List.of("Clique para abrir as ações de TPA com este jogador."),
         Material.BARRIER,
-        "<red>Ninguém online",
-        List.of("<gray>Não há nenhum outro jogador", "<gray>online no momento."),
+        "Ninguém online",
+        List.of("Não há nenhum outro jogador conectado no momento."),
         49,
         Material.ARROW,
-        "<yellow>Voltar",
-        List.of("<gray>Retorna ao menu de TPA."),
+        "Voltar",
+        List.of("Volta para o menu de TPA."),
         45,
         Material.HOPPER,
-        "<gold>Filtro: <yellow>{filter}",
+        "Filtro: {filter}",
         List.of(
-            "<gray>Filtra a lista de jogadores",
-            "<gray>mostrados no menu.",
+            "Filtra a lista de jogadores mostrados no menu.",
             "",
             "{options}",
             "",
-            "<yellow>Clique para alternar."),
+            "Clique para alternar o filtro."),
         "Todos",
         "Favoritos",
         "Mesmo mundo",
         "Recentes",
-        " <green>◀");
+        " ◀");
   }
 }
