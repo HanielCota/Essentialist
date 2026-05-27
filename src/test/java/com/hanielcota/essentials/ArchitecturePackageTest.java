@@ -162,14 +162,15 @@ class ArchitecturePackageTest {
       var violations =
           paths
               .filter(ArchitecturePackageTest::implementsPublicApiFacade)
-              .filter(ArchitecturePackageTest::livesOutsideCoreApi)
+              .filter(ArchitecturePackageTest::livesOutsideCoreApiOrModuleServicePackage)
               .map(ArchitecturePackageTest::relativePath)
               .toList();
 
       assertTrue(
           violations.isEmpty(),
           () ->
-              "Only com.hanielcota.essentials.core.api may implement public *Api interfaces: "
+              "Only com.hanielcota.essentials.core.api or modules/*/service/ may implement public"
+                  + " *Api interfaces: "
                   + violations);
     }
   }
@@ -334,9 +335,10 @@ class ArchitecturePackageTest {
     return IMPLEMENTS_PUBLIC_API.matcher(body).find();
   }
 
-  private static boolean livesOutsideCoreApi(Path path) {
+  private static boolean livesOutsideCoreApiOrModuleServicePackage(Path path) {
     var rel = relativePath(path);
-    return !rel.startsWith("com/hanielcota/essentials/core/api/");
+    return !rel.startsWith("com/hanielcota/essentials/core/api/")
+        && !(rel.startsWith("com/hanielcota/essentials/modules/") && rel.contains("/service/"));
   }
 
   private static String fileName(Path path) {

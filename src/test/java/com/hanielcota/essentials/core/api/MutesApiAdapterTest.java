@@ -22,11 +22,10 @@ class MutesApiAdapterTest {
     var id = UUID.randomUUID();
     cache.loadAll(List.of(Map.entry(id, Mute.permanent())));
 
-    var service = new MuteService(cache);
-    var adapter = new MutesApiAdapter(service);
+    var api = new MuteService(cache);
 
-    assertTrue(adapter.isMuted(id));
-    assertFalse(adapter.isMuted(UUID.randomUUID()));
+    assertTrue(api.isMuted(id));
+    assertFalse(api.isMuted(UUID.randomUUID()));
   }
 
   @Test
@@ -36,9 +35,8 @@ class MutesApiAdapterTest {
     var mute = Mute.permanent();
     cache.loadAll(List.of(Map.entry(id, mute)));
 
-    var service = new MuteService(cache);
-    var adapter = new MutesApiAdapter(service);
+    var api = new MuteService(cache);
 
-    assertEquals(mute, adapter.activeMute(id).orElseThrow());
+    assertEquals(mute, api.activeMute(id).orElseThrow());
   }
 }
