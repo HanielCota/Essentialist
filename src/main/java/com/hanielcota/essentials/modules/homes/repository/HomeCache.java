@@ -100,6 +100,26 @@ public final class HomeCache {
     return bucket.updateMaterial(name, material);
   }
 
+  Optional<Home> updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
+    var bucket = this.homes.get(owner);
+
+    if (bucket == null) {
+      return Optional.empty();
+    }
+
+    return bucket.updatePinned(name, pinned);
+  }
+
+  Optional<Home> bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
+    var bucket = this.homes.get(owner);
+
+    if (bucket == null) {
+      return Optional.empty();
+    }
+
+    return bucket.bumpUsage(name, timestampMs);
+  }
+
   private HomeBucket bucket(@NonNull UUID owner) {
     Function<UUID, HomeBucket> create = ignored -> new HomeBucket();
     return this.homes.computeIfAbsent(owner, create);

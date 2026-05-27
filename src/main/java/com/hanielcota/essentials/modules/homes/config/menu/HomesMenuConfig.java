@@ -26,6 +26,10 @@ public record HomesMenuConfig(
     @Comment("/homes previous/next page buttons.") NavigationButtonsConfig navigation,
     @Comment("Slot of the static info item shown on every /homes page.") int infoSlot,
     @Comment("Material of the static info item.") Material infoMaterial,
+    @Comment(
+            "Use the viewer's skin on the info item when material is PLAYER_HEAD. Renders "
+                + "per-viewer (each player sees their own head).")
+        boolean infoUsePlayerHead,
     @Comment("Name of the static info item.") String infoName,
     @Comment("Lore of the static info item — explain how /homes works to the player.")
         List<String> infoLore,
@@ -70,7 +74,68 @@ public record HomesMenuConfig(
     @Comment("Slot of the delete-confirmation yes button.") int deleteYesSlot,
     @Comment("Material of the delete-confirmation yes button.") Material deleteYesMaterial,
     @Comment("Slot of the delete-confirmation no button.") int deleteNoSlot,
-    @Comment("Material of the delete-confirmation no button.") Material deleteNoMaterial) {
+    @Comment("Material of the delete-confirmation no button.") Material deleteNoMaterial,
+    @Comment("Slot of the + Nova home button shown on every /homes page.") int createSlot,
+    @Comment("Material of the + Nova home button.") Material createMaterial,
+    @Comment("Name of the + Nova home button.") String createName,
+    @Comment("Lore of the + Nova home button.") List<String> createLore,
+    @Comment(
+            "Options menu title shown on right-click. Static — inventory titles can't be "
+                + "personalised per viewer, so the home name appears in the info slot instead.")
+        String optionsTitle,
+    @Comment("Options menu rows (1-6).") int optionsRows,
+    @Comment("Slot of the home info item in the options menu.") int optionsHomeSlot,
+    @Comment("Slot of the teleport button.") int optionsTeleportSlot,
+    @Comment("Material of the teleport button.") Material optionsTeleportMaterial,
+    @Comment("Name of the teleport button. Placeholders: {name}.") String optionsTeleportName,
+    @Comment("Lore of the teleport button.") List<String> optionsTeleportLore,
+    @Comment("Slot of the rename button.") int optionsRenameSlot,
+    @Comment("Material of the rename button.") Material optionsRenameMaterial,
+    @Comment("Name of the rename button. Placeholders: {name}.") String optionsRenameName,
+    @Comment("Lore of the rename button.") List<String> optionsRenameLore,
+    @Comment("Slot of the change-icon button.") int optionsIconSlot,
+    @Comment("Material of the change-icon button.") Material optionsIconMaterial,
+    @Comment("Name of the change-icon button. Placeholders: {name}.") String optionsIconName,
+    @Comment("Lore of the change-icon button.") List<String> optionsIconLore,
+    @Comment("Slot of the delete button.") int optionsDeleteSlot,
+    @Comment("Material of the delete button.") Material optionsDeleteMaterial,
+    @Comment("Name of the delete button. Placeholders: {name}.") String optionsDeleteName,
+    @Comment("Lore of the delete button.") List<String> optionsDeleteLore,
+    @Comment("Slot of the back button.") int optionsBackSlot,
+    @Comment("Material of the back button.") Material optionsBackMaterial,
+    @Comment("Name of the back button.") String optionsBackName,
+    @Comment("Lore of the back button.") List<String> optionsBackLore,
+    @Comment("Slot of the pin / unpin button.") int optionsPinSlot,
+    @Comment("Material of the pin button (shown when the home is not pinned).")
+        Material optionsPinMaterial,
+    @Comment("Name of the pin button. Placeholders: {name}.") String optionsPinName,
+    @Comment("Lore of the pin button. Placeholders: {name}.") List<String> optionsPinLore,
+    @Comment("Material of the unpin button (shown when the home is pinned).")
+        Material optionsUnpinMaterial,
+    @Comment("Name of the unpin button. Placeholders: {name}.") String optionsUnpinName,
+    @Comment("Lore of the unpin button. Placeholders: {name}.") List<String> optionsUnpinLore,
+    @Comment(
+            "Prefix added to the home name in /homes when it is pinned. Empty to disable the "
+                + "marker.")
+        String pinnedNamePrefix,
+    @Comment("Slot of the sort-cycle button on every /homes page.") int sortSlot,
+    @Comment("Material of the sort button.") Material sortMaterial,
+    @Comment("Name of the sort button. Placeholder: {state}.") String sortName,
+    @Comment(
+            "Lore of the sort button. Use {state} for the current label and {options} to expand"
+                + " the full list of sort states with the active one marked.")
+        List<String> sortLore,
+    @Comment("Label used in {state} when sorting alphabetically.") String sortLabelName,
+    @Comment("Label used in {state} when sorting by most teleports.") String sortLabelMostUsed,
+    @Comment("Label used in {state} when sorting by most recent teleport.") String sortLabelRecent,
+    @Comment("Suffix appended to the active option in the {options} expansion.")
+        String sortActiveMarker,
+    @Comment(
+            "Suffix appended to the home lore showing usage stats. Empty to disable. "
+                + "Placeholders: {count}, {last_used}, {created_at}.")
+        List<String> usageLore,
+    @Comment("Label shown for {last_used} when the home has never been teleported to.")
+        String lastUsedNever) {
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
@@ -80,21 +145,20 @@ public record HomesMenuConfig(
             11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34,
             36, 37, 38, 39, 40, 41, 42, 43),
         NavigationButtonsConfig.defaults(48, 50),
-        10,
-        Material.BOOK,
+        4,
+        Material.PLAYER_HEAD,
+        true,
         "<yellow>How homes work",
         List.of(
             "<gray>Personal teleport points.",
             "",
-            "<yellow>/sethome <name> <gray>creates a home",
             "<yellow>/home <name> <gray>teleports you there",
             "<yellow>/homes <gray>opens this menu",
             "",
             "<gray>In this menu:",
+            "<yellow>+ button <gray>creates a new home",
             "<yellow>Left-click <gray>teleports",
-            "<yellow>Right-click <gray>deletes",
-            "<yellow>Shift + click <gray>renames",
-            "<yellow>Q (drop) <gray>changes the icon",
+            "<yellow>Right-click <gray>opens the options menu",
             "",
             "<dark_gray>Your limit depends on your permission."),
         "<gold>{name}",
@@ -105,9 +169,7 @@ public record HomesMenuConfig(
             "<gray>Created: <white>{created_at}",
             "",
             "<yellow>Left-click <gray>to teleport",
-            "<yellow>Right-click <gray>to delete",
-            "<yellow>Shift + click <gray>to rename",
-            "<yellow>Q (drop) <gray>to change the icon"),
+            "<yellow>Right-click <gray>for options"),
         false,
         "dd/MM/yyyy",
         "HH:mm",
@@ -141,7 +203,65 @@ public record HomesMenuConfig(
         11,
         Material.LIME_WOOL,
         15,
-        Material.RED_WOOL);
+        Material.RED_WOOL,
+        16,
+        Material.EMERALD,
+        "<green>+ Nova home",
+        List.of(
+            "<gray>Cria uma home na sua",
+            "<gray>posição atual.",
+            "",
+            "<yellow>Clique e digite o nome no chat."),
+        "<dark_gray>Opções da home",
+        3,
+        4,
+        11,
+        Material.ENDER_PEARL,
+        "<green>Teleportar",
+        List.of("<gray>Vai até <gold>{name}</gold>."),
+        12,
+        Material.NAME_TAG,
+        "<yellow>Renomear",
+        List.of(
+            "<gray>Troca o nome de <gold>{name}</gold>.",
+            "",
+            "<yellow>Clique e digite o novo nome no chat."),
+        14,
+        Material.PAINTING,
+        "<aqua>Trocar ícone",
+        List.of("<gray>Escolhe um novo ícone para <gold>{name}</gold>."),
+        15,
+        Material.BARRIER,
+        "<red>Deletar",
+        List.of("<gray>Remove <gold>{name}</gold> permanentemente."),
+        22,
+        Material.ARROW,
+        "<yellow>Voltar",
+        List.of("<gray>Retorna à lista de homes."),
+        13,
+        Material.NETHER_STAR,
+        "<gold>Fixar no topo",
+        List.of("<gray>Move <gold>{name}</gold> para o topo da lista."),
+        Material.NETHER_STAR,
+        "<gold>★ Desfixar",
+        List.of("<gray>Remove o destaque de <gold>{name}</gold>."),
+        "<gold>★ ",
+        8,
+        Material.HOPPER,
+        "<gold>Ordenar: <yellow>{state}",
+        List.of(
+            "<gray>Ordena suas homes na lista.",
+            "",
+            "{options}",
+            "",
+            "<yellow>Clique para alternar."),
+        "Alfabético",
+        "Mais usadas",
+        "Recentes",
+        " <green>✓",
+        List.of(
+            "", "<dark_gray>Teleportes: <gray>{count}", "<dark_gray>Último uso: <gray>{last_used}"),
+        "nunca");
   }
 
   private static Map<MaterialCategory, String> defaultCategoryNames() {

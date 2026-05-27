@@ -42,37 +42,30 @@ public final class HomeService implements HomesApi {
     return this.limits.resolve(owner);
   }
 
-  public SaveResult save(
+  public CreateResult createNew(
       @NonNull Player owner,
       @NonNull String name,
       @NonNull Location location,
       @Nullable Material material) {
     var ownerId = owner.getUniqueId();
     var existing = this.repository.find(ownerId, name);
-    var sanitizedMaterial = HomeMaterials.sanitizeIcon(material);
 
     if (existing.isPresent()) {
-      var previous = existing.get();
-      var previousMaterial = previous.material();
-      var keepMaterial = material != null ? sanitizedMaterial : previousMaterial;
-
-      var updatedHome = Home.of(ownerId, name, location, keepMaterial);
-      this.repository.save(updatedHome);
-
-      return SaveResult.UPDATED;
+      return CreateResult.ALREADY_EXISTS;
     }
 
     var currentCount = this.repository.count(ownerId);
     var maxAllowed = this.limits.resolve(owner);
 
     if (currentCount >= maxAllowed) {
-      return SaveResult.LIMIT_REACHED;
+      return CreateResult.LIMIT_REACHED;
     }
 
+    var sanitizedMaterial = HomeMaterials.sanitizeIcon(material);
     var newHome = Home.of(ownerId, name, location, sanitizedMaterial);
     this.repository.save(newHome);
 
-    return SaveResult.CREATED;
+    return CreateResult.CREATED;
   }
 
   public boolean delete(@NonNull UUID owner, @NonNull String name) {
@@ -109,9 +102,17 @@ public final class HomeService implements HomesApi {
     return this.repository.updateMaterial(owner, name, material);
   }
 
-  public enum SaveResult {
+  public boolean setPinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
+    return this.repository.updatePinned(owner, name, pinned);
+  }
+
+  public boolean recordUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
+    return this.repository.bumpUsage(owner, name, timestampMs);
+  }
+
+  public enum CreateResult {
     CREATED,
-    UPDATED,
+    ALREADY_EXISTS,
     LIMIT_REACHED
   }
 

@@ -29,7 +29,7 @@ class HomesMenuConfigTest {
     var config = HomesMenuConfig.defaults();
     var moment = LocalDateTime.of(2026, 5, 25, 15, 42);
     var millis = moment.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-    var placeholders = HomeMenuPlaceholders.of("world", 10, 64, -20, 180, millis, config);
+    var placeholders = HomeMenuPlaceholders.of("world", 10, 64, -20, 180, millis, 0L, 0L, config);
 
     var lore = HomesMainMenuSection.itemLore(config, placeholders);
 

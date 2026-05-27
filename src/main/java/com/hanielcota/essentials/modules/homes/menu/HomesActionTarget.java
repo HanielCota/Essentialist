@@ -25,6 +25,10 @@ public final class HomesActionTarget {
     return this.targets.remove(player);
   }
 
+  public String peek(@NonNull UUID player) {
+    return this.targets.get(player);
+  }
+
   public void clear(@NonNull UUID player) {
     this.targets.remove(player);
     this.categories.remove(player);

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 class CachedHomeRepositoryTest {
 
   private static Home home(UUID owner, String name) {
-    return new Home(owner, name, "world", 1, 2, 3, 0, 0, Material.RED_BED, 1);
+    return new Home(owner, name, "world", 1, 2, 3, 0, 0, Material.RED_BED, 1, false, 0L, 0L);
   }
 
   private static List<String> names(List<Home> homes) {
@@ -200,6 +200,16 @@ class CachedHomeRepositoryTest {
 
     @Override
     public boolean updateMaterial(UUID owner, String name, Material material) {
+      return true;
+    }
+
+    @Override
+    public boolean updatePinned(UUID owner, String name, boolean pinned) {
+      return true;
+    }
+
+    @Override
+    public boolean bumpUsage(UUID owner, String name, long timestampMs) {
       return true;
     }
   }

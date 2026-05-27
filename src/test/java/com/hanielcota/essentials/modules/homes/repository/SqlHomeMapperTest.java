@@ -13,27 +13,20 @@ class SqlHomeMapperTest {
 
   private static ResultSet resultSet(String material) {
     var values =
-        Map.<String, Object>of(
-            "player_id",
-            UUID.randomUUID().toString(),
-            "name",
-            "base",
-            "world",
-            "world",
-            "x",
-            1D,
-            "y",
-            2D,
-            "z",
-            3D,
-            "yaw",
-            4D,
-            "pitch",
-            5D,
-            "material",
-            material,
-            "created_at",
-            6L);
+        Map.<String, Object>ofEntries(
+            Map.entry("player_id", UUID.randomUUID().toString()),
+            Map.entry("name", "base"),
+            Map.entry("world", "world"),
+            Map.entry("x", 1D),
+            Map.entry("y", 2D),
+            Map.entry("z", 3D),
+            Map.entry("yaw", 4D),
+            Map.entry("pitch", 5D),
+            Map.entry("material", material),
+            Map.entry("created_at", 6L),
+            Map.entry("pinned", 0),
+            Map.entry("teleport_count", 0L),
+            Map.entry("last_used_at", 0L));
 
     return (ResultSet)
         Proxy.newProxyInstance(
@@ -45,6 +38,7 @@ class SqlHomeMapperTest {
                 case "getString" -> String.valueOf(values.get(column));
                 case "getDouble" -> ((Number) values.get(column)).doubleValue();
                 case "getLong" -> ((Number) values.get(column)).longValue();
+                case "getInt" -> ((Number) values.get(column)).intValue();
                 case "toString" -> "HomeResultSet";
                 default -> throw new UnsupportedOperationException(method.getName());
               };

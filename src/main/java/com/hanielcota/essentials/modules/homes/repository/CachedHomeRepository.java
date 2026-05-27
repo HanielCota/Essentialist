@@ -123,6 +123,34 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   }
 
   @Override
+  public boolean updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
+    var updated = this.cache.updatePinned(owner, name, pinned);
+
+    if (updated.isEmpty()) {
+      return false;
+    }
+
+    Runnable persist = () -> this.delegate.updatePinned(owner, name, pinned);
+    this.writer.submit("update home pinned", persist);
+
+    return true;
+  }
+
+  @Override
+  public boolean bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
+    var updated = this.cache.bumpUsage(owner, name, timestampMs);
+
+    if (updated.isEmpty()) {
+      return false;
+    }
+
+    Runnable persist = () -> this.delegate.bumpUsage(owner, name, timestampMs);
+    this.writer.submit("bump home usage", persist);
+
+    return true;
+  }
+
+  @Override
   public void close() {
     this.writer.close();
   }

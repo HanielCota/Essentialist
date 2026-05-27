@@ -6,20 +6,18 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 /** Every chat line the homes module can send. */
 @ConfigSerializable
 public record HomesMessages(
-    @Comment("/sethome confirmation for a brand-new home. Placeholders: {name}.") String homeSet,
-    @Comment("/sethome confirmation when overwriting an existing home. Placeholders: {name}.")
-        String homeUpdated,
+    @Comment("Confirmation for a brand-new home created via /homes. Placeholders: {name}.")
+        String homeSet,
     @Comment(
-            "Shown by /sethome when the player has no free slots left. Placeholders: {name}, "
+            "Shown when the player has no free slots left for a new home. Placeholders: {name}, "
                 + "{limit}.")
         String limitReached,
-    @Comment("Shown by /home and /delhome when the named home is unknown. Placeholders: {name}.")
+    @Comment("Shown by /home when the named home is unknown. Placeholders: {name}.")
         String unknownHome,
     @Comment("/home when the player has no homes yet.") String noHomes,
-    @Comment("/delhome confirmation. Placeholders: {name}.") String homeDeleted,
+    @Comment("Confirmation after a home is deleted from the menu. Placeholders: {name}.")
+        String homeDeleted,
     @Comment("Shown by /home when the target world is no longer loaded.") String worldGone,
-    @Comment("/sethome when the given material name is invalid. Placeholders: {material}.")
-        String invalidMaterial,
     @Comment("Shown on /home start when a delay is configured. Placeholders: {name}, {seconds}.")
         String teleporting,
     @Comment("Clickable suffix appended to the teleporting message that runs /tpcancel.")
@@ -48,19 +46,28 @@ public record HomesMessages(
     @Comment("Shown when the new name is already used. Placeholders: {name}.") String renameTaken,
     @Comment("Shown when the home disappeared during the rename window. Placeholders: {name}.")
         String renameLost,
-    @Comment("Rename confirmation. Placeholders: {old}, {new}.") String renamed) {
+    @Comment("Rename confirmation. Placeholders: {old}, {new}.") String renamed,
+    @Comment(
+            "Chat instruction shown after clicking the + Nova home slot in /homes. "
+                + "Placeholders: {seconds}.")
+        String createPrompt,
+    @Comment("Shown when the player types 'cancel' (or its alias) to abort the create flow.")
+        String createCancelled,
+    @Comment("Shown when the create input window expires. Placeholders: {seconds}.")
+        String createTimeout,
+    @Comment(
+            "Shown when the chosen name is already used by an existing home. Placeholders: {name}.")
+        String createAlreadyExists) {
 
   public static HomesMessages defaults() {
     return new HomesMessages(
         "<green>Home <gold>{name}</gold> set.",
-        "<green>Home <gold>{name}</gold> updated.",
         "<red>You have reached your home limit (<gold>{limit}</gold>). "
-            + "Couldn't create <gold>{name}</gold>. Use /delhome to free a slot.",
+            + "Couldn't create <gold>{name}</gold>. Delete one from the menu to free a slot.",
         "<red>You don't have any home named <gold>{name}</gold>.",
-        "<red>You don't have any homes yet. Use <gold>/sethome [name]</gold>.",
+        "<red>You don't have any homes yet. Open <gold>/homes</gold> and click the + button.",
         "<yellow>Home <gold>{name}</gold> removed.",
         "<red>The world of this home is not loaded.",
-        "<red>Invalid material: <gold>{material}</gold>.",
         "<yellow>Teleporting to <gold>{name}</gold> in <gold>{seconds}s</gold>. "
             + "Don't take damage.",
         "<red><u>[Cancel]</u>",
@@ -80,7 +87,12 @@ public record HomesMessages(
         "<red>Invalid name. Use 1-32 characters: letters, digits, _ or -.",
         "<red>You already have a home named <gold>{name}</gold>.",
         "<red>Home <gold>{name}</gold> disappeared before the rename completed.",
-        "<green>Home <gold>{old}</gold> renamed to <gold>{new}</gold>.");
+        "<green>Home <gold>{old}</gold> renamed to <gold>{new}</gold>.",
+        "<yellow>Type the name for your new home in chat "
+            + "(or <gold>cancel</gold>). You have <gold>{seconds}s</gold>.",
+        "<yellow>Create cancelled.",
+        "<red>The create window (<gold>{seconds}s</gold>) expired.",
+        "<red>You already have a home named <gold>{name}</gold>. Pick a different name.");
   }
 
   public String invalidName() {
