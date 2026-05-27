@@ -65,9 +65,11 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
     var slots = contentSlots(settings, rows);
     var pagination = PaginationConfig.builder().contentSlots(slots).build();
 
+    var title = ComponentUtils.mini(settings.title());
+
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
-    builder.title(ComponentUtils.mini(settings.title()));
+    builder.title(title);
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 

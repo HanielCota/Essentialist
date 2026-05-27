@@ -65,11 +65,12 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var settings = this.config.value().targetActionMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
+    var title = ComponentUtils.mini(settings.title());
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(settings, rows)).build();
 
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
-    builder.title(ComponentUtils.mini(settings.title()));
+    builder.title(title);
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 

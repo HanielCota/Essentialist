@@ -46,12 +46,13 @@ public final class TpaHelpInfoMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var settings = this.config.value().helpInfoMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
+    var title = ComponentUtils.mini(settings.title());
+    var pagination = PaginationConfig.builder().contentSlots(contentSlots(settings, rows)).build();
 
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
-    builder.title(ComponentUtils.mini(settings.title()));
-    builder.pagination(
-        PaginationConfig.builder().contentSlots(contentSlots(settings, rows)).build());
+    builder.title(title);
+    builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 
     builder.buildAndRegister();

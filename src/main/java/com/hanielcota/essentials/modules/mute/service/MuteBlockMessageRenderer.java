@@ -22,14 +22,17 @@ public final class MuteBlockMessageRenderer {
 
     if (expiresAt == null) {
       var permanentMsg = snap.chatBlocked();
-      return ComponentUtils.mini(permanentMsg);
+      var permanentComponent = ComponentUtils.mini(permanentMsg);
+
+      return permanentComponent;
     }
 
     var now = Instant.now();
     var remaining = Duration.between(now, expiresAt);
     var timeStr = DurationFormatter.format(remaining);
     var timedMsg = snap.formatChatBlockedTimed(timeStr);
+    var timedComponent = ComponentUtils.mini(timedMsg);
 
-    return ComponentUtils.mini(timedMsg);
+    return timedComponent;
   }
 }

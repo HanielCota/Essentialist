@@ -77,12 +77,12 @@ public final class TpaHelpMenu implements EssentialsMenu {
 
     var rawTitle = helpMenu.title();
     var menuTitle = ComponentUtils.mini(rawTitle);
+    var pagination = PaginationConfig.builder().contentSlots(contentSlots(helpMenu, rows)).build();
 
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
     builder.title(menuTitle);
-    builder.pagination(
-        PaginationConfig.builder().contentSlots(contentSlots(helpMenu, rows)).build());
+    builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 
     builder.buildAndRegister();

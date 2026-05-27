@@ -71,9 +71,11 @@ public final class TpaSettingsMenu implements EssentialsMenu {
         MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var backSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
+    var title = ComponentUtils.mini(settings.title());
+
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
-    builder.title(ComponentUtils.mini(settings.title()));
+    builder.title(title);
     builder.slot(privacySlot, privacyTemplate, click -> click.switchTo(TpaPrivacySettingsMenu.ID));
     builder.slot(
         notificationsSlot,
