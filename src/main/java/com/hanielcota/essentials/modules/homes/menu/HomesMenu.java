@@ -1,22 +1,19 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
-import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuTemplates;
-import com.hanielcota.essentials.menu.PageNavigation;
+import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuSection;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
-import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -27,8 +24,6 @@ import org.bukkit.entity.Player;
 public final class HomesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.homes";
-
-  private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<HomesConfig> config;
   private final HomeService service;
@@ -56,29 +51,22 @@ public final class HomesMenu implements EssentialsMenu {
 
     var rows = HomesMainMenuSection.rows(menuSpec);
     var titleText = menuSpec.title();
-    var menuTitle = ComponentUtils.mini(titleText);
     var contentSlots = HomesMainMenuSection.contentSlots(menuSpec);
-
-    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
-    if (rows > MIN_ROWS) {
-      var navigation = menuSpec.navigation();
-      PageNavigation.apply(menus, paginationBuilder, ID, rows, navigation);
-    }
-    var pagination = paginationBuilder.build();
-
+    var navigation = menuSpec.navigation();
     var infoTemplate = buildInfoTemplate(menuSpec);
     var infoSlot = HomesMainMenuSection.infoSlot(menuSpec);
 
-    var builder = MenuFramework.builder(ID, menus);
-    builder.rows(rows);
-    builder.title(menuTitle);
-    builder.pagination(pagination);
-    builder.allowShiftClick(true);
-    builder.slot(infoSlot, infoTemplate, null);
-    builder.dynamicContent(this::buildSlots);
-
-    var menu = builder.build();
-    menu.register();
+    PaginatedInfoMenus.register(
+        menus,
+        ID,
+        rows,
+        titleText,
+        contentSlots,
+        navigation,
+        infoSlot,
+        infoTemplate,
+        this::buildSlots,
+        builder -> builder.allowShiftClick(true));
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

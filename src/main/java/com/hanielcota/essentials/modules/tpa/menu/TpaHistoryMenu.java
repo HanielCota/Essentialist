@@ -10,6 +10,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.Destination;
@@ -33,6 +34,8 @@ import org.jspecify.annotations.Nullable;
 public final class TpaHistoryMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.tpahistory";
+
+  private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<TpaConfig> config;
   private final TpaHistory history;
@@ -125,7 +128,11 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     var rows = MenuLayouts.clampRows(settings.rows());
     var slots = resolveContentSlots(settings, rows);
 
-    var pagination = PaginationConfig.builder().contentSlots(slots).build();
+    var paginationBuilder = PaginationConfig.builder().contentSlots(slots);
+    if (rows > MIN_ROWS) {
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, settings.navigation());
+    }
+    var pagination = paginationBuilder.build();
 
     var rawTitle = settings.title();
     var menuTitle = ComponentUtils.mini(rawTitle);

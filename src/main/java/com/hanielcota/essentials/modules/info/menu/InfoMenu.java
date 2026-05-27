@@ -8,6 +8,7 @@ import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.modules.info.menu.presentation.InfoMenuRenderer;
 import com.hanielcota.essentials.modules.info.menu.presentation.PlayerInfoEntries;
@@ -26,6 +27,8 @@ import org.bukkit.entity.Player;
 public final class InfoMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.info";
+
+  private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<InfoConfig> config;
   private final InfoMenuState state;
@@ -52,7 +55,11 @@ public final class InfoMenu implements EssentialsMenu {
     var snap = this.config.value();
     var rows = snap.effectiveRows();
     var contentSlots = snap.effectiveContentSlots();
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
+    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
+    if (rows > MIN_ROWS) {
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, snap.navigation());
+    }
+    var pagination = paginationBuilder.build();
 
     var rawTitle = snap.menuTitle();
     var menuTitle = ComponentUtils.mini(rawTitle);

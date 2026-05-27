@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.info.config;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.GameMode;
@@ -38,8 +39,9 @@ public record InfoConfig(
         String gameModeSpectator,
     @Comment("Templates for entries shown under the Servidor tab.") ServerEntriesSection server,
     @Comment("Templates for entries shown under the Jogador tab.") PlayerEntriesSection player,
-    @Comment("Templates for entries shown under the Essentialist tab.")
-        PluginEntriesSection plugin) {
+    @Comment("Templates for entries shown under the Essentialist tab.") PluginEntriesSection plugin,
+    @Comment("Previous/next page navigation buttons (only used when rows > 1).")
+        NavigationButtonsConfig navigation) {
 
   public static InfoConfig defaults() {
     return new InfoConfig(
@@ -69,7 +71,8 @@ public record InfoConfig(
         "Espectador",
         ServerEntriesSection.defaults(),
         PlayerEntriesSection.defaults(),
-        PluginEntriesSection.defaults());
+        PluginEntriesSection.defaults(),
+        NavigationButtonsConfig.defaults(30, 32));
   }
 
   public int effectiveRows() {

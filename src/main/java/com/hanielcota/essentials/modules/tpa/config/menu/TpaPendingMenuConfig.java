@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.config.menu;
 
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import java.util.List;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -46,7 +47,8 @@ public record TpaPendingMenuConfig(
                 + " in another world.")
         String unknownPlaceholder,
     @Comment("Format for the {distance} value when known. Placeholder: {meters}.")
-        String distanceFormat) {
+        String distanceFormat,
+    @Comment("Previous/next page navigation buttons.") NavigationButtonsConfig navigation) {
 
   public static TpaPendingMenuConfig defaults() {
     return new TpaPendingMenuConfig(
@@ -94,6 +96,7 @@ public record TpaPendingMenuConfig(
         "Quer ir até você",
         "Quer chamar você",
         "—",
-        "{meters}m");
+        "{meters}m",
+        NavigationButtonsConfig.defaults(47, 51));
   }
 }
