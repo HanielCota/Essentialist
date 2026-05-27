@@ -26,6 +26,10 @@ public record HomesMenuConfig(
     @Comment("/homes previous/next page buttons.") NavigationButtonsConfig navigation,
     @Comment("Slot of the static info item shown on every /homes page.") int infoSlot,
     @Comment("Material of the static info item.") Material infoMaterial,
+    @Comment(
+            "Use the viewer's skin on the info item when material is PLAYER_HEAD. Renders "
+                + "per-viewer (each player sees their own head).")
+        boolean infoUsePlayerHead,
     @Comment("Name of the static info item.") String infoName,
     @Comment("Lore of the static info item — explain how /homes works to the player.")
         List<String> infoLore,
@@ -110,8 +114,9 @@ public record HomesMenuConfig(
             11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34,
             36, 37, 38, 39, 40, 41, 42, 43),
         NavigationButtonsConfig.defaults(48, 50),
-        10,
-        Material.BOOK,
+        4,
+        Material.PLAYER_HEAD,
+        true,
         "<yellow>How homes work",
         List.of(
             "<gray>Personal teleport points.",

@@ -92,7 +92,12 @@ public final class HomesMenu implements EssentialsMenu {
     var prefetched = this.state.consumePrefetch(uuid);
     var entries = prefetched != null ? prefetched : this.service.homesOf(uuid);
 
-    var slots = new ArrayList<SlotDefinition>(entries.size());
+    var slots = new ArrayList<SlotDefinition>(entries.size() + 1);
+
+    var infoSlot = perViewerInfoSlot(player);
+    if (infoSlot != null) {
+      slots.add(infoSlot);
+    }
 
     for (var i = 0; i < entries.size(); i++) {
       var home = entries.get(i);
@@ -104,5 +109,24 @@ public final class HomesMenu implements EssentialsMenu {
     }
 
     return slots;
+  }
+
+  // The framework overlays this dynamic slot on top of PaginatedInfoMenus' static info template,
+  // so each viewer sees their own head in the info slot. Skipped when the admin disabled
+  // infoUsePlayerHead to keep the static template visible.
+  private SlotDefinition perViewerInfoSlot(@NonNull Player player) {
+    var menuSpec = this.config.value().menu();
+    if (!menuSpec.infoUsePlayerHead()) {
+      return null;
+    }
+
+    var infoSlot = HomesMainMenuSection.infoSlot(menuSpec);
+    var builder = ItemTemplate.builder(menuSpec.infoMaterial());
+    builder.head(player.getUniqueId());
+    builder.name(menuSpec.infoName());
+    builder.lore(menuSpec.infoLore().toArray(String[]::new));
+    builder.italic(false);
+
+    return SlotDefinition.of(infoSlot, builder.build(), click -> {});
   }
 }
