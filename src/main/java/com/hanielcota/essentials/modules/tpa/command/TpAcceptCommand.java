@@ -1,59 +1,35 @@
 package com.hanielcota.essentials.modules.tpa.command;
 
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
-import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
+import com.hanielcota.essentials.menu.MenuOpenings;
+import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
-import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tpaccept")
 @EssentialsCommand
 @Permission("essentials.tpa")
+@PlayerOnly
 @Cooldown(duration = "1s")
-@Description("Aceita um pedido de teleporte pendente.")
-@Syntax("/tpaccept [jogador]")
-public record TpAcceptCommand(
-    ConfigHandle<TpaConfig> config,
-    TeleportRequestService service,
-    TpAcceptOutcomeHandler resultHandler,
-    TpaIncomingResolver incomingResolver,
-    MainThreadCallbacks callbacks) {
+@Description("Abre o menu de pedidos pendentes para você aceitar.")
+@Syntax("/tpaccept")
+public record TpAcceptCommand(MenuService menus) {
 
   @DefaultSubcommand
-  public CommandResult execute(@NonNull CommandActor actor, Optional<String> requester) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
 
-    var resolved = this.incomingResolver.resolve(sender, requester.orElse(""), actor);
-    if (resolved.isEmpty()) {
-      return CommandResult.success();
-    }
-
-    var request = resolved.get();
-    var claim = this.service.tryAccept(request);
-
-    this.resultHandler.handleClaim(claim, request, actor);
-
-    if (claim != AcceptOutcome.ACCEPTED) {
-      return CommandResult.success();
-    }
-
-    var pending = this.service.dispatchTeleport(request);
-    this.callbacks.hop(
-        pending,
-        success -> this.resultHandler.handleTeleportOutcome(success, actor),
-        "tpaccept dispatch");
+    MenuOpenings.open(this.menus, sender, TpaPendingMenu.ID, actor);
 
     return CommandResult.success();
   }

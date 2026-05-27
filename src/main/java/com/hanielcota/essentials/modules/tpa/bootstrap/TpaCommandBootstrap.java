@@ -45,27 +45,19 @@ public final class TpaCommandBootstrap {
     var tpaHereCommand = new TpaHereCommand(this.config, menus, targetSelections);
     this.registrar.command(tpaHereCommand);
 
-    var blockCommand = new TpaBlockCommand(this.config, blocks, playerProvider);
+    var blockCommand = new TpaBlockCommand(this.config, blocks, playerProvider, menus);
     this.registrar.command(blockCommand);
 
-    var unblockCommand = new TpaUnblockCommand(this.config, blocks, playerProvider);
+    var unblockCommand = new TpaUnblockCommand(this.config, blocks, playerProvider, menus);
     this.registrar.command(unblockCommand);
 
-    var tpAcceptCommand =
-        new TpAcceptCommand(
-            this.config,
-            requestService,
-            shared.acceptHandler(),
-            shared.incomingResolver(),
-            shared.callbacks());
+    var tpAcceptCommand = new TpAcceptCommand(menus);
     this.registrar.command(tpAcceptCommand);
 
-    var tpDenyCommand =
-        new TpDenyCommand(
-            this.config, requestService, shared.incomingResolver(), shared.replyNotifier());
+    var tpDenyCommand = new TpDenyCommand(menus);
     this.registrar.command(tpDenyCommand);
 
-    var tpCancelCommand = new TpCancelCommand(this.config, requestService);
+    var tpCancelCommand = new TpCancelCommand(menus);
     this.registrar.command(tpCancelCommand);
 
     var historyPresenter = new TpaHistoryPresenter(this.config, history, menus, menuState);

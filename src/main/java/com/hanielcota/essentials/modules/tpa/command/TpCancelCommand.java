@@ -1,14 +1,15 @@
 package com.hanielcota.essentials.modules.tpa.command;
 
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.menu.MenuOpenings;
+import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -18,33 +19,17 @@ import org.bukkit.entity.Player;
 @Command("tpacancel")
 @EssentialsCommand
 @Permission("essentials.tpa")
+@PlayerOnly
 @Cooldown(duration = "1s")
-@Description("Cancela o seu pedido de teleporte pendente.")
+@Description("Abre o menu de TPA — o slot \"Pedido enviado\" tem o botão de cancelar.")
 @Syntax("/tpacancel")
-public record TpCancelCommand(ConfigHandle<TpaConfig> config, TeleportRequestService service) {
+public record TpCancelCommand(MenuService menus) {
 
   @DefaultSubcommand
   public CommandResult execute(@NonNull CommandActor actor) {
-    var snap = this.config.value();
-    var messages = snap.messages();
-
     var sender = actor.unwrap(Player.class);
-    var senderId = sender.getUniqueId();
 
-    var pending = this.service.outgoing(senderId);
-    if (pending.isEmpty()) {
-      var noOutgoingMsg = messages.noOutgoing();
-      return CommandResult.invalidUsage(noOutgoingMsg);
-    }
-
-    var request = pending.get();
-    this.service.cancel(request);
-
-    var cancelledTemplate = messages.cancelled();
-    var targetName = request.target().name();
-    var cancelledMsg = cancelledTemplate.replace("{player}", targetName);
-
-    actor.sendSuccess(cancelledMsg);
+    MenuOpenings.open(this.menus, sender, TpaHelpMenu.ID, actor);
 
     return CommandResult.success();
   }
