@@ -50,7 +50,8 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     var rows = MenuLayouts.clampRows(menuSpec.optionsRows());
 
     var titleTemplate = menuSpec.optionsTitle();
-    var title = ComponentUtils.mini(titleTemplate);
+    var titleRaw = stripNamePlaceholder(titleTemplate);
+    var title = ComponentUtils.mini(titleRaw);
 
     var contentSlots =
         List.of(
@@ -179,5 +180,12 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   private static ItemTemplate missingTemplate(@NonNull HomesMenuConfig menuSpec) {
     return MenuTemplates.simple(
         menuSpec.optionsBackMaterial(), "<red>Home indisponível", List.of());
+  }
+
+  // The inventory title is fixed at menu registration, so the {name} placeholder cannot be
+  // resolved per-viewer. The home name is shown in the info slot instead — strip the unresolved
+  // token so existing user configs don't render it literally.
+  private static String stripNamePlaceholder(@NonNull String raw) {
+    return raw.replace("{name}", "").strip();
   }
 }

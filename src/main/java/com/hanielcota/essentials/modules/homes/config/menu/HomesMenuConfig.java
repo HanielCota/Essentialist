@@ -75,7 +75,10 @@ public record HomesMenuConfig(
     @Comment("Material of the + Nova home button.") Material createMaterial,
     @Comment("Name of the + Nova home button.") String createName,
     @Comment("Lore of the + Nova home button.") List<String> createLore,
-    @Comment("Options menu title shown on right-click. Placeholders: {name}.") String optionsTitle,
+    @Comment(
+            "Options menu title shown on right-click. Static — inventory titles can't be "
+                + "personalised per viewer, so the home name appears in the info slot instead.")
+        String optionsTitle,
     @Comment("Options menu rows (1-6).") int optionsRows,
     @Comment("Slot of the home info item in the options menu.") int optionsHomeSlot,
     @Comment("Slot of the teleport button.") int optionsTeleportSlot,
@@ -173,7 +176,7 @@ public record HomesMenuConfig(
             "<gray>posição atual.",
             "",
             "<yellow>Clique e digite o nome no chat."),
-        "<dark_gray>Opções de <gold>{name}</gold>",
+        "<dark_gray>Opções da home",
         3,
         4,
         11,
