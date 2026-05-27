@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.config.menu;
 
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +48,8 @@ public record TpaMenuConfig(
     @Comment("Name of the back item.") String backName,
     @Comment("Lore of the back item.") List<String> backLore,
     @Comment("Click-to-copy hint sent in chat after clicking an accepted entry.")
-        String destinationCopyMessage) {
+        String destinationCopyMessage,
+    @Comment("Previous/next page navigation buttons.") NavigationButtonsConfig navigation) {
 
   private static final DateTimeFormatter FALLBACK_TIME_FORMAT =
       DateTimeFormatter.ofPattern("dd/MM HH:mm");
@@ -93,7 +95,8 @@ public record TpaMenuConfig(
         Material.ARROW,
         "<yellow>Voltar",
         List.of("<gray>Retorna ao menu de TPA."),
-        "<gray>Destino: <white>{world} {x}, {y}, {z}");
+        "<gray>Destino: <white>{world} {x}, {y}, {z}",
+        NavigationButtonsConfig.defaults(47, 51));
   }
 
   /** Configured time pattern, falling back to a safe default when malformed. */

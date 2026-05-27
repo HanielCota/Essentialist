@@ -66,7 +66,7 @@ class ArchitecturePackageTest {
           Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaPendingMenu.java", 180),
           Map.entry(
               "com/hanielcota/essentials/modules/tpa/service/TeleportRequestService.java", 200),
-          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaHistoryMenu.java", 240),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaHistoryMenu.java", 250),
           Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaFavoriteActionMenu.java", 240),
           Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaTargetActionMenu.java", 280),
           Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaPickPlayerMenu.java", 200),

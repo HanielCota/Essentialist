@@ -76,6 +76,9 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 
+    var backBtn = backButtonSlot();
+    builder.slot(backBtn.slot(), backBtn.template(), backBtn.handler());
+
     var menu = builder.build();
     menu.register();
   }
@@ -89,7 +92,7 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     }
 
     var icons = this.registry.iconsFor(category);
-    var slots = new ArrayList<SlotDefinition>(icons.size() + 1);
+    var slots = new ArrayList<SlotDefinition>(icons.size());
 
     for (var icon : icons) {
       var pickedMaterial = icon.material();
@@ -99,9 +102,6 @@ public final class MaterialPickerMenu implements EssentialsMenu {
 
       slots.add(slot);
     }
-
-    var backSlot = backButtonSlot();
-    slots.add(backSlot);
 
     return slots;
   }

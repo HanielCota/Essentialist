@@ -9,6 +9,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.shared.ComponentUtils;
@@ -22,6 +23,8 @@ import org.bukkit.entity.Player;
 public final class BackMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.back";
+
+  private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<BackConfig> config;
   private final TeleportHistory history;
@@ -48,18 +51,24 @@ public final class BackMenu implements EssentialsMenu {
     var fallbackSlots = MenuLayouts.fallbackContentSlots(rows, fallbackSize);
     var slots = MenuLayouts.sanitizeSlots(configuredSlots, rows, fallbackSlots);
 
-    var pagination = PaginationConfig.builder().contentSlots(slots).build();
+    var paginationBuilder = PaginationConfig.builder().contentSlots(slots);
+    if (rows > MIN_ROWS) {
+      var navigation = snap.navigation();
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, navigation);
+    }
+    var pagination = paginationBuilder.build();
 
     var rawTitle = snap.menuTitle();
     var menuTitle = ComponentUtils.mini(rawTitle);
 
-    MenuFramework.builder(ID, menus)
-        .rows(rows)
-        .title(menuTitle)
-        .pagination(pagination)
-        .dynamicContent(this::buildSlots)
-        .build()
-        .register();
+    var builder = MenuFramework.builder(ID, menus);
+    builder.rows(rows);
+    builder.title(menuTitle);
+    builder.pagination(pagination);
+    builder.dynamicContent(this::buildSlots);
+
+    var menu = builder.build();
+    menu.register();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

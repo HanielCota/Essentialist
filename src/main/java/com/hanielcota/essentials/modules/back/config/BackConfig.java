@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.back.config;
 
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import com.hanielcota.essentials.shared.Numbers;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -22,7 +23,9 @@ public record BackConfig(
     @Comment("/back item lore lines. Placeholders: {world}, {x}, {y}, {z}, {time}.")
         List<String> itemLore,
     @Comment("/back success on click. Placeholders: {world}, {x}, {y}, {z}.") String back,
-    @Comment("/back failure when there is no previous location.") String noBack) {
+    @Comment("/back failure when there is no previous location.") String noBack,
+    @Comment("Previous/next page navigation buttons (only used when menuRows > 1).")
+        NavigationButtonsConfig navigation) {
 
   private static final DateTimeFormatter FALLBACK_TIME_FORMAT =
       DateTimeFormatter.ofPattern("dd/MM HH:mm");
@@ -43,7 +46,8 @@ public record BackConfig(
             "",
             "<yellow>Click to teleport."),
         "<green>Returned to <gold>{world} {x}, {y}, {z}</gold>.",
-        "<red>No previous location to return to.");
+        "<red>No previous location to return to.",
+        NavigationButtonsConfig.defaults(48, 50));
   }
 
   public String formatItemName(int humanIndex) {
