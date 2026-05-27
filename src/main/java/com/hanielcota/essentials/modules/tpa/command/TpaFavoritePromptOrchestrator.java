@@ -4,12 +4,10 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
-import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
 import java.time.Duration;
-import java.util.UUID;
 import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +33,7 @@ public final class TpaFavoritePromptOrchestrator {
   private final TpaFavoriteNotifier notifier;
   private final PlayerProvider players;
   private final Scheduler scheduler;
-  private final TpaProfileService profiles;
+  private final TpaFavoriteAddNotifier addNotifier;
 
   private static boolean isCancel(@NonNull String input) {
     return input.equalsIgnoreCase("cancel") || input.equalsIgnoreCase("cancelar");
@@ -102,19 +100,7 @@ public final class TpaFavoritePromptOrchestrator {
       return;
     }
     this.notifier.sendAdded(player, targetName);
-    notifyTargetIfOptedIn(player, targetId);
-  }
-
-  private void notifyTargetIfOptedIn(@NonNull Player owner, @NonNull UUID targetId) {
-    var targetProfile = this.profiles.profile(targetId);
-    if (!targetProfile.notifyWhenFavorited()) {
-      return;
-    }
-
-    this.players
-        .online(targetId)
-        .ifPresent(
-            onlineTarget -> this.notifier.sendFavoritedNotification(onlineTarget, owner.getName()));
+    this.addNotifier.notify(player.getName(), targetId);
   }
 
   public void handleTimeout(@NonNull Player player) {

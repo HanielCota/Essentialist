@@ -8,6 +8,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.modules.tpa.command.TpaFavoriteAddNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
@@ -44,11 +45,12 @@ public final class TpaFavoritesMenu implements EssentialsMenu {
       @NonNull TpaProfileService profiles,
       @NonNull TpaFavoriteSelections selections,
       @NonNull TpaFavoritePromptOrchestrator prompt,
+      @NonNull TpaFavoriteAddNotifier addNotifier,
       @NonNull PlayerProvider players) {
     this.config = config;
     this.profiles = profiles;
     this.browser = new TpaFavoriteBrowser(config, favorites, contacts, players);
-    this.clicks = new TpaFavoriteClickHandler(favorites, profiles, selections, prompt);
+    this.clicks = new TpaFavoriteClickHandler(favorites, profiles, selections, prompt, addNotifier);
     this.renderer = new TpaFavoriteMenuRenderer(players);
   }
 

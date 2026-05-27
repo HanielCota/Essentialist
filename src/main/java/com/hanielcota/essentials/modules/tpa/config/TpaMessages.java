@@ -30,6 +30,14 @@ public record TpaMessages(
         String requestReceived,
     @Comment("/tpahere request line shown to the target. Placeholders: {player}, {seconds}.")
         String requestReceivedHere,
+    @Comment(
+            "/tpa request line shown to the target when the requester is in their favorites. "
+                + "Placeholders: {player}, {seconds}.")
+        String requestReceivedFavorite,
+    @Comment(
+            "/tpahere request line shown to the target when the requester is in their favorites. "
+                + "Placeholders: {player}, {seconds}.")
+        String requestReceivedFavoriteHere,
     @Comment("Clickable accept button label.") String buttonAccept,
     @Comment("Clickable deny button label.") String buttonDeny,
     @Comment("Accept button hover tooltip. Placeholders: {player}.") String buttonHoverAccept,
@@ -110,6 +118,10 @@ public record TpaMessages(
         "<gold>{player}</gold> <yellow>quer se teleportar até você. <gray>(expira em {seconds}s)",
         "<gold>{player}</gold> <yellow>quer que você se teleporte até ele. "
             + "<gray>(expira em {seconds}s)",
+        "<light_purple>★</light_purple> <gold>{player}</gold> <yellow>(seu favorito) "
+            + "<yellow>quer se teleportar até você. <gray>(expira em {seconds}s)",
+        "<light_purple>★</light_purple> <gold>{player}</gold> <yellow>(seu favorito) "
+            + "<yellow>quer que você se teleporte até ele. <gray>(expira em {seconds}s)",
         "<green><bold>[ACEITAR]</bold>",
         "<red><bold>[RECUSAR]</bold>",
         "<green>Clique para aceitar o pedido de <gold>{player}</gold>.",
@@ -149,16 +161,26 @@ public record TpaMessages(
         "<yellow>Você recusou <white>{count}</white> pedido(s).");
   }
 
-  /** The request line shown to the target, picked by {@code type}. */
+  /**
+   * The request line shown to the target, picked by {@code type} and whether {@code requester} is
+   * in the target's favorites.
+   */
   public String formatRequestReceived(
-      @NonNull TeleportRequestType type, @NonNull String player, long seconds) {
-    var isHere = type == TeleportRequestType.TPAHERE;
-    var line = isHere ? requestReceivedHere : requestReceived;
+      @NonNull TeleportRequestType type, @NonNull String player, long seconds, boolean favorite) {
+    var line = pickRequestLine(type, favorite);
 
     var secondsStr = Long.toString(seconds);
 
     var withPlayer = line.replace("{player}", player);
     return withPlayer.replace("{seconds}", secondsStr);
+  }
+
+  private String pickRequestLine(@NonNull TeleportRequestType type, boolean favorite) {
+    var isHere = type == TeleportRequestType.TPAHERE;
+    if (favorite) {
+      return isHere ? this.requestReceivedFavoriteHere : this.requestReceivedFavorite;
+    }
+    return isHere ? this.requestReceivedHere : this.requestReceived;
   }
 
   /** The "disabled" message for the given {@code type}, shown when the target refuses that kind. */

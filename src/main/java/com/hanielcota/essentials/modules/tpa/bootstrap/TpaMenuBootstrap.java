@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
 import com.hanielcota.essentials.modules.tpa.listener.TpaHistoryMenuCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaPendingSelectionCleanupListener;
+import com.hanielcota.essentials.modules.tpa.listener.TpaPickPlayerFilterCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaTargetSelectionCleanupListener;
 import com.hanielcota.essentials.modules.tpa.menu.TpaBehaviorSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaBlockedMenu;
@@ -35,6 +36,8 @@ import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
+import com.hanielcota.essentials.modules.tpa.service.TpaPickPlayerCandidates;
+import com.hanielcota.essentials.modules.tpa.service.TpaPickPlayerFilters;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import com.hanielcota.essentials.paper.ActorFactory;
@@ -149,6 +152,7 @@ public final class TpaMenuBootstrap {
             profiles,
             favoriteRuntime.selections(),
             favoriteRuntime.orchestrator(),
+            favoriteRuntime.addNotifier(),
             players);
 
     this.registrar.menu(menu);
@@ -177,11 +181,19 @@ public final class TpaMenuBootstrap {
   public void registerTargetActionMenu(
       @NonNull TpaFavoriteService favorites,
       @NonNull TpaTargetSelections selections,
+      @NonNull TpaRuntimeBootstrap.FavoriteRuntime favoriteRuntime,
       @NonNull TpaSendOrchestrator dispatcher) {
     var players = this.env.service(PlayerProvider.class);
     var actors = this.env.service(ActorFactory.class);
     var menu =
-        new TpaTargetActionMenu(this.config, selections, favorites, players, actors, dispatcher);
+        new TpaTargetActionMenu(
+            this.config,
+            selections,
+            favorites,
+            favoriteRuntime.addNotifier(),
+            players,
+            actors,
+            dispatcher);
 
     this.registrar.menu(menu);
 
@@ -189,10 +201,18 @@ public final class TpaMenuBootstrap {
     this.registrar.listener(new TpaTargetSelectionCleanupListener(selections, menus));
   }
 
-  public void registerPickPlayerMenu(@NonNull TpaTargetSelections selections) {
+  public void registerPickPlayerMenu(
+      @NonNull TpaTargetSelections selections,
+      @NonNull TpaFavoriteService favorites,
+      @NonNull TpaContactService contacts) {
     var players = this.env.service(PlayerProvider.class);
-    var menu = new TpaPickPlayerMenu(this.config, players, selections);
+    var filters = new TpaPickPlayerFilters();
+    var candidates = new TpaPickPlayerCandidates(players, favorites, contacts);
+    var menu = new TpaPickPlayerMenu(this.config, selections, filters, candidates);
 
     this.registrar.menu(menu);
+
+    var menus = this.env.service(MenuService.class);
+    this.registrar.listener(new TpaPickPlayerFilterCleanupListener(filters, menus));
   }
 }

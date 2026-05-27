@@ -11,6 +11,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
+import com.hanielcota.essentials.modules.tpa.command.TpaFavoriteAddNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaTargetActionMenuConfig;
@@ -36,6 +37,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
   private final ConfigHandle<TpaConfig> config;
   private final TpaTargetSelections selections;
   private final TpaFavoriteService favorites;
+  private final TpaFavoriteAddNotifier addNotifier;
   private final PlayerProvider players;
   private final ActorFactory actors;
   private final TpaSendOrchestrator dispatcher;
@@ -204,6 +206,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
       this.favorites.remove(viewerId, entry.targetId());
       var removedText = messages.favoriteRemoved().replace("{player}", entry.targetName());
       actor.sendSuccess(removedText);
+      click.refresh();
       return;
     }
 
@@ -216,6 +219,8 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
 
     var addedText = messages.favoriteAdded().replace("{player}", entry.targetName());
     actor.sendSuccess(addedText);
+    this.addNotifier.notify(viewer.getName(), entry.targetId());
+    click.refresh();
   }
 
   private void onBackClicked(@NonNull ClickContext click) {

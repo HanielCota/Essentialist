@@ -14,14 +14,16 @@ import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPickPlayerMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.TpaPickPlayerFilter;
 import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPickPlayerMenuRenderer;
+import com.hanielcota.essentials.modules.tpa.service.TpaPickPlayerCandidates;
+import com.hanielcota.essentials.modules.tpa.service.TpaPickPlayerFilters;
 import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
-import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -29,7 +31,8 @@ import org.bukkit.entity.Player;
 /**
  * Paginated picker of every online player (except the viewer) opened from the hub's TPA slot.
  * Clicking a head stashes a {@link TpaTargetSelection} with {@code preferredType=TPA} and switches
- * to {@link TpaTargetActionMenu}.
+ * to {@link TpaTargetActionMenu}. The list can be narrowed via a cycle button cycling between
+ * {@link TpaPickPlayerFilter} values; the choice resets on inventory close.
  */
 @RequiredArgsConstructor
 public final class TpaPickPlayerMenu implements EssentialsMenu {
@@ -37,8 +40,10 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
   public static final String ID = "essentials.tpa.pick.player";
 
   private final ConfigHandle<TpaConfig> config;
-  private final PlayerProvider players;
   private final TpaTargetSelections selections;
+  private final TpaPickPlayerFilters filters;
+  private final TpaPickPlayerCandidates candidates;
+  private final TpaPickPlayerMenuRenderer renderer = new TpaPickPlayerMenuRenderer();
 
   static List<Integer> contentSlots(@NonNull TpaPickPlayerMenuConfig settings, int rows) {
     var slotCount = MenuLayouts.slotCount(rows);
@@ -74,32 +79,22 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
     var settings = this.config.value().pickPlayerMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
     var viewerId = player.getUniqueId();
+    var filter = this.filters.of(viewerId);
 
     var slots = new ArrayList<SlotDefinition>();
     slots.add(backSlot(settings, rows));
+    slots.add(filterSlot(settings, rows, filter));
 
-    var candidates = onlineOthers(viewerId);
-    if (candidates.isEmpty()) {
+    var resolved = this.candidates.resolve(player, filter);
+    if (resolved.isEmpty()) {
       slots.add(emptySlot(settings, rows));
       return slots;
     }
 
-    for (var candidate : candidates) {
+    for (var candidate : resolved) {
       slots.add(playerSlot(settings, candidate));
     }
     return slots;
-  }
-
-  private List<Player> onlineOthers(@NonNull UUID viewerId) {
-    var all = this.players.all();
-    var result = new ArrayList<Player>(all.size());
-    for (var candidate : all) {
-      if (candidate.getUniqueId().equals(viewerId)) {
-        continue;
-      }
-      result.add(candidate);
-    }
-    return result;
   }
 
   private SlotDefinition playerSlot(
@@ -144,6 +139,20 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaHelpMenu.ID));
+  }
+
+  private SlotDefinition filterSlot(
+      @NonNull TpaPickPlayerMenuConfig settings, int rows, @NonNull TpaPickPlayerFilter filter) {
+    var template = this.renderer.filterTemplate(settings, filter);
+    var safeSlot = MenuLayouts.sanitizeSlot(settings.filterSlot(), rows, 0);
+
+    return SlotDefinition.of(safeSlot, template, this::cycleFilter);
+  }
+
+  private void cycleFilter(@NonNull ClickContext click) {
+    var viewerId = click.player().getUniqueId();
+    this.filters.cycle(viewerId);
+    click.refresh();
   }
 
   private void selectAndSwitch(@NonNull ClickContext click, @NonNull Player candidate) {
