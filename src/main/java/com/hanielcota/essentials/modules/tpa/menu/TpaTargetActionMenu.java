@@ -21,11 +21,11 @@ import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ComponentUtils;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
@@ -52,30 +52,6 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     var fallback = MenuLayouts.fallbackContentSlots(rows, configured.size());
 
     return MenuLayouts.sanitizeSlots(configured, rows, fallback);
-  }
-
-  private static void applyTargetHead(
-      @NonNull ItemTemplate.Builder builder,
-      @NonNull TpaTargetActionMenuConfig settings,
-      @NonNull TpaTargetSelection selection) {
-    if (settings.targetIcon() != Material.PLAYER_HEAD) {
-      return;
-    }
-    if (settings.targetUsePlayerHead()) {
-      builder.head(selection.targetId());
-      return;
-    }
-    if (!settings.targetHeadTexture().isBlank()) {
-      builder.head(settings.targetHeadTexture());
-    }
-  }
-
-  private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
-    var replaced = new ArrayList<String>(lines.size());
-    for (var line : lines) {
-      replaced.add(line.replace("{player}", player));
-    }
-    return replaced;
   }
 
   @Override
@@ -152,7 +128,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
       @NonNull List<String> loreTemplate,
       @NonNull TpaTargetSelection entry,
       @NonNull TeleportRequestType type) {
-    var replaced = replacePlayer(loreTemplate, entry.targetName());
+    var replaced = Placeholders.replaceInAll(loreTemplate, "{player}", entry.targetName());
     var isRecommended = entry.preferredType() == type;
     var hasTag = !settings.recommendedTag().isBlank();
     if (!isRecommended || !hasTag) {
@@ -177,7 +153,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     var slot = isFavorite ? settings.favoriteRemoveSlot() : settings.favoriteAddSlot();
 
     var name = nameTemplate.replace("{player}", entry.targetName());
-    var lore = replacePlayer(loreTemplate, entry.targetName());
+    var lore = Placeholders.replaceInAll(loreTemplate, "{player}", entry.targetName());
     var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(slot, rows, 0);
 
@@ -252,10 +228,15 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
   private ItemTemplate targetTemplate(
       @NonNull TpaTargetActionMenuConfig settings, @NonNull TpaTargetSelection entry) {
     var name = settings.targetName().replace("{player}", entry.targetName());
-    var lore = replacePlayer(settings.targetLore(), entry.targetName());
+    var lore = Placeholders.replaceInAll(settings.targetLore(), "{player}", entry.targetName());
 
     var builder = ItemTemplate.builder(settings.targetIcon());
-    applyTargetHead(builder, settings, entry);
+    MenuTemplates.applyHead(
+        builder,
+        settings.targetIcon(),
+        settings.targetUsePlayerHead(),
+        settings.targetHeadTexture(),
+        entry.targetId());
     builder.name(name);
     builder.lore(lore.toArray(String[]::new));
     builder.italic(false);

@@ -18,12 +18,12 @@ import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
 import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ComponentUtils;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
@@ -46,14 +46,6 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
     var fallback = MenuLayouts.fallbackContentSlots(rows, fallbackWidth);
 
     return MenuLayouts.sanitizeSlots(settings.contentSlots(), rows, fallback);
-  }
-
-  private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
-    var replaced = new ArrayList<String>(lines.size());
-    for (var line : lines) {
-      replaced.add(line.replace("{player}", player));
-    }
-    return replaced;
   }
 
   @Override
@@ -121,31 +113,20 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
       @NonNull TpaPickPlayerMenuConfig settings, @NonNull Player candidate) {
     var candidateName = candidate.getName();
     var name = settings.playerName().replace("{player}", candidateName);
-    var lore = replacePlayer(settings.playerLore(), candidateName);
+    var lore = Placeholders.replaceInAll(settings.playerLore(), "{player}", candidateName);
 
     var builder = ItemTemplate.builder(settings.playerIcon());
-    applyPlayerHead(builder, settings, candidate.getUniqueId());
+    MenuTemplates.applyHead(
+        builder,
+        settings.playerIcon(),
+        settings.playerUsePlayerHead(),
+        settings.playerHeadTexture(),
+        candidate.getUniqueId());
     builder.name(name);
     builder.lore(lore.toArray(String[]::new));
     builder.italic(false);
 
     return builder.build();
-  }
-
-  private static void applyPlayerHead(
-      @NonNull ItemTemplate.Builder builder,
-      @NonNull TpaPickPlayerMenuConfig settings,
-      @NonNull UUID candidateId) {
-    if (settings.playerIcon() != Material.PLAYER_HEAD) {
-      return;
-    }
-    if (settings.playerUsePlayerHead()) {
-      builder.head(candidateId);
-      return;
-    }
-    if (!settings.playerHeadTexture().isBlank()) {
-      builder.head(settings.playerHeadTexture());
-    }
   }
 
   private SlotDefinition emptySlot(@NonNull TpaPickPlayerMenuConfig settings, int rows) {

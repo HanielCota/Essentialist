@@ -22,11 +22,11 @@ import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ComponentUtils;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
@@ -49,30 +49,6 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
         MenuLayouts.sanitizeSlot(settings.tpaHereSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.removeSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0));
-  }
-
-  private static void applyTargetHead(
-      @NonNull ItemTemplate.Builder builder,
-      @NonNull TpaFavoriteActionMenuConfig settings,
-      @NonNull TpaFavorite entry) {
-    if (settings.targetIcon() != Material.PLAYER_HEAD) {
-      return;
-    }
-    if (settings.targetUsePlayerHead()) {
-      builder.head(entry.favoriteId());
-      return;
-    }
-    if (!settings.targetHeadTexture().isBlank()) {
-      builder.head(settings.targetHeadTexture());
-    }
-  }
-
-  private static List<String> replacePlayer(@NonNull List<String> lines, @NonNull String player) {
-    var replaced = new ArrayList<String>(lines.size());
-    for (var line : lines) {
-      replaced.add(line.replace("{player}", player));
-    }
-    return replaced;
   }
 
   @Override
@@ -136,7 +112,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
     var slot = type == TeleportRequestType.TPA ? settings.tpaSlot() : settings.tpaHereSlot();
 
     var name = nameTemplate.replace("{player}", entry.favoriteName());
-    var lore = replacePlayer(loreTemplate, entry.favoriteName());
+    var lore = Placeholders.replaceInAll(loreTemplate, "{player}", entry.favoriteName());
     var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(slot, rows, 0);
 
@@ -146,7 +122,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
   private SlotDefinition removeSlot(
       @NonNull TpaFavoriteActionMenuConfig settings, int rows, @NonNull TpaFavorite entry) {
     var name = settings.removeName().replace("{player}", entry.favoriteName());
-    var lore = replacePlayer(settings.removeLore(), entry.favoriteName());
+    var lore = Placeholders.replaceInAll(settings.removeLore(), "{player}", entry.favoriteName());
     var template = MenuTemplates.simple(settings.removeIcon(), name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.removeSlot(), rows, 0);
 
@@ -210,10 +186,15 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
   private ItemTemplate targetTemplate(
       @NonNull TpaFavoriteActionMenuConfig settings, @NonNull TpaFavorite entry) {
     var name = settings.targetName().replace("{player}", entry.favoriteName());
-    var lore = replacePlayer(settings.targetLore(), entry.favoriteName());
+    var lore = Placeholders.replaceInAll(settings.targetLore(), "{player}", entry.favoriteName());
 
     var builder = ItemTemplate.builder(settings.targetIcon());
-    applyTargetHead(builder, settings, entry);
+    MenuTemplates.applyHead(
+        builder,
+        settings.targetIcon(),
+        settings.targetUsePlayerHead(),
+        settings.targetHeadTexture(),
+        entry.favoriteId());
     builder.name(name);
     builder.lore(lore.toArray(String[]::new));
     builder.italic(false);
