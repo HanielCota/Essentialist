@@ -21,6 +21,7 @@ final class InfoSlotFactory {
     var name = entry.name();
     var lore = entry.lore();
     var loreArray = lore.toArray(String[]::new);
+    var headTexture = entry.headTexture();
     var headOwner = entry.headOwner();
 
     var builder = ItemTemplate.builder(icon);
@@ -28,7 +29,9 @@ final class InfoSlotFactory {
     builder = builder.lore(loreArray);
     builder = builder.italic(false);
 
-    if (headOwner != null) {
+    if (headTexture != null) {
+      builder = builder.head(headTexture);
+    } else if (headOwner != null) {
       builder = builder.head(headOwner);
     }
 
