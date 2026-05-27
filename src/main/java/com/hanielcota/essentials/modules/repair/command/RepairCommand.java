@@ -6,7 +6,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
 import com.hanielcota.essentials.modules.repair.service.RepairService;
 import com.hanielcota.essentials.paper.ActorFactory;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -58,8 +57,7 @@ public record RepairCommand(
     };
   }
 
-  @Subcommand("tudo")
-  @Alias("all")
+  @Subcommand({"tudo", "all"})
   public CommandResult all(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();

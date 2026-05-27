@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.speed.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
 import com.hanielcota.essentials.modules.speed.service.SpeedService;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -72,8 +71,7 @@ public record SpeedCommand(
     return CommandResult.success();
   }
 
-  @Subcommand("reset")
-  @Alias("resetar")
+  @Subcommand({"reset", "resetar"})
   @PermissionForOther(".others")
   public CommandResult reset(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();

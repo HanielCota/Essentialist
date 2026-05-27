@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.give.command;
 
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -46,8 +45,7 @@ public record GiveCommand(GiveOrchestrator orchestrator, PlayerProvider players)
     return CommandResult.success();
   }
 
-  @Subcommand("para")
-  @Alias("to")
+  @Subcommand({"para", "to"})
   @Permission("essentials.give.others")
   @Description("Dá itens a outro jogador.")
   @Syntax("/give para <jogador> <item> [quantidade]")
@@ -62,8 +60,7 @@ public record GiveCommand(GiveOrchestrator orchestrator, PlayerProvider players)
     return CommandResult.success();
   }
 
-  @Subcommand("all")
-  @Alias("todos")
+  @Subcommand({"all", "todos"})
   @Permission("essentials.give.all")
   @Description("Dá um item para todos os jogadores online.")
   @Syntax("/give all <item> [quantidade]")
