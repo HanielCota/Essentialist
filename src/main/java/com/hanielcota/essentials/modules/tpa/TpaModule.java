@@ -54,7 +54,7 @@ public final class TpaModule extends AbstractModule {
     menuBootstrap.registerFavoriteActionMenu(favorites, favoriteRuntime, runtime, dispatcher);
     menuBootstrap.registerTargetActionMenu(
         favorites, targetSelections, favoriteRuntime, dispatcher);
-    menuBootstrap.registerPickPlayerMenu(targetSelections);
+    menuBootstrap.registerPickPlayerMenu(targetSelections, favorites, contacts);
 
     var commandBootstrap = new TpaCommandBootstrap(env, registrar, config);
     commandBootstrap.registerCommands(

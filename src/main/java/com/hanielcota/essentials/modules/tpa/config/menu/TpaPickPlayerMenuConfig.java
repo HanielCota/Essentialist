@@ -27,7 +27,20 @@ public record TpaPickPlayerMenuConfig(
     @Comment("Slot of the back-to-hub button.") int backSlot,
     @Comment("Material of the back-to-hub button.") Material backIcon,
     @Comment("Name of the back-to-hub button.") String backName,
-    @Comment("Lore of the back-to-hub button.") List<String> backLore) {
+    @Comment("Lore of the back-to-hub button.") List<String> backLore,
+    @Comment("Slot of the filter-cycle button.") int filterSlot,
+    @Comment("Material of the filter button.") Material filterIcon,
+    @Comment("Name of the filter button. Placeholder: {filter}.") String filterName,
+    @Comment(
+            "Lore of the filter button. Use {filter} for the current label and {options} to expand"
+                + " the full list of filter states with the active one marked.")
+        List<String> filterLore,
+    @Comment("Label used in {filter} when no filter is applied.") String filterLabelAll,
+    @Comment("Label used in {filter} when filtering by favorites.") String filterLabelFavorites,
+    @Comment("Label used in {filter} when filtering by same world.") String filterLabelSameWorld,
+    @Comment("Label used in {filter} when filtering by recent contacts.") String filterLabelRecent,
+    @Comment("Suffix appended to the active option in the {options} expansion.")
+        String filterActiveMarker) {
 
   public static TpaPickPlayerMenuConfig defaults() {
     return new TpaPickPlayerMenuConfig(
@@ -45,6 +58,21 @@ public record TpaPickPlayerMenuConfig(
         49,
         Material.ARROW,
         "<yellow>Voltar",
-        List.of("<gray>Retorna ao menu de TPA."));
+        List.of("<gray>Retorna ao menu de TPA."),
+        45,
+        Material.HOPPER,
+        "<gold>Filtro: <yellow>{filter}",
+        List.of(
+            "<gray>Filtra a lista de jogadores",
+            "<gray>mostrados no menu.",
+            "",
+            "{options}",
+            "",
+            "<yellow>Clique para alternar."),
+        "Todos",
+        "Favoritos",
+        "Mesmo mundo",
+        "Recentes",
+        " <green>✓");
   }
 }
