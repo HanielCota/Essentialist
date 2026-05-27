@@ -8,10 +8,14 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 /**
  * Appearance of the favorite-action sub-menu — two TPA buttons (visit / summon) plus remove and
  * back. Opens when the player clicks a favorite head.
+ *
+ * <p>The {@code title} is resolved once at menu registration (MenuFramework v1.2.0 limitation), so
+ * it cannot contain a per-viewer {@code {player}} placeholder — the target name appears in the head
+ * item instead.
  */
 @ConfigSerializable
 public record TpaFavoriteActionMenuConfig(
-    @Comment("Favorite action menu title. Placeholder: {player}.") String title,
+    @Comment("Favorite action menu title (static, no per-viewer placeholders).") String title,
     @Comment("Favorite action menu rows (1-6).") int rows,
     @Comment("Slot of the player head shown at the top.") int targetSlot,
     @Comment("Material of the target item.") Material targetIcon,
@@ -39,7 +43,7 @@ public record TpaFavoriteActionMenuConfig(
 
   public static TpaFavoriteActionMenuConfig defaults() {
     return new TpaFavoriteActionMenuConfig(
-        "Favorito: {player}",
+        "<gold>Favorito",
         5,
         13,
         Material.PLAYER_HEAD,
