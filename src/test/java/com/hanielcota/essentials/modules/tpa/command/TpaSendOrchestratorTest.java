@@ -38,9 +38,10 @@ class TpaSendOrchestratorTest {
     var acceptHandler =
         new TpAcceptOutcomeHandler(config, new TpaRequestReplyNotifier(actors, players));
     var callbacks = new MainThreadCallbacks(new TpaTestSupport.DirectScheduler());
+    var notifier = new TpaNotifier(config, players, profiles, favorites);
     var dispatcher =
         new TpaSendOrchestrator(
-            config, service, favorites, profiles, acceptHandler, callbacks, actors);
+            config, service, favorites, profiles, acceptHandler, callbacks, actors, notifier);
     var requesterActor = actors.actorOf(requester);
 
     dispatcher.send(requesterActor, target, TeleportRequestType.TPA, "sent {player}");

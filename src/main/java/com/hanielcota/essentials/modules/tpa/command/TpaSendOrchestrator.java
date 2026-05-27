@@ -33,6 +33,7 @@ public final class TpaSendOrchestrator {
   private final TpAcceptOutcomeHandler acceptHandler;
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
+  private final TpaNotifier notifier;
 
   private static void sendError(
       @NonNull CommandActor actor, @NonNull String template, @NonNull String playerName) {
@@ -57,17 +58,26 @@ public final class TpaSendOrchestrator {
     }
 
     var autoAccept = shouldAutoAccept(targetId, senderId);
-    var created = this.service.create(sender, target, type, !autoAccept);
+    var created = this.service.create(sender, target, type);
     if (created.isEmpty()) {
       handleRefusal(requesterActor, sender, target, senderId, targetId, type, messages);
       return;
     }
 
-    var request = created.get();
+    var result = created.get();
+    var replacedRequest = result.replacedRequest();
+    if (replacedRequest != null) {
+      this.notifier.notifyRequestReplaced(replacedRequest, senderId, sender.getName());
+      this.notifier.notifyOutgoingReplaced(replacedRequest, target.getName());
+    }
+
+    var request = result.request();
     if (autoAccept) {
       autoAccept(request, target);
       return;
     }
+
+    this.notifier.sendPrompt(target, request);
 
     var confirmationMsg = confirmationTemplate.replace("{player}", target.getName());
     requesterActor.sendSuccess(confirmationMsg);

@@ -38,7 +38,8 @@ public final class TpaModule extends AbstractModule {
     var shared = runtimeBootstrap.sharedHelpers(runtime.requestService());
     var favoriteRuntime = runtimeBootstrap.favoriteRuntime(favorites, profiles);
     var dispatcher =
-        runtimeBootstrap.sendDispatcher(runtime.requestService(), favorites, profiles, shared);
+        runtimeBootstrap.sendDispatcher(
+            runtime.requestService(), favorites, profiles, shared, runtime.notifier());
 
     var menuBootstrap = new TpaMenuBootstrap(env, registrar, config);
     var historyMenu = menuBootstrap.registerHistoryMenu(history);

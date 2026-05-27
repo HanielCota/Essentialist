@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.core;
 
-import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.api.EssentialsApi;
 import com.hanielcota.essentials.api.HomesApi;
@@ -10,7 +9,6 @@ import com.hanielcota.essentials.api.TeleportsApi;
 import com.hanielcota.essentials.api.VanishApi;
 import com.hanielcota.essentials.api.WarpsApi;
 import com.hanielcota.essentials.core.lifecycle.LifecyclePhase;
-import com.hanielcota.essentials.database.connection.DatabaseProvider;
 import com.hanielcota.essentials.module.environment.ModuleContext;
 import com.hanielcota.essentials.module.registration.ModuleManager;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
@@ -20,70 +18,42 @@ import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import com.hanielcota.essentials.service.ServiceRegistry;
-import com.hanielcota.essentials.shared.Log;
 import java.util.Optional;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+/**
+ * Thin public API facade for the Essentialist plugin. Delegates lifecycle management to {@link
+ * CoreLifecycle} and service resolution to {@link ServiceRegistry}.
+ */
 public final class EssentialsCore implements EssentialsApi {
-
-  private static final Log LOG = Log.of(EssentialsCore.class);
 
   private final EssentialsPlugin plugin;
   private final ServiceRegistry services;
+  private final CoreLifecycle lifecycle;
 
-  private volatile LifecyclePhase phase = LifecyclePhase.BOOTING;
-
-  private static void safelyShutdown(@NonNull String label, @NonNull Runnable step) {
-    try {
-      step.run();
-    } catch (RuntimeException e) {
-      LOG.error(e, "{} shutdown failed", label);
-    }
+  public EssentialsCore(@NonNull EssentialsPlugin plugin, @NonNull ServiceRegistry services) {
+    this.plugin = plugin;
+    this.services = services;
+    this.lifecycle = new CoreLifecycle(services);
   }
 
   public void advance(@NonNull LifecyclePhase next) {
-    this.phase = next;
+    this.lifecycle.advance(next);
 
     if (next == LifecyclePhase.ENABLED) {
       var moduleManager = this.services.resolve(ModuleManager.class);
-      var context = newContext();
+      var context = new ModuleContext(this.plugin, this.services);
 
       moduleManager.enableAll(context);
     }
   }
 
   public void shutdown() {
-    this.phase = LifecyclePhase.DISABLING;
-
-    try {
-      var moduleManager = this.services.resolve(ModuleManager.class);
-      moduleManager.disableAll();
-    } finally {
-      // Shut down MenuService before the database: menu teardown closes open viewers via
-      // InventoryCloseEvent listeners, some of which (e.g. invsee release, homes session cleanup)
-      // may still touch services that hit SQL. Both steps are wrapped so a thrown MenuService
-      // shutdown never strands the HikariCP pool / SQLite file open.
-      safelyShutdown("MenuService", this::shutdownMenuService);
-      safelyShutdown("DatabaseProvider", this::shutdownDatabase);
-
-      this.phase = LifecyclePhase.DISABLED;
-    }
-  }
-
-  private void shutdownMenuService() {
-    var menuHandle = this.services.find(MenuService.class);
-    menuHandle.ifPresent(MenuService::shutdown);
-  }
-
-  private void shutdownDatabase() {
-    var databaseHandle = this.services.find(DatabaseProvider.class);
-    databaseHandle.ifPresent(DatabaseProvider::close);
+    this.lifecycle.shutdown();
   }
 
   public LifecyclePhase phase() {
-    return this.phase;
+    return this.lifecycle.phase();
   }
 
   @Override
@@ -114,9 +84,5 @@ public final class EssentialsCore implements EssentialsApi {
   @Override
   public Optional<TeleportsApi> teleports() {
     return this.services.find(TeleportService.class).map(TeleportsApi.class::cast);
-  }
-
-  private ModuleContext newContext() {
-    return new ModuleContext(this.plugin, this.services);
   }
 }

@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
+import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
@@ -11,9 +12,9 @@ import lombok.RequiredArgsConstructor;
  * Drives request expiry.
  *
  * <p>Sole responsibility: once a second, hand every request that has outlived its deadline to
- * {@link TeleportRequestService#expire}. One shared timer sweeps the whole {@link
- * RequestRepository} — never one delayed task per request — so spamming {@code /tpa} cannot pile up
- * scheduler work. Holds no request state of its own.
+ * {@link TeleportRequestService#expire} and notify the requester via {@link TpaNotifier}. One
+ * shared timer sweeps the whole {@link RequestRepository} — never one delayed task per request — so
+ * spamming {@code /tpa} cannot pile up scheduler work. Holds no request state of its own.
  */
 @RequiredArgsConstructor
 public final class TeleportRequestExpiry {
@@ -23,6 +24,7 @@ public final class TeleportRequestExpiry {
   private final Scheduler scheduler;
   private final RequestRepository store;
   private final TeleportRequestService service;
+  private final TpaNotifier notifier;
 
   private Task task;
 
@@ -42,7 +44,10 @@ public final class TeleportRequestExpiry {
   private void sweep() {
     var now = Instant.now();
     for (var request : this.store.expiredAt(now)) {
-      this.service.expire(request);
+      var expired = this.service.expire(request);
+      if (expired) {
+        this.notifier.notifyExpired(request);
+      }
     }
   }
 }

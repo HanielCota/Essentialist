@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.tpa;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
@@ -52,15 +51,7 @@ public final class TpaTestSupport {
       @NonNull TpaContactService contacts) {
     var config = new StaticConfigHandle();
     var favorites = new TpaFavoriteService(null, NoopAsyncDatabaseWriter.INSTANCE);
-    return new TeleportRequestService(
-        config,
-        store,
-        history,
-        new TpaNotifier(config, players, profiles, favorites),
-        players,
-        profiles,
-        blocks,
-        contacts);
+    return new TeleportRequestService(config, store, history, players, profiles, blocks, contacts);
   }
 
   public static TpaProfileService profiles() {
