@@ -23,6 +23,8 @@ import com.hanielcota.essentials.modules.homes.listener.HomesSessionCleanupListe
 import com.hanielcota.essentials.modules.homes.menu.DeleteHomeClickHandler;
 import com.hanielcota.essentials.modules.homes.menu.DeleteHomeDialog;
 import com.hanielcota.essentials.modules.homes.menu.HomeClickHandler;
+import com.hanielcota.essentials.modules.homes.menu.HomeOptionsClickHandler;
+import com.hanielcota.essentials.modules.homes.menu.HomeOptionsMenu;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
@@ -140,8 +142,12 @@ public final class HomesModule extends AbstractModule {
     // 3. Menus + dialogs.
     var menuState = new HomesMenuState();
     var renderer = new HomeEntryRenderer(config);
-    var clickHandler = new HomeClickHandler(teleporter, actors, actionTarget, rename);
+    var clickHandler = new HomeClickHandler(teleporter, actors, actionTarget);
     registrar.menu(new HomesMenu(config, homeService, renderer, clickHandler, menuState, create));
+
+    var optionsClicks =
+        new HomeOptionsClickHandler(actionTarget, homeService, teleporter, rename, actors);
+    registrar.menu(new HomeOptionsMenu(config, homeService, renderer, actionTarget, optionsClicks));
 
     var configSnap = config.value();
     var menuConfig = configSnap.menu();
