@@ -52,21 +52,18 @@ public final class InfoMenu implements EssentialsMenu {
     var snap = this.config.value();
     var rows = snap.effectiveRows();
     var contentSlots = snap.effectiveContentSlots();
-
-    var pagBuilder = PaginationConfig.builder();
-    pagBuilder = pagBuilder.contentSlots(contentSlots);
-    var pagination = pagBuilder.build();
+    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
 
     var rawTitle = snap.menuTitle();
     var menuTitle = ComponentUtils.mini(rawTitle);
 
-    var menuBuilder = MenuFramework.builder(ID, menus);
-    menuBuilder = menuBuilder.rows(rows);
-    menuBuilder = menuBuilder.title(menuTitle);
-    menuBuilder = menuBuilder.pagination(pagination);
-    menuBuilder = menuBuilder.dynamicContent(this::buildSlots);
+    var builder = MenuFramework.builder(ID, menus);
+    builder.rows(rows);
+    builder.title(menuTitle);
+    builder.pagination(pagination);
+    builder.dynamicContent(this::buildSlots);
 
-    var menu = menuBuilder.build();
+    var menu = builder.build();
     menu.register();
   }
 
