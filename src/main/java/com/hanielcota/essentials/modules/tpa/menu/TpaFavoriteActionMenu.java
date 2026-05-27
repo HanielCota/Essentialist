@@ -1,15 +1,14 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
-import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
+import com.hanielcota.essentials.menu.PaginatedMenus;
 import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoriteActionMenuConfig;
@@ -20,7 +19,6 @@ import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
-import com.hanielcota.essentials.shared.ComponentUtils;
 import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,16 +66,9 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var settings = this.config.value().favoriteActionMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
-    var title = ComponentUtils.mini(settings.title());
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots(settings, rows)).build();
+    var slots = contentSlots(settings, rows);
 
-    var builder = MenuFramework.builder(ID, menus);
-    builder.rows(rows);
-    builder.title(title);
-    builder.pagination(pagination);
-    builder.dynamicContent(this::buildSlots);
-
-    builder.buildAndRegister();
+    PaginatedMenus.register(menus, ID, rows, settings.title(), slots, this::buildSlots);
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

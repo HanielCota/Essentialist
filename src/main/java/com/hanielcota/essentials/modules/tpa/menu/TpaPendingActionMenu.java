@@ -1,14 +1,13 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
-import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
-import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.PaginatedMenus;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
@@ -20,7 +19,6 @@ import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
-import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -70,17 +68,9 @@ public final class TpaPendingActionMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var settings = this.config.value().pendingActionMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
-    var contentSlots = contentSlots(settings, rows);
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
-    var title = ComponentUtils.mini(settings.title());
+    var slots = contentSlots(settings, rows);
 
-    var builder = MenuFramework.builder(ID, menus);
-    builder.rows(rows);
-    builder.title(title);
-    builder.pagination(pagination);
-    builder.dynamicContent(this::buildSlots);
-
-    builder.buildAndRegister();
+    PaginatedMenus.register(menus, ID, rows, settings.title(), slots, this::buildSlots);
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player viewer, @NonNull MenuSession session) {
