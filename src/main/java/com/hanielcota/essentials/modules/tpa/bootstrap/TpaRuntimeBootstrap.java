@@ -51,10 +51,10 @@ public final class TpaRuntimeBootstrap {
     var notifier = new TpaNotifier(this.config, players, profiles, favorites);
     var requestService =
         new TeleportRequestService(
-            this.config, store, history, notifier, players, profiles, blocks, contacts);
+            this.config, store, history, players, profiles, blocks, contacts);
 
     var scheduler = this.env.service(Scheduler.class);
-    var expiry = new TeleportRequestExpiry(scheduler, store, requestService);
+    var expiry = new TeleportRequestExpiry(scheduler, store, requestService, notifier);
     expiry.start();
     this.registrar.closeable(expiry::stop);
 
@@ -98,7 +98,8 @@ public final class TpaRuntimeBootstrap {
       @NonNull TeleportRequestService requests,
       @NonNull TpaFavoriteService favorites,
       @NonNull TpaProfileService profiles,
-      @NonNull TpaShared shared) {
+      @NonNull TpaShared shared,
+      @NonNull TpaNotifier notifier) {
     return new TpaSendOrchestrator(
         this.config,
         requests,
@@ -106,7 +107,8 @@ public final class TpaRuntimeBootstrap {
         profiles,
         shared.acceptHandler(),
         shared.callbacks(),
-        shared.actors());
+        shared.actors(),
+        notifier);
   }
 
   public void registerQuitListener(

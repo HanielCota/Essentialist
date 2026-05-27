@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
-import com.hanielcota.essentials.modules.teleport.service.DelayedTeleportPrompt;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -48,13 +47,7 @@ public record SpawnCommand(
     var destination = resolved.get();
     var delay = snap.teleportDelay();
 
-    var teleportingMsg = messages.teleporting();
-    var teleportedMsg = messages.teleported();
-    var cancelledMsg = messages.cancelled();
-    var failedMsg = messages.failed();
-
-    var prompt =
-        new DelayedTeleportPrompt(actor, teleportingMsg, teleportedMsg, cancelledMsg, failedMsg);
+    var prompt = SpawnPromptFactory.create(actor, messages);
 
     this.delayed.schedule(sender, destination, delay, prompt);
 

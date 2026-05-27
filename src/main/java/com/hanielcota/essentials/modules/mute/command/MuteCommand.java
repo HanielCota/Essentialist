@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.mute.command;
 
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.modules.mute.domain.MuteOutcome;
+import com.hanielcota.essentials.modules.mute.service.MuteDurationParser;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -13,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
+import java.time.Duration;
 import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -22,6 +24,8 @@ import org.bukkit.entity.Player;
 @Description("Silencia o chat de um jogador.")
 @Syntax("/mute <jogador> [duração]")
 public record MuteCommand(MuteService service, MuteNotifier notifier) {
+
+  private static final String EXEMPT_PERMISSION = "essentials.mute.exempt";
 
   @DefaultSubcommand
   public CommandResult execute(
@@ -33,20 +37,30 @@ public record MuteCommand(MuteService service, MuteNotifier notifier) {
       return CommandResult.invalidUsage();
     }
 
-    var outcome = this.service.mute(target, duracao.orElse(""));
+    if (target.hasPermission(EXEMPT_PERMISSION)) {
+      this.notifier.sendExempt(sender, target.getName());
+      return CommandResult.denied();
+    }
+
+    var rawDuration = duracao.orElse("");
+    var trimmed = rawDuration.strip();
+
+    Duration duration = null;
+    if (!trimmed.isEmpty()) {
+      duration = MuteDurationParser.tryParse(trimmed);
+      if (duration == null) {
+        this.notifier.sendInvalidDuration(sender, trimmed);
+        return CommandResult.invalidUsage();
+      }
+    }
+
+    var outcome = this.service.mute(target, duration);
     return switch (outcome) {
-      case MuteOutcome.Exempt exempt -> {
-        this.notifier.sendExempt(sender, exempt.targetName());
-        yield CommandResult.denied();
-      }
-      case MuteOutcome.InvalidDuration invalid -> {
-        this.notifier.sendInvalidDuration(sender, invalid.raw());
-        yield CommandResult.invalidUsage();
-      }
       case MuteOutcome.Muted muted -> {
         this.notifier.sendMuted(sender, target, muted.mute());
         yield CommandResult.success();
       }
+      default -> CommandResult.success();
     };
   }
 }

@@ -1,13 +1,13 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.Participant;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.TpaCreationResult;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -21,15 +21,14 @@ import org.bukkit.entity.Player;
 /**
  * Application service for the teleport-request use cases: create, accept, deny, cancel, expire.
  *
- * <p>Sole responsibility: orchestration. It owns no state and renders no messages — it delegates
- * storage to {@link RequestRepository}, persistence to {@link TpaHistory} and player-facing notices
- * to {@link TpaNotifier}.
+ * <p>Sole responsibility: lifecycle and storage orchestration. It owns no state and renders no
+ * messages — it delegates storage to {@link RequestRepository} and persistence to {@link
+ * TpaHistory}. Player-facing notifications are the caller's responsibility.
  */
 public final class TeleportRequestService {
 
   private final ConfigHandle<TpaConfig> config;
   private final RequestRepository store;
-  private final TpaNotifier notifier;
   private final PlayerProvider players;
   private final TpaRequestPolicy policy;
   private final TpaRequestRecorder recorder;
@@ -39,26 +38,24 @@ public final class TeleportRequestService {
       @NonNull ConfigHandle<TpaConfig> config,
       @NonNull RequestRepository store,
       @NonNull TpaHistory history,
-      @NonNull TpaNotifier notifier,
       @NonNull PlayerProvider players,
       @NonNull TpaProfileService profiles,
       @NonNull TpaBlockService blocks,
       @NonNull TpaContactService contacts) {
     this.config = config;
     this.store = store;
-    this.notifier = notifier;
     this.players = players;
     this.policy = new TpaRequestPolicy(profiles, blocks);
     this.recorder = new TpaRequestRecorder(history, profiles, contacts);
     this.executor = new TeleportRequestExecutor(players);
   }
 
-  public Optional<TeleportRequest> create(
+  public Optional<TpaCreationResult> create(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
     return create(requester, target, type, true);
   }
 
-  public Optional<TeleportRequest> create(
+  public Optional<TpaCreationResult> create(
       @NonNull Player requester,
       @NonNull Player target,
       @NonNull TeleportRequestType type,
@@ -70,11 +67,13 @@ public final class TeleportRequestService {
       return Optional.empty();
     }
 
-    var requesterName = requester.getName();
-
     var existing = this.store.outgoingOf(requesterId);
-    existing.ifPresent(
-        previous -> replacePrevious(previous, requesterId, requesterName, target.getName()));
+    TeleportRequest replacedRequest = existing.orElse(null);
+
+    if (replacedRequest != null) {
+      this.store.delete(replacedRequest);
+      this.recorder.recordTerminal(replacedRequest, TeleportRequestStatus.CANCELLED);
+    }
 
     var snap = this.config.value();
     var lifetime = snap.requestExpiry();
@@ -85,11 +84,8 @@ public final class TeleportRequestService {
 
     this.store.add(request);
     this.recorder.recordCreated(requesterId, targetId);
-    if (notifyTarget) {
-      this.notifier.sendPrompt(target, request);
-    }
 
-    return Optional.of(request);
+    return Optional.of(new TpaCreationResult(request, replacedRequest));
   }
 
   /** The target's pending requests, newest first. */
@@ -166,15 +162,17 @@ public final class TeleportRequestService {
     return resolve(request, TeleportRequestStatus.CANCELLED);
   }
 
-  /** Expires a request and notifies the requester. Called by {@link TeleportRequestExpiry}. */
-  public void expire(@NonNull TeleportRequest request) {
+  /**
+   * Expires a request. Returns true if the request was found and removed. The caller is responsible
+   * for notifying the requester.
+   */
+  public boolean expire(@NonNull TeleportRequest request) {
     if (!this.store.delete(request)) {
-      return;
+      return false;
     }
 
     this.recorder.recordTerminal(request, TeleportRequestStatus.EXPIRED);
-
-    this.notifier.notifyExpired(request);
+    return true;
   }
 
   /**
@@ -190,16 +188,6 @@ public final class TeleportRequestService {
       }
     }
     return cancelled;
-  }
-
-  private void replacePrevious(
-      @NonNull TeleportRequest previous,
-      @NonNull UUID requesterId,
-      @NonNull String requesterName,
-      @NonNull String newTargetName) {
-    resolve(previous, TeleportRequestStatus.CANCELLED);
-    this.notifier.notifyRequestReplaced(previous, requesterId, requesterName);
-    this.notifier.notifyOutgoingReplaced(previous, newTargetName);
   }
 
   /** Removes a request and writes its terminal state to history in one step. */

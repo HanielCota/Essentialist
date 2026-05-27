@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
@@ -112,7 +111,6 @@ class TeleportRequestServiceTest {
         new StaticConfigHandle(),
         new InMemoryRequestRepository(),
         new NoopHistory(),
-        new TpaNotifier(new StaticConfigHandle(), new EmptyPlayerProvider(), profiles, favorites),
         new EmptyPlayerProvider(),
         profiles,
         blocks,
