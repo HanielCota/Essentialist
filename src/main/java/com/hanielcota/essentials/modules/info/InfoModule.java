@@ -29,9 +29,9 @@ public final class InfoModule extends AbstractModule {
     var menus = env.service(MenuService.class);
     var players = env.service(PlayerProvider.class);
 
-    var serverEntries = new ServerInfoEntries();
+    var serverEntries = new ServerInfoEntries(config);
     var playerEntries = new PlayerInfoEntries(sessions, config);
-    var pluginEntries = new PluginInfoEntries(env.plugin());
+    var pluginEntries = new PluginInfoEntries(env.plugin(), config);
 
     var menuState = new InfoMenuState(players);
     var menu = new InfoMenu(config, serverEntries, playerEntries, pluginEntries, menuState);
