@@ -258,7 +258,7 @@ public record HomesMenuConfig(
         "Alfabético",
         "Mais usadas",
         "Recentes",
-        " <green>✓",
+        " <green>◀",
         List.of(
             "", "<dark_gray>Teleportes: <gray>{count}", "<dark_gray>Último uso: <gray>{last_used}"),
         "nunca");

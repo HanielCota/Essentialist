@@ -73,6 +73,6 @@ public record TpaPickPlayerMenuConfig(
         "Favoritos",
         "Mesmo mundo",
         "Recentes",
-        " <green>✓");
+        " <green>◀");
   }
 }
