@@ -2,23 +2,20 @@ package com.hanielcota.essentials.modules.info.menu.presentation;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
+import com.hanielcota.essentials.modules.info.config.PlayerEntriesSection;
 import com.hanielcota.essentials.shared.DurationFormatter;
 import com.hanielcota.essentials.shared.Numbers;
 import com.hanielcota.essentials.user.UserSessionService;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
 public final class PlayerInfoEntries {
-
-  private static final String GRAY = "<gray>";
 
   private final UserSessionService sessions;
   private final ConfigHandle<InfoConfig> config;
@@ -27,50 +24,37 @@ public final class PlayerInfoEntries {
     return (int) Math.round(player.getHealth());
   }
 
-  private static String formatCoords(@NonNull Location location) {
-    var x = Numbers.display(location.getX());
-    var y = Numbers.display(location.getY());
-    var z = Numbers.display(location.getZ());
-
-    return x + ", " + y + ", " + z;
-  }
-
   public List<InfoEntry> entries(@NonNull Player player) {
+    var snap = this.config.value();
+    var section = snap.player();
+
     var uuid = player.getUniqueId();
     var name = player.getName();
     var location = player.getLocation();
-    var world = player.getWorld();
-    var worldName = world.getName();
+    var worldName = player.getWorld().getName();
 
     var health = roundedHealth(player);
     var foodLevel = player.getFoodLevel();
     var level = player.getLevel();
-    var gameMode = player.getGameMode();
-    var gameModeLabel = labelFor(gameMode);
+    var gameModeLabel = snap.gameModeLabel(player.getGameMode());
     var ping = player.getPing();
-    var coords = formatCoords(location);
-    var sessionTime = sessionDuration(player);
+    var sessionTime = sessionDuration(section, player);
 
-    var headTitle = "<yellow>" + name;
-    var headLore = "<gray>Informações do jogador.";
-    var healthLore = GRAY + health + " <red>❤";
-    var foodLore = GRAY + foodLevel + " <dark_gray>/ <gray>20";
-    var levelLore = GRAY + level;
-    var gameModeLore = GRAY + gameModeLabel;
-    var worldLore = GRAY + worldName;
-    var coordsLore = GRAY + coords;
-    var pingLore = GRAY + ping + " ms";
-    var sessionLore = GRAY + sessionTime;
+    var x = Numbers.display(location.getX());
+    var y = Numbers.display(location.getY());
+    var z = Numbers.display(location.getZ());
+    var coords = x + ", " + y + ", " + z;
 
-    var headEntry = InfoEntry.head(uuid, headTitle, headLore);
-    var healthEntry = InfoEntry.of(Material.GOLDEN_APPLE, "<yellow>Vida", healthLore);
-    var foodEntry = InfoEntry.of(Material.COOKED_BEEF, "<yellow>Fome", foodLore);
-    var levelEntry = InfoEntry.of(Material.EXPERIENCE_BOTTLE, "<yellow>Nível", levelLore);
-    var modeEntry = InfoEntry.of(Material.GRASS_BLOCK, "<yellow>Modo de jogo", gameModeLore);
-    var worldEntry = InfoEntry.of(Material.MAP, "<yellow>Mundo", worldLore);
-    var locationEntry = InfoEntry.of(Material.COMPASS, "<yellow>Localização", coordsLore);
-    var pingEntry = InfoEntry.of(Material.FEATHER, "<yellow>Ping", pingLore);
-    var sessionEntry = InfoEntry.of(Material.CLOCK, "<yellow>Tempo de sessão", sessionLore);
+    var headEntry = InfoEntry.headFrom(uuid, section.head(), Map.of("player", name));
+    var healthEntry = InfoEntry.from(section.health(), Map.of("health", health));
+    var foodEntry = InfoEntry.from(section.food(), Map.of("food", foodLevel));
+    var levelEntry = InfoEntry.from(section.level(), Map.of("level", level));
+    var modeEntry = InfoEntry.from(section.mode(), Map.of("mode", gameModeLabel));
+    var worldEntry = InfoEntry.from(section.world(), Map.of("world", worldName));
+    var locationEntry =
+        InfoEntry.from(section.location(), Map.of("x", x, "y", y, "z", z, "coords", coords));
+    var pingEntry = InfoEntry.from(section.ping(), Map.of("ping", ping));
+    var sessionEntry = InfoEntry.from(section.session(), Map.of("duration", sessionTime));
 
     return List.of(
         headEntry,
@@ -84,18 +68,12 @@ public final class PlayerInfoEntries {
         sessionEntry);
   }
 
-  private String labelFor(@NonNull GameMode mode) {
-    var snap = this.config.value();
-
-    return snap.gameModeLabel(mode);
-  }
-
-  private String sessionDuration(@NonNull Player player) {
+  private String sessionDuration(@NonNull PlayerEntriesSection section, @NonNull Player player) {
     var uuid = player.getUniqueId();
     var sessionOpt = this.sessions.sessionOf(uuid);
 
     if (sessionOpt.isEmpty()) {
-      return "agora mesmo";
+      return section.noSessionLabel();
     }
 
     var session = sessionOpt.get();

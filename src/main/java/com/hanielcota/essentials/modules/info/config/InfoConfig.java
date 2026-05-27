@@ -35,7 +35,11 @@ public record InfoConfig(
     @Comment("Label shown for GameMode ADVENTURE on the player info card.")
         String gameModeAdventure,
     @Comment("Label shown for GameMode SPECTATOR on the player info card.")
-        String gameModeSpectator) {
+        String gameModeSpectator,
+    @Comment("Templates for entries shown under the Servidor tab.") ServerEntriesSection server,
+    @Comment("Templates for entries shown under the Jogador tab.") PlayerEntriesSection player,
+    @Comment("Templates for entries shown under the Essentialist tab.")
+        PluginEntriesSection plugin) {
 
   public static InfoConfig defaults() {
     return new InfoConfig(
@@ -62,7 +66,10 @@ public record InfoConfig(
         "Sobrevivência",
         "Criativo",
         "Aventura",
-        "Espectador");
+        "Espectador",
+        ServerEntriesSection.defaults(),
+        PlayerEntriesSection.defaults(),
+        PluginEntriesSection.defaults());
   }
 
   public int effectiveRows() {

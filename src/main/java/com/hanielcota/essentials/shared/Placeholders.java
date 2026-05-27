@@ -89,6 +89,19 @@ public final class Placeholders {
     return result.toString();
   }
 
+  /**
+   * Multi-token list-wise variant of {@link #format(String, Map)}: returns a fresh list with every
+   * line expanded against the same {@code values}. One regex walk per line, no chained allocations.
+   */
+  public static List<String> formatAll(
+      @NonNull List<String> templates, @NonNull Map<String, ?> values) {
+    var result = new ArrayList<String>(templates.size());
+    for (var line : templates) {
+      result.add(format(line, values));
+    }
+    return result;
+  }
+
   private static String resolveReplacement(@NonNull Matcher matcher, Object replacementValue) {
     if (replacementValue == null) {
       return matcher.group();
