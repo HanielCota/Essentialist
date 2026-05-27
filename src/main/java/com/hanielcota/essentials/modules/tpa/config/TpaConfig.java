@@ -13,6 +13,7 @@ import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPrivacySettingsMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaProfileMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaTargetActionMenuConfig;
 import java.time.Duration;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -38,6 +39,7 @@ public record TpaConfig(
     TpaSettingsMenuConfig settingsMenu,
     TpaFavoritesMenuConfig favoritesMenu,
     TpaFavoriteActionMenuConfig favoriteActionMenu,
+    TpaTargetActionMenuConfig targetActionMenu,
     TpaPendingActionMenuConfig pendingActionMenu,
     TpaPrivacySettingsMenuConfig privacySettingsMenu,
     TpaNotificationSettingsMenuConfig notificationSettingsMenu,
@@ -57,6 +59,7 @@ public record TpaConfig(
         TpaSettingsMenuConfig.defaults(),
         TpaFavoritesMenuConfig.defaults(),
         TpaFavoriteActionMenuConfig.defaults(),
+        TpaTargetActionMenuConfig.defaults(),
         TpaPendingActionMenuConfig.defaults(),
         TpaPrivacySettingsMenuConfig.defaults(),
         TpaNotificationSettingsMenuConfig.defaults(),

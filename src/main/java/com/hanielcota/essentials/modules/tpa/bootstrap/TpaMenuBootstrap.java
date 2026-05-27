@@ -9,6 +9,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
 import com.hanielcota.essentials.modules.tpa.listener.TpaHistoryMenuCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaPendingSelectionCleanupListener;
+import com.hanielcota.essentials.modules.tpa.listener.TpaTargetSelectionCleanupListener;
 import com.hanielcota.essentials.modules.tpa.menu.TpaBehaviorSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaBlockedMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaFavoriteActionMenu;
@@ -26,6 +27,7 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaPendingMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPrivacySettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaProfileMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaSettingsMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaTargetActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
@@ -33,6 +35,7 @@ import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
+import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import lombok.NonNull;
@@ -168,5 +171,20 @@ public final class TpaMenuBootstrap {
             dispatcher);
 
     this.registrar.menu(menu);
+  }
+
+  public void registerTargetActionMenu(
+      @NonNull TpaFavoriteService favorites,
+      @NonNull TpaTargetSelections selections,
+      @NonNull TpaSendOrchestrator dispatcher) {
+    var players = this.env.service(PlayerProvider.class);
+    var actors = this.env.service(ActorFactory.class);
+    var menu =
+        new TpaTargetActionMenu(this.config, selections, favorites, players, actors, dispatcher);
+
+    this.registrar.menu(menu);
+
+    var menus = this.env.service(MenuService.class);
+    this.registrar.listener(new TpaTargetSelectionCleanupListener(selections, menus));
   }
 }

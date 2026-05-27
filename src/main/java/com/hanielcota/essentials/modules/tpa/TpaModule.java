@@ -10,6 +10,7 @@ import com.hanielcota.essentials.modules.tpa.bootstrap.TpaPersistenceBootstrap;
 import com.hanielcota.essentials.modules.tpa.bootstrap.TpaRuntimeBootstrap;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
+import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import java.util.Set;
 import lombok.NonNull;
 
@@ -45,15 +46,17 @@ public final class TpaModule extends AbstractModule {
         profiles, runtime.requestService(), favorites, contacts, dispatcher);
 
     var pendingSelections = new TpaPendingSelections();
+    var targetSelections = new TpaTargetSelections();
     menuBootstrap.registerPendingMenu(runtime.requestService(), blocks, shared, pendingSelections);
     menuBootstrap.registerSettingsMenu(profiles);
     menuBootstrap.registerBlockedMenu(blocks);
     menuBootstrap.registerFavoritesMenu(favorites, contacts, profiles, favoriteRuntime);
     menuBootstrap.registerFavoriteActionMenu(favorites, favoriteRuntime, runtime, dispatcher);
+    menuBootstrap.registerTargetActionMenu(favorites, targetSelections, dispatcher);
 
     var commandBootstrap = new TpaCommandBootstrap(env, registrar, config);
     commandBootstrap.registerCommands(
-        history, runtime.requestService(), blocks, historyMenu, dispatcher, shared);
+        history, runtime.requestService(), blocks, historyMenu, targetSelections, shared);
 
     runtimeBootstrap.registerQuitListener(runtime, pendingSelections);
   }
