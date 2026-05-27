@@ -24,6 +24,7 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaPendingActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPendingMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaPickPlayerMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPrivacySettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaProfileMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaSettingsMenu;
@@ -186,5 +187,12 @@ public final class TpaMenuBootstrap {
 
     var menus = this.env.service(MenuService.class);
     this.registrar.listener(new TpaTargetSelectionCleanupListener(selections, menus));
+  }
+
+  public void registerPickPlayerMenu(@NonNull TpaTargetSelections selections) {
+    var players = this.env.service(PlayerProvider.class);
+    var menu = new TpaPickPlayerMenu(this.config, players, selections);
+
+    this.registrar.menu(menu);
   }
 }
