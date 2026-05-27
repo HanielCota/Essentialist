@@ -1,20 +1,18 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
-import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
+import com.hanielcota.essentials.menu.PaginatedMenus;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaBlockedMenuConfig;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
-import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -81,19 +79,20 @@ public final class TpaBlockedMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var settings = this.config.value().blockedMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots(settings, rows)).build();
+    var slots = contentSlots(settings, rows);
 
-    var builder = MenuFramework.builder(ID, menus);
-    builder.rows(rows);
-    builder.title(ComponentUtils.mini(settings.title()));
-    builder.pagination(pagination);
-    builder.dynamicContent(this::buildSlots);
-    builder.slot(
-        backSlot(settings, rows),
-        backTemplate(settings),
-        click -> click.switchTo(TpaPrivacySettingsMenu.ID));
-
-    builder.buildAndRegister();
+    PaginatedMenus.register(
+        menus,
+        ID,
+        rows,
+        settings.title(),
+        slots,
+        this::buildSlots,
+        builder ->
+            builder.slot(
+                backSlot(settings, rows),
+                backTemplate(settings),
+                click -> click.switchTo(TpaPrivacySettingsMenu.ID)));
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

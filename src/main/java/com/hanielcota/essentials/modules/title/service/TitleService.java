@@ -20,9 +20,13 @@ public final class TitleService {
 
   private static Component render(@NonNull String raw) {
     try {
-      return ComponentUtils.mini(raw);
+      var parsed = ComponentUtils.mini(raw);
+
+      return parsed;
     } catch (RuntimeException _) {
-      return Component.text(raw);
+      var fallback = Component.text(raw);
+
+      return fallback;
     }
   }
 

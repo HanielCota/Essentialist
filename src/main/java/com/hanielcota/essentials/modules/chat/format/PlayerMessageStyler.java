@@ -72,6 +72,8 @@ public final class PlayerMessageStyler {
     }
     resolver.resolver(StandardTags.reset());
 
-    return MiniMessage.builder().tags(resolver.build()).build();
+    var tagResolver = resolver.build();
+
+    return MiniMessage.builder().tags(tagResolver).build();
   }
 }

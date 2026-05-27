@@ -63,7 +63,9 @@ public final class DeleteHomeDialog implements EssentialsMenu {
   private @NonNull Component title(@NonNull HomesConfig configSnap) {
     var messages = configSnap.messages();
     var titleText = messages.deleteConfirmTitle();
-    return ComponentUtils.mini(titleText);
+    var titleComponent = ComponentUtils.mini(titleText);
+
+    return titleComponent;
   }
 
   private @NonNull ItemTemplate promptItem(@NonNull HomesConfig configSnap) {
