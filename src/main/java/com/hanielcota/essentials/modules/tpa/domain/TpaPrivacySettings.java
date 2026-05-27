@@ -22,7 +22,7 @@ public record TpaPrivacySettings(
   }
 
   public boolean accepts(@NonNull TeleportRequestType type) {
-    return this.receiveByType.getOrDefault(type, false);
+    return this.receiveByType.getOrDefault(type, true);
   }
 
   public boolean isDndActive(long nowEpochMs) {

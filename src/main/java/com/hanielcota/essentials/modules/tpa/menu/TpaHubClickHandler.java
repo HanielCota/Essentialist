@@ -24,7 +24,12 @@ public final class TpaHubClickHandler {
     var actor = this.actors.actorOf(click.player());
     var messages = this.config.value().messages();
 
-    this.requests.cancel(request);
+    var cancelled = this.requests.cancel(request);
+    if (!cancelled) {
+      actor.sendError(messages.noOutgoing());
+      click.refresh();
+      return;
+    }
 
     var targetName = request.target().name();
     var cancelledText = messages.cancelled().replace("{player}", targetName);

@@ -13,8 +13,8 @@ public record RequestWindow(Instant createdAt, Instant expiresAt) {
     return new RequestWindow(now, now.plus(lifetime));
   }
 
-  /** Whether {@code now} is past the expiry instant. */
+  /** Whether {@code now} has reached or passed the expiry instant. */
   public boolean hasExpired(@NonNull Instant now) {
-    return now.isAfter(this.expiresAt);
+    return !now.isBefore(this.expiresAt);
   }
 }

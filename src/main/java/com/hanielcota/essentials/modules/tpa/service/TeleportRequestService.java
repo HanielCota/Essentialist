@@ -129,9 +129,13 @@ public final class TeleportRequestService {
     var targetId = request.target().id();
     var targetOnline = this.players.online(targetId).isPresent();
 
-    if (!requesterOnline || !targetOnline) {
+    if (!requesterOnline) {
       this.recorder.recordTerminal(request, TeleportRequestStatus.CANCELLED);
       return AcceptOutcome.REQUESTER_OFFLINE;
+    }
+    if (!targetOnline) {
+      this.recorder.recordTerminal(request, TeleportRequestStatus.CANCELLED);
+      return AcceptOutcome.TARGET_OFFLINE;
     }
 
     return AcceptOutcome.ACCEPTED;
@@ -147,9 +151,9 @@ public final class TeleportRequestService {
     return resolve(request, TeleportRequestStatus.DENIED);
   }
 
-  /** Cancels a request (the requester withdrew it). */
-  public void cancel(@NonNull TeleportRequest request) {
-    resolve(request, TeleportRequestStatus.CANCELLED);
+  /** Cancels a request (the requester withdrew it). Returns false when it was already resolved. */
+  public boolean cancel(@NonNull TeleportRequest request) {
+    return resolve(request, TeleportRequestStatus.CANCELLED);
   }
 
   /** Expires a request and notifies the requester. Called by {@link TeleportRequestExpiry}. */

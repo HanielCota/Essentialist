@@ -27,6 +27,7 @@ public final class TpAcceptOutcomeHandler {
     var map = new EnumMap<AcceptOutcome, ResultRoute>(AcceptOutcome.class);
     map.put(AcceptOutcome.ACCEPTED, this::notifyAccepted);
     map.put(AcceptOutcome.REQUESTER_OFFLINE, this::notifyRequesterOffline);
+    map.put(AcceptOutcome.TARGET_OFFLINE, this::notifyTargetOffline);
     map.put(AcceptOutcome.NOT_FOUND, this::notifyNotFound);
     return Map.copyOf(map);
   }
@@ -84,6 +85,17 @@ public final class TpAcceptOutcomeHandler {
     var requesterName = request.requester().name();
     var requesterOfflineTemplate = messages.requesterOffline();
     var offlineMsg = requesterOfflineTemplate.replace("{player}", requesterName);
+
+    actor.sendError(offlineMsg);
+  }
+
+  private void notifyTargetOffline(
+      @NonNull TeleportRequest request,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor) {
+    var targetName = request.target().name();
+    var targetOfflineTemplate = messages.targetOffline();
+    var offlineMsg = targetOfflineTemplate.replace("{player}", targetName);
 
     actor.sendError(offlineMsg);
   }
