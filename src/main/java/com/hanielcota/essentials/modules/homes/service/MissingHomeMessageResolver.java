@@ -22,7 +22,7 @@ public final class MissingHomeMessageResolver {
     var snap = this.config.value();
     var messages = snap.messages();
 
-    if (this.service.count(owner) == 0) {
+    if (this.service.homeCount(owner) == 0) {
       return messages.noHomes();
     }
 

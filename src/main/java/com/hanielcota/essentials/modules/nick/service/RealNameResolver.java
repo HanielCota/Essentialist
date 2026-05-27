@@ -22,7 +22,7 @@ public final class RealNameResolver {
       return online.getName();
     }
 
-    var entry = this.nicks.nickFor(id).orElse(null);
+    var entry = this.nicks.nickOf(id).orElse(null);
     if (entry != null) {
       return entry.realName();
     }

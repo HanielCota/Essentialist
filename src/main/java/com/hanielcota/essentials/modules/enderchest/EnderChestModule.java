@@ -17,7 +17,9 @@ public final class EnderChestModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("enderchest", EnderChestConfig.class, EnderChestConfig::defaults);
-    registrar.command(new EnderChestCommand(config));
+    var command = new EnderChestCommand(config);
+
+    registrar.command(command);
     registrar.listener(new EnderChestQuitListener());
   }
 }

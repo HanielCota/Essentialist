@@ -21,7 +21,7 @@ class NickServiceTest {
 
     service.set(id, "Ace", "RealName");
 
-    assertEquals("Ace", service.nickFor(id).orElseThrow().nickname());
+    assertEquals("Ace", service.nickOf(id).orElseThrow().nickname());
     assertEquals(id, service.idByNick("ace").orElseThrow());
     assertEquals(id, service.idByNick("ACE").orElseThrow());
   }
@@ -34,7 +34,7 @@ class NickServiceTest {
     service.set(id, "OldName", "Real");
     service.set(id, "NewName", "Real");
 
-    assertEquals("NewName", service.nickFor(id).orElseThrow().nickname());
+    assertEquals("NewName", service.nickOf(id).orElseThrow().nickname());
     assertEquals(id, service.idByNick("newname").orElseThrow());
     assertFalse(service.idByNick("oldname").isPresent());
   }
@@ -47,7 +47,7 @@ class NickServiceTest {
 
     assertTrue(service.reset(id));
     assertFalse(service.reset(id));
-    assertFalse(service.nickFor(id).isPresent());
+    assertFalse(service.nickOf(id).isPresent());
     assertFalse(service.idByNick("ace").isPresent());
   }
 

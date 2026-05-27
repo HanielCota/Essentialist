@@ -13,26 +13,24 @@ class VanishApiAdapterTest {
 
   @Test
   void isVanishedDelegatesToService() {
-    var service = new VanishService();
-    var adapter = new VanishApiAdapter(service);
+    var api = new VanishService();
     var id = UUID.randomUUID();
 
-    assertFalse(adapter.isVanished(id));
+    assertFalse(api.isVanished(id));
 
-    service.enter(id);
-    assertTrue(adapter.isVanished(id));
+    api.enter(id);
+    assertTrue(api.isVanished(id));
   }
 
   @Test
   void vanishedReturnsSnapshotOfServiceState() {
-    var service = new VanishService();
-    var adapter = new VanishApiAdapter(service);
+    var api = new VanishService();
     var first = UUID.randomUUID();
     var second = UUID.randomUUID();
 
-    service.enter(first);
-    service.enter(second);
+    api.enter(first);
+    api.enter(second);
 
-    assertEquals(Set.of(first, second), adapter.vanished());
+    assertEquals(Set.of(first, second), api.vanished());
   }
 }

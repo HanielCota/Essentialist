@@ -72,7 +72,7 @@ public final class HomesMenu implements EssentialsMenu {
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var uuid = player.getUniqueId();
     var prefetched = this.state.consumePrefetch(uuid);
-    var entries = prefetched != null ? prefetched : this.service.list(uuid);
+    var entries = prefetched != null ? prefetched : this.service.homesOf(uuid);
 
     var slots = new ArrayList<SlotDefinition>(entries.size());
 

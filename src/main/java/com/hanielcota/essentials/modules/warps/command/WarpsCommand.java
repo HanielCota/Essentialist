@@ -26,7 +26,7 @@ public record WarpsCommand(@NonNull WarpService service, @NonNull WarpsListNotif
   @PlayerOnly
   public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
-    var warps = this.service.listVisibleTo(sender);
+    var warps = this.service.visibleTo(sender);
 
     if (warps.isEmpty()) {
       this.notifier.sendEmpty(actor);

@@ -23,7 +23,7 @@ public final class NickJoinListener implements Listener {
     var player = event.getPlayer();
     var id = player.getUniqueId();
 
-    var entry = this.service.nickFor(id).orElse(null);
+    var entry = this.service.nickOf(id).orElse(null);
     if (entry == null) {
       return;
     }

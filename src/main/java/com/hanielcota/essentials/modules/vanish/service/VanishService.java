@@ -1,12 +1,12 @@
 package com.hanielcota.essentials.modules.vanish.service;
 
+import com.hanielcota.essentials.api.VanishApi;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 
-/** Runtime-only registry of vanished players. State is dropped on plugin disable. */
-public final class VanishService {
+public final class VanishService implements VanishApi {
 
   private final Set<UUID> vanished = ConcurrentHashMap.newKeySet();
 

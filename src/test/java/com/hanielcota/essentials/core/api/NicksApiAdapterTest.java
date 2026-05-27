@@ -21,10 +21,9 @@ class NicksApiAdapterTest {
     var entry = new NickEntry(id, "Ace", "RealName");
     cache.loadAll(List.of(entry));
 
-    var service = new NickService(cache);
-    var adapter = new NicksApiAdapter(service);
+    var api = new NickService(cache);
 
-    assertEquals(entry, adapter.nickOf(id).orElseThrow());
+    assertEquals(entry, api.nickOf(id).orElseThrow());
   }
 
   @Test
@@ -33,19 +32,17 @@ class NicksApiAdapterTest {
     var id = UUID.randomUUID();
     cache.loadAll(List.of(new NickEntry(id, "Ace", "RealName")));
 
-    var service = new NickService(cache);
-    var adapter = new NicksApiAdapter(service);
+    var api = new NickService(cache);
 
-    assertEquals(id, adapter.idByNick("ACE").orElseThrow());
-    assertEquals(id, adapter.idByNick("ace").orElseThrow());
+    assertEquals(id, api.idByNick("ACE").orElseThrow());
+    assertEquals(id, api.idByNick("ace").orElseThrow());
   }
 
   @Test
   void unknownIdYieldsEmpty() {
-    var service = new NickService(newCache());
-    var adapter = new NicksApiAdapter(service);
+    var api = new NickService(newCache());
 
-    assertTrue(adapter.nickOf(UUID.randomUUID()).isEmpty());
+    assertTrue(api.nickOf(UUID.randomUUID()).isEmpty());
   }
 
   private static NickCache newCache() {

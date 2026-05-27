@@ -10,6 +10,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
 
+  private static final long MILLIS_PER_TICK = 50L;
+
+  private static long toTicks(@NonNull Duration duration) {
+    return Math.max(1L, duration.toMillis() / MILLIS_PER_TICK);
+  }
+
   private static Consumer<ScheduledTask> adapt(@NonNull Runnable task) {
     return scheduled -> task.run();
   }
@@ -41,7 +47,7 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
       @NonNull Entity entity, @NonNull Runnable task, @NonNull Duration delay) {
     var scheduler = entity.getScheduler();
     var adaptedTask = adapt(task);
-    var ticksDelay = Ticks.fromDuration(delay);
+    var ticksDelay = toTicks(delay);
 
     var handle = scheduler.runDelayed(this.plugin, adaptedTask, null, ticksDelay);
     if (handle == null) {
@@ -56,7 +62,7 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var server = this.plugin.getServer();
     var scheduler = server.getGlobalRegionScheduler();
     var adaptedTask = adapt(task);
-    var ticksDelay = Ticks.fromDuration(delay);
+    var ticksDelay = toTicks(delay);
 
     var handle = scheduler.runDelayed(this.plugin, adaptedTask, ticksDelay);
     if (handle == null) {
@@ -72,8 +78,8 @@ public record PaperScheduler(@NonNull JavaPlugin plugin) implements Scheduler {
     var scheduler = server.getGlobalRegionScheduler();
     var adaptedTask = adapt(task);
 
-    var ticksInitialDelay = Ticks.fromDuration(initialDelay);
-    var ticksPeriod = Ticks.fromDuration(period);
+    var ticksInitialDelay = toTicks(initialDelay);
+    var ticksPeriod = toTicks(period);
 
     var handle = scheduler.runAtFixedRate(this.plugin, adaptedTask, ticksInitialDelay, ticksPeriod);
     if (handle == null) {

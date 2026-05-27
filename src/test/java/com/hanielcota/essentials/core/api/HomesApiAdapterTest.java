@@ -3,6 +3,7 @@ package com.hanielcota.essentials.core.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.hanielcota.essentials.api.HomesApi;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.repository.HomeRepository;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
@@ -24,33 +25,32 @@ class HomesApiAdapterTest {
     var owner = UUID.randomUUID();
     var first = home(owner, "base");
     var second = home(owner, "mine");
-    var adapter = adapterWith(first, second);
+    var api = apiWith(first, second);
 
-    assertEquals(List.of(first, second), adapter.homesOf(owner));
+    assertEquals(List.of(first, second), api.homesOf(owner));
   }
 
   @Test
   void findHomeFiltersByName() {
     var owner = UUID.randomUUID();
     var base = home(owner, "base");
-    var adapter = adapterWith(base, home(owner, "mine"));
+    var api = apiWith(base, home(owner, "mine"));
 
-    assertEquals(base, adapter.findHome(owner, "base").orElseThrow());
-    assertTrue(adapter.findHome(owner, "missing").isEmpty());
+    assertEquals(base, api.findHome(owner, "base").orElseThrow());
+    assertTrue(api.findHome(owner, "missing").isEmpty());
   }
 
   @Test
   void homeCountMatchesRepositoryCount() {
     var owner = UUID.randomUUID();
-    var adapter = adapterWith(home(owner, "a"), home(owner, "b"), home(owner, "c"));
+    var api = apiWith(home(owner, "a"), home(owner, "b"), home(owner, "c"));
 
-    assertEquals(3, adapter.homeCount(owner));
+    assertEquals(3, api.homeCount(owner));
   }
 
-  private static HomesApiAdapter adapterWith(@NonNull Home... homes) {
+  private static HomesApi apiWith(@NonNull Home... homes) {
     var repository = new InMemoryHomeRepository(List.of(homes));
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 0));
-    return new HomesApiAdapter(service);
+    return new HomeService(repository, new HomeLimitResolver(() -> 0));
   }
 
   private static Home home(@NonNull UUID owner, @NonNull String name) {

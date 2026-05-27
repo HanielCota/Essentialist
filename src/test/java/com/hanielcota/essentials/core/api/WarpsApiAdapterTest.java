@@ -29,10 +29,9 @@ class WarpsApiAdapterTest {
     cache.put(warp("Zulu"));
     cache.put(warp("Alpha"));
 
-    var adapter =
-        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
 
-    var names = adapter.warps().stream().map(Warp::name).toList();
+    var names = api.warps().stream().map(Warp::name).toList();
     assertEquals(List.of("Alpha", "Zulu"), names);
   }
 
@@ -41,11 +40,10 @@ class WarpsApiAdapterTest {
     var cache = new WarpCache();
     cache.put(warp("Spawn"));
 
-    var adapter =
-        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
 
-    assertTrue(adapter.findWarp("SPAWN").isPresent());
-    assertTrue(adapter.findWarp("spawn").isPresent());
+    assertTrue(api.findWarp("SPAWN").isPresent());
+    assertTrue(api.findWarp("spawn").isPresent());
   }
 
   @Test
@@ -53,12 +51,11 @@ class WarpsApiAdapterTest {
     var cache = new WarpCache();
     cache.put(warp("Vip"));
 
-    var adapter =
-        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
 
-    assertFalse(adapter.canUse(new StubPermissible(Set.of()), "Vip"));
-    assertTrue(adapter.canUse(new StubPermissible(Set.of("essentials.warp.use.vip")), "Vip"));
-    assertTrue(adapter.canUse(new StubPermissible(Set.of("essentials.warp.use.*")), "Vip"));
+    assertFalse(api.canUse(new StubPermissible(Set.of()), "Vip"));
+    assertTrue(api.canUse(new StubPermissible(Set.of("essentials.warp.use.vip")), "Vip"));
+    assertTrue(api.canUse(new StubPermissible(Set.of("essentials.warp.use.*")), "Vip"));
   }
 
   @Test
@@ -67,11 +64,10 @@ class WarpsApiAdapterTest {
     cache.put(warp("Public"));
     cache.put(warp("Vip"));
 
-    var adapter =
-        new WarpsApiAdapter(new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE));
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
 
     var viewer = new StubPermissible(Set.of("essentials.warp.use.public"));
-    var visible = adapter.visibleTo(viewer).stream().map(Warp::name).toList();
+    var visible = api.visibleTo(viewer).stream().map(Warp::name).toList();
 
     assertEquals(List.of("Public"), visible);
   }
