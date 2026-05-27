@@ -73,7 +73,8 @@ public final class TeleportRequestService {
     var requesterName = requester.getName();
 
     var existing = this.store.outgoingOf(requesterId);
-    existing.ifPresent(previous -> replacePrevious(previous, requesterId, requesterName));
+    existing.ifPresent(
+        previous -> replacePrevious(previous, requesterId, requesterName, target.getName()));
 
     var snap = this.config.value();
     var lifetime = snap.requestExpiry();
@@ -138,12 +139,21 @@ public final class TeleportRequestService {
       return AcceptOutcome.TARGET_OFFLINE;
     }
 
+    this.recorder.recordTerminal(request, TeleportRequestStatus.ACCEPTED);
     return AcceptOutcome.ACCEPTED;
   }
 
   public CompletableFuture<Boolean> dispatchTeleport(@NonNull TeleportRequest request) {
     var pending = this.executor.execute(request);
-    return pending.thenApply(execution -> this.recorder.recordExecution(request, execution));
+    return pending.thenApply(
+        execution -> {
+          if (!execution.succeeded()) {
+            this.recorder.recordTeleportFailure(request);
+            return false;
+          }
+          this.recorder.recordTeleportSuccess(request, execution);
+          return true;
+        });
   }
 
   /** Denies a request. Returns false when it was already resolved or expired. */
@@ -183,9 +193,13 @@ public final class TeleportRequestService {
   }
 
   private void replacePrevious(
-      @NonNull TeleportRequest previous, @NonNull UUID requesterId, @NonNull String requesterName) {
+      @NonNull TeleportRequest previous,
+      @NonNull UUID requesterId,
+      @NonNull String requesterName,
+      @NonNull String newTargetName) {
     resolve(previous, TeleportRequestStatus.CANCELLED);
     this.notifier.notifyRequestReplaced(previous, requesterId, requesterName);
+    this.notifier.notifyOutgoingReplaced(previous, newTargetName);
   }
 
   /** Removes a request and writes its terminal state to history in one step. */

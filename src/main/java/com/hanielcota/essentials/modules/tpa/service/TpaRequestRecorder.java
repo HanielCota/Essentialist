@@ -42,6 +42,18 @@ final class TpaRequestRecorder {
     return true;
   }
 
+  void recordTeleportFailure(@NonNull TeleportRequest request) {
+    recordTerminal(request, TeleportRequestStatus.CANCELLED);
+  }
+
+  void recordTeleportSuccess(
+      @NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
+    var destination = execution.optionalDestination().orElseThrow();
+    var entry = TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, destination);
+    this.history.push(entry);
+    recordAcceptedOutgoingStats(request, entry);
+  }
+
   private void recordAcceptedOutgoingStats(
       @NonNull TeleportRequest request, @NonNull TpaHistoryEntry entry) {
     var requesterId = request.requester().id();

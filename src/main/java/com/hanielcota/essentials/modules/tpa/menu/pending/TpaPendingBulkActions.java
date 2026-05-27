@@ -77,17 +77,26 @@ public final class TpaPendingBulkActions {
     }
 
     var deniedCount = 0;
+    var alreadyProcessed = 0;
     for (var request : pending) {
       var denied = this.service.deny(request);
       if (denied) {
         this.replyNotifier.notifyDenied(request, messages.denied());
         deniedCount++;
+      } else {
+        alreadyProcessed++;
       }
     }
 
     var countText = Integer.toString(deniedCount);
     var summary = messages.deniedAllMessage().replace("{count}", countText);
     actor.sendSuccess(summary);
+
+    if (alreadyProcessed > 0) {
+      var processedText = Integer.toString(alreadyProcessed);
+      var processedMsg = messages.alreadyProcessedMessage().replace("{count}", processedText);
+      actor.sendError(processedMsg);
+    }
 
     click.refresh();
   }
@@ -97,8 +106,13 @@ public final class TpaPendingBulkActions {
       @NonNull CommandActor actor,
       @NonNull TpaMessages messages) {
     var accepted = 0;
+    var alreadyProcessed = 0;
     for (var request : pending) {
       var claim = this.service.tryAccept(request);
+      if (claim == AcceptOutcome.NOT_FOUND) {
+        alreadyProcessed++;
+        continue;
+      }
       if (claim != AcceptOutcome.ACCEPTED) {
         continue;
       }
@@ -109,6 +123,11 @@ public final class TpaPendingBulkActions {
           success -> this.acceptHandler.handleTeleportOutcome(success, actor),
           "tpa accept-all");
       accepted++;
+    }
+    if (alreadyProcessed > 0) {
+      var processedText = Integer.toString(alreadyProcessed);
+      var processedMsg = messages.alreadyProcessedMessage().replace("{count}", processedText);
+      actor.sendError(processedMsg);
     }
     return accepted;
   }

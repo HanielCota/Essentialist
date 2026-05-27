@@ -114,8 +114,9 @@ public final class InMemoryRequestRepository implements RequestRepository {
       return List.of();
     }
 
-    var requests = new ArrayList<TeleportRequest>(ids.size());
-    for (var id : ids) {
+    var idsCopy = Set.copyOf(ids);
+    var requests = new ArrayList<TeleportRequest>(idsCopy.size());
+    for (var id : idsCopy) {
       var request = this.byId.get(id);
       if (request != null) {
         requests.add(request);
