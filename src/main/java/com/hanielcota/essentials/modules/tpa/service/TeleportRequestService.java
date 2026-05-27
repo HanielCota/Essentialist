@@ -172,17 +172,20 @@ public final class TeleportRequestService {
    * the caller can notify the other party.
    */
   public List<TeleportRequest> cancelAllOf(@NonNull UUID player) {
-    var affected = this.store.involving(player);
-    for (TeleportRequest request : affected) {
-      resolve(request, TeleportRequestStatus.CANCELLED);
+    var candidates = this.store.involving(player);
+    var cancelled = new java.util.ArrayList<TeleportRequest>();
+    for (TeleportRequest request : candidates) {
+      if (resolve(request, TeleportRequestStatus.CANCELLED)) {
+        cancelled.add(request);
+      }
     }
-    return affected;
+    return cancelled;
   }
 
   private void replacePrevious(
       @NonNull TeleportRequest previous, @NonNull UUID requesterId, @NonNull String requesterName) {
     resolve(previous, TeleportRequestStatus.CANCELLED);
-    this.notifier.notifyPartnerLeft(previous, requesterId, requesterName);
+    this.notifier.notifyRequestReplaced(previous, requesterId, requesterName);
   }
 
   /** Removes a request and writes its terminal state to history in one step. */

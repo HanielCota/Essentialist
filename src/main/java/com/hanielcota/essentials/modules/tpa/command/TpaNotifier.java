@@ -119,4 +119,23 @@ public record TpaNotifier(
 
     online.sendMessage(partnerLeftComponent);
   }
+
+  public void notifyRequestReplaced(
+      @NonNull TeleportRequest request, @NonNull UUID requesterId, @NonNull String requesterName) {
+    var targetId = request.target().id();
+
+    var online = this.players.online(targetId).orElse(null);
+    if (online == null) {
+      return;
+    }
+
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var replacedTemplate = messages.requestReplaced();
+    var replacedMsg = replacedTemplate.replace("{player}", requesterName);
+    var replacedComponent = ComponentUtils.mini(replacedMsg);
+
+    online.sendMessage(replacedComponent);
+  }
 }
