@@ -51,10 +51,25 @@ public final class TpaCommandBootstrap {
     var unblockCommand = new TpaUnblockCommand(this.config, blocks, playerProvider, menus);
     this.registrar.command(unblockCommand);
 
-    var tpAcceptCommand = new TpAcceptCommand(menus);
+    var tpAcceptCommand =
+        new TpAcceptCommand(
+            this.config,
+            menus,
+            requestService,
+            shared.acceptHandler(),
+            shared.incomingResolver(),
+            shared.actors(),
+            shared.callbacks());
     this.registrar.command(tpAcceptCommand);
 
-    var tpDenyCommand = new TpDenyCommand(menus);
+    var tpDenyCommand =
+        new TpDenyCommand(
+            this.config,
+            menus,
+            requestService,
+            shared.replyNotifier(),
+            shared.incomingResolver(),
+            shared.actors());
     this.registrar.command(tpDenyCommand);
 
     var tpCancelCommand = new TpCancelCommand(menus);

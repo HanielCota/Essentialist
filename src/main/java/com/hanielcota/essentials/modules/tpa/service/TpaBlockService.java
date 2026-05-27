@@ -35,9 +35,15 @@ public final class TpaBlockService {
 
   public void unblock(@NonNull UUID blockerId, @NonNull UUID blockedId) {
     var playerBlocks = this.blocked.get(blockerId);
-    if (playerBlocks != null) {
-      playerBlocks.remove(blockedId);
+    if (playerBlocks == null) {
+      return;
     }
+
+    var removed = playerBlocks.remove(blockedId);
+    if (removed == null) {
+      return;
+    }
+
     delete(blockerId, blockedId);
   }
 

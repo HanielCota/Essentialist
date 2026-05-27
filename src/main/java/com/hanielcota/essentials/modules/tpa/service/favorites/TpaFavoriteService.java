@@ -35,7 +35,9 @@ public final class TpaFavoriteService {
     var ownerFavorites = this.favorites.computeIfAbsent(ownerId, id -> new ConcurrentHashMap<>());
     var prior = ownerFavorites.put(favoriteId, favoriteName);
 
-    save(ownerId, favoriteId, favoriteName);
+    if (prior == null) {
+      save(ownerId, favoriteId, favoriteName);
+    }
 
     return prior == null;
   }

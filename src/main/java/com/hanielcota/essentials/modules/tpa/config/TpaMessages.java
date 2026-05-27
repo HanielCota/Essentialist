@@ -54,6 +54,10 @@ public record TpaMessages(
             "Shown to the other party when a request dies because someone disconnected. "
                 + "Placeholders: {player}.")
         String partnerLeft,
+    @Comment(
+            "Shown to the old target when the requester sends a new TPA to someone else. "
+                + "Placeholders: {player}.")
+        String requestReplaced,
     @Comment("/tpahistory when the player has no history yet.") String noHistory,
     @Comment("/tpahistory <jogador> when the target has no history. Placeholders: {player}.")
         String noHistoryOther,
@@ -105,7 +109,11 @@ public record TpaMessages(
     @Comment("Sent after the player clicks accept-all in the pending menu. Placeholder: {count}.")
         String acceptedAllMessage,
     @Comment("Sent after the player clicks deny-all in the pending menu. Placeholder: {count}.")
-        String deniedAllMessage) {
+        String deniedAllMessage,
+    @Comment(
+            "Shown when accept-all skips TPA requests because a TPAHERE has priority. "
+                + "Placeholder: {count}.")
+        String tpaHerePriorityMessage) {
 
   public static TpaMessages defaults() {
     return new TpaMessages(
@@ -137,6 +145,7 @@ public record TpaMessages(
         "<green>Você aceitou o pedido de <gold>{player}</gold>.",
         "<yellow>Você recusou o pedido de <gold>{player}</gold>.",
         "<red>O pedido de teleporte foi cancelado — <gold>{player}</gold> saiu do servidor.",
+        "<red>O pedido de teleporte foi cancelado — <gold>{player}</gold> enviou um novo pedido.",
         "<red>Você ainda não enviou nenhum pedido de teleporte.",
         "<red><gold>{player}</gold> ainda não enviou nenhum pedido de teleporte.",
         "<red>Você não tem permissão para ver o histórico de outros jogadores.",
@@ -163,7 +172,9 @@ public record TpaMessages(
         "<gold>{player}</gold> te adicionou aos favoritos.",
         "<red><gold>{player}</gold> não está aceitando pedidos vindos de outros mundos.",
         "<green>Você aceitou <white>{count}</white> pedido(s).",
-        "<yellow>Você recusou <white>{count}</white> pedido(s).");
+        "<yellow>Você recusou <white>{count}</white> pedido(s).",
+        "<yellow>Pedidos /tpa ignorados — um pedido /tpahere tem prioridade. "
+            + "(<white>{count}</white> ignorado(s))");
   }
 
   /**

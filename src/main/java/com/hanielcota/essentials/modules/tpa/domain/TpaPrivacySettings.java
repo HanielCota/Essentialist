@@ -31,7 +31,7 @@ public record TpaPrivacySettings(
 
   public TpaPrivacySettings toggled(@NonNull TeleportRequestType type) {
     var next = new EnumMap<>(this.receiveByType);
-    var current = next.getOrDefault(type, false);
+    var current = next.getOrDefault(type, true);
     next.put(type, !current);
 
     return new TpaPrivacySettings(next, this.allowCrossWorld, this.dndUntilEpochMs);

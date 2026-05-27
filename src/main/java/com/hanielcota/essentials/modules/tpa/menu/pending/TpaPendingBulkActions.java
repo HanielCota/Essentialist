@@ -5,6 +5,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
+import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
 import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
@@ -34,7 +35,8 @@ public final class TpaPendingBulkActions {
     var viewer = click.player();
     var viewerId = viewer.getUniqueId();
     var actor = this.actors.actorOf(viewer);
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
 
     var pending = this.service.incoming(viewerId);
     if (pending.isEmpty()) {
@@ -43,11 +45,19 @@ public final class TpaPendingBulkActions {
       return;
     }
 
-    var accepted = claimAndDispatch(requestsToAccept(pending), actor);
+    var toAccept = requestsToAccept(pending);
+    var skipped = pending.size() - toAccept.size();
+    var accepted = claimAndDispatch(toAccept, actor, messages);
 
     var countText = Integer.toString(accepted);
     var summary = messages.acceptedAllMessage().replace("{count}", countText);
     actor.sendSuccess(summary);
+
+    if (skipped > 0) {
+      var skippedText = Integer.toString(skipped);
+      var skippedMsg = messages.tpaHerePriorityMessage().replace("{count}", skippedText);
+      actor.sendError(skippedMsg);
+    }
 
     click.refresh();
   }
@@ -56,7 +66,8 @@ public final class TpaPendingBulkActions {
     var viewer = click.player();
     var viewerId = viewer.getUniqueId();
     var actor = this.actors.actorOf(viewer);
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
 
     var pending = this.service.incoming(viewerId);
     if (pending.isEmpty()) {
@@ -65,14 +76,16 @@ public final class TpaPendingBulkActions {
       return;
     }
 
+    var deniedCount = 0;
     for (var request : pending) {
       var denied = this.service.deny(request);
       if (denied) {
         this.replyNotifier.notifyDenied(request, messages.denied());
+        deniedCount++;
       }
     }
 
-    var countText = Integer.toString(pending.size());
+    var countText = Integer.toString(deniedCount);
     var summary = messages.deniedAllMessage().replace("{count}", countText);
     actor.sendSuccess(summary);
 
@@ -80,14 +93,15 @@ public final class TpaPendingBulkActions {
   }
 
   private int claimAndDispatch(
-      @NonNull List<TeleportRequest> pending, @NonNull CommandActor actor) {
+      @NonNull List<TeleportRequest> pending,
+      @NonNull CommandActor actor,
+      @NonNull TpaMessages messages) {
     var accepted = 0;
     for (var request : pending) {
       var claim = this.service.tryAccept(request);
       if (claim != AcceptOutcome.ACCEPTED) {
         continue;
       }
-      var messages = this.config.value().messages();
       this.replyNotifier.notifyAccepted(request, messages.accepted());
       var pendingTeleport = this.service.dispatchTeleport(request);
       this.callbacks.hop(
