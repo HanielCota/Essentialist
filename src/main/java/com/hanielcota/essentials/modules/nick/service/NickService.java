@@ -6,18 +6,16 @@ import com.hanielcota.essentials.modules.nick.repository.NickCache;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Thin facade for the nickname system. In-memory caching and persistence coordination are delegated
  * to {@link NickCache}.
  */
+@RequiredArgsConstructor
 public final class NickService implements NicksApi {
 
-  private final NickCache cache;
-
-  public NickService(@NonNull NickCache cache) {
-    this.cache = cache;
-  }
+  private final @NonNull NickCache cache;
 
   public Optional<NickEntry> nickOf(@NonNull UUID id) {
     return this.cache.nickFor(id);

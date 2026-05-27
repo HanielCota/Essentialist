@@ -8,18 +8,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public final class NickCache {
 
-  private final NickRepository repository;
-  private final AsyncDatabaseWriter writer;
+  private final @NonNull NickRepository repository;
+  private final @NonNull AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, NickEntry> byId = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, UUID> idByLowerNick = new ConcurrentHashMap<>();
-
-  public NickCache(@NonNull NickRepository repository, @NonNull AsyncDatabaseWriter writer) {
-    this.repository = repository;
-    this.writer = writer;
-  }
 
   public void loadAll(@NonNull List<NickEntry> entries) {
     for (var entry : entries) {

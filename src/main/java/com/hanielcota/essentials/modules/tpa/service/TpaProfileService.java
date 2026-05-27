@@ -12,19 +12,15 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.UnaryOperator;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
+@RequiredArgsConstructor
 public final class TpaProfileService {
 
   private final @Nullable TpaProfileRepository repository;
-  private final AsyncDatabaseWriter writer;
+  private final @NonNull AsyncDatabaseWriter writer;
   private final Map<UUID, TpaProfile> profiles = new ConcurrentHashMap<>();
-
-  public TpaProfileService(
-      @Nullable TpaProfileRepository repository, @NonNull AsyncDatabaseWriter writer) {
-    this.repository = repository;
-    this.writer = writer;
-  }
 
   private static TpaProfile applyOrDefault(
       @Nullable TpaProfile current, @NonNull UnaryOperator<TpaProfile> mutator) {

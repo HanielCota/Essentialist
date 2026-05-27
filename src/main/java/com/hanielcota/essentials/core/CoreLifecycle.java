@@ -6,22 +6,21 @@ import com.hanielcota.essentials.database.connection.DatabaseProvider;
 import com.hanielcota.essentials.module.registration.ModuleManager;
 import com.hanielcota.essentials.service.ServiceRegistry;
 import com.hanielcota.essentials.shared.Log;
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Manages the plugin lifecycle phases and the ordered shutdown sequence. Extracted from {@link
  * EssentialsCore} so lifecycle orchestration is separate from the public API facade.
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class CoreLifecycle {
 
   private static final Log LOG = Log.of(CoreLifecycle.class);
 
-  private final ServiceRegistry services;
+  private final @NonNull ServiceRegistry services;
   private volatile LifecyclePhase phase = LifecyclePhase.BOOTING;
-
-  CoreLifecycle(@NonNull ServiceRegistry services) {
-    this.services = services;
-  }
 
   LifecyclePhase phase() {
     return this.phase;

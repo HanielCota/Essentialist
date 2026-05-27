@@ -8,19 +8,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
+@RequiredArgsConstructor
 public final class TpaBlockService {
 
   private final @Nullable TpaBlockRepository repository;
-  private final AsyncDatabaseWriter writer;
+  private final @NonNull AsyncDatabaseWriter writer;
   private final Map<UUID, Map<UUID, String>> blocked = new ConcurrentHashMap<>();
-
-  public TpaBlockService(
-      @Nullable TpaBlockRepository repository, @NonNull AsyncDatabaseWriter writer) {
-    this.repository = repository;
-    this.writer = writer;
-  }
 
   public void loadAll(@NonNull List<Entry> entries) {
     for (var entry : entries) {
