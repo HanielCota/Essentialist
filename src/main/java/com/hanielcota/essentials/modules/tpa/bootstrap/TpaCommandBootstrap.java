@@ -12,6 +12,7 @@ import com.hanielcota.essentials.modules.tpa.command.TpaCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHereCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryPresenter;
+import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaUnblockCommand;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
@@ -32,6 +33,7 @@ public final class TpaCommandBootstrap {
   public void registerCommands(
       @NonNull AsyncTpaHistory history,
       @NonNull TeleportRequestService requestService,
+      @NonNull TpaNotifier notifier,
       @NonNull TpaBlockService blocks,
       @NonNull TpaHistoryMenuState menuState,
       @NonNull TpaTargetSelections targetSelections,
@@ -51,13 +53,29 @@ public final class TpaCommandBootstrap {
     var unblockCommand = new TpaUnblockCommand(this.config, blocks, playerProvider, menus);
     this.registrar.command(unblockCommand);
 
-    var tpAcceptCommand = new TpAcceptCommand(menus);
+    var tpAcceptCommand =
+        new TpAcceptCommand(
+            this.config,
+            requestService,
+            shared.acceptHandler(),
+            shared.incomingResolver(),
+            shared.callbacks(),
+            shared.actors(),
+            menus);
     this.registrar.command(tpAcceptCommand);
 
-    var tpDenyCommand = new TpDenyCommand(menus);
+    var tpDenyCommand =
+        new TpDenyCommand(
+            this.config,
+            requestService,
+            shared.replyNotifier(),
+            shared.incomingResolver(),
+            shared.actors(),
+            menus);
     this.registrar.command(tpDenyCommand);
 
-    var tpCancelCommand = new TpCancelCommand(menus);
+    var tpCancelCommand =
+        new TpCancelCommand(this.config, requestService, notifier, shared.actors());
     this.registrar.command(tpCancelCommand);
 
     var historyPresenter = new TpaHistoryPresenter(this.config, history, menus, menuState);

@@ -58,7 +58,13 @@ public final class TpaModule extends AbstractModule {
 
     var commandBootstrap = new TpaCommandBootstrap(env, registrar, config);
     commandBootstrap.registerCommands(
-        history, runtime.requestService(), blocks, historyMenu, targetSelections, shared);
+        history,
+        runtime.requestService(),
+        runtime.notifier(),
+        blocks,
+        historyMenu,
+        targetSelections,
+        shared);
 
     runtimeBootstrap.registerQuitListener(runtime, pendingSelections);
   }
