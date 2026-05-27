@@ -1,59 +1,35 @@
 package com.hanielcota.essentials.modules.tpa.command;
 
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.menu.MenuOpenings;
+import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
-import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
 @Command("tpdeny")
 @EssentialsCommand
 @Permission("essentials.tpa")
+@PlayerOnly
 @Cooldown(duration = "1s")
-@Description("Recusa um pedido de teleporte pendente.")
-@Syntax("/tpdeny [jogador]")
-public record TpDenyCommand(
-    ConfigHandle<TpaConfig> config,
-    TeleportRequestService service,
-    TpaIncomingResolver incomingResolver,
-    TpaRequestReplyNotifier replyNotifier) {
+@Description("Abre o menu de pedidos pendentes para você recusar.")
+@Syntax("/tpdeny")
+public record TpDenyCommand(MenuService menus) {
 
   @DefaultSubcommand
-  public CommandResult execute(@NonNull CommandActor actor, Optional<String> requester) {
-    var snap = this.config.value();
-    var messages = snap.messages();
-
+  public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
 
-    var resolved = this.incomingResolver.resolve(sender, requester.orElse(""), actor);
-    if (resolved.isEmpty()) {
-      return CommandResult.success();
-    }
-
-    var request = resolved.get();
-    var denied = this.service.deny(request);
-    if (!denied) {
-      return CommandResult.invalidUsage(messages.noIncoming());
-    }
-
-    var deniedSelfTemplate = messages.deniedSelf();
-    var requesterName = request.requester().name();
-    var deniedMsg = deniedSelfTemplate.replace("{player}", requesterName);
-
-    actor.sendSuccess(deniedMsg);
-
-    var deniedTemplate = messages.denied();
-    this.replyNotifier.notifyDenied(request, deniedTemplate);
+    MenuOpenings.open(this.menus, sender, TpaPendingMenu.ID, actor);
 
     return CommandResult.success();
   }
