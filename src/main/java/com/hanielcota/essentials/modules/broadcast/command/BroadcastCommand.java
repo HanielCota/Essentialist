@@ -33,7 +33,7 @@ public record BroadcastCommand(ConfigHandle<BroadcastConfig> config, BroadcastSe
     if (body.isEmpty()) {
       var usageMsg = snap.usage();
 
-      return CommandResult.invalidUsage(sender, usageMsg);
+      return CommandResult.invalidUsage(usageMsg);
     }
 
     this.service.broadcast(body);

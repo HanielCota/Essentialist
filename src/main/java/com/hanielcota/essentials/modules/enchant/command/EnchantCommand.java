@@ -37,14 +37,14 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
       @DefaultValue("1") @Arg("nivel") int level) {
     var snap = this.config.value();
     if (level < 1) {
-      return CommandResult.invalidUsage(sender, snap.invalidLevel());
+      return CommandResult.invalidUsage(snap.invalidLevel());
     }
 
     var player = sender.unwrap(Player.class);
     var result = this.service.apply(player, enchantment, level);
 
     if (result == EnchantService.ApplyResult.EMPTY_HAND) {
-      return CommandResult.invalidUsage(sender, snap.emptyHand());
+      return CommandResult.invalidUsage(snap.emptyHand());
     }
 
     var label = enchantment.getKey().getKey();
@@ -65,10 +65,10 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
     var result = this.service.remove(player, enchantment);
 
     return switch (result) {
-      case EMPTY_HAND -> CommandResult.invalidUsage(sender, snap.emptyHand());
+      case EMPTY_HAND -> CommandResult.invalidUsage(snap.emptyHand());
       case NOT_ENCHANTED -> {
         var notEnchantedMsg = snap.formatNotEnchanted(label);
-        yield CommandResult.invalidUsage(sender, notEnchantedMsg);
+        yield CommandResult.invalidUsage(notEnchantedMsg);
       }
       case REMOVED -> {
         var removedMsg = snap.formatRemoved(label);
@@ -85,11 +85,11 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
     var removed = this.service.clearAll(player);
 
     if (removed < 0) {
-      return CommandResult.invalidUsage(sender, snap.emptyHand());
+      return CommandResult.invalidUsage(snap.emptyHand());
     }
 
     if (removed == 0) {
-      return CommandResult.invalidUsage(sender, snap.nothingToClear());
+      return CommandResult.invalidUsage(snap.nothingToClear());
     }
 
     var clearedMsg = snap.formatCleared(removed);

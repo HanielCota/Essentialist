@@ -44,7 +44,7 @@ public record TpaHistoryCommand(
     }
 
     if (!actor.hasPermission(OTHERS_PERMISSION)) {
-      return CommandResult.invalidUsage(actor, messages.noPermissionOther());
+      return CommandResult.invalidUsage(messages.noPermissionOther());
     }
 
     var resolved = this.players.offlineByName(targetName.orElse(""));
@@ -52,7 +52,7 @@ public record TpaHistoryCommand(
       var notFoundTemplate = messages.playerNotFound();
       var notFoundMsg = notFoundTemplate.replace("{player}", targetName.orElse(""));
 
-      return CommandResult.invalidUsage(actor, notFoundMsg);
+      return CommandResult.invalidUsage(notFoundMsg);
     }
 
     var target = resolved.get();

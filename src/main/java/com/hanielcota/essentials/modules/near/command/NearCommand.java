@@ -35,7 +35,7 @@ public record NearCommand(
 
     if (radius < 1 || radius > snap.maxRadius()) {
       var invalidRadiusMsg = snap.formatInvalidRadius();
-      return CommandResult.invalidUsage(actor, invalidRadiusMsg);
+      return CommandResult.invalidUsage(invalidRadiusMsg);
     }
 
     var nearby = this.service.findNearby(player, radius);

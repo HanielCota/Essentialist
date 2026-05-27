@@ -44,7 +44,7 @@ public record GamemodeCommand(
     if (result == GamemodeService.Result.ALREADY_IN_MODE) {
       var alreadyMessages = snap.whenAlreadyInMode(mode);
       var alreadyMsg = alreadyMessages.forSender(self, name);
-      return CommandResult.invalidUsage(sender, alreadyMsg);
+      return CommandResult.invalidUsage(alreadyMsg);
     }
 
     var messages = snap.whenUpdated(mode);

@@ -43,7 +43,7 @@ public record FeedCommand(
     if (!this.service.feed(subject)) {
       var alreadyFull = snap.whenAlreadyFull();
       var alreadyFullMsg = alreadyFull.forSender(self, name);
-      return CommandResult.invalidUsage(sender, alreadyFullMsg);
+      return CommandResult.invalidUsage(alreadyFullMsg);
     }
 
     var messages = snap.whenFed();

@@ -51,6 +51,6 @@ public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigSer
     var total = report.total();
     var failureMsg = snap.formatFailure(succeeded, total, failed);
 
-    return CommandResult.invalidUsage(actor, failureMsg);
+    return CommandResult.invalidUsage(failureMsg);
   }
 }

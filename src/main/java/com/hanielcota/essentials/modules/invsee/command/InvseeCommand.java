@@ -33,7 +33,7 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
 
     if (target.equals(viewer)) {
       var selfMsg = snap.self();
-      return CommandResult.invalidUsage(sender, selfMsg);
+      return CommandResult.invalidUsage(selfMsg);
     }
 
     var targetName = target.getName();
@@ -42,7 +42,7 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
 
     if (viewOpt.isEmpty()) {
       var alreadyViewedMsg = snap.alreadyViewed();
-      return CommandResult.invalidUsage(sender, alreadyViewedMsg);
+      return CommandResult.invalidUsage(alreadyViewedMsg);
     }
 
     var view = viewOpt.get();

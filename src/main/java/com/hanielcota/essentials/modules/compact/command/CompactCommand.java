@@ -32,7 +32,7 @@ public record CompactCommand(ConfigHandle<CompactConfig> config, CompactService 
     var snap = this.config.value();
 
     if (blocks == 0) {
-      return CommandResult.invalidUsage(actor, snap.nothing());
+      return CommandResult.invalidUsage(snap.nothing());
     }
     var successMsg = snap.formatSuccess(blocks);
     actor.sendSuccess(successMsg);

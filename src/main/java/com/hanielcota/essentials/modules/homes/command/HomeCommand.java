@@ -53,7 +53,7 @@ public record HomeCommand(
 
     if (name == null) {
       var invalidNameMsg = messages.invalidName();
-      return CommandResult.invalidUsage(actor, invalidNameMsg);
+      return CommandResult.invalidUsage(invalidNameMsg);
     }
 
     var uuid = sender.getUniqueId();
@@ -61,7 +61,7 @@ public record HomeCommand(
 
     if (home.isEmpty()) {
       var missingMsg = this.missingResolver.resolve(uuid, name);
-      return CommandResult.invalidUsage(actor, missingMsg);
+      return CommandResult.invalidUsage(missingMsg);
     }
 
     var target = home.get();

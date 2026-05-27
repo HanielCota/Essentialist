@@ -42,12 +42,12 @@ public record RepairCommand(
       case EMPTY_HAND -> {
         var emptyMessages = snap.whenEmptyHand();
         var emptyMsg = emptyMessages.forSender(self, name);
-        yield CommandResult.invalidUsage(sender, emptyMsg);
+        yield CommandResult.invalidUsage(emptyMsg);
       }
       case NOTHING_TO_REPAIR -> {
         var nothingMessages = snap.whenNothingHand();
         var nothingMsg = nothingMessages.forSender(self, name);
-        yield CommandResult.invalidUsage(sender, nothingMsg);
+        yield CommandResult.invalidUsage(nothingMsg);
       }
       case REPAIRED -> {
         var messages = snap.whenHandRepaired();
@@ -67,7 +67,7 @@ public record RepairCommand(
     if (repaired == 0) {
       var nothingMessages = snap.whenNothingAll();
       var nothingMsg = nothingMessages.forSender(self, name);
-      return CommandResult.invalidUsage(sender, nothingMsg);
+      return CommandResult.invalidUsage(nothingMsg);
     }
 
     var messages = snap.whenAllRepaired();

@@ -35,6 +35,6 @@ public record TeleportCancelCommand(ConfigHandle<TeleportConfig> config, Delayed
 
     var snap = this.config.value();
     var noPendingMsg = snap.cancelNoPending();
-    return CommandResult.invalidUsage(actor, noPendingMsg);
+    return CommandResult.invalidUsage(noPendingMsg);
   }
 }

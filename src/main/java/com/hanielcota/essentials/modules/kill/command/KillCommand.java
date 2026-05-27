@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
+import io.github.hanielcota.commandframework.core.CommandStatus;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -41,13 +42,13 @@ public record KillCommand(ConfigHandle<KillConfig> config, ActorFactory actors) 
     // essentials.kill.exempt can still kill themselves.
     if (!self && subject.hasPermission(EXEMPT_PERMISSION)) {
       var exemptMsg = snap.formatExempt(name);
-      return CommandResult.denied(sender, exemptMsg);
+      return CommandResult.failure(CommandStatus.NO_PERMISSION, exemptMsg);
     }
 
     if (subject.getHealth() <= 0) {
       var alreadyDead = snap.whenAlreadyDead();
       var alreadyDeadMsg = alreadyDead.forSender(self, name);
-      return CommandResult.invalidUsage(sender, alreadyDeadMsg);
+      return CommandResult.invalidUsage(alreadyDeadMsg);
     }
 
     subject.setHealth(0);

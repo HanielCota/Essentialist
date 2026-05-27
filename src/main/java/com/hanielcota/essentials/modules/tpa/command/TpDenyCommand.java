@@ -43,7 +43,7 @@ public record TpDenyCommand(
     var request = resolved.get();
     var denied = this.service.deny(request);
     if (!denied) {
-      return CommandResult.invalidUsage(actor, messages.noIncoming());
+      return CommandResult.invalidUsage(messages.noIncoming());
     }
 
     var deniedSelfTemplate = messages.deniedSelf();

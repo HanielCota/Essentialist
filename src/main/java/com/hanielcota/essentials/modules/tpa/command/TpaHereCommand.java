@@ -40,7 +40,7 @@ public record TpaHereCommand(
 
     if (senderId.equals(targetId)) {
       var messages = this.config.value().messages();
-      return CommandResult.invalidUsage(actor, messages.selfTarget());
+      return CommandResult.invalidUsage(messages.selfTarget());
     }
 
     var selection = new TpaTargetSelection(targetId, target.getName(), TeleportRequestType.TPAHERE);

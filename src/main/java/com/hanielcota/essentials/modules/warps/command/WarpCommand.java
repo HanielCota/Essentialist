@@ -41,7 +41,7 @@ public record WarpCommand(
     if (warpOpt.isEmpty()) {
       var unknownTemplate = messages.unknownWarp();
       var unknownMsg = unknownTemplate.replace(NAME, name);
-      return CommandResult.invalidUsage(actor, unknownMsg);
+      return CommandResult.invalidUsage(unknownMsg);
     }
 
     var warp = warpOpt.get();
@@ -50,13 +50,13 @@ public record WarpCommand(
     if (!this.service.canUse(sender, resolvedName)) {
       var noPermTemplate = messages.noPermission();
       var noPermMsg = noPermTemplate.replace(NAME, resolvedName);
-      return CommandResult.invalidUsage(actor, noPermMsg);
+      return CommandResult.invalidUsage(noPermMsg);
     }
 
     var locationOpt = warp.resolve();
     if (locationOpt.isEmpty()) {
       var worldGoneMsg = messages.worldGone();
-      return CommandResult.invalidUsage(actor, worldGoneMsg);
+      return CommandResult.invalidUsage(worldGoneMsg);
     }
 
     var destination = locationOpt.get();

@@ -34,7 +34,7 @@ public record TpCancelCommand(ConfigHandle<TpaConfig> config, TeleportRequestSer
     var pending = this.service.outgoing(senderId);
     if (pending.isEmpty()) {
       var noOutgoingMsg = messages.noOutgoing();
-      return CommandResult.invalidUsage(actor, noOutgoingMsg);
+      return CommandResult.invalidUsage(noOutgoingMsg);
     }
 
     var request = pending.get();

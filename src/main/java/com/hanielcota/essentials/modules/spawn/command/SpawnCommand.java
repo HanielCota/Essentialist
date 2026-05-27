@@ -34,14 +34,14 @@ public record SpawnCommand(
     var current = this.service.current();
     if (current.isEmpty()) {
       var noSpawnMsg = messages.noSpawn();
-      return CommandResult.invalidUsage(actor, noSpawnMsg);
+      return CommandResult.invalidUsage(noSpawnMsg);
     }
 
     var spawnLocation = current.get();
     var resolved = spawnLocation.resolve();
     if (resolved.isEmpty()) {
       var worldGoneMsg = messages.worldGone();
-      return CommandResult.invalidUsage(actor, worldGoneMsg);
+      return CommandResult.invalidUsage(worldGoneMsg);
     }
 
     var sender = actor.unwrap(Player.class);

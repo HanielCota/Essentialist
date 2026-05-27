@@ -44,17 +44,17 @@ public record MsgCommand(
 
     if (body.isEmpty()) {
       var emptyMsg = snap.emptyMessage();
-      return CommandResult.invalidUsage(sender, emptyMsg);
+      return CommandResult.invalidUsage(emptyMsg);
     }
 
     if (Senders.isSelf(sender, target)) {
       var selfMsg = snap.cannotMessageSelf();
-      return CommandResult.invalidUsage(sender, selfMsg);
+      return CommandResult.invalidUsage(selfMsg);
     }
 
     if (!this.visibilityFilter.test(from, target)) {
       var notFoundMsg = snap.formatTargetUnavailable(targetName);
-      return CommandResult.invalidUsage(sender, notFoundMsg);
+      return CommandResult.invalidUsage(notFoundMsg);
     }
 
     this.dispatcher.send(from, target, body);
