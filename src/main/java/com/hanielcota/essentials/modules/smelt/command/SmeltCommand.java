@@ -33,7 +33,7 @@ public record SmeltCommand(ConfigHandle<SmeltConfig> config, SmeltService servic
 
     if (count == 0) {
       var nothingMsg = snap.nothing();
-      return CommandResult.invalidUsage(actor, nothingMsg);
+      return CommandResult.invalidUsage(nothingMsg);
     }
 
     var successMsg = snap.formatSuccess(count);

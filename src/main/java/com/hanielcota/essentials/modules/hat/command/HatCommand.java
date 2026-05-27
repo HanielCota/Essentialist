@@ -36,9 +36,9 @@ public record HatCommand(ConfigHandle<HatConfig> config, HatService service) {
         actor.sendSuccess(snap.equipped());
         yield CommandResult.success();
       }
-      case EMPTY_HAND -> CommandResult.invalidUsage(actor, snap.emptyHand());
-      case NOT_ALLOWED -> CommandResult.invalidUsage(actor, snap.notAllowed());
-      case INVENTORY_FULL -> CommandResult.invalidUsage(actor, snap.inventoryFull());
+      case EMPTY_HAND -> CommandResult.invalidUsage(snap.emptyHand());
+      case NOT_ALLOWED -> CommandResult.invalidUsage(snap.notAllowed());
+      case INVENTORY_FULL -> CommandResult.invalidUsage(snap.inventoryFull());
     };
   }
 }

@@ -32,8 +32,7 @@ public record TpaUnblockCommand(
     var resolved = this.players.offlineByName(targetName);
 
     if (resolved.isEmpty()) {
-      return CommandResult.invalidUsage(
-          actor, messages.playerNotFound().replace("{player}", targetName));
+      return CommandResult.invalidUsage(messages.playerNotFound().replace("{player}", targetName));
     }
 
     var target = resolved.get();

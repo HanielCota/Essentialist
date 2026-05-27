@@ -43,13 +43,13 @@ public record HealCommand(
     if (subject.getHealth() <= 0) {
       var dead = snap.whenDead();
       var deadMsg = dead.forSender(self, name);
-      return CommandResult.invalidUsage(sender, deadMsg);
+      return CommandResult.invalidUsage(deadMsg);
     }
 
     if (!this.service.heal(subject)) {
       var alreadyFull = snap.whenAlreadyFull();
       var alreadyFullMsg = alreadyFull.forSender(self, name);
-      return CommandResult.invalidUsage(sender, alreadyFullMsg);
+      return CommandResult.invalidUsage(alreadyFullMsg);
     }
 
     var messages = snap.whenHealed();

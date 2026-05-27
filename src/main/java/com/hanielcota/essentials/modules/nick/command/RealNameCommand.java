@@ -31,7 +31,7 @@ public record RealNameCommand(
 
     if (ownerId == null) {
       var unknownMsg = snap.formatUnknownNick(query);
-      return CommandResult.invalidUsage(sender, unknownMsg);
+      return CommandResult.invalidUsage(unknownMsg);
     }
 
     var realName = this.resolver.resolve(ownerId);

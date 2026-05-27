@@ -34,7 +34,7 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
 
     if (message.isBlank()) {
       var usageMsg = snap.usage();
-      return CommandResult.invalidUsage(sender, usageMsg);
+      return CommandResult.invalidUsage(usageMsg);
     }
 
     var player = sender.unwrap(Player.class);
@@ -58,7 +58,7 @@ public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarSe
 
     if (message.isBlank()) {
       var usageMsg = snap.usage();
-      return CommandResult.invalidUsage(sender, usageMsg);
+      return CommandResult.invalidUsage(usageMsg);
     }
 
     var count = this.service.broadcast(message);

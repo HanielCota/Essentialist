@@ -44,7 +44,7 @@ public record GlobalChatCommand(GlobalChatNotifier notifier) {
       @NonNull CommandActor actor, @GreedyString @Arg("message") Optional<String> message) {
     var body = message.map(String::strip).orElse("");
     if (body.isEmpty()) {
-      return CommandResult.invalidUsage(actor, "");
+      return CommandResult.invalidUsage("");
     }
 
     var player = actor.unwrap(Player.class);

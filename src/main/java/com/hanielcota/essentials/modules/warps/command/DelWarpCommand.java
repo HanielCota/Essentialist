@@ -32,7 +32,7 @@ public record DelWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
     if (!deleted) {
       var unknownTemplate = messages.unknownWarp();
       var unknownMsg = unknownTemplate.replace("{name}", name);
-      return CommandResult.invalidUsage(actor, unknownMsg);
+      return CommandResult.invalidUsage(unknownMsg);
     }
 
     var deletedTemplate = messages.warpDeleted();

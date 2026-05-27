@@ -44,12 +44,12 @@ public record ReplyCommand(
 
     if (body.isEmpty()) {
       var emptyMsg = snap.emptyMessage();
-      return CommandResult.invalidUsage(sender, emptyMsg);
+      return CommandResult.invalidUsage(emptyMsg);
     }
 
     if (partnerId == null) {
       var noPartnerMsg = snap.noReplyPartner();
-      return CommandResult.invalidUsage(sender, noPartnerMsg);
+      return CommandResult.invalidUsage(noPartnerMsg);
     }
 
     var target = this.players.online(partnerId).orElse(null);
@@ -57,7 +57,7 @@ public record ReplyCommand(
     if (target == null || !this.visibilityFilter.test(from, target)) {
       var partnerName = PlayerNames.nameOf(this.players, partnerId, target);
       var offlineMsg = snap.formatReplyPartnerUnavailable(partnerName);
-      return CommandResult.invalidUsage(sender, offlineMsg);
+      return CommandResult.invalidUsage(offlineMsg);
     }
 
     this.dispatcher.send(from, target, body);

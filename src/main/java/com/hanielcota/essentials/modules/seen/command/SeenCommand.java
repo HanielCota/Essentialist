@@ -31,7 +31,7 @@ public record SeenCommand(ConfigHandle<SeenConfig> config, SeenService service) 
 
     if (line == null) {
       var neverMsg = snap.formatNeverSeen(query);
-      return CommandResult.invalidUsage(sender, neverMsg);
+      return CommandResult.invalidUsage(neverMsg);
     }
 
     var message = snap.formatLine(line);

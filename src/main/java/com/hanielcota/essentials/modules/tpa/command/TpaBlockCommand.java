@@ -32,8 +32,7 @@ public record TpaBlockCommand(
     var resolved = this.players.offlineByName(targetName);
 
     if (resolved.isEmpty()) {
-      return CommandResult.invalidUsage(
-          actor, messages.playerNotFound().replace("{player}", targetName));
+      return CommandResult.invalidUsage(messages.playerNotFound().replace("{player}", targetName));
     }
 
     var target = resolved.get();
@@ -41,7 +40,7 @@ public record TpaBlockCommand(
     var targetId = target.getUniqueId();
 
     if (senderId.equals(targetId)) {
-      return CommandResult.invalidUsage(actor, messages.blockSelf());
+      return CommandResult.invalidUsage(messages.blockSelf());
     }
 
     var blockedName = target.getName() != null ? target.getName() : targetName;

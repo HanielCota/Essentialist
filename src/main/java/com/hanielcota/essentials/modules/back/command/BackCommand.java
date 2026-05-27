@@ -41,7 +41,7 @@ public record BackCommand(
       var snap = this.config.value();
       var noBackMsg = snap.noBack();
 
-      return CommandResult.invalidUsage(actor, noBackMsg);
+      return CommandResult.invalidUsage(noBackMsg);
     }
 
     this.state.prefetch(senderId, entries);

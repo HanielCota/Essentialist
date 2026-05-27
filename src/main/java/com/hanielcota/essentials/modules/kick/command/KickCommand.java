@@ -14,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
+import io.github.hanielcota.commandframework.core.CommandStatus;
 import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -37,7 +38,7 @@ public record KickCommand(ConfigHandle<KickConfig> config) {
 
     if (target.hasPermission(EXEMPT_PERMISSION)) {
       var exemptMsg = snap.formatExempt(name);
-      return CommandResult.denied(sender, exemptMsg);
+      return CommandResult.failure(CommandStatus.NO_PERMISSION, exemptMsg);
     }
 
     var trimmed = motivo.map(String::strip).orElse("");

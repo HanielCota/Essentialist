@@ -54,12 +54,12 @@ public record TpaCommand(
     if (resolved.isEmpty()) {
       var notFoundTemplate = messages.playerNotFound();
       var notFoundMsg = notFoundTemplate.replace("{player}", name);
-      return CommandResult.invalidUsage(actor, notFoundMsg);
+      return CommandResult.invalidUsage(notFoundMsg);
     }
 
     var target = resolved.get();
     if (sender.getUniqueId().equals(target.getUniqueId())) {
-      return CommandResult.invalidUsage(actor, messages.selfTarget());
+      return CommandResult.invalidUsage(messages.selfTarget());
     }
 
     var selection =

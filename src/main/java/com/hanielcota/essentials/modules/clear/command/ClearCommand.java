@@ -43,7 +43,7 @@ public record ClearCommand(
     if (removed == 0) {
       var emptyMessages = snap.whenEmpty();
       var emptyMsg = emptyMessages.forSender(self, name);
-      return CommandResult.invalidUsage(sender, emptyMsg);
+      return CommandResult.invalidUsage(emptyMsg);
     }
 
     var messages = snap.whenCleared();

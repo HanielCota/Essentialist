@@ -64,7 +64,7 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
       }
       case EMPTY_HAND -> {
         var emptyHandMsg = snap.emptyHand();
-        yield CommandResult.invalidUsage(sender, emptyHandMsg);
+        yield CommandResult.invalidUsage(emptyHandMsg);
       }
     };
   }

@@ -48,8 +48,8 @@ public record WhitelistCommand(
         sender.sendSuccess(addedMsg);
         yield CommandResult.success();
       }
-      case ALREADY_WHITELISTED -> CommandResult.invalidUsage(sender, snap.formatAlreadyAdded(name));
-      case UNKNOWN_PLAYER -> CommandResult.invalidUsage(sender, snap.formatUnknownPlayer(name));
+      case ALREADY_WHITELISTED -> CommandResult.invalidUsage(snap.formatAlreadyAdded(name));
+      case UNKNOWN_PLAYER -> CommandResult.invalidUsage(snap.formatUnknownPlayer(name));
     };
   }
 
@@ -65,6 +65,6 @@ public record WhitelistCommand(
     }
 
     var notWhitelistedMsg = snap.formatNotWhitelisted(name);
-    return CommandResult.invalidUsage(sender, notWhitelistedMsg);
+    return CommandResult.invalidUsage(notWhitelistedMsg);
   }
 }

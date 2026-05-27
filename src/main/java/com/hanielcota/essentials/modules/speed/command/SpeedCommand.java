@@ -45,7 +45,7 @@ public record SpeedCommand(
 
     if (!this.service.setWalkSpeed(subject, valor)) {
       var invalidMsg = snap.invalid();
-      return CommandResult.invalidUsage(sender, invalidMsg);
+      return CommandResult.invalidUsage(invalidMsg);
     }
 
     var messages = snap.whenWalkSet(valor);
@@ -63,7 +63,7 @@ public record SpeedCommand(
 
     if (!this.service.setFlySpeed(subject, valor)) {
       var invalidMsg = snap.invalid();
-      return CommandResult.invalidUsage(sender, invalidMsg);
+      return CommandResult.invalidUsage(invalidMsg);
     }
 
     var messages = snap.whenFlySet(valor);

@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
+import io.github.hanielcota.commandframework.core.CommandStatus;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -40,20 +41,20 @@ public record TitleCommand(
     var message = request.message();
 
     if (targetId == null || targetName == null || message.isBlank()) {
-      return CommandResult.invalidUsage(sender, snap.usage());
+      return CommandResult.invalidUsage(snap.usage());
     }
 
     var toSelf = self != null && targetId.equals(self.getUniqueId());
 
     if (!toSelf && !sender.hasPermission("essentials.title.others")) {
-      return CommandResult.denied(sender, snap.noPermissionOther());
+      return CommandResult.failure(CommandStatus.NO_PERMISSION, snap.noPermissionOther());
     }
 
     // Re-resolve from the snapshot UUID — the parsed target could have disconnected between the
     // command parse and dispatch on a busy tick.
     var liveTarget = this.players.online(targetId).orElse(null);
     if (liveTarget == null) {
-      return CommandResult.invalidUsage(sender, snap.formatTargetOffline(targetName));
+      return CommandResult.invalidUsage(snap.formatTargetOffline(targetName));
     }
 
     this.service.send(liveTarget, message);
@@ -75,7 +76,7 @@ public record TitleCommand(
     var message = texto.strip();
 
     if (message.isBlank()) {
-      return CommandResult.invalidUsage(sender, snap.usage());
+      return CommandResult.invalidUsage(snap.usage());
     }
 
     var count = this.service.broadcast(message);
