@@ -9,17 +9,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public final class MuteCache {
 
-  private final MuteRepository repository;
-  private final AsyncDatabaseWriter writer;
+  private final @NonNull MuteRepository repository;
+  private final @NonNull AsyncDatabaseWriter writer;
   private final ConcurrentHashMap<UUID, Mute> cache = new ConcurrentHashMap<>();
-
-  public MuteCache(@NonNull MuteRepository repository, @NonNull AsyncDatabaseWriter writer) {
-    this.repository = repository;
-    this.writer = writer;
-  }
 
   public void loadAll(@NonNull List<Map.Entry<UUID, Mute>> rows) {
     for (var row : rows) {

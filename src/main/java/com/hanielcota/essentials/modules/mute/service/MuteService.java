@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 /**
@@ -18,13 +19,10 @@ import org.bukkit.entity.Player;
  * <p>In-memory caching is delegated to {@link MuteCache} which handles cache eviction and async
  * persistence coordination.
  */
+@RequiredArgsConstructor
 public final class MuteService implements MutesApi {
 
-  private final MuteCache cache;
-
-  public MuteService(@NonNull MuteCache cache) {
-    this.cache = cache;
-  }
+  private final @NonNull MuteCache cache;
 
   public Optional<Mute> activeMute(@NonNull UUID id) {
     return this.cache.activeMute(id);

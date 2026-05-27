@@ -9,19 +9,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
+@RequiredArgsConstructor
 public final class TpaFavoriteService {
 
   private final @Nullable TpaFavoriteRepository repository;
-  private final AsyncDatabaseWriter writer;
+  private final @NonNull AsyncDatabaseWriter writer;
   private final Map<UUID, Map<UUID, String>> favorites = new ConcurrentHashMap<>();
-
-  public TpaFavoriteService(
-      @Nullable TpaFavoriteRepository repository, @NonNull AsyncDatabaseWriter writer) {
-    this.repository = repository;
-    this.writer = writer;
-  }
 
   public void loadAll(@NonNull List<TpaFavorite> entries) {
     for (var entry : entries) {

@@ -10,23 +10,19 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Aggregates successful outgoing TPAs per owner→target pair. Incremented every time an outgoing
  * request finishes ACCEPTED and surfaces "top contacted" and "last contacted" reads to the menus.
  */
+@RequiredArgsConstructor
 public final class TpaContactService {
 
   private final @Nullable TpaContactRepository repository;
-  private final AsyncDatabaseWriter writer;
+  private final @NonNull AsyncDatabaseWriter writer;
   private final Map<UUID, Map<UUID, TpaContact>> contacts = new ConcurrentHashMap<>();
-
-  public TpaContactService(
-      @Nullable TpaContactRepository repository, @NonNull AsyncDatabaseWriter writer) {
-    this.repository = repository;
-    this.writer = writer;
-  }
 
   private static TpaContact bumped(
       @Nullable TpaContact prior,
