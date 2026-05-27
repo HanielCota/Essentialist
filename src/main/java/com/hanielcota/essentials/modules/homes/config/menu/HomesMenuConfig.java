@@ -70,7 +70,11 @@ public record HomesMenuConfig(
     @Comment("Slot of the delete-confirmation yes button.") int deleteYesSlot,
     @Comment("Material of the delete-confirmation yes button.") Material deleteYesMaterial,
     @Comment("Slot of the delete-confirmation no button.") int deleteNoSlot,
-    @Comment("Material of the delete-confirmation no button.") Material deleteNoMaterial) {
+    @Comment("Material of the delete-confirmation no button.") Material deleteNoMaterial,
+    @Comment("Slot of the + Nova home button shown on every /homes page.") int createSlot,
+    @Comment("Material of the + Nova home button.") Material createMaterial,
+    @Comment("Name of the + Nova home button.") String createName,
+    @Comment("Lore of the + Nova home button.") List<String> createLore) {
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
@@ -86,11 +90,11 @@ public record HomesMenuConfig(
         List.of(
             "<gray>Personal teleport points.",
             "",
-            "<yellow>/sethome <name> <gray>creates a home",
             "<yellow>/home <name> <gray>teleports you there",
             "<yellow>/homes <gray>opens this menu",
             "",
             "<gray>In this menu:",
+            "<yellow>+ button <gray>creates a new home",
             "<yellow>Left-click <gray>teleports",
             "<yellow>Right-click <gray>deletes",
             "<yellow>Shift + click <gray>renames",
@@ -141,7 +145,15 @@ public record HomesMenuConfig(
         11,
         Material.LIME_WOOL,
         15,
-        Material.RED_WOOL);
+        Material.RED_WOOL,
+        16,
+        Material.EMERALD,
+        "<green>+ Nova home",
+        List.of(
+            "<gray>Cria uma home na sua",
+            "<gray>posição atual.",
+            "",
+            "<yellow>Clique e digite o nome no chat."));
   }
 
   private static Map<MaterialCategory, String> defaultCategoryNames() {

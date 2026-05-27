@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.rename;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.create.HomeCreateSessions;
 import com.hanielcota.essentials.modules.homes.service.HomeNameValidator;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import lombok.NonNull;
@@ -22,6 +23,7 @@ public final class HomeRenameOrchestrator {
   private final ConfigHandle<HomesConfig> config;
   private final HomeService service;
   private final HomeRenameSessions sessions;
+  private final HomeCreateSessions createSessions;
   private final HomeNameValidator validator;
   private final HomeRenameTimer timer;
   private final HomeRenameNotifier notifier;
@@ -35,6 +37,8 @@ public final class HomeRenameOrchestrator {
     var timeout = snap.renameTimeout();
     var seconds = timeout.toSeconds();
     var uuid = player.getUniqueId();
+
+    this.createSessions.cancel(uuid);
 
     Runnable onTimeout = () -> handleTimeout(player, seconds);
     var timeoutTask = this.timer.schedule(player, timeout, onTimeout);

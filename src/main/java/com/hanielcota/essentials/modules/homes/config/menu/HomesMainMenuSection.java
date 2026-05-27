@@ -26,6 +26,10 @@ public final class HomesMainMenuSection {
     return MenuLayouts.sanitizeSlot(snap.infoSlot(), rows(snap), 10);
   }
 
+  public static int createSlot(@NonNull HomesMenuConfig snap) {
+    return MenuLayouts.sanitizeSlot(snap.createSlot(), rows(snap), 16);
+  }
+
   public static List<Integer> contentSlots(@NonNull HomesMenuConfig snap) {
     var configured = snap.contentSlots();
     if (configured.isEmpty()) {

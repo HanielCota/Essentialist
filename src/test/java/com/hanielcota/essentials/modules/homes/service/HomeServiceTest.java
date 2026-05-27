@@ -76,12 +76,12 @@ class HomeServiceTest {
   }
 
   @Test
-  void saveNormalizesNullMaterialToDefaultIcon() {
+  void createNewNormalizesNullMaterialToDefaultIcon() {
     var owner = UUID.randomUUID();
     var repository = new RecordingRepository();
     var service = new HomeService(repository, new HomeLimitResolver(() -> 3));
 
-    service.save(player(owner), "base", location(), null);
+    service.createNew(player(owner), "base", location(), null);
 
     assertEquals(Material.RED_BED, repository.saved.material());
   }

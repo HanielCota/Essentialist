@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.homes.menu;
 
+import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
@@ -12,6 +13,7 @@ import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuSection;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
+import com.hanielcota.essentials.modules.homes.create.HomeCreateOrchestrator;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ public final class HomesMenu implements EssentialsMenu {
   private final HomeEntryRenderer renderer;
   private final HomeClickHandler clickHandler;
   private final HomesMenuState state;
+  private final HomeCreateOrchestrator create;
 
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMenuConfig menuSpec) {
     var infoMaterial = menuSpec.infoMaterial();
@@ -37,6 +40,14 @@ public final class HomesMenu implements EssentialsMenu {
     var infoLore = menuSpec.infoLore();
 
     return MenuTemplates.simple(infoMaterial, infoName, infoLore);
+  }
+
+  private static @NonNull ItemTemplate buildCreateTemplate(@NonNull HomesMenuConfig menuSpec) {
+    var createMaterial = menuSpec.createMaterial();
+    var createName = menuSpec.createName();
+    var createLore = menuSpec.createLore();
+
+    return MenuTemplates.simple(createMaterial, createName, createLore);
   }
 
   @Override
@@ -55,6 +66,8 @@ public final class HomesMenu implements EssentialsMenu {
     var navigation = menuSpec.navigation();
     var infoTemplate = buildInfoTemplate(menuSpec);
     var infoSlot = HomesMainMenuSection.infoSlot(menuSpec);
+    var createTemplate = buildCreateTemplate(menuSpec);
+    var createSlot = HomesMainMenuSection.createSlot(menuSpec);
 
     PaginatedInfoMenus.register(
         menus,
@@ -66,7 +79,15 @@ public final class HomesMenu implements EssentialsMenu {
         infoSlot,
         infoTemplate,
         this::buildSlots,
-        builder -> builder.allowShiftClick(true));
+        builder -> {
+          builder.allowShiftClick(true);
+          builder.slot(createSlot, createTemplate, this::onCreateClicked);
+        });
+  }
+
+  private void onCreateClicked(@NonNull ClickContext click) {
+    click.close();
+    this.create.prompt(click.player());
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
