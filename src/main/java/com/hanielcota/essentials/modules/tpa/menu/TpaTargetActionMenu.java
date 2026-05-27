@@ -224,11 +224,6 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     var actor = this.actors.actorOf(viewer);
     var messages = this.config.value().messages();
 
-    if (viewerId.equals(entry.targetId())) {
-      actor.sendError(messages.favoriteSelf());
-      return;
-    }
-
     if (isFavorite) {
       this.favorites.remove(viewerId, entry.targetId());
       var removedText = messages.favoriteRemoved().replace("{player}", entry.targetName());
