@@ -77,7 +77,6 @@ public final class PaginatedInfoMenus {
 
     builderConfigurer.accept(menuBuilder);
 
-    var definition = menuBuilder.build();
-    definition.register();
+    menuBuilder.buildAndRegister();
   }
 }

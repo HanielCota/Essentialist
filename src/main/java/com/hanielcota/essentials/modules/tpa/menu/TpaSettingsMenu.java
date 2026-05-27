@@ -84,7 +84,6 @@ public final class TpaSettingsMenu implements EssentialsMenu {
     builder.slot(cooldownSlot, cooldownTemplate, click -> {});
     builder.slot(backSlot, backTemplate, click -> click.switchTo(TpaHelpMenu.ID));
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 }

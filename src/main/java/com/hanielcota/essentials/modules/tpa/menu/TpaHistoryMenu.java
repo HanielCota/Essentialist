@@ -92,8 +92,7 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     builder.slot(
         backSlot(settings, rows), backTemplate(settings), click -> click.switchTo(TpaHelpMenu.ID));
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private static int backSlot(@NonNull TpaMenuConfig settings, int rows) {

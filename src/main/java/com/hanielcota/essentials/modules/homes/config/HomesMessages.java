@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.homes.config.messages;
+package com.hanielcota.essentials.modules.homes.config;
 
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;

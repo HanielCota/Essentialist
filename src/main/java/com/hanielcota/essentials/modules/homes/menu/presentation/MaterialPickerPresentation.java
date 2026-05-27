@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.homes.config.HomesMessages;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
-import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;

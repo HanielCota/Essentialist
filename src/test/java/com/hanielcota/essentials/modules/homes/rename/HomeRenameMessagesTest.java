@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.homes.rename;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
+import com.hanielcota.essentials.modules.homes.config.HomesMessages;
 import com.hanielcota.essentials.modules.homes.service.HomeService.RenameResult;
 import org.junit.jupiter.api.Test;
 

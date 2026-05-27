@@ -2,18 +2,15 @@ package com.hanielcota.essentials.modules.mute.listener;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
+import com.hanielcota.essentials.modules.mute.service.MuteBlockMessageRenderer;
+import com.hanielcota.essentials.modules.mute.service.MuteCommandLineParser;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
-import com.hanielcota.essentials.shared.ComponentUtils;
-import com.hanielcota.essentials.shared.DurationFormatter;
-import java.time.Duration;
-import java.time.Instant;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Blocks chat-equivalent commands ({@code /me}, {@code /tell}, {@code /say}, ...) for muted
@@ -29,33 +26,11 @@ public final class MuteCommandListener implements Listener {
 
   private final ConfigHandle<MuteConfig> config;
   private final MuteService service;
-
-  private static String extractCommandName(@NonNull String rawMessage) {
-    var withoutSlash = rawMessage.startsWith("/") ? rawMessage.substring(1) : rawMessage;
-    var space = withoutSlash.indexOf(' ');
-    var firstToken = space < 0 ? withoutSlash : withoutSlash.substring(0, space);
-
-    // Strip namespace: "/minecraft:me" → "me", "/essentials:tell" → "tell".
-    var colon = firstToken.indexOf(':');
-    return colon < 0 ? firstToken : firstToken.substring(colon + 1);
-  }
-
-  private static String renderBlocked(@NonNull MuteConfig snap, @Nullable Instant expiresAt) {
-    if (expiresAt == null) {
-      return snap.chatBlocked();
-    }
-
-    var now = Instant.now();
-    var remaining = Duration.between(now, expiresAt);
-    var timeStr = DurationFormatter.format(remaining);
-
-    return snap.formatChatBlockedTimed(timeStr);
-  }
+  private final MuteBlockMessageRenderer renderer;
 
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
   public void onCommand(@NonNull PlayerCommandPreprocessEvent event) {
-    var rawMessage = event.getMessage();
-    var commandName = extractCommandName(rawMessage);
+    var commandName = MuteCommandLineParser.canonicalName(event.getMessage());
     if (commandName.isEmpty()) {
       return;
     }
@@ -74,9 +49,8 @@ public final class MuteCommandListener implements Listener {
 
     event.setCancelled(true);
 
-    var line = renderBlocked(snap, mute.expiresAt());
-    var component = ComponentUtils.mini(line);
+    var message = this.renderer.render(mute);
 
-    player.sendMessage(component);
+    player.sendMessage(message);
   }
 }

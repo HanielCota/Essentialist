@@ -79,8 +79,7 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     var backBtn = backButtonSlot();
     builder.slot(backBtn.slot(), backBtn.template(), backBtn.handler());
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

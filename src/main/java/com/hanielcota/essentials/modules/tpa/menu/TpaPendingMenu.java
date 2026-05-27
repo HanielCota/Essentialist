@@ -80,8 +80,7 @@ public final class TpaPendingMenu implements EssentialsMenu {
         this.renderer.backTemplate(settings),
         click -> click.switchTo(TpaHelpMenu.ID));
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private SlotDefinition bulkSlot(

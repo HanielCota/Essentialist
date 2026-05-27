@@ -71,8 +71,7 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

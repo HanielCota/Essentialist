@@ -85,8 +85,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
         PaginationConfig.builder().contentSlots(contentSlots(helpMenu, rows)).build());
     builder.dynamicContent(this::buildSlots);
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

@@ -3,8 +3,8 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.homes.config.HomesMessages;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
-import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 

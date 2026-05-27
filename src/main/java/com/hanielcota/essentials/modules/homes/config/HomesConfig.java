@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.homes.config;
 
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
-import com.hanielcota.essentials.modules.homes.config.messages.HomesMessages;
 import java.time.Duration;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;

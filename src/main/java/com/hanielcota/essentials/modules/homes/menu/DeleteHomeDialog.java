@@ -57,8 +57,7 @@ public final class DeleteHomeDialog implements EssentialsMenu {
     builder.slot(yesSlot, yes, confirmClick);
     builder.slot(noSlot, no, cancelClick);
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private @NonNull Component title(@NonNull HomesConfig configSnap) {
