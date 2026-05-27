@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 
 @Command("clearchat")
@@ -20,7 +21,7 @@ import lombok.NonNull;
 public record ClearChatCommand(ConfigHandle<ClearChatConfig> config, ClearChatService service) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var snap = this.config.value();
     var actorName = actor.name();
     var announcement = snap.formatAnnouncement(actorName);
@@ -32,5 +33,7 @@ public record ClearChatCommand(ConfigHandle<ClearChatConfig> config, ClearChatSe
     if (!actor.isPlayer()) {
       actor.sendMessage(announcement);
     }
+
+    return CommandResult.success();
   }
 }

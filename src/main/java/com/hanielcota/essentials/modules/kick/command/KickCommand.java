@@ -7,13 +7,14 @@ import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,20 +28,19 @@ public record KickCommand(ConfigHandle<KickConfig> config) {
   private static final String EXEMPT_PERMISSION = "essentials.kick.exempt";
 
   @DefaultSubcommand
-  public void execute(
+  public CommandResult execute(
       @NonNull CommandActor sender,
       @OnlinePlayer @NonNull Player target,
-      @DefaultValue("") @GreedyString @Arg("motivo") String motivo) {
+      @GreedyString @Arg("motivo") Optional<String> motivo) {
     var snap = this.config.value();
     var name = target.getName();
 
     if (target.hasPermission(EXEMPT_PERMISSION)) {
       var exemptMsg = snap.formatExempt(name);
-      sender.sendError(exemptMsg);
-      return;
+      return CommandResult.denied(sender, exemptMsg);
     }
 
-    var trimmed = motivo.strip();
+    var trimmed = motivo.map(String::strip).orElse("");
     var reason = snap.reasonOr(trimmed);
     var screenMsg = snap.formatScreen(reason);
     var screenComponent = ComponentUtils.mini(screenMsg);
@@ -49,5 +49,6 @@ public record KickCommand(ConfigHandle<KickConfig> config) {
 
     var kickedMsg = snap.formatKicked(name, reason);
     sender.sendSuccess(kickedMsg);
+    return CommandResult.success();
   }
 }

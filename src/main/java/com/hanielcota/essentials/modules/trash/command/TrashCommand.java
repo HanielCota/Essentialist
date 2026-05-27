@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -26,7 +27,7 @@ import org.bukkit.entity.Player;
 public record TrashCommand(ConfigHandle<TrashConfig> config) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var player = actor.unwrap(Player.class);
     var snap = this.config.value();
     var size = snap.size();
@@ -37,5 +38,7 @@ public record TrashCommand(ConfigHandle<TrashConfig> config) {
     // the menu closes.
     var trash = Bukkit.createInventory(null, size, titleComponent);
     player.openInventory(trash);
+
+    return CommandResult.success();
   }
 }

@@ -17,6 +17,7 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -33,7 +34,8 @@ public record HealCommand(
 
   @DefaultSubcommand
   @PermissionForOther(".others")
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
@@ -41,26 +43,25 @@ public record HealCommand(
     if (subject.getHealth() <= 0) {
       var dead = snap.whenDead();
       var deadMsg = dead.forSender(self, name);
-      sender.sendError(deadMsg);
-      return;
+      return CommandResult.invalidUsage(sender, deadMsg);
     }
 
     if (!this.service.heal(subject)) {
       var alreadyFull = snap.whenAlreadyFull();
       var alreadyFullMsg = alreadyFull.forSender(self, name);
-      sender.sendError(alreadyFullMsg);
-      return;
+      return CommandResult.invalidUsage(sender, alreadyFullMsg);
     }
 
     var messages = snap.whenHealed();
     DualReply.send(sender, subject, this.actors, messages);
+    return CommandResult.success();
   }
 
   @Subcommand("todos")
   @Permission("essentials.heal.all")
   @Description("Restaura a vida de todos os jogadores online.")
   @Syntax("/curar todos")
-  public void healAll(@NonNull CommandActor sender) {
+  public CommandResult healAll(@NonNull CommandActor sender) {
     var online = this.players.all();
     var healed = this.service.healAll(online);
 
@@ -68,5 +69,6 @@ public record HealCommand(
     var summaryMsg = snap.formatHealedAll(healed);
 
     sender.sendSuccess(summaryMsg);
+    return CommandResult.success();
   }
 }

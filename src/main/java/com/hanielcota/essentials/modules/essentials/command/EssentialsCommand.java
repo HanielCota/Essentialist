@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 
 @Command("essentials")
@@ -19,17 +20,19 @@ import lombok.NonNull;
 public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigService configs) {
 
   @DefaultSubcommand
-  public void showUsage(@NonNull CommandActor actor) {
+  public CommandResult showUsage(@NonNull CommandActor actor) {
     var snap = this.config.value();
     var usage = snap.usage();
 
     actor.sendMessage(usage);
+
+    return CommandResult.success();
   }
 
   @Subcommand("reload")
   @Description("Recarrega todas as configurações do plugin.")
   @Syntax("/essentials reload")
-  public void reload(@NonNull CommandActor actor) {
+  public CommandResult reload(@NonNull CommandActor actor) {
     var report = this.configs.reloadAll();
     var snap = this.config.value();
 
@@ -38,7 +41,8 @@ public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigSer
       var successMsg = snap.formatSuccess(total);
 
       actor.sendSuccess(successMsg);
-      return;
+
+      return CommandResult.success();
     }
 
     var failedNames = report.failedNames();
@@ -47,6 +51,6 @@ public record EssentialsCommand(ConfigHandle<EssentialsConfig> config, ConfigSer
     var total = report.total();
     var failureMsg = snap.formatFailure(succeeded, total, failed);
 
-    actor.sendError(failureMsg);
+    return CommandResult.invalidUsage(actor, failureMsg);
   }
 }

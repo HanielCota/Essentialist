@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -31,7 +32,7 @@ public record HomesCommand(
     HomesMenuState state) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
     var uuid = sender.getUniqueId();
     var homes = this.service.list(uuid);
@@ -40,12 +41,12 @@ public record HomesCommand(
       var snap = this.config.value();
       var messages = snap.messages();
       var noHomesMsg = messages.noHomes();
-      actor.sendError(noHomesMsg);
-      return;
+      return CommandResult.invalidUsage(actor, noHomesMsg);
     }
 
     this.state.prefetch(uuid, homes);
 
     MenuOpenings.open(this.menus, sender, HomesMenu.ID, actor);
+    return CommandResult.success();
   }
 }

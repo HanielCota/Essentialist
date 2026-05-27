@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -26,7 +27,7 @@ public record NickCommand(NickOperationService operations, NickNotifier notifier
   private static final String OFF_KEYWORD = "off";
 
   @DefaultSubcommand
-  public void execute(
+  public CommandResult execute(
       @NonNull CommandActor sender,
       @Arg("nick") String nick,
       @TargetOrSelf @NonNull Player subject) {
@@ -36,10 +37,13 @@ public record NickCommand(NickOperationService operations, NickNotifier notifier
     if (trimmed.equalsIgnoreCase(OFF_KEYWORD)) {
       var outcome = this.operations.reset(subject);
       this.notifier.sendResetOutcome(sender, subject, self, outcome);
-      return;
+
+      return CommandResult.success();
     }
 
     var outcome = this.operations.set(subject, trimmed);
     this.notifier.sendSetOutcome(sender, subject, self, outcome);
+
+    return CommandResult.success();
   }
 }

@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -30,7 +31,8 @@ public record KillCommand(ConfigHandle<KillConfig> config, ActorFactory actors) 
   private static final String EXEMPT_PERMISSION = "essentials.kill.exempt";
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
@@ -39,20 +41,19 @@ public record KillCommand(ConfigHandle<KillConfig> config, ActorFactory actors) 
     // essentials.kill.exempt can still kill themselves.
     if (!self && subject.hasPermission(EXEMPT_PERMISSION)) {
       var exemptMsg = snap.formatExempt(name);
-      sender.sendError(exemptMsg);
-      return;
+      return CommandResult.denied(sender, exemptMsg);
     }
 
     if (subject.getHealth() <= 0) {
       var alreadyDead = snap.whenAlreadyDead();
       var alreadyDeadMsg = alreadyDead.forSender(self, name);
-      sender.sendError(alreadyDeadMsg);
-      return;
+      return CommandResult.invalidUsage(sender, alreadyDeadMsg);
     }
 
     subject.setHealth(0);
 
     var messages = snap.whenKilled();
     DualReply.send(sender, subject, this.actors, messages);
+    return CommandResult.success();
   }
 }

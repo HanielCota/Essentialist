@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 
 @Command("delwarp")
@@ -23,7 +24,7 @@ import lombok.NonNull;
 public record DelWarpCommand(ConfigHandle<WarpsConfig> config, WarpService service) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @Arg("nome") String name) {
+  public CommandResult execute(@NonNull CommandActor actor, @Arg("nome") String name) {
     var snap = this.config.value();
     var messages = snap.messages();
 
@@ -31,13 +32,13 @@ public record DelWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
     if (!deleted) {
       var unknownTemplate = messages.unknownWarp();
       var unknownMsg = unknownTemplate.replace("{name}", name);
-      actor.sendError(unknownMsg);
-      return;
+      return CommandResult.invalidUsage(actor, unknownMsg);
     }
 
     var deletedTemplate = messages.warpDeleted();
     var deletedMsg = deletedTemplate.replace("{name}", name);
 
     actor.sendSuccess(deletedMsg);
+    return CommandResult.success();
   }
 }

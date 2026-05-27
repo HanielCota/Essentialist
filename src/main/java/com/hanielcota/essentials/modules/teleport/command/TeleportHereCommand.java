@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,7 +28,7 @@ public record TeleportHereCommand(
     MainThreadCallbacks callbacks) {
 
   @DefaultSubcommand
-  public void execute(@NonNull Player sender, @OnlinePlayer @NonNull Player target) {
+  public CommandResult execute(@NonNull Player sender, @OnlinePlayer @NonNull Player target) {
     var senderActor = this.actors.actorOf(sender);
     var senderName = sender.getName();
     var targetName = target.getName();
@@ -38,5 +39,7 @@ public record TeleportHereCommand(
         outcome ->
             this.notifier.notifyBringHere(senderActor, target, senderName, targetName, outcome),
         "tphere");
+
+    return CommandResult.success();
   }
 }

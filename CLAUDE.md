@@ -256,7 +256,8 @@ cheaper than adding an unjustified second one.
     target.
   - Method-level `@Permission` overrides class-level (precedence:
     method → class → `@AutoPermission` → empty).
-  - `@Subcommand` accepts only one name; use `@Alias` for additional names.
+  - Prefer `@Alias` for additional subcommand names for clarity.
+    `@Subcommand({"a", "b"})` with an array also works in v3.3.1.
   - `CommandActor.uniqueId()` returns **`String`**, not `UUID`. Compare with
     `player.getUniqueId().toString()`.
 - **Paper 26.x workstation menus**:

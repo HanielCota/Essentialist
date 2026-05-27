@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -25,7 +26,8 @@ import org.bukkit.entity.Player;
 public record PingCommand(ConfigHandle<PingConfig> config, PingService service) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
@@ -38,5 +40,7 @@ public record PingCommand(ConfigHandle<PingConfig> config, PingService service) 
     var message = base.replace("{ping}", coloredPing);
 
     sender.sendMessage(message);
+
+    return CommandResult.success();
   }
 }

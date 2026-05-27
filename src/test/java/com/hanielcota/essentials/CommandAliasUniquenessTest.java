@@ -21,6 +21,8 @@ class CommandAliasUniquenessTest {
   private static final Pattern ALIASES_SINGLE = Pattern.compile("aliases\\s*=\\s*\"([^\"]+)\"");
   private static final Pattern ALIAS = Pattern.compile("@Alias\\s*\\(\\s*\"([^\"]+)\"");
   private static final Pattern QUOTED = Pattern.compile("\"([^\"]+)\"");
+  private static final Pattern SUBCOMMAND_ARRAY =
+      Pattern.compile("@Subcommand\\s*\\(\\s*\\{([^}]*)}", Pattern.DOTALL);
 
   @Test
   void commandAliasesAreGloballyUnique() throws IOException {
@@ -53,6 +55,7 @@ class CommandAliasUniquenessTest {
     collectMatches(ALIASES_SINGLE, source, location, occurrences);
     collectArrayAliases(source, location, occurrences);
     collectMatches(ALIAS, source, location, occurrences);
+    collectSubcommandArrayAliases(source, location, occurrences);
   }
 
   private static void collectArrayAliases(
@@ -62,6 +65,29 @@ class CommandAliasUniquenessTest {
     while (matcher.find()) {
       var aliases = matcher.group(1);
       collectMatches(QUOTED, aliases, location, occurrences);
+    }
+  }
+
+  private static void collectSubcommandArrayAliases(
+      String source, String location, Map<String, List<String>> occurrences) {
+    var matcher = SUBCOMMAND_ARRAY.matcher(source);
+
+    while (matcher.find()) {
+      var raw = matcher.group(1);
+      var quoted = QUOTED.matcher(raw);
+      var first = true;
+
+      while (quoted.find()) {
+        if (first) {
+          first = false;
+          continue;
+        }
+
+        var alias = quoted.group(1);
+        var locations = occurrences.computeIfAbsent(alias, ignored -> new ArrayList<>());
+
+        locations.add(location);
+      }
     }
   }
 

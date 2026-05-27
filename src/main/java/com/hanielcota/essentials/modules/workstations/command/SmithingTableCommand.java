@@ -9,6 +9,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.inventory.MenuType;
 
@@ -24,7 +25,8 @@ import org.bukkit.inventory.MenuType;
 public final class SmithingTableCommand {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     WorkstationOpener.open(actor, MenuType.SMITHING);
+    return CommandResult.success();
   }
 }

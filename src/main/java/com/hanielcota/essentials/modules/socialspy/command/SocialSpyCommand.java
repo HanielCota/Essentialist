@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -23,7 +24,8 @@ import org.bukkit.entity.Player;
 public record SocialSpyCommand(SocialSpyService service, SocialSpyNotifier notifier) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var subjectId = subject.getUniqueId();
     var subjectName = subject.getName();
     var self = Senders.isSelf(sender, subject);
@@ -34,5 +36,7 @@ public record SocialSpyCommand(SocialSpyService service, SocialSpyNotifier notif
     }
 
     this.notifier.sendToggle(sender, enabled, self, subjectName);
+
+    return CommandResult.success();
   }
 }

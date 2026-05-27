@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -25,14 +26,14 @@ public record TpaUnblockCommand(
     ConfigHandle<TpaConfig> config, TpaBlockService blocks, PlayerProvider players) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @NonNull String targetName) {
+  public CommandResult execute(@NonNull CommandActor actor, @NonNull String targetName) {
     var sender = actor.unwrap(Player.class);
     var messages = this.config.value().messages();
     var resolved = this.players.offlineByName(targetName);
 
     if (resolved.isEmpty()) {
-      actor.sendError(messages.playerNotFound().replace("{player}", targetName));
-      return;
+      return CommandResult.invalidUsage(
+          actor, messages.playerNotFound().replace("{player}", targetName));
     }
 
     var target = resolved.get();
@@ -42,5 +43,7 @@ public record TpaUnblockCommand(
     this.blocks.unblock(sender.getUniqueId(), targetId);
 
     actor.sendSuccess(messages.unblockedPlayer().replace("{player}", targetDisplayName));
+
+    return CommandResult.success();
   }
 }

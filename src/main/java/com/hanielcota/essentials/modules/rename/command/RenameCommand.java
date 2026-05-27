@@ -9,13 +9,14 @@ import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -41,28 +42,30 @@ public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService ser
   }
 
   @DefaultSubcommand
-  public void execute(
-      @NonNull CommandActor sender, @DefaultValue("") @GreedyString @Arg("nome") String nome) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @GreedyString @Arg("nome") Optional<String> nome) {
     var snap = this.config.value();
     var player = sender.unwrap(Player.class);
-    var trimmed = nome.strip();
+    var trimmed = nome.map(String::strip).orElse("");
 
     var nameComponent = renderName(trimmed);
     var result = this.service.rename(player, nameComponent);
 
-    switch (result) {
+    return switch (result) {
       case RENAMED -> {
         var renamedMsg = snap.formatRenamed(trimmed);
         sender.sendSuccess(renamedMsg);
+        yield CommandResult.success();
       }
       case CLEARED -> {
         var clearedMsg = snap.cleared();
         sender.sendSuccess(clearedMsg);
+        yield CommandResult.success();
       }
       case EMPTY_HAND -> {
         var emptyHandMsg = snap.emptyHand();
-        sender.sendError(emptyHandMsg);
+        yield CommandResult.invalidUsage(sender, emptyHandMsg);
       }
-    }
+    };
   }
 }

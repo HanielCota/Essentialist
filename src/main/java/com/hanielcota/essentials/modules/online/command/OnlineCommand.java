@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import java.util.function.ToIntFunction;
 import lombok.NonNull;
 
@@ -24,7 +25,7 @@ public record OnlineCommand(
     ToIntFunction<CommandActor> visibleCount) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var snap = this.config.value();
     var onlineCount = this.visibleCount.applyAsInt(actor);
     var maxPlayers = this.players.maxPlayers();
@@ -32,5 +33,7 @@ public record OnlineCommand(
     var message = snap.format(onlineCount, maxPlayers);
 
     actor.sendMessage(message);
+
+    return CommandResult.success();
   }
 }

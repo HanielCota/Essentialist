@@ -18,6 +18,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -32,20 +33,21 @@ public record TpaHereCommand(
     ConfigHandle<TpaConfig> config, MenuService menus, TpaTargetSelections selections) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @OnlinePlayer @NonNull Player target) {
+  public CommandResult execute(@NonNull CommandActor actor, @OnlinePlayer @NonNull Player target) {
     var sender = actor.unwrap(Player.class);
     var senderId = sender.getUniqueId();
     var targetId = target.getUniqueId();
 
     if (senderId.equals(targetId)) {
       var messages = this.config.value().messages();
-      actor.sendError(messages.selfTarget());
-      return;
+      return CommandResult.invalidUsage(actor, messages.selfTarget());
     }
 
     var selection = new TpaTargetSelection(targetId, target.getName(), TeleportRequestType.TPAHERE);
     this.selections.select(senderId, selection);
 
     MenuOpenings.open(this.menus, sender, TpaTargetActionMenu.ID, actor);
+
+    return CommandResult.success();
   }
 }

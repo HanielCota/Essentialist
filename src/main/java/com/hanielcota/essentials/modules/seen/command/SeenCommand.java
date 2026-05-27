@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import java.time.Instant;
 import lombok.NonNull;
 
@@ -22,7 +23,7 @@ import lombok.NonNull;
 public record SeenCommand(ConfigHandle<SeenConfig> config, SeenService service) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @Arg("jogador") String jogador) {
+  public CommandResult execute(@NonNull CommandActor sender, @Arg("jogador") String jogador) {
     var snap = this.config.value();
     var query = jogador.strip();
     var now = Instant.now();
@@ -30,11 +31,12 @@ public record SeenCommand(ConfigHandle<SeenConfig> config, SeenService service) 
 
     if (line == null) {
       var neverMsg = snap.formatNeverSeen(query);
-      sender.sendError(neverMsg);
-      return;
+      return CommandResult.invalidUsage(sender, neverMsg);
     }
 
     var message = snap.formatLine(line);
     sender.sendMessage(message);
+
+    return CommandResult.success();
   }
 }

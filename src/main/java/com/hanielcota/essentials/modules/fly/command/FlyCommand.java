@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -23,20 +24,24 @@ import org.bukkit.entity.Player;
 public record FlyCommand(FlyService service, FlyNotifier notifier) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var result = this.service.toggle(subject);
     this.notifier.announce(sender, subject, result);
+    return CommandResult.success();
   }
 
   @Subcommand("on")
-  public void on(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult on(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var result = this.service.set(subject, true);
     this.notifier.announce(sender, subject, result);
+    return CommandResult.success();
   }
 
   @Subcommand("off")
-  public void off(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult off(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var result = this.service.set(subject, false);
     this.notifier.announce(sender, subject, result);
+    return CommandResult.success();
   }
 }

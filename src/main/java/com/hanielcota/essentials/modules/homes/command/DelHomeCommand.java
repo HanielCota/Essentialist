@@ -9,11 +9,12 @@ import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,16 +28,15 @@ public record DelHomeCommand(
     ConfigHandle<HomesConfig> config, HomeService service, HomeNameResolver nameResolver) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @DefaultValue("") @Arg("nome") String rawName) {
+  public CommandResult execute(@NonNull CommandActor actor, @Arg("nome") Optional<String> rawName) {
     var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
     var messages = snap.messages();
-    var name = this.nameResolver.resolve(rawName);
+    var name = this.nameResolver.resolve(rawName.orElse(""));
 
     if (name == null) {
       var invalidNameMsg = messages.invalidName();
-      actor.sendError(invalidNameMsg);
-      return;
+      return CommandResult.invalidUsage(actor, invalidNameMsg);
     }
 
     var uuid = sender.getUniqueId();
@@ -44,13 +44,13 @@ public record DelHomeCommand(
     if (!this.service.delete(uuid, name)) {
       var unknownHomeMsg = messages.unknownHome();
       var unknownMsg = unknownHomeMsg.replace("{name}", name);
-      actor.sendError(unknownMsg);
-      return;
+      return CommandResult.invalidUsage(actor, unknownMsg);
     }
 
     var homeDeletedMsg = messages.homeDeleted();
     var deletedMsg = homeDeletedMsg.replace("{name}", name);
 
     actor.sendSuccess(deletedMsg);
+    return CommandResult.success();
   }
 }

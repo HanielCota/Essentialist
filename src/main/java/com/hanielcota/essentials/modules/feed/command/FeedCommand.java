@@ -17,6 +17,7 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -33,7 +34,8 @@ public record FeedCommand(
 
   @DefaultSubcommand
   @PermissionForOther(".others")
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
@@ -41,19 +43,19 @@ public record FeedCommand(
     if (!this.service.feed(subject)) {
       var alreadyFull = snap.whenAlreadyFull();
       var alreadyFullMsg = alreadyFull.forSender(self, name);
-      sender.sendError(alreadyFullMsg);
-      return;
+      return CommandResult.invalidUsage(sender, alreadyFullMsg);
     }
 
     var messages = snap.whenFed();
     DualReply.send(sender, subject, this.actors, messages);
+    return CommandResult.success();
   }
 
   @Subcommand("todos")
   @Permission("essentials.feed.all")
   @Description("Alimenta todos os jogadores online.")
   @Syntax("/alimentar todos")
-  public void feedAll(@NonNull CommandActor sender) {
+  public CommandResult feedAll(@NonNull CommandActor sender) {
     var online = this.players.all();
 
     var fed = 0;
@@ -67,5 +69,6 @@ public record FeedCommand(
     var summaryMsg = snap.formatFedAll(fed);
 
     sender.sendSuccess(summaryMsg);
+    return CommandResult.success();
   }
 }

@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import java.util.function.BiPredicate;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -33,7 +34,7 @@ public record ReplyCommand(
 
   @DefaultSubcommand
   @PlayerOnly
-  public void execute(
+  public CommandResult execute(
       @NonNull CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
     var snap = this.config.value();
     var body = mensagem.strip();
@@ -43,14 +44,12 @@ public record ReplyCommand(
 
     if (body.isEmpty()) {
       var emptyMsg = snap.emptyMessage();
-      sender.sendError(emptyMsg);
-      return;
+      return CommandResult.invalidUsage(sender, emptyMsg);
     }
 
     if (partnerId == null) {
       var noPartnerMsg = snap.noReplyPartner();
-      sender.sendError(noPartnerMsg);
-      return;
+      return CommandResult.invalidUsage(sender, noPartnerMsg);
     }
 
     var target = this.players.online(partnerId).orElse(null);
@@ -58,10 +57,10 @@ public record ReplyCommand(
     if (target == null || !this.visibilityFilter.test(from, target)) {
       var partnerName = PlayerNames.nameOf(this.players, partnerId, target);
       var offlineMsg = snap.formatReplyPartnerUnavailable(partnerName);
-      sender.sendError(offlineMsg);
-      return;
+      return CommandResult.invalidUsage(sender, offlineMsg);
     }
 
     this.dispatcher.send(from, target, body);
+    return CommandResult.success();
   }
 }

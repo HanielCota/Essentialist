@@ -16,6 +16,8 @@ import io.github.hanielcota.commandframework.annotation.PermissionForOther;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.function.UnaryOperator;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -30,7 +32,8 @@ public record ClearCommand(
     ConfigHandle<ClearConfig> config, ClearService service, ActorFactory actors) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var clearArmor = snap.clearArmor();
     var removed = this.service.clear(subject, clearArmor);
@@ -40,12 +43,13 @@ public record ClearCommand(
     if (removed == 0) {
       var emptyMessages = snap.whenEmpty();
       var emptyMsg = emptyMessages.forSender(self, name);
-      sender.sendError(emptyMsg);
-      return;
+      return CommandResult.invalidUsage(sender, emptyMsg);
     }
 
     var messages = snap.whenCleared();
     var count = Integer.toString(removed);
-    DualReply.send(sender, subject, this.actors, messages, line -> line.replace("{count}", count));
+    var replacer = (UnaryOperator<String>) line -> line.replace("{count}", count);
+    DualReply.send(sender, subject, this.actors, messages, replacer);
+    return CommandResult.success();
   }
 }
