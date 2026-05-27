@@ -28,6 +28,7 @@ public final class PlayerInfoEntries {
     var snap = this.config.value();
     var section = snap.player();
 
+    var uuid = player.getUniqueId();
     var name = player.getName();
     var location = player.getLocation();
     var worldName = player.getWorld().getName();
@@ -44,7 +45,7 @@ public final class PlayerInfoEntries {
     var z = Numbers.display(location.getZ());
     var coords = x + ", " + y + ", " + z;
 
-    var headEntry = InfoEntry.headFrom(player, section.head(), Map.of("player", name));
+    var headEntry = InfoEntry.headFrom(uuid, section.head(), Map.of("player", name));
     var healthEntry = InfoEntry.from(section.health(), Map.of("health", health));
     var foodEntry = InfoEntry.from(section.food(), Map.of("food", foodLevel));
     var levelEntry = InfoEntry.from(section.level(), Map.of("level", level));

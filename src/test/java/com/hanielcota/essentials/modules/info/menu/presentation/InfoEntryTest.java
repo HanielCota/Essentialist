@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.hanielcota.essentials.modules.info.config.InfoEntryConfig;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Material;
@@ -28,26 +27,17 @@ class InfoEntryTest {
   }
 
   @Test
-  void headStaticFactoryForcesPlayerHeadMaterialAndStoresOwner() {
+  void headFromForcesPlayerHeadMaterialAndStoresOwner() {
     var owner = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    var template =
+        InfoEntryConfig.of(Material.NAME_TAG, "<yellow>{player}", "<gray>id <white>{id}");
+    var values = Map.of("player", "Steve", "id", owner.toString());
 
-    var entry = InfoEntry.head(owner, "<yellow>Steve", "<gray>id <white>" + owner);
+    var entry = InfoEntry.headFrom(owner, template, values);
 
     assertEquals(Material.PLAYER_HEAD, entry.icon());
     assertEquals("<yellow>Steve", entry.name());
     assertEquals(owner, entry.headOwner());
-    assertNull(entry.headTexture());
-  }
-
-  @Test
-  void headTextureSlotTakesPrecedenceWhenBothSet() {
-    var owner = UUID.fromString("00000000-0000-0000-0000-000000000002");
-    var texture = "base64-encoded-texture";
-
-    var entry = new InfoEntry(Material.PLAYER_HEAD, "name", List.of("lore"), owner, texture);
-
-    assertEquals(owner, entry.headOwner());
-    assertEquals(texture, entry.headTexture());
   }
 
   @Test

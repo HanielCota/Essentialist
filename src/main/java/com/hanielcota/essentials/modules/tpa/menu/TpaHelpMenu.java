@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
+import com.github.hanielcota.menuframework.api.MenuFeatures;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -21,6 +22,7 @@ import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,10 @@ public final class TpaHelpMenu implements EssentialsMenu {
   // lowercase preserves both the field-as-constant convention and the EssentialsMenu interface.
   @SuppressWarnings("java:S1845")
   public static final String ID = "essentials.tpa.help";
+
+  // Refresh once per second so the outgoing-request countdown ticks down live instead of needing
+  // a close/reopen — matches TpaPendingMenu's countdown cadence.
+  private static final long REFRESH_TICKS = 20L;
 
   private final ConfigHandle<TpaConfig> config;
   private final TpaProfileService profiles;
@@ -74,8 +80,16 @@ public final class TpaHelpMenu implements EssentialsMenu {
     var helpMenu = snap.helpMenu();
     var rows = MenuLayouts.clampRows(helpMenu.rows());
     var slots = contentSlots(helpMenu, rows);
+    var countdownFeature = MenuFeatures.refreshInterval(REFRESH_TICKS);
 
-    PaginatedMenus.register(menus, ID, rows, helpMenu.title(), slots, this::buildSlots);
+    PaginatedMenus.register(
+        menus,
+        ID,
+        rows,
+        helpMenu.title(),
+        slots,
+        this::buildSlots,
+        builder -> builder.feature(countdownFeature));
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
@@ -119,8 +133,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
 
     var builder = ItemTemplate.builder(helpMenu.profileIcon());
     if (helpMenu.profileUsePlayerHead()) {
-      var playerId = player.getUniqueId();
-      builder.head(playerId);
+      PlayerHeadTextures.applyTo(builder, player);
     } else if (helpMenu.profileIcon() == Material.PLAYER_HEAD
         && !helpMenu.profileHeadTexture().isBlank()) {
       builder.head(helpMenu.profileHeadTexture());
