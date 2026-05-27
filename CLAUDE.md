@@ -245,7 +245,7 @@ cheaper than adding an unjustified second one.
 
 ## Architectural rules
 
-- **CommandFramework v3.2.1** (artifact
+- **CommandFramework v3.3.1** (artifact
   `com.github.HanielCota.CommandFramework:command-paper:${commandFrameworkVersion}`).
   Annotations live in `io.github.hanielcota.commandframework.annotation.*`,
   runtime in `…commandframework.core.*`, entry point
