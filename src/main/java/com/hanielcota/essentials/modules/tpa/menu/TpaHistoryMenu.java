@@ -62,59 +62,6 @@ public final class TpaHistoryMenu implements EssentialsMenu {
         .replace("{z}", Long.toString(Math.round(destination.z())));
   }
 
-  private static List<String> renderFilterLore(
-      @NonNull TpaMenuConfig settings,
-      @NonNull String filterLabel,
-      @Nullable TeleportRequestStatus filter) {
-    var lines = new ArrayList<String>(settings.filterLore().size() + 4);
-    for (var template : settings.filterLore()) {
-      if (template.contains("{options}")) {
-        lines.addAll(filterOptions(settings, filter));
-        continue;
-      }
-      lines.add(template.replace("{filter}", filterLabel));
-    }
-    return lines;
-  }
-
-  private static List<String> filterOptions(
-      @NonNull TpaMenuConfig settings, @Nullable TeleportRequestStatus current) {
-    var marker = settings.filterActiveMarker();
-    return List.of(
-        markActive(settings.filterAll(), marker, current == null),
-        markActive(settings.statusAccepted(), marker, current == TeleportRequestStatus.ACCEPTED),
-        markActive(settings.statusDenied(), marker, current == TeleportRequestStatus.DENIED),
-        markActive(settings.statusExpired(), marker, current == TeleportRequestStatus.EXPIRED),
-        markActive(settings.statusCancelled(), marker, current == TeleportRequestStatus.CANCELLED));
-  }
-
-  private static String markActive(@NonNull String label, @NonNull String marker, boolean active) {
-    return active ? label + marker : label;
-  }
-
-  private static List<TpaHistoryEntry> applyFilter(
-      @NonNull List<TpaHistoryEntry> entries, @Nullable TeleportRequestStatus filter) {
-    if (filter == null) {
-      return entries;
-    }
-    var filtered = new ArrayList<TpaHistoryEntry>(entries.size());
-    for (var entry : entries) {
-      if (entry.status() == filter) {
-        filtered.add(entry);
-      }
-    }
-    return filtered;
-  }
-
-  private static ItemTemplate filterTemplate(
-      @NonNull TpaMenuConfig settings, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(settings.filterIcon());
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
-  }
-
   @Override
   public @NonNull String id() {
     return ID;
@@ -161,6 +108,15 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     return builder.build();
   }
 
+  private static ItemTemplate filterTemplate(
+      @NonNull TpaMenuConfig settings, @NonNull String name, @NonNull List<String> lore) {
+    var builder = ItemTemplate.builder(settings.filterIcon());
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+    return builder.build();
+  }
+
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var snap = this.config.value();
     var settings = snap.menu();
@@ -170,7 +126,7 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     var prefetched = this.state.consumePrefetch(playerId);
     var allEntries = prefetched != null ? prefetched : this.history.list(playerId);
     var filter = this.state.filterOf(playerId);
-    var entries = applyFilter(allEntries, filter);
+    var entries = TpaHistoryFilter.apply(allEntries, filter);
 
     var slots = new ArrayList<SlotDefinition>();
 
@@ -212,7 +168,7 @@ public final class TpaHistoryMenu implements EssentialsMenu {
       @NonNull TpaMenuConfig settings, int rows, @Nullable TeleportRequestStatus filter) {
     var filterLabel = filter == null ? settings.filterAll() : settings.statusLabel(filter);
     var name = settings.filterName().replace("{filter}", filterLabel);
-    var lore = renderFilterLore(settings, filterLabel, filter);
+    var lore = TpaHistoryFilter.renderFilterLore(settings, filterLabel, filter);
     var template = filterTemplate(settings, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.filterSlot(), rows, 0);
 
