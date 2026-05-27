@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
+import com.hanielcota.essentials.modules.tpa.service.TpaSendRateLimiter;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
@@ -39,9 +40,10 @@ class TpaSendOrchestratorTest {
     var acceptHandler =
         new TpAcceptOutcomeHandler(config, new TpaRequestReplyNotifier(actors, players), notifier);
     var callbacks = new MainThreadCallbacks(new TpaTestSupport.DirectScheduler());
+    var rateLimiter = new TpaSendRateLimiter();
     var dispatcher =
         new TpaSendOrchestrator(
-            config, service, favorites, profiles, acceptHandler, callbacks, actors);
+            config, service, favorites, profiles, acceptHandler, callbacks, actors, rateLimiter);
     var requesterActor = actors.actorOf(requester);
 
     dispatcher.send(requesterActor, target, TeleportRequestType.TPA, "sent {player}");

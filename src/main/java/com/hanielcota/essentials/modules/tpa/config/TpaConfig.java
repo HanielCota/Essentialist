@@ -32,6 +32,12 @@ public record TpaConfig(
         int requestExpirySeconds,
     @Comment("How long the favorite-add prompt waits for chat input, in seconds (minimum 5).")
         int favoritePromptSeconds,
+    @Comment(
+            "Minimum seconds between two /tpa or /tpahere sends by the same player. Applies to"
+                + " every entry point (command, target action menu, hub last-contacted, favorite"
+                + " action menu) so menus cannot bypass the command's cooldown. Set to 0 to"
+                + " disable.")
+        int sendCooldownSeconds,
     TpaMessages messages,
     TpaMenuConfig menu,
     TpaHelpMenuConfig helpMenu,
@@ -53,6 +59,7 @@ public record TpaConfig(
     return new TpaConfig(
         60,
         30,
+        5,
         TpaMessages.defaults(),
         TpaMenuConfig.defaults(),
         TpaHelpMenuConfig.defaults(),
@@ -79,5 +86,10 @@ public record TpaConfig(
   /** Configured timeout for the favorite-add chat prompt, clamped to a sane minimum. */
   public Duration favoritePromptTimeout() {
     return Duration.ofSeconds(Math.max(5, favoritePromptSeconds));
+  }
+
+  /** Configured per-sender send cooldown. {@link Duration#ZERO} disables the rate limit. */
+  public Duration sendCooldown() {
+    return Duration.ofSeconds(Math.max(0, sendCooldownSeconds));
   }
 }

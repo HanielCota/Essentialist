@@ -23,6 +23,7 @@ import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
+import com.hanielcota.essentials.modules.tpa.service.TpaSendRateLimiter;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSessions;
@@ -100,6 +101,7 @@ public final class TpaRuntimeBootstrap {
       @NonNull TpaFavoriteService favorites,
       @NonNull TpaProfileService profiles,
       @NonNull TpaShared shared) {
+    var rateLimiter = new TpaSendRateLimiter();
     return new TpaSendOrchestrator(
         this.config,
         requests,
@@ -107,7 +109,8 @@ public final class TpaRuntimeBootstrap {
         profiles,
         shared.acceptHandler(),
         shared.callbacks(),
-        shared.actors());
+        shared.actors(),
+        rateLimiter);
   }
 
   public void registerQuitListener(

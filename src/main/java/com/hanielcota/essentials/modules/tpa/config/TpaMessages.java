@@ -121,7 +121,11 @@ public record TpaMessages(
     @Comment(
             "Sent to the target of an outgoing request when the requester cancelled it from the "
                 + "hub menu. Placeholders: {player}.")
-        String cancelledByRequester) {
+        String cancelledByRequester,
+    @Comment(
+            "Shown when the sender is still on the /tpa send cooldown (also rate-limits clicks on "
+                + "the target action menus). Placeholders: {seconds}.")
+        String sendCooldownActive) {
 
   public static TpaMessages defaults() {
     return new TpaMessages(
@@ -184,7 +188,8 @@ public record TpaMessages(
         "<yellow>Você recusou <white>{count}</white> pedido(s).",
         "<gold>{player}</gold> <green>foi auto-aceito (está nos seus favoritos) — teleportando…",
         "<yellow><gold>{player}</gold> trocou o destino do pedido de teleporte.",
-        "<yellow><gold>{player}</gold> cancelou o pedido de teleporte.");
+        "<yellow><gold>{player}</gold> cancelou o pedido de teleporte.",
+        "<red>Aguarde <white>{seconds}s</white> antes de enviar outro pedido de teleporte.");
   }
 
   /**

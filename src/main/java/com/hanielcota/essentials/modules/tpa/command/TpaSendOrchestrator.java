@@ -8,6 +8,7 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
+import com.hanielcota.essentials.modules.tpa.service.TpaSendRateLimiter;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
@@ -33,6 +34,7 @@ public final class TpaSendOrchestrator {
   private final TpAcceptOutcomeHandler acceptHandler;
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
+  private final TpaSendRateLimiter rateLimiter;
 
   private static void sendError(
       @NonNull CommandActor actor, @NonNull String template, @NonNull String playerName) {
@@ -53,6 +55,14 @@ public final class TpaSendOrchestrator {
 
     if (senderId.equals(targetId)) {
       requesterActor.sendError(messages.selfTarget());
+      return;
+    }
+
+    var cooldown = snap.sendCooldown();
+    if (!cooldown.isZero() && !this.rateLimiter.tryClaim(senderId, cooldown)) {
+      var seconds = this.rateLimiter.remainingSeconds(senderId, cooldown);
+      var msg = messages.sendCooldownActive().replace("{seconds}", Long.toString(seconds));
+      requesterActor.sendError(msg);
       return;
     }
 
