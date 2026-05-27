@@ -119,4 +119,63 @@ public record TpaNotifier(
 
     online.sendMessage(partnerLeftComponent);
   }
+
+  /**
+   * Tells the previous target, if online, that the requester switched to a different target —
+   * distinct from {@link #notifyPartnerLeft} which fires on disconnects.
+   */
+  public void notifyRequesterSwitched(
+      @NonNull TeleportRequest previous, @NonNull String requesterName) {
+    var targetId = previous.target().id();
+    var online = this.players.online(targetId).orElse(null);
+    if (online == null) {
+      return;
+    }
+
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var template = messages.requesterSwitchedTarget();
+    var msg = template.replace("{player}", requesterName);
+    var component = ComponentUtils.mini(msg);
+
+    online.sendMessage(component);
+  }
+
+  /**
+   * Tells the target, if online, that the requester cancelled the outgoing request from the hub
+   * menu — so the clickable prompt they may still see in chat is now stale.
+   */
+  public void notifyCancelledByRequester(@NonNull TeleportRequest request) {
+    var targetId = request.target().id();
+    var online = this.players.online(targetId).orElse(null);
+    if (online == null) {
+      return;
+    }
+
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var requesterName = request.requester().name();
+    var template = messages.cancelledByRequester();
+    var msg = template.replace("{player}", requesterName);
+    var component = ComponentUtils.mini(msg);
+
+    online.sendMessage(component);
+  }
+
+  /**
+   * Tells the target that an incoming request from a favorite was auto-accepted on their behalf —
+   * sent in place of the manual {@code acceptedSelf} line.
+   */
+  public void notifyAutoAccepted(@NonNull Player target, @NonNull String requesterName) {
+    var snap = this.config.value();
+    var messages = snap.messages();
+
+    var template = messages.autoAcceptedNotice();
+    var msg = template.replace("{player}", requesterName);
+    var component = ComponentUtils.mini(msg);
+
+    target.sendMessage(component);
+  }
 }

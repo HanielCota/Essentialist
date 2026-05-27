@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
+import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -117,7 +120,9 @@ class TpaPendingBulkActionsTest {
     var config = new TpaTestSupport.StaticConfigHandle();
     var actors = new TpaTestSupport.RecordingActorFactory();
     var replyNotifier = new TpaRequestReplyNotifier(actors, players);
-    var acceptHandler = new TpAcceptOutcomeHandler(config, replyNotifier);
+    var favorites = new TpaFavoriteService(null, NoopAsyncDatabaseWriter.INSTANCE);
+    var notifier = new TpaNotifier(config, players, profiles, favorites);
+    var acceptHandler = new TpAcceptOutcomeHandler(config, replyNotifier, notifier);
     var callbacks = new MainThreadCallbacks(new TpaTestSupport.DirectScheduler());
     var bulk =
         new TpaPendingBulkActions(config, service, acceptHandler, replyNotifier, callbacks, actors);

@@ -65,7 +65,7 @@ public final class TpaSendOrchestrator {
 
     var request = created.get();
     if (autoAccept) {
-      autoAccept(request, target);
+      autoAccept(request, target, requesterActor);
       return;
     }
 
@@ -81,10 +81,12 @@ public final class TpaSendOrchestrator {
     return this.favorites.isFavorite(targetId, senderId);
   }
 
-  private void autoAccept(@NonNull TeleportRequest request, @NonNull Player target) {
-    var targetActor = this.actors.actorOf(target);
+  private void autoAccept(
+      @NonNull TeleportRequest request,
+      @NonNull Player target,
+      @NonNull CommandActor requesterActor) {
     var claim = this.service.tryAccept(request);
-    this.acceptHandler.handleClaim(claim, request, targetActor);
+    this.acceptHandler.handleAutoClaim(claim, request, target, requesterActor);
 
     if (claim != AcceptOutcome.ACCEPTED) {
       return;
@@ -93,7 +95,7 @@ public final class TpaSendOrchestrator {
     var pending = this.service.dispatchTeleport(request);
     this.callbacks.hop(
         pending,
-        success -> this.acceptHandler.handleTeleportOutcome(success, targetActor),
+        success -> this.acceptHandler.handleTeleportOutcome(success, requesterActor),
         "tpa auto-accept");
   }
 

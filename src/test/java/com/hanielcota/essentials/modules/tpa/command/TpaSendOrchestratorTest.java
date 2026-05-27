@@ -35,8 +35,9 @@ class TpaSendOrchestratorTest {
             TpaTestSupport.contacts());
     var config = new TpaTestSupport.StaticConfigHandle();
     var actors = new TpaTestSupport.RecordingActorFactory();
+    var notifier = new TpaNotifier(config, players, profiles, favorites);
     var acceptHandler =
-        new TpAcceptOutcomeHandler(config, new TpaRequestReplyNotifier(actors, players));
+        new TpAcceptOutcomeHandler(config, new TpaRequestReplyNotifier(actors, players), notifier);
     var callbacks = new MainThreadCallbacks(new TpaTestSupport.DirectScheduler());
     var dispatcher =
         new TpaSendOrchestrator(
@@ -45,7 +46,8 @@ class TpaSendOrchestratorTest {
 
     dispatcher.send(requesterActor, target, TeleportRequestType.TPA, "sent {player}");
 
-    assertEquals(0, targetState.messages());
+    // Target gets the auto-accepted notice (one message) but no clickable prompt and no sound.
+    assertEquals(1, targetState.messages());
     assertEquals(0, targetState.sounds());
   }
 }

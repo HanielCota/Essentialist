@@ -61,12 +61,13 @@ public final class TpaRuntimeBootstrap {
     return new TpaRuntime(requestService, notifier);
   }
 
-  public TpaShared sharedHelpers(@NonNull TeleportRequestService requestService) {
+  public TpaShared sharedHelpers(
+      @NonNull TeleportRequestService requestService, @NonNull TpaNotifier notifier) {
     var actors = this.env.service(ActorFactory.class);
     var players = this.env.service(PlayerProvider.class);
     var callbacks = this.env.service(MainThreadCallbacks.class);
     var replyNotifier = new TpaRequestReplyNotifier(actors, players);
-    var acceptHandler = new TpAcceptOutcomeHandler(this.config, replyNotifier);
+    var acceptHandler = new TpAcceptOutcomeHandler(this.config, replyNotifier, notifier);
     var incomingResolver = new TpaIncomingResolver(this.config, requestService);
 
     return new TpaShared(

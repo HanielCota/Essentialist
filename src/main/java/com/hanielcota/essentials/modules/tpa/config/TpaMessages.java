@@ -105,7 +105,19 @@ public record TpaMessages(
     @Comment("Sent after the player clicks accept-all in the pending menu. Placeholder: {count}.")
         String acceptedAllMessage,
     @Comment("Sent after the player clicks deny-all in the pending menu. Placeholder: {count}.")
-        String deniedAllMessage) {
+        String deniedAllMessage,
+    @Comment(
+            "Sent to the target when the requester is in their favorites and auto-accept fired. "
+                + "Placeholders: {player}.")
+        String autoAcceptedNotice,
+    @Comment(
+            "Sent to the target of an outgoing request when the requester switched their target "
+                + "to someone else. Placeholders: {player}.")
+        String requesterSwitchedTarget,
+    @Comment(
+            "Sent to the target of an outgoing request when the requester cancelled it from the "
+                + "hub menu. Placeholders: {player}.")
+        String cancelledByRequester) {
 
   public static TpaMessages defaults() {
     return new TpaMessages(
@@ -163,7 +175,10 @@ public record TpaMessages(
         "<gold>{player}</gold> te adicionou aos favoritos.",
         "<red><gold>{player}</gold> não está aceitando pedidos vindos de outros mundos.",
         "<green>Você aceitou <white>{count}</white> pedido(s).",
-        "<yellow>Você recusou <white>{count}</white> pedido(s).");
+        "<yellow>Você recusou <white>{count}</white> pedido(s).",
+        "<gold>{player}</gold> <green>foi auto-aceito (está nos seus favoritos) — teleportando…",
+        "<yellow><gold>{player}</gold> trocou o destino do pedido de teleporte.",
+        "<yellow><gold>{player}</gold> cancelou o pedido de teleporte.");
   }
 
   /**

@@ -68,11 +68,12 @@ public final class TpaMenuBootstrap {
   public void registerHelpMenu(
       @NonNull TpaProfileService profiles,
       @NonNull TeleportRequestService requests,
+      @NonNull com.hanielcota.essentials.modules.tpa.command.TpaNotifier notifier,
       @NonNull TpaFavoriteService favorites,
       @NonNull TpaContactService contacts,
       @NonNull TpaSendOrchestrator dispatcher) {
     var actors = this.env.service(ActorFactory.class);
-    var clickHandler = new TpaHubClickHandler(this.config, requests, actors);
+    var clickHandler = new TpaHubClickHandler(this.config, requests, notifier, actors);
     var helpMenu =
         new TpaHelpMenu(this.config, profiles, requests, favorites, contacts, clickHandler);
     this.registrar.menu(helpMenu);

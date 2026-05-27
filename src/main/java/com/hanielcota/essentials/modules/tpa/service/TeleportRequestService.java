@@ -73,7 +73,7 @@ public final class TeleportRequestService {
     var requesterName = requester.getName();
 
     var existing = this.store.outgoingOf(requesterId);
-    existing.ifPresent(previous -> replacePrevious(previous, requesterId, requesterName));
+    existing.ifPresent(previous -> replacePrevious(previous, requesterName));
 
     var snap = this.config.value();
     var lifetime = snap.requestExpiry();
@@ -179,10 +179,9 @@ public final class TeleportRequestService {
     return affected;
   }
 
-  private void replacePrevious(
-      @NonNull TeleportRequest previous, @NonNull UUID requesterId, @NonNull String requesterName) {
+  private void replacePrevious(@NonNull TeleportRequest previous, @NonNull String requesterName) {
     resolve(previous, TeleportRequestStatus.CANCELLED);
-    this.notifier.notifyPartnerLeft(previous, requesterId, requesterName);
+    this.notifier.notifyRequesterSwitched(previous, requesterName);
   }
 
   /** Removes a request and writes its terminal state to history in one step. */

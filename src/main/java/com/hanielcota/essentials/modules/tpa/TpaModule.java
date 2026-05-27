@@ -35,7 +35,7 @@ public final class TpaModule extends AbstractModule {
 
     var runtimeBootstrap = new TpaRuntimeBootstrap(env, registrar, config);
     var runtime = runtimeBootstrap.requestRuntime(history, profiles, blocks, contacts, favorites);
-    var shared = runtimeBootstrap.sharedHelpers(runtime.requestService());
+    var shared = runtimeBootstrap.sharedHelpers(runtime.requestService(), runtime.notifier());
     var favoriteRuntime = runtimeBootstrap.favoriteRuntime(favorites, profiles);
     var dispatcher =
         runtimeBootstrap.sendDispatcher(runtime.requestService(), favorites, profiles, shared);
@@ -43,7 +43,7 @@ public final class TpaModule extends AbstractModule {
     var menuBootstrap = new TpaMenuBootstrap(env, registrar, config);
     var historyMenu = menuBootstrap.registerHistoryMenu(history);
     menuBootstrap.registerHelpMenu(
-        profiles, runtime.requestService(), favorites, contacts, dispatcher);
+        profiles, runtime.requestService(), runtime.notifier(), favorites, contacts, dispatcher);
 
     var pendingSelections = new TpaPendingSelections();
     var targetSelections = new TpaTargetSelections();
