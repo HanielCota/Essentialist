@@ -50,26 +50,45 @@ public final class InMemoryRequestRepository implements RequestRepository {
   /**
    * Adds a request and indexes it by requester and by target.
    *
-   * <p>If the requester already had an outgoing request indexed (caller raced or forgot to resolve
-   * it first), the prior request's row is purged from {@link #byId} and {@link #incomingByTarget}
-   * before the new index is installed — otherwise the previous request would stay reachable to the
-   * target's {@code /tpaccept} long after the indexes pointed elsewhere. The {@code
-   * outgoingByRequester} mutation goes through {@code compute} so two concurrent {@code add} calls
-   * for the same requester cannot leave a dangling index entry pointing at an already-removed
-   * request id.
+   * <p>The entire registration runs inside {@code outgoingByRequester.compute} so two concurrent
+   * {@code add} calls for the same requester serialize on the requester key. This guarantees that
+   * (a) the new request lands in {@link #byId} and {@link #incomingByTarget} at the same time it
+   * becomes the requester's outgoing, and (b) a stale previous request (left behind because the
+   * caller raced or forgot to resolve it first) is purged from {@link #byId} and {@link
+   * #incomingByTarget} before the new index is installed — otherwise the previous request would
+   * stay reachable to the target's {@code /tpaccept} long after the indexes pointed elsewhere.
    */
   public void add(@NonNull TeleportRequest request) {
     var requestId = request.id();
     var requesterId = request.requester().id();
     var targetId = request.target().id();
 
-    this.byId.put(requestId, request);
-
-    var incomingIds = this.incomingByTarget.computeIfAbsent(targetId, key -> newRequestIdSet());
-    incomingIds.add(requestId);
-
     this.outgoingByRequester.compute(
-        requesterId, (key, previousId) -> swapOutgoing(previousId, requestId));
+        requesterId,
+        (key, previousId) -> {
+          purgePrevious(previousId, requestId);
+
+          this.byId.put(requestId, request);
+
+          var incomingIds = this.incomingByTarget.computeIfAbsent(targetId, k -> newRequestIdSet());
+          incomingIds.add(requestId);
+
+          return requestId;
+        });
+  }
+
+  private void purgePrevious(RequestId previousId, @NonNull RequestId newId) {
+    if (previousId == null || previousId.equals(newId)) {
+      return;
+    }
+
+    var previous = this.byId.remove(previousId);
+    if (previous == null) {
+      return;
+    }
+
+    var previousTargetId = previous.target().id();
+    detachIncoming(previousTargetId, previousId);
   }
 
   /** Removes a request. Returns {@code false} when it was already gone. */
@@ -155,20 +174,6 @@ public final class InMemoryRequestRepository implements RequestRepository {
     }
 
     return List.copyOf(involved);
-  }
-
-  private RequestId swapOutgoing(RequestId previousId, @NonNull RequestId newId) {
-    if (previousId == null || previousId.equals(newId)) {
-      return newId;
-    }
-
-    var previous = this.byId.remove(previousId);
-    if (previous != null) {
-      var previousTargetId = previous.target().id();
-      detachIncoming(previousTargetId, previousId);
-    }
-
-    return newId;
   }
 
   private void detachIncoming(@NonNull UUID target, @NonNull RequestId id) {

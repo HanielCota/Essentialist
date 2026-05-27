@@ -9,5 +9,6 @@ package com.hanielcota.essentials.modules.tpa.domain;
 public enum AcceptOutcome {
   ACCEPTED,
   NOT_FOUND,
-  REQUESTER_OFFLINE
+  REQUESTER_OFFLINE,
+  TARGET_OFFLINE
 }

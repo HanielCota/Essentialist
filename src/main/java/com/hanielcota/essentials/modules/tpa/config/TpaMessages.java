@@ -25,6 +25,10 @@ public record TpaMessages(
     @Comment("Sent to the requester when the target denies. Placeholders: {player}.") String denied,
     @Comment("Shown when accepting but the requester has gone offline. Placeholders: {player}.")
         String requesterOffline,
+    @Comment(
+            "Shown when accepting but the target (accepter) is no longer online. Placeholders:"
+                + " {player}.")
+        String targetOffline,
     @Comment("Shown when the teleport itself fails.") String teleportFailed,
     @Comment("/tpa request line shown to the target. Placeholders: {player}, {seconds}.")
         String requestReceived,
@@ -114,6 +118,7 @@ public record TpaMessages(
         "<green><gold>{player}</gold> aceitou seu pedido de teleporte.",
         "<red><gold>{player}</gold> recusou seu pedido de teleporte.",
         "<red><gold>{player}</gold> está offline — o pedido foi cancelado.",
+        "<red><gold>{player}</gold> não está mais online — o pedido foi cancelado.",
         "<red>O teleporte não pôde ser concluído.",
         "<gold>{player}</gold> <yellow>quer se teleportar até você. <gray>(expira em {seconds}s)",
         "<gold>{player}</gold> <yellow>quer que você se teleporte até ele. "
