@@ -106,6 +106,10 @@ public final class HomeService implements HomesApi {
     return this.repository.updatePinned(owner, name, pinned);
   }
 
+  public boolean recordUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
+    return this.repository.bumpUsage(owner, name, timestampMs);
+  }
+
   public enum CreateResult {
     CREATED,
     ALREADY_EXISTS,

@@ -15,7 +15,9 @@ public record HomeMenuPlaceholders(
     String direction,
     String createdDate,
     String createdTime,
-    String createdAt) {
+    String createdAt,
+    String count,
+    String lastUsed) {
 
   private static final String[] DIRECTIONS = {
     "Sul", "Sudoeste", "Oeste", "Noroeste", "Norte", "Nordeste", "Leste", "Sudeste"
@@ -28,6 +30,8 @@ public record HomeMenuPlaceholders(
       double z,
       float yaw,
       long createdAt,
+      long teleportCount,
+      long lastUsedAt,
       @NonNull HomesMenuConfig settings) {
     var instant = Instant.ofEpochMilli(createdAt);
     var zone = ZoneId.systemDefault();
@@ -40,6 +44,9 @@ public record HomeMenuPlaceholders(
     var timestamp = date + " " + time;
     var displayWorld = displayWorld(world, settings);
 
+    var countStr = Long.toString(teleportCount);
+    var lastUsedStr = formatLastUsed(lastUsedAt, settings);
+
     return new HomeMenuPlaceholders(
         displayWorld,
         Numbers.display(x),
@@ -48,7 +55,22 @@ public record HomeMenuPlaceholders(
         directionOf(yaw),
         date,
         time,
-        timestamp);
+        timestamp,
+        countStr,
+        lastUsedStr);
+  }
+
+  private static String formatLastUsed(long lastUsedAt, @NonNull HomesMenuConfig settings) {
+    if (lastUsedAt <= 0) {
+      return settings.lastUsedNever();
+    }
+
+    var instant = Instant.ofEpochMilli(lastUsedAt);
+    var zone = ZoneId.systemDefault();
+    var moment = LocalDateTime.ofInstant(instant, zone);
+    var dateFormatter = settings.createdDateFormatter();
+    var timeFormatter = settings.createdTimeFormatter();
+    return dateFormatter.format(moment) + " " + timeFormatter.format(moment);
   }
 
   private static String directionOf(float yaw) {

@@ -17,7 +17,7 @@ class HomeMenuPlaceholdersTest {
     var moment = LocalDateTime.of(2026, 5, 25, 15, 42);
     var millis = moment.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-    var placeholders = HomeMenuPlaceholders.of("world", 10, 64, -20, 0, millis, settings);
+    var placeholders = HomeMenuPlaceholders.of("world", 10, 64, -20, 0, millis, 0L, 0L, settings);
 
     assertEquals("25/05/2026", placeholders.createdDate());
     assertEquals("15:42", placeholders.createdTime());
@@ -29,15 +29,20 @@ class HomeMenuPlaceholdersTest {
     var settings = HomesMenuConfig.defaults();
     var millis = System.currentTimeMillis();
 
-    assertEquals("Sul", HomeMenuPlaceholders.of("world", 0, 0, 0, 0, millis, settings).direction());
     assertEquals(
-        "Oeste", HomeMenuPlaceholders.of("world", 0, 0, 0, 90, millis, settings).direction());
+        "Sul", HomeMenuPlaceholders.of("world", 0, 0, 0, 0, millis, 0L, 0L, settings).direction());
     assertEquals(
-        "Norte", HomeMenuPlaceholders.of("world", 0, 0, 0, 180, millis, settings).direction());
+        "Oeste",
+        HomeMenuPlaceholders.of("world", 0, 0, 0, 90, millis, 0L, 0L, settings).direction());
     assertEquals(
-        "Leste", HomeMenuPlaceholders.of("world", 0, 0, 0, -90, millis, settings).direction());
+        "Norte",
+        HomeMenuPlaceholders.of("world", 0, 0, 0, 180, millis, 0L, 0L, settings).direction());
     assertEquals(
-        "Sudoeste", HomeMenuPlaceholders.of("world", 0, 0, 0, 45, millis, settings).direction());
+        "Leste",
+        HomeMenuPlaceholders.of("world", 0, 0, 0, -90, millis, 0L, 0L, settings).direction());
+    assertEquals(
+        "Sudoeste",
+        HomeMenuPlaceholders.of("world", 0, 0, 0, 45, millis, 0L, 0L, settings).direction());
   }
 
   @Test
@@ -45,7 +50,7 @@ class HomeMenuPlaceholdersTest {
     var settings = settingsWithWorldNames(Map.of("world", "spawn"));
     var millis = System.currentTimeMillis();
 
-    var placeholders = HomeMenuPlaceholders.of("World", 0, 0, 0, 0, millis, settings);
+    var placeholders = HomeMenuPlaceholders.of("World", 0, 0, 0, 0, millis, 0L, 0L, settings);
 
     assertEquals("spawn", placeholders.world());
   }
@@ -55,7 +60,7 @@ class HomeMenuPlaceholdersTest {
     var settings = HomesMenuConfig.defaults();
     var millis = System.currentTimeMillis();
 
-    var placeholders = HomeMenuPlaceholders.of("arena", 0, 0, 0, 0, millis, settings);
+    var placeholders = HomeMenuPlaceholders.of("arena", 0, 0, 0, 0, millis, 0L, 0L, settings);
 
     assertEquals("arena", placeholders.world());
   }

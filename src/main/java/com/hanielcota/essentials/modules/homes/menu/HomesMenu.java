@@ -14,9 +14,14 @@ import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuSection;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.create.HomeCreateOrchestrator;
+import com.hanielcota.essentials.modules.homes.domain.Home;
+import com.hanielcota.essentials.modules.homes.domain.HomeOrdering;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
+import com.hanielcota.essentials.modules.homes.menu.presentation.HomesSortRenderer;
+import com.hanielcota.essentials.modules.homes.service.HomeOrderingPreferences;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +38,8 @@ public final class HomesMenu implements EssentialsMenu {
   private final HomeClickHandler clickHandler;
   private final HomesMenuState state;
   private final HomeCreateOrchestrator create;
+  private final HomeOrderingPreferences orderings;
+  private final HomesSortRenderer sortRenderer = new HomesSortRenderer();
 
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMenuConfig menuSpec) {
     var infoMaterial = menuSpec.infoMaterial();
@@ -48,6 +55,19 @@ public final class HomesMenu implements EssentialsMenu {
     var createLore = menuSpec.createLore();
 
     return MenuTemplates.simple(createMaterial, createName, createLore);
+  }
+
+  private static Comparator<Home> comparator(@NonNull HomeOrdering ordering) {
+    var byName = Comparator.comparing(Home::name, String.CASE_INSENSITIVE_ORDER);
+    var secondary =
+        switch (ordering) {
+          case NAME -> byName;
+          case MOST_USED ->
+              Comparator.comparingLong(Home::teleportCount).reversed().thenComparing(byName);
+          case RECENT ->
+              Comparator.comparingLong(Home::lastUsedAt).reversed().thenComparing(byName);
+        };
+    return Comparator.comparing(Home::pinned).reversed().thenComparing(secondary);
   }
 
   @Override
@@ -87,20 +107,31 @@ public final class HomesMenu implements EssentialsMenu {
     this.create.prompt(click.player());
   }
 
+  private void onSortClicked(@NonNull ClickContext click) {
+    var uuid = click.player().getUniqueId();
+    this.orderings.cycle(uuid);
+    click.refresh();
+  }
+
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var uuid = player.getUniqueId();
     var prefetched = this.state.consumePrefetch(uuid);
     var entries = prefetched != null ? prefetched : this.service.homesOf(uuid);
 
-    var slots = new ArrayList<SlotDefinition>(entries.size() + 1);
+    var ordering = this.orderings.of(uuid);
+    var sorted = new ArrayList<>(entries);
+    sorted.sort(comparator(ordering));
+
+    var slots = new ArrayList<SlotDefinition>(sorted.size() + 2);
 
     var infoSlot = perViewerInfoSlot(player);
     if (infoSlot != null) {
       slots.add(infoSlot);
     }
 
-    for (var i = 0; i < entries.size(); i++) {
-      var home = entries.get(i);
+    slots.add(sortSlot(ordering));
+
+    for (var home : sorted) {
       var template = this.renderer.render(home);
       ClickHandler onClick = click -> this.clickHandler.handle(click, home);
       var slot = SlotDefinition.of(-1, template, onClick);
@@ -128,5 +159,13 @@ public final class HomesMenu implements EssentialsMenu {
     builder.italic(false);
 
     return SlotDefinition.of(infoSlot, builder.build(), click -> {});
+  }
+
+  private SlotDefinition sortSlot(@NonNull HomeOrdering ordering) {
+    var menuSpec = this.config.value().menu();
+    var template = this.sortRenderer.sortTemplate(menuSpec, ordering);
+    var safeSlot = HomesMainMenuSection.sortSlot(menuSpec);
+
+    return SlotDefinition.of(safeSlot, template, this::onSortClicked);
   }
 }

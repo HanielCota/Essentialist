@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.homes.listener;
 import com.hanielcota.essentials.modules.homes.create.HomeCreateSessions;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameSessions;
+import com.hanielcota.essentials.modules.homes.service.HomeOrderingPreferences;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
@@ -19,6 +20,7 @@ public final class HomesSessionCleanupListener implements Listener {
   private final HomesActionTarget actionTarget;
   private final HomeRenameSessions renameSessions;
   private final HomeCreateSessions createSessions;
+  private final HomeOrderingPreferences orderingPreferences;
 
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
@@ -27,5 +29,6 @@ public final class HomesSessionCleanupListener implements Listener {
     this.actionTarget.clear(uuid);
     this.renameSessions.cancel(uuid);
     this.createSessions.cancel(uuid);
+    this.orderingPreferences.clear(uuid);
   }
 }

@@ -19,13 +19,16 @@ public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) {
     var z = home.z();
     var yaw = home.yaw();
     var createdAt = home.createdAt();
+    var teleportCount = home.teleportCount();
+    var lastUsedAt = home.lastUsedAt();
 
     var homeName = home.name();
     var material = home.material();
     var displayName = home.pinned() ? menu.pinnedNamePrefix() + homeName : homeName;
 
     var name = HomesMainMenuSection.itemName(menu, displayName);
-    var placeholders = HomeMenuPlaceholders.of(world, x, y, z, yaw, createdAt, menu);
+    var placeholders =
+        HomeMenuPlaceholders.of(world, x, y, z, yaw, createdAt, teleportCount, lastUsedAt, menu);
     var lore = HomesMainMenuSection.itemLore(menu, placeholders);
     var glow = menu.itemGlow() || home.pinned();
 

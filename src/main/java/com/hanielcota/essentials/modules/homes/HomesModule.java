@@ -47,6 +47,7 @@ import com.hanielcota.essentials.modules.homes.service.HomeLimitReachedMessageRe
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeNameResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeNameValidator;
+import com.hanielcota.essentials.modules.homes.service.HomeOrderingPreferences;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
 import com.hanielcota.essentials.modules.homes.service.MissingHomeMessageResolver;
@@ -106,9 +107,10 @@ public final class HomesModule extends AbstractModule {
     var actionTarget = new HomesActionTarget();
     var renameSessions = new HomeRenameSessions();
     var createSessions = new HomeCreateSessions();
+    var orderingPreferences = new HomeOrderingPreferences();
     var nameValidator = new HomeNameValidator();
     var nameResolver = new HomeNameResolver(nameValidator);
-    var teleporter = new HomeTeleporter(config, delayed);
+    var teleporter = new HomeTeleporter(config, delayed, homeService);
     var renameTimer = new HomeRenameTimer(scheduler);
     var renameNotifier = new HomeRenameNotifier(config);
     var rename =
@@ -135,7 +137,8 @@ public final class HomesModule extends AbstractModule {
             limitReachedResolver);
 
     registrar.listener(
-        new HomesSessionCleanupListener(actionTarget, renameSessions, createSessions));
+        new HomesSessionCleanupListener(
+            actionTarget, renameSessions, createSessions, orderingPreferences));
     registrar.listener(new HomeRenameChatListener(rename, renameSessions));
     registrar.listener(new HomeCreateChatListener(create, createSessions));
 
@@ -143,7 +146,9 @@ public final class HomesModule extends AbstractModule {
     var menuState = new HomesMenuState();
     var renderer = new HomeEntryRenderer(config);
     var clickHandler = new HomeClickHandler(teleporter, actors, actionTarget);
-    registrar.menu(new HomesMenu(config, homeService, renderer, clickHandler, menuState, create));
+    registrar.menu(
+        new HomesMenu(
+            config, homeService, renderer, clickHandler, menuState, create, orderingPreferences));
 
     var optionsClicks =
         new HomeOptionsClickHandler(actionTarget, homeService, teleporter, rename, actors);

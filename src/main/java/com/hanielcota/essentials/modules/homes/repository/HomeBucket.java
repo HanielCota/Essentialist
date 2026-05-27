@@ -95,4 +95,12 @@ final class HomeBucket {
     var updated = this.homes.computeIfPresent(homeKey, (k, current) -> current.withPinned(pinned));
     return Optional.ofNullable(updated);
   }
+
+  Optional<Home> bumpUsage(@NonNull String name, long timestampMs) {
+    var homeKey = key(name);
+
+    var updated =
+        this.homes.computeIfPresent(homeKey, (k, current) -> current.withUsageBump(timestampMs));
+    return Optional.ofNullable(updated);
+  }
 }

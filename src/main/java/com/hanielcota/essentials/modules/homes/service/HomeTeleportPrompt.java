@@ -26,6 +26,7 @@ public final class HomeTeleportPrompt implements DelayedTeleport.Callback {
   private final String failed;
   private final String cancelButton;
   private final String cancelHover;
+  private final Runnable onSuccessHook;
 
   @Override
   public void onScheduled(long seconds) {
@@ -51,6 +52,7 @@ public final class HomeTeleportPrompt implements DelayedTeleport.Callback {
   @Override
   public void onSuccess() {
     this.actor.sendSuccess(this.teleported);
+    this.onSuccessHook.run();
   }
 
   @Override

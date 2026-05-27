@@ -24,7 +24,9 @@ public record Home(
     float pitch,
     Material material,
     long createdAt,
-    boolean pinned) {
+    boolean pinned,
+    long teleportCount,
+    long lastUsedAt) {
 
   public static Home of(
       @NonNull UUID owner,
@@ -42,7 +44,8 @@ public record Home(
 
     var createdAt = System.currentTimeMillis();
 
-    return new Home(owner, name, worldName, x, y, z, yaw, pitch, material, createdAt, false);
+    return new Home(
+        owner, name, worldName, x, y, z, yaw, pitch, material, createdAt, false, 0L, 0L);
   }
 
   public Home withName(@NonNull String newName) {
@@ -57,7 +60,9 @@ public record Home(
         this.pitch,
         this.material,
         this.createdAt,
-        this.pinned);
+        this.pinned,
+        this.teleportCount,
+        this.lastUsedAt);
   }
 
   public Home withMaterial(@NonNull Material newMaterial) {
@@ -72,7 +77,9 @@ public record Home(
         this.pitch,
         newMaterial,
         this.createdAt,
-        this.pinned);
+        this.pinned,
+        this.teleportCount,
+        this.lastUsedAt);
   }
 
   public Home withPinned(boolean newPinned) {
@@ -87,7 +94,26 @@ public record Home(
         this.pitch,
         this.material,
         this.createdAt,
-        newPinned);
+        newPinned,
+        this.teleportCount,
+        this.lastUsedAt);
+  }
+
+  public Home withUsageBump(long timestampMs) {
+    return new Home(
+        this.owner,
+        this.name,
+        this.world,
+        this.x,
+        this.y,
+        this.z,
+        this.yaw,
+        this.pitch,
+        this.material,
+        this.createdAt,
+        this.pinned,
+        this.teleportCount + 1,
+        timestampMs);
   }
 
   public Optional<Location> resolve() {

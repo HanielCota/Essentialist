@@ -54,7 +54,7 @@ class HomesApiAdapterTest {
   }
 
   private static Home home(@NonNull UUID owner, @NonNull String name) {
-    return new Home(owner, name, "world", 0, 64, 0, 0, 0, Material.RED_BED, 0L, false);
+    return new Home(owner, name, "world", 0, 64, 0, 0, 0, Material.RED_BED, 0L, false, 0L, 0L);
   }
 
   private static final class InMemoryHomeRepository implements HomeRepository {
@@ -105,6 +105,11 @@ class HomesApiAdapterTest {
 
     @Override
     public boolean updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
+      return false;
+    }
+
+    @Override
+    public boolean bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
       return false;
     }
   }

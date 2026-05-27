@@ -21,12 +21,14 @@ public final class HomeTeleporter {
 
   private final ConfigHandle<HomesConfig> config;
   private final DelayedTeleport delayed;
+  private final HomeService service;
 
   private static HomeTeleportPrompt buildPrompt(
       @NonNull Player player,
       @NonNull CommandActor actor,
       @NonNull HomesMessages messages,
-      @NonNull Home home) {
+      @NonNull Home home,
+      @NonNull Runnable onSuccess) {
 
     var homeName = home.name();
 
@@ -49,7 +51,8 @@ public final class HomeTeleporter {
         cancelledMsg,
         failedMsg,
         cancelButton,
-        cancelHover);
+        cancelHover,
+        onSuccess);
   }
 
   public void teleport(@NonNull Player player, @NonNull Home home, @NonNull CommandActor actor) {
@@ -63,7 +66,11 @@ public final class HomeTeleporter {
     }
 
     var delay = snap.teleportDelay();
-    var prompt = buildPrompt(player, actor, messages, home);
+    var ownerId = home.owner();
+    var homeName = home.name();
+    Runnable onSuccess =
+        () -> this.service.recordUsage(ownerId, homeName, System.currentTimeMillis());
+    var prompt = buildPrompt(player, actor, messages, home, onSuccess);
 
     this.delayed.schedule(player, resolved, delay, prompt);
   }

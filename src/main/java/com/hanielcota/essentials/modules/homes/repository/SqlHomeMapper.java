@@ -27,7 +27,22 @@ final class SqlHomeMapper {
     var material = HomeMaterials.parseIcon(rs.getString("material"));
     var createdAt = rs.getLong("created_at");
     var pinned = rs.getInt("pinned") != 0;
+    var teleportCount = rs.getLong("teleport_count");
+    var lastUsedAt = rs.getLong("last_used_at");
 
-    return new Home(ownerId, name, world, x, y, z, yaw, pitch, material, createdAt, pinned);
+    return new Home(
+        ownerId,
+        name,
+        world,
+        x,
+        y,
+        z,
+        yaw,
+        pitch,
+        material,
+        createdAt,
+        pinned,
+        teleportCount,
+        lastUsedAt);
   }
 }

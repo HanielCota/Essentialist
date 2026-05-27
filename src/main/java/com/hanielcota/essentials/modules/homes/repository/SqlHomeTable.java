@@ -27,15 +27,23 @@ public final class SqlHomeTable extends SqlTable {
       UPDATE homes SET pinned = ? WHERE player_id = ? AND name = ?\
       """;
 
+  static final String BUMP_USAGE =
+      """
+      UPDATE homes SET teleport_count = teleport_count + 1, last_used_at = ? \
+      WHERE player_id = ? AND name = ?\
+      """;
+
   static final String SELECT_ONE =
       """
-      SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at, pinned \
+      SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at, pinned, \
+      teleport_count, last_used_at \
       FROM homes WHERE player_id = ? AND name = ?\
       """;
 
   static final String SELECT_ALL =
       """
-      SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at, pinned \
+      SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at, pinned, \
+      teleport_count, last_used_at \
       FROM homes WHERE player_id = ? ORDER BY name\
       """;
 
@@ -52,6 +60,16 @@ public final class SqlHomeTable extends SqlTable {
   private static final String ADD_PINNED_COLUMN =
       """
       ALTER TABLE homes ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0\
+      """;
+
+  private static final String ADD_TELEPORT_COUNT_COLUMN =
+      """
+      ALTER TABLE homes ADD COLUMN teleport_count INTEGER NOT NULL DEFAULT 0\
+      """;
+
+  private static final String ADD_LAST_USED_AT_COLUMN =
+      """
+      ALTER TABLE homes ADD COLUMN last_used_at INTEGER NOT NULL DEFAULT 0\
       """;
 
   private final String columnExistsQuery;
@@ -71,7 +89,9 @@ public final class SqlHomeTable extends SqlTable {
         "pitch",
         "material",
         "created_at",
-        "pinned");
+        "pinned",
+        "teleport_count",
+        "last_used_at");
     this.columnExistsQuery = dialect.columnExistsQuery();
   }
 
@@ -91,6 +111,8 @@ public final class SqlHomeTable extends SqlTable {
         + "  material TEXT NOT NULL DEFAULT 'RED_BED',\n"
         + "  created_at INTEGER NOT NULL,\n"
         + "  pinned INTEGER NOT NULL DEFAULT 0,\n"
+        + "  teleport_count INTEGER NOT NULL DEFAULT 0,\n"
+        + "  last_used_at INTEGER NOT NULL DEFAULT 0,\n"
         + "  PRIMARY KEY (player_id, name)\n"
         + ")";
   }
@@ -100,6 +122,8 @@ public final class SqlHomeTable extends SqlTable {
     super.install(sqlExecutor);
     migrateColumn(sqlExecutor, "material", ADD_MATERIAL_COLUMN);
     migrateColumn(sqlExecutor, "pinned", ADD_PINNED_COLUMN);
+    migrateColumn(sqlExecutor, "teleport_count", ADD_TELEPORT_COUNT_COLUMN);
+    migrateColumn(sqlExecutor, "last_used_at", ADD_LAST_USED_AT_COLUMN);
   }
 
   private void migrateColumn(

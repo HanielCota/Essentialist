@@ -117,7 +117,25 @@ public record HomesMenuConfig(
     @Comment(
             "Prefix added to the home name in /homes when it is pinned. Empty to disable the "
                 + "marker.")
-        String pinnedNamePrefix) {
+        String pinnedNamePrefix,
+    @Comment("Slot of the sort-cycle button on every /homes page.") int sortSlot,
+    @Comment("Material of the sort button.") Material sortMaterial,
+    @Comment("Name of the sort button. Placeholder: {state}.") String sortName,
+    @Comment(
+            "Lore of the sort button. Use {state} for the current label and {options} to expand"
+                + " the full list of sort states with the active one marked.")
+        List<String> sortLore,
+    @Comment("Label used in {state} when sorting alphabetically.") String sortLabelName,
+    @Comment("Label used in {state} when sorting by most teleports.") String sortLabelMostUsed,
+    @Comment("Label used in {state} when sorting by most recent teleport.") String sortLabelRecent,
+    @Comment("Suffix appended to the active option in the {options} expansion.")
+        String sortActiveMarker,
+    @Comment(
+            "Suffix appended to the home lore showing usage stats. Empty to disable. "
+                + "Placeholders: {count}, {last_used}, {created_at}.")
+        List<String> usageLore,
+    @Comment("Label shown for {last_used} when the home has never been teleported to.")
+        String lastUsedNever) {
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
@@ -227,7 +245,23 @@ public record HomesMenuConfig(
         Material.NETHER_STAR,
         "<gold>★ Desfixar",
         List.of("<gray>Remove o destaque de <gold>{name}</gold>."),
-        "<gold>★ ");
+        "<gold>★ ",
+        8,
+        Material.HOPPER,
+        "<gold>Ordenar: <yellow>{state}",
+        List.of(
+            "<gray>Ordena suas homes na lista.",
+            "",
+            "{options}",
+            "",
+            "<yellow>Clique para alternar."),
+        "Alfabético",
+        "Mais usadas",
+        "Recentes",
+        " <green>✓",
+        List.of(
+            "", "<dark_gray>Teleportes: <gray>{count}", "<dark_gray>Último uso: <gray>{last_used}"),
+        "nunca");
   }
 
   private static Map<MaterialCategory, String> defaultCategoryNames() {

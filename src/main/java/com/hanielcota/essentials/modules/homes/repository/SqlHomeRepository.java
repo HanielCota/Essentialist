@@ -71,6 +71,8 @@ public final class SqlHomeRepository implements HomeRepository {
 
     var createdAt = home.createdAt();
     var pinned = home.pinned() ? 1 : 0;
+    var teleportCount = home.teleportCount();
+    var lastUsedAt = home.lastUsedAt();
 
     this.sqlExecutor.update(
         this.table.upsert(),
@@ -84,7 +86,9 @@ public final class SqlHomeRepository implements HomeRepository {
         pitch,
         materialStr,
         createdAt,
-        pinned);
+        pinned,
+        teleportCount,
+        lastUsedAt);
   }
 
   @Override
@@ -135,6 +139,16 @@ public final class SqlHomeRepository implements HomeRepository {
 
     var rowsAffected =
         this.sqlExecutor.updateCount(SqlHomeTable.UPDATE_PINNED, pinnedFlag, ownerStr, name);
+
+    return rowsAffected > 0;
+  }
+
+  @Override
+  public boolean bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
+    var ownerStr = owner.toString();
+
+    var rowsAffected =
+        this.sqlExecutor.updateCount(SqlHomeTable.BUMP_USAGE, timestampMs, ownerStr, name);
 
     return rowsAffected > 0;
   }

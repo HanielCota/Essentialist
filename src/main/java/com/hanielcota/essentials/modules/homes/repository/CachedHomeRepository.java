@@ -137,6 +137,20 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   }
 
   @Override
+  public boolean bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
+    var updated = this.cache.bumpUsage(owner, name, timestampMs);
+
+    if (updated.isEmpty()) {
+      return false;
+    }
+
+    Runnable persist = () -> this.delegate.bumpUsage(owner, name, timestampMs);
+    this.writer.submit("bump home usage", persist);
+
+    return true;
+  }
+
+  @Override
   public void close() {
     this.writer.close();
   }
