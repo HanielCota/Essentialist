@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.whitelist.config.WhitelistConfig;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -22,7 +23,7 @@ public record WhitelistEntryRenderer(ConfigHandle<WhitelistConfig> config) {
     var loreArray = lore.toArray(String[]::new);
 
     var builder = ItemTemplate.builder(Material.PLAYER_HEAD);
-    builder = builder.head(ownerId);
+    PlayerHeadTextures.applyTo(builder, ownerId);
     builder = builder.name(itemName);
     builder = builder.lore(loreArray);
     builder = builder.italic(false);

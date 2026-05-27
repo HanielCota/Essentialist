@@ -6,6 +6,7 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.Destination;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.shared.Numbers;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -90,7 +91,7 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
     var glow = settings.itemGlow();
 
     var builder = ItemTemplate.builder(Material.PLAYER_HEAD);
-    builder.head(targetId);
+    PlayerHeadTextures.applyTo(builder, targetId);
     builder.name(itemName);
     builder.lore(lore);
     builder.glow(glow);

@@ -6,6 +6,7 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.shared.Placeholders;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -169,7 +170,8 @@ public final class TpaHelpMenuRenderer {
       return;
     }
     if (helpMenu.outgoingUsePlayerHead()) {
-      builder.head(request.target().id());
+      var targetId = request.target().id();
+      PlayerHeadTextures.applyTo(builder, targetId);
       return;
     }
     if (!helpMenu.outgoingHeadTexture().isBlank()) {

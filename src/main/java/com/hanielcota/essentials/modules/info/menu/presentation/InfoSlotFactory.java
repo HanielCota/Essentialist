@@ -6,6 +6,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.modules.info.menu.InfoTab;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.util.List;
 import java.util.function.BiConsumer;
 import lombok.AccessLevel;
@@ -21,7 +22,6 @@ final class InfoSlotFactory {
     var name = entry.name();
     var lore = entry.lore();
     var loreArray = lore.toArray(String[]::new);
-    var headTexture = entry.headTexture();
     var headOwner = entry.headOwner();
 
     var builder = ItemTemplate.builder(icon);
@@ -29,10 +29,8 @@ final class InfoSlotFactory {
     builder = builder.lore(loreArray);
     builder = builder.italic(false);
 
-    if (headTexture != null) {
-      builder = builder.head(headTexture);
-    } else if (headOwner != null) {
-      builder = builder.head(headOwner);
+    if (headOwner != null) {
+      PlayerHeadTextures.applyTo(builder, headOwner);
     }
 
     var template = builder.build();

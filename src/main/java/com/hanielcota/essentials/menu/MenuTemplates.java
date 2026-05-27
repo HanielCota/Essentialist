@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.menu;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -28,7 +29,7 @@ public final class MenuTemplates {
       return;
     }
     if (useSkin) {
-      builder.head(playerId);
+      PlayerHeadTextures.applyTo(builder, playerId);
       return;
     }
     if (!headTexture.isBlank()) {
