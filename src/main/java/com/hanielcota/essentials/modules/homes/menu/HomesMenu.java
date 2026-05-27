@@ -20,6 +20,7 @@ import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRender
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomesSortRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeOrderingPreferences;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -153,7 +154,7 @@ public final class HomesMenu implements EssentialsMenu {
 
     var infoSlot = HomesMainMenuSection.infoSlot(menuSpec);
     var builder = ItemTemplate.builder(menuSpec.infoMaterial());
-    builder.head(player.getUniqueId());
+    PlayerHeadTextures.applyTo(builder, player);
     builder.name(menuSpec.infoName());
     builder.lore(menuSpec.infoLore().toArray(String[]::new));
     builder.italic(false);
