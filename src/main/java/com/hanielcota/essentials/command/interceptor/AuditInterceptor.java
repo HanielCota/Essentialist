@@ -1,7 +1,9 @@
 package com.hanielcota.essentials.command.interceptor;
 
+import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandContext;
 import io.github.hanielcota.commandframework.core.CommandResult;
+import io.github.hanielcota.commandframework.core.CommandRoute;
 import io.github.hanielcota.commandframework.core.ParsedParameter;
 import io.github.hanielcota.commandframework.core.RichCommandInterceptor;
 import java.util.List;
@@ -42,32 +44,48 @@ public final class AuditInterceptor implements RichCommandInterceptor {
     var actor = commandActor.name();
 
     var route = context.route();
-    var pathTokens = route.path();
-    var routePath = String.join(" ", pathTokens);
+    var displayPath = displayPathOf(route);
 
-    if (parameters.isEmpty()) {
+    var args = joinUserParameters(parameters);
+
+    if (args.isEmpty()) {
       var template = "[CMD] %s executed /%s";
-      var messageWithoutArgs = template.formatted(actor, routePath);
+      var messageWithoutArgs = template.formatted(actor, displayPath);
       this.logger.info(messageWithoutArgs);
 
       return CommandResult.success();
     }
 
-    var joiner = new StringJoiner(", ");
-    for (var parameter : parameters) {
-      var rawValue = parameter.value();
-      var simplifiedStr = simplifyValue(rawValue);
-
-      joiner.add(simplifiedStr);
-    }
-
-    var args = joiner.toString();
-
     var template = "[CMD] %s executed /%s with parameters: [%s]";
-    var messageWithArgs = template.formatted(actor, routePath, args);
+    var messageWithArgs = template.formatted(actor, displayPath, args);
     this.logger.info(messageWithArgs);
 
     return CommandResult.success();
+  }
+
+  private static String displayPathOf(@NonNull CommandRoute route) {
+    var root = route.root();
+    var pathTokens = route.path();
+    if (pathTokens.isEmpty()) {
+      return root;
+    }
+    var subPath = String.join(" ", pathTokens);
+    return root + " " + subPath;
+  }
+
+  // Skip the auto-injected CommandActor parameter — it's redundant with the actor name already on
+  // the log line. Any other parameter (positional args, flags) keeps its simplified value.
+  private String joinUserParameters(@NonNull List<ParsedParameter<?>> parameters) {
+    var joiner = new StringJoiner(", ");
+    for (var parameter : parameters) {
+      var rawValue = parameter.value();
+      if (rawValue instanceof CommandActor) {
+        continue;
+      }
+      var simplifiedStr = simplifyValue(rawValue);
+      joiner.add(simplifiedStr);
+    }
+    return joiner.toString();
   }
 
   private String simplifyValue(Object value) {
