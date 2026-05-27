@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaPickPlayerFilter;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.ArrayList;
 import java.util.HashSet;

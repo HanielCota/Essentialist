@@ -1,9 +1,9 @@
-package com.hanielcota.essentials.modules.tpa.command;
+package com.hanielcota.essentials.modules.tpa.command.favorites;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSessions;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;

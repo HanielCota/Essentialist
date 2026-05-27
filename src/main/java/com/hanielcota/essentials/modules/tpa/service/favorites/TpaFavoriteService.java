@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.service;
+package com.hanielcota.essentials.modules.tpa.service.favorites;
 
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;

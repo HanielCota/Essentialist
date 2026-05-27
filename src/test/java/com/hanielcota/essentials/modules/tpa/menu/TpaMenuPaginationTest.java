@@ -6,6 +6,7 @@ import com.hanielcota.essentials.modules.tpa.config.menu.TpaBlockedMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaHelpMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

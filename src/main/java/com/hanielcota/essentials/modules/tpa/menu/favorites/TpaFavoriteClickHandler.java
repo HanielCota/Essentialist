@@ -1,13 +1,13 @@
-package com.hanielcota.essentials.modules.tpa.menu;
+package com.hanielcota.essentials.modules.tpa.menu.favorites;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
-import com.hanielcota.essentials.modules.tpa.command.TpaFavoriteAddNotifier;
-import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
+import com.hanielcota.essentials.modules.tpa.command.favorites.TpaFavoriteAddNotifier;
+import com.hanielcota.essentials.modules.tpa.command.favorites.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSelections;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

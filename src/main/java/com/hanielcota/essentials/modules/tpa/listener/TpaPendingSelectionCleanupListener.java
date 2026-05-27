@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.tpa.listener;
 
 import com.github.hanielcota.menuframework.api.MenuService;
-import com.hanielcota.essentials.modules.tpa.menu.TpaPendingActionMenu;
-import com.hanielcota.essentials.modules.tpa.menu.TpaPendingMenu;
+import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingActionMenu;
+import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
 import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
 import java.util.Set;
 import lombok.NonNull;

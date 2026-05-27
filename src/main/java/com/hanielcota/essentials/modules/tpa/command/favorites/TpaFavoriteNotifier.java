@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.command;
+package com.hanielcota.essentials.modules.tpa.command.favorites;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;

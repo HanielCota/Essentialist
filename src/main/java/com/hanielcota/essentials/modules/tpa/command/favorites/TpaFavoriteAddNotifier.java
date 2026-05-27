@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.command;
+package com.hanielcota.essentials.modules.tpa.command.favorites;
 
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
  * notifyWhenFavorited} preference and skipped silently if the target is offline.
  *
  * <p>Centralises the opt-in check so every entry point that calls {@link
- * com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService#add} can plug into the same
- * behaviour: chat prompt, contact-suggestion click and pick-player action menu.
+ * com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService#add} can plug into the
+ * same behaviour: chat prompt, contact-suggestion click and pick-player action menu.
  */
 @RequiredArgsConstructor
 public final class TpaFavoriteAddNotifier {

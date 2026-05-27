@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.listener;
 
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSelections;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSessions;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
