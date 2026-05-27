@@ -24,7 +24,6 @@ public final class CommandBootstrap {
 
   private final @NonNull JavaPlugin plugin;
 
-  // Tab-completes enchantment names (without the `minecraft:` namespace) by prefix.
   private static SuggestionProvider<Enchantment> enchantmentSuggestions() {
     return context -> {
       var currentInput = context.currentInput();
@@ -70,10 +69,6 @@ public final class CommandBootstrap {
     return builder.build();
   }
 
-  // The framework's CommandExceptionHandler signature is (CommandContext, RuntimeException),
-  // so each handler method must accept the supertype even when the registered Class<?> picks
-  // a narrower branch — the framework dispatches by the registered class, not by the method
-  // parameter type.
   private void registerExceptionHandlers(@NonNull PaperCommandFramework.Builder builder) {
     builder.onException(IllegalArgumentException.class, this::handleIllegalArgument);
     builder.onException(RuntimeException.class, this::handleUnexpected);

@@ -88,8 +88,7 @@ public final class TpaFavoritesMenu implements EssentialsMenu {
     builder.slot(addSlot, addTemplate, this.clicks::add);
     builder.slot(backSlot, backTemplate, click -> click.switchTo(TpaHelpMenu.ID));
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

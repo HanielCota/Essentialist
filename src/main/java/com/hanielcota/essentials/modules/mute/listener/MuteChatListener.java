@@ -1,19 +1,13 @@
 package com.hanielcota.essentials.modules.mute.listener;
 
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.mute.config.MuteConfig;
+import com.hanielcota.essentials.modules.mute.service.MuteBlockMessageRenderer;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
-import com.hanielcota.essentials.shared.ComponentUtils;
-import com.hanielcota.essentials.shared.DurationFormatter;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import java.time.Duration;
-import java.time.Instant;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Cancels chat from muted players and notifies them inline.
@@ -26,20 +20,8 @@ import org.jspecify.annotations.Nullable;
 @RequiredArgsConstructor
 public final class MuteChatListener implements Listener {
 
-  private final ConfigHandle<MuteConfig> config;
   private final MuteService service;
-
-  private static String renderBlocked(@NonNull MuteConfig snap, @Nullable Instant expiresAt) {
-    if (expiresAt == null) {
-      return snap.chatBlocked();
-    }
-
-    var now = Instant.now();
-    var remaining = Duration.between(now, expiresAt);
-    var timeStr = DurationFormatter.format(remaining);
-
-    return snap.formatChatBlockedTimed(timeStr);
-  }
+  private final MuteBlockMessageRenderer renderer;
 
   @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
   public void onChat(@NonNull AsyncChatEvent event) {
@@ -53,10 +35,8 @@ public final class MuteChatListener implements Listener {
 
     event.setCancelled(true);
 
-    var snap = this.config.value();
-    var line = renderBlocked(snap, mute.expiresAt());
-    var component = ComponentUtils.mini(line);
+    var message = this.renderer.render(mute);
 
-    player.sendMessage(component);
+    player.sendMessage(message);
   }
 }

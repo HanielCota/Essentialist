@@ -93,8 +93,7 @@ public final class TpaBlockedMenu implements EssentialsMenu {
         backTemplate(settings),
         click -> click.switchTo(TpaPrivacySettingsMenu.ID));
 
-    var menu = builder.build();
-    menu.register();
+    builder.buildAndRegister();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

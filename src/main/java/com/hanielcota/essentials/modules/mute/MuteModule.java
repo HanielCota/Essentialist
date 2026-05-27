@@ -16,6 +16,7 @@ import com.hanielcota.essentials.modules.mute.repository.MuteCache;
 import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import com.hanielcota.essentials.modules.mute.repository.MuteTable;
 import com.hanielcota.essentials.modules.mute.repository.SqlMuteRepository;
+import com.hanielcota.essentials.modules.mute.service.MuteBlockMessageRenderer;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import java.time.Instant;
@@ -57,7 +58,9 @@ public final class MuteModule extends AbstractModule {
     registrar.command(new MuteCommand(service, notifier));
     registrar.command(new UnmuteCommand(service, notifier));
 
-    registrar.listener(new MuteChatListener(config, service));
-    registrar.listener(new MuteCommandListener(config, service));
+    var blockRenderer = new MuteBlockMessageRenderer(config);
+
+    registrar.listener(new MuteChatListener(service, blockRenderer));
+    registrar.listener(new MuteCommandListener(config, service, blockRenderer));
   }
 }
