@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
 import com.hanielcota.essentials.modules.list.domain.PlayerEntry;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -23,7 +24,7 @@ public record ListEntryRenderer(ConfigHandle<ListConfig> config) {
     var builder = ItemTemplate.builder(material);
 
     if (material == Material.PLAYER_HEAD) {
-      builder = builder.head(entry.id());
+      PlayerHeadTextures.applyTo(builder, entry.id());
     }
 
     builder = builder.name(itemName);

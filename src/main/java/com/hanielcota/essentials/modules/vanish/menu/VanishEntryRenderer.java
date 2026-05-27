@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.modules.vanish.config.VanishMessages;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,7 +16,6 @@ public record VanishEntryRenderer(ConfigHandle<VanishConfig> config) {
   public ItemTemplate render(@NonNull Player player) {
     var snap = this.config.value();
 
-    var playerId = player.getUniqueId();
     var name = player.getName();
     var location = player.getLocation();
     var world = location.getWorld();
@@ -29,7 +29,7 @@ public record VanishEntryRenderer(ConfigHandle<VanishConfig> config) {
     var loreArray = loreList.toArray(String[]::new);
 
     var builder = ItemTemplate.builder(Material.PLAYER_HEAD);
-    builder.head(playerId);
+    PlayerHeadTextures.applyTo(builder, player);
     builder.name(displayName);
     builder.lore(loreArray);
     builder.italic(false);

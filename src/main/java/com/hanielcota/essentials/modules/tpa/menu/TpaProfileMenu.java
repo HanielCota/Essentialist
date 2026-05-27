@@ -18,6 +18,7 @@ import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.shared.Placeholders;
+import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public final class TpaProfileMenu implements EssentialsMenu {
 
     var builder = ItemTemplate.builder(settings.headIcon());
     if (settings.headUsePlayerHead()) {
-      builder.head(player.getUniqueId());
+      PlayerHeadTextures.applyTo(builder, player);
     } else if (settings.headIcon() == Material.PLAYER_HEAD
         && !settings.headHeadTexture().isBlank()) {
       builder.head(settings.headHeadTexture());
