@@ -106,11 +106,12 @@ class TeleportRequestServiceTest {
 
   private static TeleportRequestService newService(
       @NonNull TpaProfileService profiles, @NonNull TpaBlockService blocks) {
+    var favorites = new TpaFavoriteService(null, NoopAsyncDatabaseWriter.INSTANCE);
     return new TeleportRequestService(
         new StaticConfigHandle(),
         new InMemoryRequestRepository(),
         new NoopHistory(),
-        new TpaNotifier(new StaticConfigHandle(), new EmptyPlayerProvider(), profiles),
+        new TpaNotifier(new StaticConfigHandle(), new EmptyPlayerProvider(), profiles, favorites),
         new EmptyPlayerProvider(),
         profiles,
         blocks,

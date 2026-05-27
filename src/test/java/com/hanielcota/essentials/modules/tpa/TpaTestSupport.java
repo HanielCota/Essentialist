@@ -10,6 +10,7 @@ import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
+import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -50,11 +51,12 @@ public final class TpaTestSupport {
       @NonNull TpaBlockService blocks,
       @NonNull TpaContactService contacts) {
     var config = new StaticConfigHandle();
+    var favorites = new TpaFavoriteService(null, NoopAsyncDatabaseWriter.INSTANCE);
     return new TeleportRequestService(
         config,
         store,
         history,
-        new TpaNotifier(config, players, profiles),
+        new TpaNotifier(config, players, profiles, favorites),
         players,
         profiles,
         blocks,

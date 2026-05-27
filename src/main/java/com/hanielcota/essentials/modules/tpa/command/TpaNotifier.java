@@ -3,12 +3,14 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ClickableMessage;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.UUID;
 import lombok.NonNull;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 
 /**
@@ -20,9 +22,14 @@ import org.bukkit.entity.Player;
  * stay in the command classes.
  */
 public record TpaNotifier(
-    ConfigHandle<TpaConfig> config, PlayerProvider players, TpaProfileService profiles) {
+    ConfigHandle<TpaConfig> config,
+    PlayerProvider players,
+    TpaProfileService profiles,
+    TpaFavoriteService favorites) {
 
-  private static final String PROMPT_SOUND_KEY = "minecraft:entity.experience_orb.pickup";
+  private static final String PROMPT_SOUND_KEY = "entity.experience_orb.pickup";
+  private static final float PROMPT_SOUND_VOLUME = 1.0f;
+  private static final float PROMPT_SOUND_PITCH = 1.2f;
 
   public void sendPrompt(@NonNull Player target, @NonNull TeleportRequest request) {
     var snap = this.config.value();
@@ -32,7 +39,11 @@ public record TpaNotifier(
     var seconds = snap.requestExpiry().toSeconds();
 
     var requestType = request.type();
-    var requestLine = messages.formatRequestReceived(requestType, requesterName, seconds);
+    var targetId = target.getUniqueId();
+    var requesterId = request.requester().id();
+    var requesterIsFavorite = this.favorites.isFavorite(targetId, requesterId);
+    var requestLine =
+        messages.formatRequestReceived(requestType, requesterName, seconds, requesterIsFavorite);
 
     var acceptHoverTemplate = messages.buttonHoverAccept();
     var acceptHover = acceptHoverTemplate.replace("{player}", requesterName);
@@ -62,7 +73,9 @@ public record TpaNotifier(
     if (!profile.soundsEnabled()) {
       return;
     }
-    target.playSound(target.getLocation(), PROMPT_SOUND_KEY, 1.0f, 1.2f);
+
+    target.playSound(
+        target, PROMPT_SOUND_KEY, SoundCategory.MASTER, PROMPT_SOUND_VOLUME, PROMPT_SOUND_PITCH);
   }
 
   public void notifyExpired(@NonNull TeleportRequest request) {

@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.tpa.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
+import com.github.hanielcota.menuframework.api.MenuFeatures;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -32,6 +33,7 @@ public final class TpaPendingMenu implements EssentialsMenu {
   public static final String ID = "essentials.tpa.pending";
 
   private static final int MIN_ROWS = 1;
+  private static final long COUNTDOWN_REFRESH_TICKS = 20L;
 
   private final ConfigHandle<TpaConfig> config;
   private final TeleportRequestService requests;
@@ -65,11 +67,14 @@ public final class TpaPendingMenu implements EssentialsMenu {
     }
     var pagination = paginationBuilder.build();
 
+    var countdownFeature = MenuFeatures.refreshInterval(COUNTDOWN_REFRESH_TICKS);
+
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
     builder.title(title);
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
+    builder.feature(countdownFeature);
     builder.slot(
         backSlot(settings, rows),
         this.renderer.backTemplate(settings),

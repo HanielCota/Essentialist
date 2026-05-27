@@ -149,6 +149,7 @@ public final class TpaMenuBootstrap {
             profiles,
             favoriteRuntime.selections(),
             favoriteRuntime.orchestrator(),
+            favoriteRuntime.addNotifier(),
             players);
 
     this.registrar.menu(menu);
@@ -177,11 +178,19 @@ public final class TpaMenuBootstrap {
   public void registerTargetActionMenu(
       @NonNull TpaFavoriteService favorites,
       @NonNull TpaTargetSelections selections,
+      @NonNull TpaRuntimeBootstrap.FavoriteRuntime favoriteRuntime,
       @NonNull TpaSendOrchestrator dispatcher) {
     var players = this.env.service(PlayerProvider.class);
     var actors = this.env.service(ActorFactory.class);
     var menu =
-        new TpaTargetActionMenu(this.config, selections, favorites, players, actors, dispatcher);
+        new TpaTargetActionMenu(
+            this.config,
+            selections,
+            favorites,
+            favoriteRuntime.addNotifier(),
+            players,
+            actors,
+            dispatcher);
 
     this.registrar.menu(menu);
 

@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.module.environment.ModuleEnvironment;
 import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpaFavoriteAddNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaFavoriteNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.command.TpaIncomingResolver;
@@ -43,10 +44,11 @@ public final class TpaRuntimeBootstrap {
       @NonNull AsyncTpaHistory history,
       @NonNull TpaProfileService profiles,
       @NonNull TpaBlockService blocks,
-      @NonNull TpaContactService contacts) {
+      @NonNull TpaContactService contacts,
+      @NonNull TpaFavoriteService favorites) {
     var store = new InMemoryRequestRepository();
     var players = this.env.service(PlayerProvider.class);
-    var notifier = new TpaNotifier(this.config, players, profiles);
+    var notifier = new TpaNotifier(this.config, players, profiles, favorites);
     var requestService =
         new TeleportRequestService(
             this.config, store, history, notifier, players, profiles, blocks, contacts);
@@ -77,10 +79,11 @@ public final class TpaRuntimeBootstrap {
     var selections = new TpaFavoriteSelections();
     var notifier = new TpaFavoriteNotifier(this.config);
     var players = this.env.service(PlayerProvider.class);
+    var addNotifier = new TpaFavoriteAddNotifier(notifier, profiles, players);
     var scheduler = this.env.service(Scheduler.class);
     var orchestrator =
         new TpaFavoritePromptOrchestrator(
-            this.config, favorites, sessions, notifier, players, scheduler, profiles);
+            this.config, favorites, sessions, notifier, players, scheduler, addNotifier);
 
     var chatListener = new TpaFavoriteChatListener(orchestrator, sessions);
     this.registrar.listener(chatListener);
@@ -88,7 +91,7 @@ public final class TpaRuntimeBootstrap {
     var cleanupListener = new TpaFavoriteSessionCleanupListener(sessions, selections);
     this.registrar.listener(cleanupListener);
 
-    return new FavoriteRuntime(selections, orchestrator);
+    return new FavoriteRuntime(selections, orchestrator, addNotifier);
   }
 
   public TpaSendOrchestrator sendDispatcher(
@@ -118,7 +121,9 @@ public final class TpaRuntimeBootstrap {
   public record TpaRuntime(TeleportRequestService requestService, TpaNotifier notifier) {}
 
   public record FavoriteRuntime(
-      TpaFavoriteSelections selections, TpaFavoritePromptOrchestrator orchestrator) {}
+      TpaFavoriteSelections selections,
+      TpaFavoritePromptOrchestrator orchestrator,
+      TpaFavoriteAddNotifier addNotifier) {}
 
   public record TpaShared(
       ActorFactory actors,

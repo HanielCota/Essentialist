@@ -34,7 +34,7 @@ public final class TpaModule extends AbstractModule {
     var contacts = persistence.contacts();
 
     var runtimeBootstrap = new TpaRuntimeBootstrap(env, registrar, config);
-    var runtime = runtimeBootstrap.requestRuntime(history, profiles, blocks, contacts);
+    var runtime = runtimeBootstrap.requestRuntime(history, profiles, blocks, contacts, favorites);
     var shared = runtimeBootstrap.sharedHelpers(runtime.requestService());
     var favoriteRuntime = runtimeBootstrap.favoriteRuntime(favorites, profiles);
     var dispatcher =
@@ -52,7 +52,8 @@ public final class TpaModule extends AbstractModule {
     menuBootstrap.registerBlockedMenu(blocks);
     menuBootstrap.registerFavoritesMenu(favorites, contacts, profiles, favoriteRuntime);
     menuBootstrap.registerFavoriteActionMenu(favorites, favoriteRuntime, runtime, dispatcher);
-    menuBootstrap.registerTargetActionMenu(favorites, targetSelections, dispatcher);
+    menuBootstrap.registerTargetActionMenu(
+        favorites, targetSelections, favoriteRuntime, dispatcher);
     menuBootstrap.registerPickPlayerMenu(targetSelections);
 
     var commandBootstrap = new TpaCommandBootstrap(env, registrar, config);
