@@ -48,7 +48,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
             settings.tpaHereSlot(),
             settings.favoriteAddSlot(),
             settings.favoriteRemoveSlot(),
-            settings.closeSlot());
+            settings.backSlot());
     var fallback = MenuLayouts.fallbackContentSlots(rows, configured.size());
 
     return MenuLayouts.sanitizeSlots(configured, rows, fallback);
@@ -106,7 +106,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     var rows = MenuLayouts.clampRows(settings.rows());
 
     if (selected == null) {
-      return List.of(closeSlot(settings, rows));
+      return List.of(backSlotDefinition(settings, rows));
     }
 
     var isFavorite = this.favorites.isFavorite(viewerId, selected.targetId());
@@ -116,7 +116,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     slots.add(actionSlot(settings, rows, selected, TeleportRequestType.TPA));
     slots.add(actionSlot(settings, rows, selected, TeleportRequestType.TPAHERE));
     slots.add(favoriteToggleSlot(settings, rows, selected, isFavorite));
-    slots.add(closeSlot(settings, rows));
+    slots.add(backSlotDefinition(settings, rows));
     return slots;
   }
 
@@ -184,12 +184,12 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     return SlotDefinition.of(safeSlot, template, click -> toggleFavorite(click, entry, isFavorite));
   }
 
-  private SlotDefinition closeSlot(@NonNull TpaTargetActionMenuConfig settings, int rows) {
+  private SlotDefinition backSlotDefinition(@NonNull TpaTargetActionMenuConfig settings, int rows) {
     var template =
-        MenuTemplates.simple(settings.closeIcon(), settings.closeName(), settings.closeLore());
-    var safeSlot = MenuLayouts.sanitizeSlot(settings.closeSlot(), rows, 0);
+        MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
+    var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
-    return SlotDefinition.of(safeSlot, template, this::onCloseClicked);
+    return SlotDefinition.of(safeSlot, template, this::onBackClicked);
   }
 
   private void sendRequest(
@@ -247,11 +247,11 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     actor.sendSuccess(addedText);
   }
 
-  private void onCloseClicked(@NonNull ClickContext click) {
+  private void onBackClicked(@NonNull ClickContext click) {
     var viewerId = click.player().getUniqueId();
     this.selections.clear(viewerId);
 
-    click.close();
+    click.switchTo(TpaHelpMenu.ID);
   }
 
   private ItemTemplate targetTemplate(

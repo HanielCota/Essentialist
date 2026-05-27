@@ -7,11 +7,15 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
  * Appearance of the target-action sub-menu opened by {@code /tpa <nick>} and {@code /tpahere
- * <nick>}: target head, two TPA buttons (visit / summon), favorite toggle, and close.
+ * <nick>}: target head, two TPA buttons (visit / summon), favorite toggle, and back-to-hub.
+ *
+ * <p>The {@code title} is resolved once at menu registration (MenuFramework v1.2.0 limitation), so
+ * it cannot contain a per-viewer {@code {player}} placeholder — the target name appears in the head
+ * item instead.
  */
 @ConfigSerializable
 public record TpaTargetActionMenuConfig(
-    @Comment("Target action menu title. Placeholder: {player}.") String title,
+    @Comment("Target action menu title (static, no per-viewer placeholders).") String title,
     @Comment("Target action menu rows (1-6).") int rows,
     @Comment("Slot of the player head shown at the top.") int targetSlot,
     @Comment("Material of the target item.") Material targetIcon,
@@ -43,14 +47,14 @@ public record TpaTargetActionMenuConfig(
         String favoriteRemoveName,
     @Comment("Lore of the remove-favorite button. Placeholder: {player}.")
         List<String> favoriteRemoveLore,
-    @Comment("Slot of the close button.") int closeSlot,
-    @Comment("Material of the close button.") Material closeIcon,
-    @Comment("Name of the close button.") String closeName,
-    @Comment("Lore of the close button.") List<String> closeLore) {
+    @Comment("Slot of the back-to-hub button (returns to /tpa menu).") int backSlot,
+    @Comment("Material of the back-to-hub button.") Material backIcon,
+    @Comment("Name of the back-to-hub button.") String backName,
+    @Comment("Lore of the back-to-hub button.") List<String> backLore) {
 
   public static TpaTargetActionMenuConfig defaults() {
     return new TpaTargetActionMenuConfig(
-        "TPA: {player}",
+        "<gold>Ações de TPA",
         3,
         4,
         Material.PLAYER_HEAD,
@@ -92,8 +96,8 @@ public record TpaTargetActionMenuConfig(
             "",
             "<yellow>Clique para remover."),
         23,
-        Material.BARRIER,
-        "<yellow>Fechar",
-        List.of("<gray>Fecha este menu."));
+        Material.ARROW,
+        "<yellow>Voltar ao menu principal",
+        List.of("<gray>Retorna ao menu de TPA."));
   }
 }
