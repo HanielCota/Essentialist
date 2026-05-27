@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import org.junit.jupiter.api.Test;

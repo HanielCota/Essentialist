@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.menu;
+package com.hanielcota.essentials.modules.tpa.menu.pending;
 
 import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
@@ -15,6 +15,7 @@ import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
+import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -41,7 +42,7 @@ public final class TpaPendingMenu implements EssentialsMenu {
   private final PlayerProvider players;
   private final TpaPendingMenuRenderer renderer = new TpaPendingMenuRenderer();
 
-  static List<Integer> contentSlots(@NonNull TpaPendingMenuConfig settings, int rows) {
+  public static List<Integer> contentSlots(@NonNull TpaPendingMenuConfig settings, int rows) {
     var fallback = MenuLayouts.fallbackContentSlots(rows, Math.min(7, MenuLayouts.slotCount(rows)));
 
     return MenuLayouts.sanitizeSlots(settings.contentSlots(), rows, fallback);

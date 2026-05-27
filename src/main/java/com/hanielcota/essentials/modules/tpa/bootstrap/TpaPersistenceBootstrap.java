@@ -18,8 +18,8 @@ import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteTable;
 import com.hanielcota.essentials.modules.tpa.repository.TpaProfileTable;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

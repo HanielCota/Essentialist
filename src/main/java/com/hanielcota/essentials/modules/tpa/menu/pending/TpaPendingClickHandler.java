@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.menu;
+package com.hanielcota.essentials.modules.tpa.menu.pending;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;

@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.listener;
 
-import com.hanielcota.essentials.modules.tpa.command.TpaFavoritePromptOrchestrator;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSessions;
+import com.hanielcota.essentials.modules.tpa.command.favorites.TpaFavoritePromptOrchestrator;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSessions;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

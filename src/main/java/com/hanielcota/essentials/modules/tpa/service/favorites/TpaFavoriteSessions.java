@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.service;
+package com.hanielcota.essentials.modules.tpa.service.favorites;
 
 import com.hanielcota.essentials.scheduler.Task;
 import java.util.UUID;

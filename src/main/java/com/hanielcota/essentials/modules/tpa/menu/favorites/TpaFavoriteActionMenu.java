@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.tpa.menu;
+package com.hanielcota.essentials.modules.tpa.menu.favorites;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
@@ -15,8 +15,8 @@ import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoriteActionMenuCo
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSelections;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.Placeholders;

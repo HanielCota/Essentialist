@@ -6,7 +6,7 @@ import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.ArrayList;
 import java.util.Comparator;

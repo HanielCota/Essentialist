@@ -10,6 +10,7 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
+import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import java.lang.reflect.Proxy;
