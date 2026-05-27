@@ -76,7 +76,6 @@ class MaterialCategoryMenuTest {
 
     return new HomesConfig(
         original.teleportDelaySeconds(),
-        original.defaultHomeName(),
         original.defaultLimit(),
         original.defaultMaterial(),
         original.renameTimeoutSeconds(),

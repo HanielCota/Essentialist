@@ -107,7 +107,7 @@ public final class HomesModule extends AbstractModule {
     var renameSessions = new HomeRenameSessions();
     var createSessions = new HomeCreateSessions();
     var nameValidator = new HomeNameValidator();
-    var nameResolver = new HomeNameResolver(config, nameValidator);
+    var nameResolver = new HomeNameResolver(nameValidator);
     var teleporter = new HomeTeleporter(config, delayed);
     var renameTimer = new HomeRenameTimer(scheduler);
     var renameNotifier = new HomeRenameNotifier(config);
@@ -168,7 +168,8 @@ public final class HomesModule extends AbstractModule {
     // 4. Commands.
     var missingResolver = new MissingHomeMessageResolver(config, homeService);
     registrar.command(
-        new HomeCommand(config, homeService, teleporter, nameResolver, missingResolver));
+        new HomeCommand(
+            config, homeService, teleporter, nameResolver, missingResolver, menus, menuState));
     registrar.command(new HomesCommand(homeService, menus, menuState));
   }
 }

@@ -1,8 +1,12 @@
 package com.hanielcota.essentials.modules.homes.command;
 
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
+import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
 import com.hanielcota.essentials.modules.homes.service.HomeNameResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
@@ -24,21 +28,28 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.home.use")
 @Cooldown(duration = "2s")
-@Description("Teleporta para uma home (ou \"home\" se ausente).")
+@Description("Teleporta para a home indicada ou abre o menu /homes quando sem argumento.")
 @Syntax("/home [nome]")
 public record HomeCommand(
     ConfigHandle<HomesConfig> config,
     HomeService service,
     HomeTeleporter teleporter,
     HomeNameResolver nameResolver,
-    MissingHomeMessageResolver missingResolver) {
+    MissingHomeMessageResolver missingResolver,
+    MenuService menus,
+    HomesMenuState state) {
 
   @DefaultSubcommand
   public CommandResult execute(@NonNull CommandActor actor, @Arg("nome") Optional<String> rawName) {
     var sender = actor.unwrap(Player.class);
+
+    if (rawName.isEmpty()) {
+      return openMenu(sender, actor);
+    }
+
     var snap = this.config.value();
     var messages = snap.messages();
-    var name = this.nameResolver.resolve(rawName.orElse(""));
+    var name = this.nameResolver.resolve(rawName.get());
 
     if (name == null) {
       var invalidNameMsg = messages.invalidName();
@@ -56,6 +67,16 @@ public record HomeCommand(
     var target = home.get();
 
     this.teleporter.teleport(sender, target, actor);
+    return CommandResult.success();
+  }
+
+  private CommandResult openMenu(@NonNull Player sender, @NonNull CommandActor actor) {
+    var uuid = sender.getUniqueId();
+    var homes = this.service.homesOf(uuid);
+
+    this.state.prefetch(uuid, homes);
+
+    MenuOpenings.open(this.menus, sender, HomesMenu.ID, actor);
     return CommandResult.success();
   }
 }

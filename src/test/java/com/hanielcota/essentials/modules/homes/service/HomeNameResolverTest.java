@@ -3,37 +3,28 @@ package com.hanielcota.essentials.modules.homes.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import org.junit.jupiter.api.Test;
 
 class HomeNameResolverTest {
 
-  private static ConfigHandle<HomesConfig> config(HomesConfig value) {
-    return new ConfigHandle<>() {
-      @Override
-      public String name() {
-        return "homes";
-      }
+  @Test
+  void rejectsBlankInput() {
+    var resolver = new HomeNameResolver(new HomeNameValidator());
 
-      @Override
-      public HomesConfig value() {
-        return value;
-      }
-    };
+    assertNull(resolver.resolve(""));
   }
 
   @Test
-  void usesConfiguredDefaultWhenArgumentIsBlank() {
-    var resolver = new HomeNameResolver(config(HomesConfig.defaults()), new HomeNameValidator());
-
-    assertEquals("home", resolver.resolve(""));
-  }
-
-  @Test
-  void rejectsInvalidNamesAfterDefaultResolution() {
-    var resolver = new HomeNameResolver(config(HomesConfig.defaults()), new HomeNameValidator());
+  void rejectsInvalidCharacters() {
+    var resolver = new HomeNameResolver(new HomeNameValidator());
 
     assertNull(resolver.resolve("<red>base"));
+  }
+
+  @Test
+  void passesThroughValidName() {
+    var resolver = new HomeNameResolver(new HomeNameValidator());
+
+    assertEquals("base", resolver.resolve("base"));
   }
 }

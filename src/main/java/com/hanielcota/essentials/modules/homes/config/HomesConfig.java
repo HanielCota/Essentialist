@@ -16,15 +16,14 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public record HomesConfig(
     @Comment("Warm-up delay in seconds before /home teleports. 0 disables the delay.")
         int teleportDelaySeconds,
-    @Comment("Home name used when /sethome and /home are run with no argument.")
-        String defaultHomeName,
     @Comment(
             "Default home limit per player when they have no essentials.home.limit.N permission. "
                 + "Set to 0 to require permissions for every home.")
         int defaultLimit,
-    @Comment("Icon for new homes when /sethome is called without a material.")
-        Material defaultMaterial,
-    @Comment("Seconds the rename prompt waits for the player's next chat message. 0 disables.")
+    @Comment("Icon used for new homes created from the /homes + button.") Material defaultMaterial,
+    @Comment(
+            "Seconds the rename and create prompts wait for the player's next chat message. "
+                + "0 disables.")
         int renameTimeoutSeconds,
     HomesMenuConfig menu,
     HomesMessages messages) {
@@ -33,7 +32,7 @@ public record HomesConfig(
     var menu = HomesMenuConfig.defaults();
     var messages = HomesMessages.defaults();
 
-    return new HomesConfig(3, "home", 1, Material.RED_BED, 30, menu, messages);
+    return new HomesConfig(3, 1, Material.RED_BED, 30, menu, messages);
   }
 
   public Duration teleportDelay() {
