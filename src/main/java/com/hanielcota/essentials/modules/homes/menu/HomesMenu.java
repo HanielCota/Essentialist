@@ -79,10 +79,7 @@ public final class HomesMenu implements EssentialsMenu {
         infoSlot,
         infoTemplate,
         this::buildSlots,
-        builder -> {
-          builder.allowShiftClick(true);
-          builder.slot(createSlot, createTemplate, this::onCreateClicked);
-        });
+        builder -> builder.slot(createSlot, createTemplate, this::onCreateClicked));
   }
 
   private void onCreateClicked(@NonNull ClickContext click) {

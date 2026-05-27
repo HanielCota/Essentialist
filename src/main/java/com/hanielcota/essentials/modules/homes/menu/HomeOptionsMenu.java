@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
+import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
@@ -51,9 +52,20 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     var titleTemplate = menuSpec.optionsTitle();
     var title = ComponentUtils.mini(titleTemplate);
 
+    var contentSlots =
+        List.of(
+            MenuLayouts.sanitizeSlot(menuSpec.optionsHomeSlot(), rows, 4),
+            MenuLayouts.sanitizeSlot(menuSpec.optionsTeleportSlot(), rows, 11),
+            MenuLayouts.sanitizeSlot(menuSpec.optionsRenameSlot(), rows, 12),
+            MenuLayouts.sanitizeSlot(menuSpec.optionsIconSlot(), rows, 14),
+            MenuLayouts.sanitizeSlot(menuSpec.optionsDeleteSlot(), rows, 15),
+            MenuLayouts.sanitizeSlot(menuSpec.optionsBackSlot(), rows, 22));
+    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
+
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
     builder.title(title);
+    builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 
     var menu = builder.build();
