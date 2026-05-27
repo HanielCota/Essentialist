@@ -17,6 +17,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
+import io.github.hanielcota.commandframework.annotation.Suggestions;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -38,7 +39,8 @@ public record TpaCommand(
     TpaTargetSelections selections) {
 
   @DefaultSubcommand
-  public CommandResult execute(@NonNull CommandActor actor, Optional<String> targetName) {
+  public CommandResult execute(
+      @NonNull CommandActor actor, @Suggestions("players") Optional<String> targetName) {
     var sender = actor.unwrap(Player.class);
 
     if (targetName.isEmpty()) {
