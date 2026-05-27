@@ -8,11 +8,12 @@ import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -28,8 +29,8 @@ public record TpaHistoryCommand(
   private static final String OTHERS_PERMISSION = "essentials.tpa.history.others";
 
   @DefaultSubcommand
-  public void execute(
-      @NonNull CommandActor actor, @DefaultValue("") @Arg("jogador") String targetName) {
+  public CommandResult execute(
+      @NonNull CommandActor actor, @Arg("jogador") Optional<String> targetName) {
     var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
     var messages = snap.messages();
@@ -38,28 +39,30 @@ public record TpaHistoryCommand(
       var senderId = sender.getUniqueId();
       var senderName = sender.getName();
       this.presenter.open(actor, sender, senderId, /* self */ true, senderName);
-      return;
+
+      return CommandResult.success();
     }
 
     if (!actor.hasPermission(OTHERS_PERMISSION)) {
-      actor.sendError(messages.noPermissionOther());
-      return;
+      return CommandResult.invalidUsage(actor, messages.noPermissionOther());
     }
 
-    var resolved = this.players.offlineByName(targetName);
+    var resolved = this.players.offlineByName(targetName.orElse(""));
     if (resolved.isEmpty()) {
       var notFoundTemplate = messages.playerNotFound();
-      var notFoundMsg = notFoundTemplate.replace("{player}", targetName);
-      actor.sendError(notFoundMsg);
-      return;
+      var notFoundMsg = notFoundTemplate.replace("{player}", targetName.orElse(""));
+
+      return CommandResult.invalidUsage(actor, notFoundMsg);
     }
 
     var target = resolved.get();
     var targetId = target.getUniqueId();
 
     var resolvedRawName = target.getName();
-    var resolvedName = resolvedRawName != null ? resolvedRawName : targetName;
+    var resolvedName = resolvedRawName != null ? resolvedRawName : targetName.orElse("");
 
     this.presenter.open(actor, sender, targetId, /* self */ false, resolvedName);
+
+    return CommandResult.success();
   }
 }

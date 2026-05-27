@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -26,27 +27,29 @@ public record NearCommand(
     ConfigHandle<NearConfig> config, NearService service, NearResultFormatter formatter) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @DefaultValue("-1") @Arg("raio") int raio) {
+  public CommandResult execute(
+      @NonNull CommandActor actor, @DefaultValue("-1") @Arg("raio") int raio) {
     var snap = this.config.value();
     var player = actor.unwrap(Player.class);
     var radius = raio >= 0 ? raio : snap.defaultRadius();
 
     if (radius < 1 || radius > snap.maxRadius()) {
       var invalidRadiusMsg = snap.formatInvalidRadius();
-      actor.sendError(invalidRadiusMsg);
-      return;
+      return CommandResult.invalidUsage(actor, invalidRadiusMsg);
     }
 
     var nearby = this.service.findNearby(player, radius);
     if (nearby.isEmpty()) {
       var noneMsg = snap.formatNone(radius);
       actor.sendMessage(noneMsg);
-      return;
+      return CommandResult.success();
     }
 
     var playersText = this.formatter.join(snap, nearby);
     var foundMsg = snap.formatFound(radius, nearby.size(), playersText);
 
     actor.sendMessage(foundMsg);
+
+    return CommandResult.success();
   }
 }

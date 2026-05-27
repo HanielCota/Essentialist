@@ -14,6 +14,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import java.util.function.BiPredicate;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -32,7 +33,7 @@ public record MsgCommand(
 
   @DefaultSubcommand
   @PlayerOnly
-  public void execute(
+  public CommandResult execute(
       @NonNull CommandActor sender,
       @OnlinePlayer @NonNull Player target,
       @GreedyString @Arg("mensagem") String mensagem) {
@@ -43,22 +44,20 @@ public record MsgCommand(
 
     if (body.isEmpty()) {
       var emptyMsg = snap.emptyMessage();
-      sender.sendError(emptyMsg);
-      return;
+      return CommandResult.invalidUsage(sender, emptyMsg);
     }
 
     if (Senders.isSelf(sender, target)) {
       var selfMsg = snap.cannotMessageSelf();
-      sender.sendError(selfMsg);
-      return;
+      return CommandResult.invalidUsage(sender, selfMsg);
     }
 
     if (!this.visibilityFilter.test(from, target)) {
       var notFoundMsg = snap.formatTargetUnavailable(targetName);
-      sender.sendError(notFoundMsg);
-      return;
+      return CommandResult.invalidUsage(sender, notFoundMsg);
     }
 
     this.dispatcher.send(from, target, body);
+    return CommandResult.success();
   }
 }

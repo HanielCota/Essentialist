@@ -6,6 +6,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
 import com.hanielcota.essentials.modules.repair.service.RepairService;
 import com.hanielcota.essentials.paper.ActorFactory;
+import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -16,6 +17,8 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.function.UnaryOperator;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -29,32 +32,35 @@ public record RepairCommand(
     ConfigHandle<RepairConfig> config, RepairService service, ActorFactory actors) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
 
     var result = this.service.repairHand(subject);
-    switch (result) {
+    return switch (result) {
       case EMPTY_HAND -> {
         var emptyMessages = snap.whenEmptyHand();
         var emptyMsg = emptyMessages.forSender(self, name);
-        sender.sendError(emptyMsg);
+        yield CommandResult.invalidUsage(sender, emptyMsg);
       }
       case NOTHING_TO_REPAIR -> {
         var nothingMessages = snap.whenNothingHand();
         var nothingMsg = nothingMessages.forSender(self, name);
-        sender.sendError(nothingMsg);
+        yield CommandResult.invalidUsage(sender, nothingMsg);
       }
       case REPAIRED -> {
         var messages = snap.whenHandRepaired();
         DualReply.send(sender, subject, this.actors, messages);
+        yield CommandResult.success();
       }
-    }
+    };
   }
 
-  @Subcommand({"tudo", "all"})
-  public void all(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  @Subcommand("tudo")
+  @Alias("all")
+  public CommandResult all(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
@@ -63,12 +69,13 @@ public record RepairCommand(
     if (repaired == 0) {
       var nothingMessages = snap.whenNothingAll();
       var nothingMsg = nothingMessages.forSender(self, name);
-      sender.sendError(nothingMsg);
-      return;
+      return CommandResult.invalidUsage(sender, nothingMsg);
     }
 
     var messages = snap.whenAllRepaired();
     var count = Integer.toString(repaired);
-    DualReply.send(sender, subject, this.actors, messages, line -> line.replace("{count}", count));
+    var replacer = (UnaryOperator<String>) line -> line.replace("{count}", count);
+    DualReply.send(sender, subject, this.actors, messages, replacer);
+    return CommandResult.success();
   }
 }

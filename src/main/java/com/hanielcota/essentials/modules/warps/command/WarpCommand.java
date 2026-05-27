@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -31,7 +32,7 @@ public record WarpCommand(
   private static final String NAME = "{name}";
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @NonNull @Arg("nome") String name) {
+  public CommandResult execute(@NonNull CommandActor actor, @NonNull @Arg("nome") String name) {
     var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
     var messages = snap.messages();
@@ -40,8 +41,7 @@ public record WarpCommand(
     if (warpOpt.isEmpty()) {
       var unknownTemplate = messages.unknownWarp();
       var unknownMsg = unknownTemplate.replace(NAME, name);
-      actor.sendError(unknownMsg);
-      return;
+      return CommandResult.invalidUsage(actor, unknownMsg);
     }
 
     var warp = warpOpt.get();
@@ -50,15 +50,13 @@ public record WarpCommand(
     if (!this.service.canUse(sender, resolvedName)) {
       var noPermTemplate = messages.noPermission();
       var noPermMsg = noPermTemplate.replace(NAME, resolvedName);
-      actor.sendError(noPermMsg);
-      return;
+      return CommandResult.invalidUsage(actor, noPermMsg);
     }
 
     var locationOpt = warp.resolve();
     if (locationOpt.isEmpty()) {
       var worldGoneMsg = messages.worldGone();
-      actor.sendError(worldGoneMsg);
-      return;
+      return CommandResult.invalidUsage(actor, worldGoneMsg);
     }
 
     var destination = locationOpt.get();
@@ -66,5 +64,6 @@ public record WarpCommand(
     var teleportPrompt = this.promptFactory.create(actor, messages, warp);
 
     this.delayed.schedule(sender, destination, delay, teleportPrompt);
+    return CommandResult.success();
   }
 }

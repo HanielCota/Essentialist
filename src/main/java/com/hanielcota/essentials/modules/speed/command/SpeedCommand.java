@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.speed.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
 import com.hanielcota.essentials.modules.speed.service.SpeedService;
+import io.github.hanielcota.commandframework.annotation.Alias;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -15,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,15 +29,16 @@ public record SpeedCommand(
     ConfigHandle<SpeedConfig> config, SpeedService service, SpeedNotifier notifier) {
 
   @DefaultSubcommand
-  public void showUsage(@NonNull CommandActor sender) {
+  public CommandResult showUsage(@NonNull CommandActor sender) {
     var snap = this.config.value();
     var usageMsg = snap.usage();
     sender.sendMessage(usageMsg);
+    return CommandResult.success();
   }
 
   @Subcommand("walk")
   @PermissionForOther(".others")
-  public void walk(
+  public CommandResult walk(
       @NonNull CommandActor sender,
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
@@ -43,17 +46,17 @@ public record SpeedCommand(
 
     if (!this.service.setWalkSpeed(subject, valor)) {
       var invalidMsg = snap.invalid();
-      sender.sendError(invalidMsg);
-      return;
+      return CommandResult.invalidUsage(sender, invalidMsg);
     }
 
     var messages = snap.whenWalkSet(valor);
     this.notifier.announce(sender, subject, messages);
+    return CommandResult.success();
   }
 
   @Subcommand("fly")
   @PermissionForOther(".others")
-  public void fly(
+  public CommandResult fly(
       @NonNull CommandActor sender,
       @Range(min = 1, max = 10) @Arg("valor") int valor,
       @TargetOrSelf Player subject) {
@@ -61,21 +64,23 @@ public record SpeedCommand(
 
     if (!this.service.setFlySpeed(subject, valor)) {
       var invalidMsg = snap.invalid();
-      sender.sendError(invalidMsg);
-      return;
+      return CommandResult.invalidUsage(sender, invalidMsg);
     }
 
     var messages = snap.whenFlySet(valor);
     this.notifier.announce(sender, subject, messages);
+    return CommandResult.success();
   }
 
-  @Subcommand({"reset", "resetar"})
+  @Subcommand("reset")
+  @Alias("resetar")
   @PermissionForOther(".others")
-  public void reset(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
+  public CommandResult reset(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     this.service.reset(subject);
 
     var messages = snap.whenReset();
     this.notifier.announce(sender, subject, messages);
+    return CommandResult.success();
   }
 }

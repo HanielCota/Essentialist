@@ -7,11 +7,12 @@ import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -28,22 +29,21 @@ public record TpDenyCommand(
     TpaRequestReplyNotifier replyNotifier) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
+  public CommandResult execute(@NonNull CommandActor actor, Optional<String> requester) {
     var snap = this.config.value();
     var messages = snap.messages();
 
     var sender = actor.unwrap(Player.class);
 
-    var resolved = this.incomingResolver.resolve(sender, requester, actor);
+    var resolved = this.incomingResolver.resolve(sender, requester.orElse(""), actor);
     if (resolved.isEmpty()) {
-      return;
+      return CommandResult.success();
     }
 
     var request = resolved.get();
     var denied = this.service.deny(request);
     if (!denied) {
-      actor.sendError(messages.noIncoming());
-      return;
+      return CommandResult.invalidUsage(actor, messages.noIncoming());
     }
 
     var deniedSelfTemplate = messages.deniedSelf();
@@ -54,5 +54,7 @@ public record TpDenyCommand(
 
     var deniedTemplate = messages.denied();
     this.replyNotifier.notifyDenied(request, deniedTemplate);
+
+    return CommandResult.success();
   }
 }

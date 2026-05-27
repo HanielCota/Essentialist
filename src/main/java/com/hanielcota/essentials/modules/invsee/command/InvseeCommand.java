@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -26,14 +27,13 @@ import org.bukkit.entity.Player;
 public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService service) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @OnlinePlayer @NonNull Player target) {
+  public CommandResult execute(@NonNull CommandActor sender, @OnlinePlayer @NonNull Player target) {
     var viewer = sender.unwrap(Player.class);
     var snap = this.config.value();
 
     if (target.equals(viewer)) {
       var selfMsg = snap.self();
-      sender.sendError(selfMsg);
-      return;
+      return CommandResult.invalidUsage(sender, selfMsg);
     }
 
     var targetName = target.getName();
@@ -42,8 +42,7 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
 
     if (viewOpt.isEmpty()) {
       var alreadyViewedMsg = snap.alreadyViewed();
-      sender.sendError(alreadyViewedMsg);
-      return;
+      return CommandResult.invalidUsage(sender, alreadyViewedMsg);
     }
 
     var view = viewOpt.get();
@@ -51,5 +50,7 @@ public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService ser
 
     var openedMsg = snap.formatOpened(targetName);
     sender.sendSuccess(openedMsg);
+
+    return CommandResult.success();
   }
 }

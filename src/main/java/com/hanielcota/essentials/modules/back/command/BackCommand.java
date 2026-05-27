@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -31,7 +32,7 @@ public record BackCommand(
     BackMenuState state) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
     var senderId = sender.getUniqueId();
 
@@ -39,11 +40,13 @@ public record BackCommand(
     if (entries.isEmpty()) {
       var snap = this.config.value();
       var noBackMsg = snap.noBack();
-      actor.sendError(noBackMsg);
-      return;
+
+      return CommandResult.invalidUsage(actor, noBackMsg);
     }
 
     this.state.prefetch(senderId, entries);
     MenuOpenings.open(this.menus, sender, BackMenu.ID, actor);
+
+    return CommandResult.success();
   }
 }

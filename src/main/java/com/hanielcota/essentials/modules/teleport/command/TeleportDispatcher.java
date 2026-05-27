@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -39,18 +40,18 @@ public final class TeleportDispatcher {
   public void dispatch(
       @NonNull CommandActor sender,
       @NonNull String arg1,
-      @NonNull String arg2,
-      @NonNull String arg3) {
+      Optional<String> arg2,
+      Optional<String> arg3) {
 
     var hasArg3 = !arg3.isEmpty();
     if (hasArg3) {
-      dispatchToPosition(sender, arg1, arg2, arg3);
+      dispatchToPosition(sender, arg1, arg2.get(), arg3.get());
       return;
     }
 
     var hasArg2 = !arg2.isEmpty();
     if (hasArg2) {
-      dispatchMove(sender, arg1, arg2);
+      dispatchMove(sender, arg1, arg2.get());
       return;
     }
 

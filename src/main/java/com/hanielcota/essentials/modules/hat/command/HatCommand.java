@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -25,16 +26,19 @@ import org.bukkit.entity.Player;
 public record HatCommand(ConfigHandle<HatConfig> config, HatService service) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     Player sender = actor.unwrap(Player.class);
     var snap = this.config.value();
     var result = this.service.equip(sender, snap);
 
-    switch (result) {
-      case EQUIPPED -> actor.sendSuccess(snap.equipped());
-      case EMPTY_HAND -> actor.sendError(snap.emptyHand());
-      case NOT_ALLOWED -> actor.sendError(snap.notAllowed());
-      case INVENTORY_FULL -> actor.sendError(snap.inventoryFull());
-    }
+    return switch (result) {
+      case EQUIPPED -> {
+        actor.sendSuccess(snap.equipped());
+        yield CommandResult.success();
+      }
+      case EMPTY_HAND -> CommandResult.invalidUsage(actor, snap.emptyHand());
+      case NOT_ALLOWED -> CommandResult.invalidUsage(actor, snap.notAllowed());
+      case INVENTORY_FULL -> CommandResult.invalidUsage(actor, snap.inventoryFull());
+    };
   }
 }

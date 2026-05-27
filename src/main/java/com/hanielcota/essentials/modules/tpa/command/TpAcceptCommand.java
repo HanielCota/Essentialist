@@ -9,11 +9,12 @@ import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -31,12 +32,12 @@ public record TpAcceptCommand(
     MainThreadCallbacks callbacks) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor, @DefaultValue("") String requester) {
+  public CommandResult execute(@NonNull CommandActor actor, Optional<String> requester) {
     var sender = actor.unwrap(Player.class);
 
-    var resolved = this.incomingResolver.resolve(sender, requester, actor);
+    var resolved = this.incomingResolver.resolve(sender, requester.orElse(""), actor);
     if (resolved.isEmpty()) {
-      return;
+      return CommandResult.success();
     }
 
     var request = resolved.get();
@@ -45,7 +46,7 @@ public record TpAcceptCommand(
     this.resultHandler.handleClaim(claim, request, actor);
 
     if (claim != AcceptOutcome.ACCEPTED) {
-      return;
+      return CommandResult.success();
     }
 
     var pending = this.service.dispatchTeleport(request);
@@ -53,5 +54,7 @@ public record TpAcceptCommand(
         pending,
         success -> this.resultHandler.handleTeleportOutcome(success, actor),
         "tpaccept dispatch");
+
+    return CommandResult.success();
   }
 }

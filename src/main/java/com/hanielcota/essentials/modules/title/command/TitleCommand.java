@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,7 +28,8 @@ public record TitleCommand(
 
   @DefaultSubcommand
   @Cooldown(duration = "3s")
-  public void execute(@NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
+  public CommandResult execute(
+      @NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
     var snap = this.config.value();
     var self = sender.isPlayer() ? sender.unwrap(Player.class) : null;
     var input = texto.strip();
@@ -38,25 +40,20 @@ public record TitleCommand(
     var message = request.message();
 
     if (targetId == null || targetName == null || message.isBlank()) {
-      var usageMsg = snap.usage();
-      sender.sendError(usageMsg);
-      return;
+      return CommandResult.invalidUsage(sender, snap.usage());
     }
 
     var toSelf = self != null && targetId.equals(self.getUniqueId());
 
     if (!toSelf && !sender.hasPermission("essentials.title.others")) {
-      var noPermissionMsg = snap.noPermissionOther();
-      sender.sendError(noPermissionMsg);
-      return;
+      return CommandResult.denied(sender, snap.noPermissionOther());
     }
 
     // Re-resolve from the snapshot UUID — the parsed target could have disconnected between the
     // command parse and dispatch on a busy tick.
     var liveTarget = this.players.online(targetId).orElse(null);
     if (liveTarget == null) {
-      sender.sendError(snap.formatTargetOffline(targetName));
-      return;
+      return CommandResult.invalidUsage(sender, snap.formatTargetOffline(targetName));
     }
 
     this.service.send(liveTarget, message);
@@ -65,25 +62,26 @@ public record TitleCommand(
     var sentMsg = messages.forSender(toSelf, targetName);
 
     sender.sendSuccess(sentMsg);
+    return CommandResult.success();
   }
 
   @Subcommand("broadcast")
   @Permission("essentials.title.broadcast")
   @Description("Envia um título para todos os jogadores online.")
   @Syntax("/title broadcast \"título\" [\"subtítulo\"]")
-  public void broadcast(@NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
+  public CommandResult broadcast(
+      @NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
     var snap = this.config.value();
     var message = texto.strip();
 
     if (message.isBlank()) {
-      var usageMsg = snap.usage();
-      sender.sendError(usageMsg);
-      return;
+      return CommandResult.invalidUsage(sender, snap.usage());
     }
 
     var count = this.service.broadcast(message);
     var broadcastedMsg = snap.formatBroadcasted(count);
 
     sender.sendSuccess(broadcastedMsg);
+    return CommandResult.success();
   }
 }

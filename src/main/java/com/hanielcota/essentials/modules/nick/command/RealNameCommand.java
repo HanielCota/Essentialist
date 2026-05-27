@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 
 @Command("realname")
@@ -23,15 +24,14 @@ public record RealNameCommand(
     ConfigHandle<NickConfig> config, NickService service, RealNameResolver resolver) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @Arg("apelido") String apelido) {
+  public CommandResult execute(@NonNull CommandActor sender, @Arg("apelido") String apelido) {
     var snap = this.config.value();
     var query = apelido.strip();
     var ownerId = this.service.idByNick(query).orElse(null);
 
     if (ownerId == null) {
       var unknownMsg = snap.formatUnknownNick(query);
-      sender.sendError(unknownMsg);
-      return;
+      return CommandResult.invalidUsage(sender, unknownMsg);
     }
 
     var realName = this.resolver.resolve(ownerId);
@@ -39,5 +39,7 @@ public record RealNameCommand(
     var foundMsg = snap.formatRealNameOf(entry.nickname(), realName);
 
     sender.sendMessage(foundMsg);
+
+    return CommandResult.success();
   }
 }

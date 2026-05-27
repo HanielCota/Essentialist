@@ -16,6 +16,7 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -29,45 +30,41 @@ public record WhitelistCommand(
 
   @DefaultSubcommand
   @PlayerOnly
-  public void open(@NonNull CommandActor actor) {
+  public CommandResult open(@NonNull CommandActor actor) {
     var viewer = actor.unwrap(Player.class);
 
     MenuOpenings.open(this.menus, viewer, WhitelistMenu.ID, actor);
+    return CommandResult.success();
   }
 
   @Subcommand("add")
-  public void add(@NonNull CommandActor sender, @Arg("jogador") String name) {
+  public CommandResult add(@NonNull CommandActor sender, @Arg("jogador") String name) {
     var snap = this.config.value();
     var result = this.service.add(name);
 
-    switch (result) {
+    return switch (result) {
       case ADDED -> {
         var addedMsg = snap.formatAdded(name);
         sender.sendSuccess(addedMsg);
+        yield CommandResult.success();
       }
-      case ALREADY_WHITELISTED -> {
-        var alreadyAddedMsg = snap.formatAlreadyAdded(name);
-        sender.sendError(alreadyAddedMsg);
-      }
-      case UNKNOWN_PLAYER -> {
-        var unknownMsg = snap.formatUnknownPlayer(name);
-        sender.sendError(unknownMsg);
-      }
-    }
+      case ALREADY_WHITELISTED -> CommandResult.invalidUsage(sender, snap.formatAlreadyAdded(name));
+      case UNKNOWN_PLAYER -> CommandResult.invalidUsage(sender, snap.formatUnknownPlayer(name));
+    };
   }
 
   @Subcommand("remove")
-  public void remove(@NonNull CommandActor sender, @Arg("jogador") String name) {
+  public CommandResult remove(@NonNull CommandActor sender, @Arg("jogador") String name) {
     var snap = this.config.value();
     var removed = this.service.remove(name);
 
     if (removed) {
       var removedMsg = snap.formatRemoved(name);
       sender.sendSuccess(removedMsg);
-      return;
+      return CommandResult.success();
     }
 
     var notWhitelistedMsg = snap.formatNotWhitelisted(name);
-    sender.sendError(notWhitelistedMsg);
+    return CommandResult.invalidUsage(sender, notWhitelistedMsg);
   }
 }

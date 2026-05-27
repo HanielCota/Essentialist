@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.chat.service.StaffChatToggleService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
-import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -13,6 +12,8 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -44,29 +45,30 @@ public record StaffChatCommand(StaffChatToggleService toggleService, StaffChatNo
   @Subcommand("toggle")
   @Description("Toggle persistent staff chat for your session.")
   @Syntax("/staffchat toggle")
-  public void toggle(@NonNull CommandActor actor) {
+  public CommandResult toggle(@NonNull CommandActor actor) {
     var player = actor.unwrap(Player.class);
     var id = player.getUniqueId();
     var nowActive = this.toggleService.toggle(id);
 
     if (nowActive) {
       this.notifier.sendToggleOn(actor);
-      return;
+      return CommandResult.success();
     }
 
     this.notifier.sendToggleOff(actor);
+    return CommandResult.success();
   }
 
   @DefaultSubcommand
-  public void send(
-      @NonNull CommandActor actor, @GreedyString @DefaultValue("") @Arg("message") String message) {
-    var body = message.strip();
+  public CommandResult send(
+      @NonNull CommandActor actor, @GreedyString @Arg("message") Optional<String> message) {
+    var body = message.map(String::strip).orElse("");
     if (body.isEmpty()) {
-      this.notifier.sendUsage(actor);
-      return;
+      return CommandResult.invalidUsage(actor, "");
     }
 
     var player = actor.unwrap(Player.class);
     this.notifier.sendOneShot(player, body);
+    return CommandResult.success();
   }
 }

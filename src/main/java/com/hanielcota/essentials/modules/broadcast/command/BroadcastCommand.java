@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 
 @Command(
@@ -24,17 +25,19 @@ import lombok.NonNull;
 public record BroadcastCommand(ConfigHandle<BroadcastConfig> config, BroadcastService service) {
 
   @DefaultSubcommand
-  public void execute(
+  public CommandResult execute(
       @NonNull CommandActor sender, @GreedyString @Arg("mensagem") String mensagem) {
     var snap = this.config.value();
     var body = mensagem.strip();
 
     if (body.isEmpty()) {
       var usageMsg = snap.usage();
-      sender.sendError(usageMsg);
-      return;
+
+      return CommandResult.invalidUsage(sender, usageMsg);
     }
 
     this.service.broadcast(body);
+
+    return CommandResult.success();
   }
 }

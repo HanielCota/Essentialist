@@ -9,6 +9,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 
 /**
@@ -23,21 +24,22 @@ import lombok.NonNull;
 public record ChatCommand(ConfigService configs, ChatNotifier notifier) {
 
   @DefaultSubcommand
-  public void showUsage(@NonNull CommandActor actor) {
+  public CommandResult showUsage(@NonNull CommandActor actor) {
     this.notifier.sendUsage(actor);
+    return CommandResult.success();
   }
 
   @Subcommand("reload")
   @Permission(ChatPermissions.RELOAD)
   @Description("Reload every module config — chat templates are re-normalised lazily on first use.")
   @Syntax("/chat reload")
-  public void reload(@NonNull CommandActor actor) {
+  public CommandResult reload(@NonNull CommandActor actor) {
     var report = this.configs.reloadAll();
 
     if (report.failures().isEmpty()) {
       var total = report.total();
       this.notifier.sendReloadSuccess(actor, total);
-      return;
+      return CommandResult.success();
     }
 
     var failedNames = report.failedNames();
@@ -46,5 +48,6 @@ public record ChatCommand(ConfigService configs, ChatNotifier notifier) {
     var total = report.total();
 
     this.notifier.sendReloadFailure(actor, succeeded, total, failed);
+    return CommandResult.success();
   }
 }

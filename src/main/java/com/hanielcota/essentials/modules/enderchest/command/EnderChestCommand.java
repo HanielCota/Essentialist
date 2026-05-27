@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -27,7 +28,7 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config) {
 
   @DefaultSubcommand
   @PermissionForOther(".others")
-  public void execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player target) {
+  public CommandResult execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player target) {
     var viewer = sender.unwrap(Player.class);
     var snap = this.config.value();
     var self = target.equals(viewer);
@@ -39,5 +40,7 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config) {
     var openedMsg = messages.forSender(self, targetName);
 
     sender.sendSuccess(openedMsg);
+
+    return CommandResult.success();
   }
 }

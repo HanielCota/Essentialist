@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class TpDenyCommandTest {
@@ -36,7 +37,7 @@ class TpDenyCommandTest {
             resolver,
             new TpaRequestReplyNotifier(actors, players));
 
-    command.execute(actor, requester.getName());
+    command.execute(actor, Optional.of(requester.getName()));
 
     assertTrue(actors.actor(viewer).messages().stream().anyMatch(msg -> msg.contains("nenhum")));
   }

@@ -8,6 +8,7 @@ import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -18,16 +19,19 @@ import org.bukkit.entity.Player;
 public record UnmuteCommand(MuteService service, MuteNotifier notifier) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor sender, @OnlinePlayer @NonNull Player target) {
+  public CommandResult execute(@NonNull CommandActor sender, @OnlinePlayer @NonNull Player target) {
     var targetId = target.getUniqueId();
     var removed = this.service.unmute(targetId);
 
     if (!removed) {
       var name = target.getName();
       this.notifier.sendNotMuted(sender, name);
-      return;
+
+      return CommandResult.success();
     }
 
     this.notifier.sendUnmuted(sender, target);
+
+    return CommandResult.success();
   }
 }

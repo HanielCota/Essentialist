@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -25,9 +26,11 @@ public record ListCommand(MenuService menus) {
 
   @DefaultSubcommand
   @PlayerOnly
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var viewer = actor.unwrap(Player.class);
 
     MenuOpenings.open(this.menus, viewer, ListMenu.ID, actor);
+
+    return CommandResult.success();
   }
 }

@@ -13,6 +13,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -26,23 +27,21 @@ public record SpawnCommand(
     ConfigHandle<SpawnConfig> config, SpawnService service, DelayedTeleport delayed) {
 
   @DefaultSubcommand
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var snap = this.config.value();
     var messages = snap.messages();
 
     var current = this.service.current();
     if (current.isEmpty()) {
       var noSpawnMsg = messages.noSpawn();
-      actor.sendError(noSpawnMsg);
-      return;
+      return CommandResult.invalidUsage(actor, noSpawnMsg);
     }
 
     var spawnLocation = current.get();
     var resolved = spawnLocation.resolve();
     if (resolved.isEmpty()) {
       var worldGoneMsg = messages.worldGone();
-      actor.sendError(worldGoneMsg);
-      return;
+      return CommandResult.invalidUsage(actor, worldGoneMsg);
     }
 
     var sender = actor.unwrap(Player.class);
@@ -58,5 +57,7 @@ public record SpawnCommand(
         new DelayedTeleportPrompt(actor, teleportingMsg, teleportedMsg, cancelledMsg, failedMsg);
 
     this.delayed.schedule(sender, destination, delay, prompt);
+
+    return CommandResult.success();
   }
 }

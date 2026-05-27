@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -23,15 +24,16 @@ public record WarpsCommand(@NonNull WarpService service, @NonNull WarpsListNotif
 
   @DefaultSubcommand
   @PlayerOnly
-  public void execute(@NonNull CommandActor actor) {
+  public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
     var warps = this.service.listVisibleTo(sender);
 
     if (warps.isEmpty()) {
       this.notifier.sendEmpty(actor);
-      return;
+      return CommandResult.invalidUsage();
     }
 
     this.notifier.sendList(sender, warps);
+    return CommandResult.success();
   }
 }
