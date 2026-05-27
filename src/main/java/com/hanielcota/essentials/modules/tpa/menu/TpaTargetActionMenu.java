@@ -13,12 +13,11 @@ import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoriteActionMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaTargetActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
-import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
-import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
-import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteSelections;
+import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
 import com.hanielcota.essentials.modules.tpa.service.TpaFavoriteService;
+import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ComponentUtils;
@@ -30,25 +29,29 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
-public final class TpaFavoriteActionMenu implements EssentialsMenu {
+public final class TpaTargetActionMenu implements EssentialsMenu {
 
-  public static final String ID = "essentials.tpa.favorite.action";
+  public static final String ID = "essentials.tpa.target.action";
 
   private final ConfigHandle<TpaConfig> config;
+  private final TpaTargetSelections selections;
   private final TpaFavoriteService favorites;
-  private final TpaFavoriteSelections selections;
-  private final TeleportRequestService requests;
   private final PlayerProvider players;
   private final ActorFactory actors;
   private final TpaSendOrchestrator dispatcher;
 
-  static List<Integer> contentSlots(@NonNull TpaFavoriteActionMenuConfig settings, int rows) {
-    return List.of(
-        MenuLayouts.sanitizeSlot(settings.targetSlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(settings.tpaSlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(settings.tpaHereSlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(settings.removeSlot(), rows, 0),
-        MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0));
+  static List<Integer> contentSlots(@NonNull TpaTargetActionMenuConfig settings, int rows) {
+    var configured =
+        List.of(
+            settings.targetSlot(),
+            settings.tpaSlot(),
+            settings.tpaHereSlot(),
+            settings.favoriteAddSlot(),
+            settings.favoriteRemoveSlot(),
+            settings.backSlot());
+    var fallback = MenuLayouts.fallbackContentSlots(rows, configured.size());
+
+    return MenuLayouts.sanitizeSlots(configured, rows, fallback);
   }
 
   @Override
@@ -58,7 +61,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
 
   @Override
   public void register(@NonNull MenuService menus) {
-    var settings = this.config.value().favoriteActionMenu();
+    var settings = this.config.value().targetActionMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
     var pagination = PaginationConfig.builder().contentSlots(contentSlots(settings, rows)).build();
 
@@ -75,24 +78,26 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var viewerId = player.getUniqueId();
     var selected = this.selections.of(viewerId);
-    var settings = this.config.value().favoriteActionMenu();
+    var settings = this.config.value().targetActionMenu();
     var rows = MenuLayouts.clampRows(settings.rows());
 
     if (selected == null) {
       return List.of(backSlotDefinition(settings, rows));
     }
 
+    var isFavorite = this.favorites.isFavorite(viewerId, selected.targetId());
+
     var slots = new ArrayList<SlotDefinition>(5);
     slots.add(targetSlot(settings, rows, selected));
     slots.add(actionSlot(settings, rows, selected, TeleportRequestType.TPA));
     slots.add(actionSlot(settings, rows, selected, TeleportRequestType.TPAHERE));
-    slots.add(removeSlot(settings, rows, selected));
+    slots.add(favoriteToggleSlot(settings, rows, selected, isFavorite));
     slots.add(backSlotDefinition(settings, rows));
     return slots;
   }
 
   private SlotDefinition targetSlot(
-      @NonNull TpaFavoriteActionMenuConfig settings, int rows, @NonNull TpaFavorite entry) {
+      @NonNull TpaTargetActionMenuConfig settings, int rows, @NonNull TpaTargetSelection entry) {
     var template = targetTemplate(settings, entry);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.targetSlot(), rows, 0);
 
@@ -100,37 +105,62 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
   }
 
   private SlotDefinition actionSlot(
-      @NonNull TpaFavoriteActionMenuConfig settings,
+      @NonNull TpaTargetActionMenuConfig settings,
       int rows,
-      @NonNull TpaFavorite entry,
+      @NonNull TpaTargetSelection entry,
       @NonNull TeleportRequestType type) {
-    var nameTemplate =
-        type == TeleportRequestType.TPA ? settings.tpaName() : settings.tpaHereName();
-    var loreTemplate =
-        type == TeleportRequestType.TPA ? settings.tpaLore() : settings.tpaHereLore();
-    var icon = type == TeleportRequestType.TPA ? settings.tpaIcon() : settings.tpaHereIcon();
-    var slot = type == TeleportRequestType.TPA ? settings.tpaSlot() : settings.tpaHereSlot();
+    var isTpa = type == TeleportRequestType.TPA;
+    var nameTemplate = isTpa ? settings.tpaName() : settings.tpaHereName();
+    var loreTemplate = isTpa ? settings.tpaLore() : settings.tpaHereLore();
+    var icon = isTpa ? settings.tpaIcon() : settings.tpaHereIcon();
+    var slot = isTpa ? settings.tpaSlot() : settings.tpaHereSlot();
 
-    var name = nameTemplate.replace("{player}", entry.favoriteName());
-    var lore = Placeholders.replaceInAll(loreTemplate, "{player}", entry.favoriteName());
+    var name = nameTemplate.replace("{player}", entry.targetName());
+    var lore = buildActionLore(settings, loreTemplate, entry, type);
     var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(slot, rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> sendRequest(click, entry, type));
   }
 
-  private SlotDefinition removeSlot(
-      @NonNull TpaFavoriteActionMenuConfig settings, int rows, @NonNull TpaFavorite entry) {
-    var name = settings.removeName().replace("{player}", entry.favoriteName());
-    var lore = Placeholders.replaceInAll(settings.removeLore(), "{player}", entry.favoriteName());
-    var template = MenuTemplates.simple(settings.removeIcon(), name, lore);
-    var safeSlot = MenuLayouts.sanitizeSlot(settings.removeSlot(), rows, 0);
+  private List<String> buildActionLore(
+      @NonNull TpaTargetActionMenuConfig settings,
+      @NonNull List<String> loreTemplate,
+      @NonNull TpaTargetSelection entry,
+      @NonNull TeleportRequestType type) {
+    var replaced = Placeholders.replaceInAll(loreTemplate, "{player}", entry.targetName());
+    var isRecommended = entry.preferredType() == type;
+    var hasTag = !settings.recommendedTag().isBlank();
+    if (!isRecommended || !hasTag) {
+      return replaced;
+    }
 
-    return SlotDefinition.of(safeSlot, template, click -> removeFavorite(click, entry));
+    var lore = new ArrayList<String>(replaced.size() + 2);
+    lore.add(settings.recommendedTag());
+    lore.add("");
+    lore.addAll(replaced);
+    return lore;
   }
 
-  private SlotDefinition backSlotDefinition(
-      @NonNull TpaFavoriteActionMenuConfig settings, int rows) {
+  private SlotDefinition favoriteToggleSlot(
+      @NonNull TpaTargetActionMenuConfig settings,
+      int rows,
+      @NonNull TpaTargetSelection entry,
+      boolean isFavorite) {
+    var icon = isFavorite ? settings.favoriteRemoveIcon() : settings.favoriteAddIcon();
+    var nameTemplate = isFavorite ? settings.favoriteRemoveName() : settings.favoriteAddName();
+    var loreTemplate = isFavorite ? settings.favoriteRemoveLore() : settings.favoriteAddLore();
+    var slot = isFavorite ? settings.favoriteRemoveSlot() : settings.favoriteAddSlot();
+
+    var name = nameTemplate.replace("{player}", entry.targetName());
+    var lore = Placeholders.replaceInAll(loreTemplate, "{player}", entry.targetName());
+    var template = MenuTemplates.simple(icon, name, lore);
+    var safeSlot = MenuLayouts.sanitizeSlot(slot, rows, 0);
+
+    return SlotDefinition.of(safeSlot, template, click -> toggleFavorite(click, entry, isFavorite));
+  }
+
+  private SlotDefinition backSlotDefinition(@NonNull TpaTargetActionMenuConfig settings, int rows) {
     var template =
         MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
@@ -139,15 +169,17 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
   }
 
   private void sendRequest(
-      @NonNull ClickContext click, @NonNull TpaFavorite entry, @NonNull TeleportRequestType type) {
+      @NonNull ClickContext click,
+      @NonNull TpaTargetSelection entry,
+      @NonNull TeleportRequestType type) {
     var viewer = click.player();
     var actor = this.actors.actorOf(viewer);
     var snap = this.config.value();
     var messages = snap.messages();
 
-    var resolved = this.players.online(entry.favoriteId());
+    var resolved = this.players.online(entry.targetId());
     if (resolved.isEmpty()) {
-      var offlineText = messages.favoriteOffline().replace("{player}", entry.favoriteName());
+      var offlineText = messages.favoriteOffline().replace("{player}", entry.targetName());
       actor.sendError(offlineText);
       return;
     }
@@ -161,32 +193,42 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
     this.dispatcher.send(actor, target, type, confirmationTemplate);
   }
 
-  private void removeFavorite(@NonNull ClickContext click, @NonNull TpaFavorite entry) {
+  private void toggleFavorite(
+      @NonNull ClickContext click, @NonNull TpaTargetSelection entry, boolean isFavorite) {
     var viewer = click.player();
     var viewerId = viewer.getUniqueId();
     var actor = this.actors.actorOf(viewer);
-
-    this.favorites.remove(viewerId, entry.favoriteId());
-    this.selections.clear(viewerId);
-
     var messages = this.config.value().messages();
-    var removedText = messages.favoriteRemoved().replace("{player}", entry.favoriteName());
-    actor.sendSuccess(removedText);
 
-    click.switchTo(TpaFavoritesMenu.ID);
+    if (isFavorite) {
+      this.favorites.remove(viewerId, entry.targetId());
+      var removedText = messages.favoriteRemoved().replace("{player}", entry.targetName());
+      actor.sendSuccess(removedText);
+      return;
+    }
+
+    var added = this.favorites.add(viewerId, entry.targetId(), entry.targetName());
+    if (!added) {
+      var alreadyText = messages.favoriteAlready().replace("{player}", entry.targetName());
+      actor.sendError(alreadyText);
+      return;
+    }
+
+    var addedText = messages.favoriteAdded().replace("{player}", entry.targetName());
+    actor.sendSuccess(addedText);
   }
 
   private void onBackClicked(@NonNull ClickContext click) {
     var viewerId = click.player().getUniqueId();
     this.selections.clear(viewerId);
 
-    click.switchTo(TpaFavoritesMenu.ID);
+    click.switchTo(TpaHelpMenu.ID);
   }
 
   private ItemTemplate targetTemplate(
-      @NonNull TpaFavoriteActionMenuConfig settings, @NonNull TpaFavorite entry) {
-    var name = settings.targetName().replace("{player}", entry.favoriteName());
-    var lore = Placeholders.replaceInAll(settings.targetLore(), "{player}", entry.favoriteName());
+      @NonNull TpaTargetActionMenuConfig settings, @NonNull TpaTargetSelection entry) {
+    var name = settings.targetName().replace("{player}", entry.targetName());
+    var lore = Placeholders.replaceInAll(settings.targetLore(), "{player}", entry.targetName());
 
     var builder = ItemTemplate.builder(settings.targetIcon());
     MenuTemplates.applyHead(
@@ -194,7 +236,7 @@ public final class TpaFavoriteActionMenu implements EssentialsMenu {
         settings.targetIcon(),
         settings.targetUsePlayerHead(),
         settings.targetHeadTexture(),
-        entry.favoriteId());
+        entry.targetId());
     builder.name(name);
     builder.lore(lore.toArray(String[]::new));
     builder.italic(false);

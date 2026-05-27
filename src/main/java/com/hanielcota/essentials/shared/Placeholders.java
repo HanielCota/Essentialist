@@ -1,5 +1,7 @@
 package com.hanielcota.essentials.shared;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +54,20 @@ public final class Placeholders {
       @NonNull Object v4) {
     var valuesMap = Map.of(k1, v1, k2, v2, k3, v3, k4, v4);
     return format(template, valuesMap);
+  }
+
+  /**
+   * Single-token list-wise replacement: returns a fresh list where every line has {@code token}
+   * swapped for {@code replacement}. Use this when the same lore template needs to be expanded for
+   * multiple viewers — call sites avoid hand-rolling a loop over {@link String#replace}.
+   */
+  public static List<String> replaceInAll(
+      @NonNull List<String> templates, @NonNull String token, @NonNull String replacement) {
+    var result = new ArrayList<String>(templates.size());
+    for (var line : templates) {
+      result.add(line.replace(token, replacement));
+    }
+    return result;
   }
 
   public static String format(@NonNull String template, @NonNull Map<String, ?> values) {

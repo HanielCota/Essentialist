@@ -10,9 +10,11 @@ import com.hanielcota.essentials.modules.tpa.config.menu.TpaMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaNotificationSettingsMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaPickPlayerMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPrivacySettingsMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaProfileMenuConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.config.menu.TpaTargetActionMenuConfig;
 import java.time.Duration;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -38,6 +40,8 @@ public record TpaConfig(
     TpaSettingsMenuConfig settingsMenu,
     TpaFavoritesMenuConfig favoritesMenu,
     TpaFavoriteActionMenuConfig favoriteActionMenu,
+    TpaTargetActionMenuConfig targetActionMenu,
+    TpaPickPlayerMenuConfig pickPlayerMenu,
     TpaPendingActionMenuConfig pendingActionMenu,
     TpaPrivacySettingsMenuConfig privacySettingsMenu,
     TpaNotificationSettingsMenuConfig notificationSettingsMenu,
@@ -57,6 +61,8 @@ public record TpaConfig(
         TpaSettingsMenuConfig.defaults(),
         TpaFavoritesMenuConfig.defaults(),
         TpaFavoriteActionMenuConfig.defaults(),
+        TpaTargetActionMenuConfig.defaults(),
+        TpaPickPlayerMenuConfig.defaults(),
         TpaPendingActionMenuConfig.defaults(),
         TpaPrivacySettingsMenuConfig.defaults(),
         TpaNotificationSettingsMenuConfig.defaults(),

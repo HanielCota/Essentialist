@@ -6,8 +6,10 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
-import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.modules.tpa.menu.TpaTargetActionMenu;
+import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
@@ -15,6 +17,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import lombok.NonNull;
@@ -23,15 +26,15 @@ import org.bukkit.entity.Player;
 @Command("tpa")
 @EssentialsCommand
 @Permission("essentials.tpa")
+@PlayerOnly
 @Cooldown(duration = "5s")
-@Description("Abre o menu de ajuda do TPA, ou pede teleporte até outro jogador.")
+@Description("Abre o menu de ações de TPA com o jogador (ou o hub se nenhum nick for passado).")
 @Syntax("/tpa [jogador]")
 public record TpaCommand(
     ConfigHandle<TpaConfig> config,
-    TeleportRequestService service,
     PlayerProvider players,
     MenuService menus,
-    TpaSendOrchestrator dispatcher) {
+    TpaTargetSelections selections) {
 
   @DefaultSubcommand
   public void execute(@NonNull CommandActor actor, @DefaultValue("") @NonNull String targetName) {
@@ -54,9 +57,15 @@ public record TpaCommand(
     }
 
     var target = resolved.get();
-    var confirmationTemplate = messages.requestSent();
-    var type = TeleportRequestType.TPA;
+    if (sender.getUniqueId().equals(target.getUniqueId())) {
+      actor.sendError(messages.selfTarget());
+      return;
+    }
 
-    this.dispatcher.send(actor, target, type, confirmationTemplate);
+    var selection =
+        new TpaTargetSelection(target.getUniqueId(), target.getName(), TeleportRequestType.TPA);
+    this.selections.select(sender.getUniqueId(), selection);
+
+    MenuOpenings.open(this.menus, sender, TpaTargetActionMenu.ID, actor);
   }
 }

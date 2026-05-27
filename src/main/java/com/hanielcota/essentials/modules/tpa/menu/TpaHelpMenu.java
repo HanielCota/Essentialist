@@ -155,7 +155,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
             this.renderer.replacePending(helpMenu.tpaLore(), pending));
     var safeSlot = MenuLayouts.sanitizeSlot(helpMenu.tpaSlot(), rows, 0);
 
-    return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaHelpInfoMenu.ID));
+    return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaPickPlayerMenu.ID));
   }
 
   private SlotDefinition pendingSlot(@NonNull TpaHelpMenuConfig helpMenu, int pending, int rows) {

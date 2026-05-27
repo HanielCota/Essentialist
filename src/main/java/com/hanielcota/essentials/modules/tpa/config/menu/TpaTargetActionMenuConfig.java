@@ -6,20 +6,20 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
- * Appearance of the favorite-action sub-menu — two TPA buttons (visit / summon) plus remove and
- * back. Opens when the player clicks a favorite head.
+ * Appearance of the target-action sub-menu opened by {@code /tpa <nick>} and {@code /tpahere
+ * <nick>}: target head, two TPA buttons (visit / summon), favorite toggle, and back-to-hub.
  *
  * <p>The {@code title} is resolved once at menu registration (MenuFramework v1.2.0 limitation), so
  * it cannot contain a per-viewer {@code {player}} placeholder — the target name appears in the head
  * item instead.
  */
 @ConfigSerializable
-public record TpaFavoriteActionMenuConfig(
-    @Comment("Favorite action menu title (static, no per-viewer placeholders).") String title,
-    @Comment("Favorite action menu rows (1-6).") int rows,
+public record TpaTargetActionMenuConfig(
+    @Comment("Target action menu title (static, no per-viewer placeholders).") String title,
+    @Comment("Target action menu rows (1-6).") int rows,
     @Comment("Slot of the player head shown at the top.") int targetSlot,
     @Comment("Material of the target item.") Material targetIcon,
-    @Comment("Use the favorited player's skin on the target item.") boolean targetUsePlayerHead,
+    @Comment("Use the target player's skin on the target item.") boolean targetUsePlayerHead,
     @Comment("Custom head texture for the target item when material is PLAYER_HEAD.")
         String targetHeadTexture,
     @Comment("Name of the target item. Placeholder: {player}.") String targetName,
@@ -32,26 +32,37 @@ public record TpaFavoriteActionMenuConfig(
     @Comment("Material of the /tpahere button.") Material tpaHereIcon,
     @Comment("Name of the /tpahere button. Placeholder: {player}.") String tpaHereName,
     @Comment("Lore of the /tpahere button. Placeholder: {player}.") List<String> tpaHereLore,
-    @Comment("Slot of the remove-favorite button.") int removeSlot,
-    @Comment("Material of the remove-favorite button.") Material removeIcon,
-    @Comment("Name of the remove-favorite button. Placeholder: {player}.") String removeName,
-    @Comment("Lore of the remove-favorite button. Placeholder: {player}.") List<String> removeLore,
-    @Comment("Slot of the back item.") int backSlot,
-    @Comment("Material of the back item.") Material backIcon,
-    @Comment("Name of the back item.") String backName,
-    @Comment("Lore of the back item.") List<String> backLore) {
+    @Comment("Line prepended to the lore of whichever button matches the typed command.")
+        String recommendedTag,
+    @Comment("Slot of the add-favorite button (shown when the target is not yet a favorite).")
+        int favoriteAddSlot,
+    @Comment("Material of the add-favorite button.") Material favoriteAddIcon,
+    @Comment("Name of the add-favorite button. Placeholder: {player}.") String favoriteAddName,
+    @Comment("Lore of the add-favorite button. Placeholder: {player}.")
+        List<String> favoriteAddLore,
+    @Comment("Slot of the remove-favorite button (shown when the target is already a favorite).")
+        int favoriteRemoveSlot,
+    @Comment("Material of the remove-favorite button.") Material favoriteRemoveIcon,
+    @Comment("Name of the remove-favorite button. Placeholder: {player}.")
+        String favoriteRemoveName,
+    @Comment("Lore of the remove-favorite button. Placeholder: {player}.")
+        List<String> favoriteRemoveLore,
+    @Comment("Slot of the back-to-hub button (returns to /tpa menu).") int backSlot,
+    @Comment("Material of the back-to-hub button.") Material backIcon,
+    @Comment("Name of the back-to-hub button.") String backName,
+    @Comment("Lore of the back-to-hub button.") List<String> backLore) {
 
-  public static TpaFavoriteActionMenuConfig defaults() {
-    return new TpaFavoriteActionMenuConfig(
-        "<gold>Favorito",
-        5,
-        13,
+  public static TpaTargetActionMenuConfig defaults() {
+    return new TpaTargetActionMenuConfig(
+        "<gold>Ações de TPA",
+        3,
+        4,
         Material.PLAYER_HEAD,
         true,
         "",
         "<gold>{player}",
-        List.of("<gray>Escolha uma ação abaixo."),
-        30,
+        List.of("<gray>Escolha como teleportar."),
+        11,
         Material.ENDER_PEARL,
         "<yellow>Ir até {player}",
         List.of(
@@ -59,7 +70,7 @@ public record TpaFavoriteActionMenuConfig(
             "<gold>{player}</gold>.",
             "",
             "<yellow>Clique para enviar."),
-        31,
+        15,
         Material.COMPASS,
         "<yellow>Chamar {player}",
         List.of(
@@ -67,7 +78,16 @@ public record TpaFavoriteActionMenuConfig(
             "<gray>vir até você.",
             "",
             "<yellow>Clique para enviar."),
-        32,
+        "<gold>★ Recomendado",
+        21,
+        Material.NETHER_STAR,
+        "<aqua>Favoritar {player}",
+        List.of(
+            "<gray>Adiciona <gold>{player}</gold> aos",
+            "<gray>seus favoritos.",
+            "",
+            "<yellow>Clique para favoritar."),
+        21,
         Material.RED_DYE,
         "<red>Remover dos favoritos",
         List.of(
@@ -75,9 +95,9 @@ public record TpaFavoriteActionMenuConfig(
             "<gray>sua lista de favoritos.",
             "",
             "<yellow>Clique para remover."),
-        40,
+        23,
         Material.ARROW,
-        "<yellow>Voltar",
-        List.of("<gray>Retorna à lista de favoritos."));
+        "<yellow>Voltar ao menu principal",
+        List.of("<gray>Retorna ao menu de TPA."));
   }
 }

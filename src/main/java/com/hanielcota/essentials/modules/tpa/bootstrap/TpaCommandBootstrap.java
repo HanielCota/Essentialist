@@ -12,13 +12,13 @@ import com.hanielcota.essentials.modules.tpa.command.TpaCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHereCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryCommand;
 import com.hanielcota.essentials.modules.tpa.command.TpaHistoryPresenter;
-import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.command.TpaUnblockCommand;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.AsyncTpaHistory;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
+import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -34,15 +34,15 @@ public final class TpaCommandBootstrap {
       @NonNull TeleportRequestService requestService,
       @NonNull TpaBlockService blocks,
       @NonNull TpaHistoryMenuState menuState,
-      @NonNull TpaSendOrchestrator dispatcher,
+      @NonNull TpaTargetSelections targetSelections,
       @NonNull TpaRuntimeBootstrap.TpaShared shared) {
     var menus = this.env.service(MenuService.class);
     var playerProvider = shared.players();
 
-    var tpaCommand = new TpaCommand(this.config, requestService, playerProvider, menus, dispatcher);
+    var tpaCommand = new TpaCommand(this.config, playerProvider, menus, targetSelections);
     this.registrar.command(tpaCommand);
 
-    var tpaHereCommand = new TpaHereCommand(this.config, requestService, dispatcher);
+    var tpaHereCommand = new TpaHereCommand(this.config, menus, targetSelections);
     this.registrar.command(tpaHereCommand);
 
     var blockCommand = new TpaBlockCommand(this.config, blocks, playerProvider);
