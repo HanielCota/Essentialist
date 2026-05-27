@@ -30,7 +30,7 @@ public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService servi
     var snap = this.config.value();
     var messages = snap.messages();
 
-    var warpOpt = this.service.find(name);
+    var warpOpt = this.service.findWarp(name);
     var existed = warpOpt.isPresent();
 
     // SELECT is COLLATE NOCASE so "/setwarp SPAWN" finds an existing "Spawn".

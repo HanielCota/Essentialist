@@ -35,7 +35,7 @@ public record RealNameCommand(
     }
 
     var realName = this.resolver.resolve(ownerId);
-    var entry = this.service.nickFor(ownerId).orElseThrow();
+    var entry = this.service.nickOf(ownerId).orElseThrow();
     var foundMsg = snap.formatRealNameOf(entry.nickname(), realName);
 
     sender.sendMessage(foundMsg);

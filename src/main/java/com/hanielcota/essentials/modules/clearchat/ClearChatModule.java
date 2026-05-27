@@ -19,6 +19,9 @@ public final class ClearChatModule extends AbstractModule {
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("clearchat", ClearChatConfig.class, ClearChatConfig::defaults);
     var audiences = env.service(AudienceProvider.class);
-    registrar.command(new ClearChatCommand(config, new ClearChatService(audiences)));
+    var service = new ClearChatService(audiences);
+    var command = new ClearChatCommand(config, service);
+
+    registrar.command(command);
   }
 }

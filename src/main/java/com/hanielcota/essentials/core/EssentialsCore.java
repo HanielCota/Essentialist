@@ -9,12 +9,6 @@ import com.hanielcota.essentials.api.NicksApi;
 import com.hanielcota.essentials.api.TeleportsApi;
 import com.hanielcota.essentials.api.VanishApi;
 import com.hanielcota.essentials.api.WarpsApi;
-import com.hanielcota.essentials.core.api.HomesApiAdapter;
-import com.hanielcota.essentials.core.api.MutesApiAdapter;
-import com.hanielcota.essentials.core.api.NicksApiAdapter;
-import com.hanielcota.essentials.core.api.TeleportsApiAdapter;
-import com.hanielcota.essentials.core.api.VanishApiAdapter;
-import com.hanielcota.essentials.core.api.WarpsApiAdapter;
 import com.hanielcota.essentials.core.lifecycle.LifecyclePhase;
 import com.hanielcota.essentials.database.connection.DatabaseProvider;
 import com.hanielcota.essentials.module.environment.ModuleContext;
@@ -94,32 +88,32 @@ public final class EssentialsCore implements EssentialsApi {
 
   @Override
   public Optional<HomesApi> homes() {
-    return this.services.find(HomeService.class).map(HomesApiAdapter::new);
+    return this.services.find(HomeService.class).map(HomesApi.class::cast);
   }
 
   @Override
   public Optional<WarpsApi> warps() {
-    return this.services.find(WarpService.class).map(WarpsApiAdapter::new);
+    return this.services.find(WarpService.class).map(WarpsApi.class::cast);
   }
 
   @Override
   public Optional<MutesApi> mutes() {
-    return this.services.find(MuteService.class).map(MutesApiAdapter::new);
+    return this.services.find(MuteService.class).map(MutesApi.class::cast);
   }
 
   @Override
   public Optional<NicksApi> nicks() {
-    return this.services.find(NickService.class).map(NicksApiAdapter::new);
+    return this.services.find(NickService.class).map(NicksApi.class::cast);
   }
 
   @Override
   public Optional<VanishApi> vanish() {
-    return this.services.find(VanishService.class).map(VanishApiAdapter::new);
+    return this.services.find(VanishService.class).map(VanishApi.class::cast);
   }
 
   @Override
   public Optional<TeleportsApi> teleports() {
-    return this.services.find(TeleportService.class).map(TeleportsApiAdapter::new);
+    return this.services.find(TeleportService.class).map(TeleportsApi.class::cast);
   }
 
   private ModuleContext newContext() {

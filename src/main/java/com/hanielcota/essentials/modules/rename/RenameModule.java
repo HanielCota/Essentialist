@@ -17,6 +17,9 @@ public final class RenameModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("rename", RenameConfig.class, RenameConfig::defaults);
-    registrar.command(new RenameCommand(config, new RenameService()));
+    var service = new RenameService();
+    var command = new RenameCommand(config, service);
+
+    registrar.command(command);
   }
 }

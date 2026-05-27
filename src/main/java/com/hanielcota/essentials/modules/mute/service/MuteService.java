@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.mute.service;
 
+import com.hanielcota.essentials.api.MutesApi;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.modules.mute.domain.MuteOutcome;
 import com.hanielcota.essentials.modules.mute.repository.MuteCache;
@@ -19,7 +20,7 @@ import org.jspecify.annotations.Nullable;
  * <p>In-memory caching is delegated to {@link MuteCache} which handles cache eviction and async
  * persistence coordination.
  */
-public final class MuteService {
+public final class MuteService implements MutesApi {
 
   public static final String EXEMPT_PERMISSION = "essentials.mute.exempt";
 
@@ -39,6 +40,11 @@ public final class MuteService {
 
   public Optional<Mute> activeMute(@NonNull UUID id) {
     return this.cache.activeMute(id);
+  }
+
+  @Override
+  public boolean isMuted(@NonNull UUID id) {
+    return this.cache.activeMute(id).isPresent();
   }
 
   /**

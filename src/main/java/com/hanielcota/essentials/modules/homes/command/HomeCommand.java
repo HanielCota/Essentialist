@@ -46,7 +46,7 @@ public record HomeCommand(
     }
 
     var uuid = sender.getUniqueId();
-    var home = this.service.find(uuid, name);
+    var home = this.service.findHome(uuid, name);
 
     if (home.isEmpty()) {
       var missingMsg = this.missingResolver.resolve(uuid, name);

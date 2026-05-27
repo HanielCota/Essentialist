@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.homes.service;
 
+import com.hanielcota.essentials.api.HomesApi;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.repository.HomeRepository;
 import java.util.List;
@@ -20,20 +21,20 @@ import org.jspecify.annotations.Nullable;
  * repository directly.
  */
 @RequiredArgsConstructor
-public final class HomeService {
+public final class HomeService implements HomesApi {
 
   private final HomeRepository repository;
   private final HomeLimitResolver limits;
 
-  public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
+  public Optional<Home> findHome(@NonNull UUID owner, @NonNull String name) {
     return this.repository.find(owner, name);
   }
 
-  public List<Home> list(@NonNull UUID owner) {
+  public List<Home> homesOf(@NonNull UUID owner) {
     return this.repository.list(owner);
   }
 
-  public int count(@NonNull UUID owner) {
+  public int homeCount(@NonNull UUID owner) {
     return this.repository.count(owner);
   }
 

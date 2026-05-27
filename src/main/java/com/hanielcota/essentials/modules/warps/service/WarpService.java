@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.warps.service;
 
+import com.hanielcota.essentials.api.WarpsApi;
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.warps.domain.Warp;
 import com.hanielcota.essentials.modules.warps.repository.WarpCache;
@@ -22,7 +23,7 @@ import org.bukkit.permissions.Permissible;
  * essentials.warp.use.*} — stays here so menu and command paths agree.
  */
 @RequiredArgsConstructor
-public final class WarpService {
+public final class WarpService implements WarpsApi {
 
   private static final String USE_PREFIX = "essentials.warp.use.";
   private static final String USE_WILDCARD = "essentials.warp.use.*";
@@ -31,15 +32,15 @@ public final class WarpService {
   private final WarpCache cache;
   private final AsyncDatabaseWriter writer;
 
-  public Optional<Warp> find(@NonNull String name) {
+  public Optional<Warp> findWarp(@NonNull String name) {
     return this.cache.find(name);
   }
 
-  public List<Warp> list() {
+  public List<Warp> warps() {
     return this.cache.list();
   }
 
-  public List<Warp> listVisibleTo(@NonNull Permissible permissible) {
+  public List<Warp> visibleTo(@NonNull Permissible permissible) {
     var allWarps = this.cache.list();
     Predicate<Warp> usableByPermissible = warp -> canUse(permissible, warp.name());
 

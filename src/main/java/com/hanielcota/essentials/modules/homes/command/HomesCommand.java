@@ -35,7 +35,7 @@ public record HomesCommand(
   public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
     var uuid = sender.getUniqueId();
-    var homes = this.service.list(uuid);
+    var homes = this.service.homesOf(uuid);
 
     if (homes.isEmpty()) {
       var snap = this.config.value();

@@ -37,7 +37,7 @@ public record WarpCommand(
     var snap = this.config.value();
     var messages = snap.messages();
 
-    var warpOpt = this.service.find(name);
+    var warpOpt = this.service.findWarp(name);
     if (warpOpt.isEmpty()) {
       var unknownTemplate = messages.unknownWarp();
       var unknownMsg = unknownTemplate.replace(NAME, name);

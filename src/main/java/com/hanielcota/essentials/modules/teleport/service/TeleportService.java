@@ -1,27 +1,13 @@
 package com.hanielcota.essentials.modules.teleport.service;
 
+import com.hanielcota.essentials.api.TeleportsApi;
 import com.hanielcota.essentials.modules.teleport.domain.TeleportOutcome;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-/**
- * Owns the teleport flow for {@code /tp}, {@code /tphere} and friends. Validates pre-flight
- * conditions (same-target / world bounds / world border) and delegates the actual move to Paper's
- * async teleport API. Returns a {@link CompletableFuture} of {@link TeleportOutcome} which the
- * caller's notifier consumes.
- *
- * <p>Stateless — every call is independent. Pre-flight rejections short-circuit by completing the
- * future immediately so callers always observe a single completion signal. Instance-based so
- * callers can inject a mock in tests; the registered singleton is owned by {@code TeleportModule}.
- *
- * <p>Callers must drive the returned future through {@link
- * com.hanielcota.essentials.scheduler.MainThreadCallbacks#hop} (or schedule the callback on the
- * appropriate entity) before touching Bukkit API. The future completes on Paper's teleport
- * completion thread, not the main thread.
- */
-public final class TeleportService {
+public final class TeleportService implements TeleportsApi {
 
   private static CompletableFuture<TeleportOutcome> dispatch(
       @NonNull Player subject, @NonNull Location destination) {
