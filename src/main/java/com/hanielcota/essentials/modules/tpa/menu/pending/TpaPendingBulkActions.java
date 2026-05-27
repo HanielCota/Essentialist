@@ -43,11 +43,17 @@ public final class TpaPendingBulkActions {
       return;
     }
 
-    var accepted = claimAndDispatch(requestsToAccept(pending), actor);
+    var toAccept = requestsToAccept(pending);
+    var accepted = claimAndDispatch(toAccept, actor);
+    var skipped = pending.size() - accepted;
 
-    var countText = Integer.toString(accepted);
-    var summary = messages.acceptedAllMessage().replace("{count}", countText);
+    var summary = messages.acceptedAllMessage().replace("{count}", Integer.toString(accepted));
     actor.sendSuccess(summary);
+    if (skipped > 0) {
+      var skippedMsg =
+          messages.acceptedAllSkippedMessage().replace("{count}", Integer.toString(skipped));
+      actor.sendError(skippedMsg);
+    }
 
     click.refresh();
   }
@@ -65,14 +71,16 @@ public final class TpaPendingBulkActions {
       return;
     }
 
+    var denied = 0;
     for (var request : pending) {
-      var denied = this.service.deny(request);
-      if (denied) {
-        this.replyNotifier.notifyDenied(request, messages.denied());
+      if (!this.service.deny(request)) {
+        continue;
       }
+      this.replyNotifier.notifyDenied(request, messages.denied());
+      denied++;
     }
 
-    var countText = Integer.toString(pending.size());
+    var countText = Integer.toString(denied);
     var summary = messages.deniedAllMessage().replace("{count}", countText);
     actor.sendSuccess(summary);
 
@@ -99,12 +107,25 @@ public final class TpaPendingBulkActions {
     return accepted;
   }
 
+  /**
+   * Picks the requests we can safely accept together: every {@code TPA} (each one teleports a
+   * different requester to the viewer, so they compose) plus the first {@code TPAHERE} (the viewer
+   * can only move to one place). Any extra TPAHERE is left pending so the viewer can resolve it
+   * manually.
+   */
   private static List<TeleportRequest> requestsToAccept(@NonNull List<TeleportRequest> pending) {
+    var picks = new java.util.ArrayList<TeleportRequest>(pending.size());
+    var firstHere = false;
     for (var request : pending) {
-      if (request.type() == TeleportRequestType.TPAHERE) {
-        return List.of(request);
+      var isHere = request.type() == TeleportRequestType.TPAHERE;
+      if (isHere && firstHere) {
+        continue;
       }
+      if (isHere) {
+        firstHere = true;
+      }
+      picks.add(request);
     }
-    return pending;
+    return picks;
   }
 }

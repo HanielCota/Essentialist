@@ -43,7 +43,7 @@ class TpaPendingBulkActionsTest {
   }
 
   @Test
-  void acceptAllLeavesTpaRequestsPendingWhenNewestTpahereIsAccepted() {
+  void acceptAllAcceptsEveryTpaAndTheFirstTpahereTogether() {
     var fixture = newFixture();
     var viewerState = new TpaTestSupport.TestPlayerState("Viewer");
     var tpaRequesterState = new TpaTestSupport.TestPlayerState("Alice");
@@ -60,8 +60,8 @@ class TpaPendingBulkActionsTest {
     fixture.bulk.acceptAll(TpaTestSupport.click(viewer));
 
     assertEquals(1, viewerState.teleports());
-    assertEquals(0, tpaRequesterState.teleports());
-    assertEquals(1, fixture.service.incoming(viewer.getUniqueId()).size());
+    assertEquals(1, tpaRequesterState.teleports());
+    assertEquals(0, fixture.service.incoming(viewer.getUniqueId()).size());
   }
 
   @Test

@@ -104,6 +104,10 @@ public record TpaMessages(
         String crossWorldRefused,
     @Comment("Sent after the player clicks accept-all in the pending menu. Placeholder: {count}.")
         String acceptedAllMessage,
+    @Comment(
+            "Sent after accept-all when some requests were left pending (extra TPAHERE requests "
+                + "the viewer cannot accept in bulk). Placeholder: {count}.")
+        String acceptedAllSkippedMessage,
     @Comment("Sent after the player clicks deny-all in the pending menu. Placeholder: {count}.")
         String deniedAllMessage,
     @Comment(
@@ -175,6 +179,8 @@ public record TpaMessages(
         "<gold>{player}</gold> te adicionou aos favoritos.",
         "<red><gold>{player}</gold> não está aceitando pedidos vindos de outros mundos.",
         "<green>Você aceitou <white>{count}</white> pedido(s).",
+        "<yellow><white>{count}</white> pedido(s) de teleporte ficaram pendentes — abra o menu para"
+            + " resolvê-los.",
         "<yellow>Você recusou <white>{count}</white> pedido(s).",
         "<gold>{player}</gold> <green>foi auto-aceito (está nos seus favoritos) — teleportando…",
         "<yellow><gold>{player}</gold> trocou o destino do pedido de teleporte.",
