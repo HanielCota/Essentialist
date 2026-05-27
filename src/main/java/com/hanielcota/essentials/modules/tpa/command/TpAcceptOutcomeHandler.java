@@ -29,6 +29,7 @@ public final class TpAcceptOutcomeHandler {
     map.put(AcceptOutcome.REQUESTER_OFFLINE, this::notifyRequesterOffline);
     map.put(AcceptOutcome.TARGET_OFFLINE, this::notifyTargetOffline);
     map.put(AcceptOutcome.NOT_FOUND, this::notifyNotFound);
+    map.put(AcceptOutcome.CROSS_WORLD_REFUSED, this::notifyCrossWorldRefused);
     return Map.copyOf(map);
   }
 
@@ -105,5 +106,15 @@ public final class TpAcceptOutcomeHandler {
       @NonNull TpaMessages messages,
       @NonNull CommandActor actor) {
     actor.sendError(messages.noIncoming());
+  }
+
+  private void notifyCrossWorldRefused(
+      @NonNull TeleportRequest request,
+      @NonNull TpaMessages messages,
+      @NonNull CommandActor actor) {
+    var requesterName = request.requester().name();
+    var template = messages.crossWorldRefused();
+    var msg = template.replace("{player}", requesterName);
+    actor.sendError(msg);
   }
 }

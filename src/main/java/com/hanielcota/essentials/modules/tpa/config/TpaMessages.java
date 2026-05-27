@@ -113,7 +113,15 @@ public record TpaMessages(
     @Comment(
             "Shown when accept-all skips TPA requests because a TPAHERE has priority. "
                 + "Placeholder: {count}.")
-        String tpaHerePriorityMessage) {
+        String tpaHerePriorityMessage,
+    @Comment(
+            "Shown when deny-all skips some requests that were already processed. "
+                + "Placeholder: {count}.")
+        String alreadyProcessedMessage,
+    @Comment(
+            "Sent to the requester when their outgoing request is replaced by a new one. "
+                + "Placeholders: {oldTarget}, {newTarget}.")
+        String outgoingReplaced) {
 
   public static TpaMessages defaults() {
     return new TpaMessages(
@@ -174,7 +182,11 @@ public record TpaMessages(
         "<green>Você aceitou <white>{count}</white> pedido(s).",
         "<yellow>Você recusou <white>{count}</white> pedido(s).",
         "<yellow>Pedidos /tpa ignorados — um pedido /tpahere tem prioridade. "
-            + "(<white>{count}</white> ignorado(s))");
+            + "(<white>{count}</white> ignorado(s))",
+        "<gray>Alguns pedidos já foram processados e não puderam ser negados. "
+            + "(<white>{count}</white> pedido(s))",
+        "<yellow>Seu pedido para <gold>{oldTarget}</gold> foi substituído por um novo para "
+            + "<gold>{newTarget}</gold>.</yellow>");
   }
 
   /**
