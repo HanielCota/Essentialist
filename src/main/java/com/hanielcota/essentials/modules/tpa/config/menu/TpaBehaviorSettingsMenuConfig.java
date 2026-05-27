@@ -70,7 +70,7 @@ public record TpaBehaviorSettingsMenuConfig(
             "Clique para ligar ou desligar."),
         12,
         Material.RED_DYE,
-        Material.GRAY_DYE,
+        Material.LIME_DYE,
         "Não perturbe: {state}",
         List.of(
             "Quando ligado, todos os pedidos de TPA são recusados em silêncio.",
