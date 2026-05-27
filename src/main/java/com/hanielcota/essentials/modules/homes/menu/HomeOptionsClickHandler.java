@@ -63,6 +63,26 @@ public final class HomeOptionsClickHandler {
     click.switchTo(MaterialCategoryMenu.ID);
   }
 
+  void togglePin(@NonNull ClickContext click) {
+    var player = click.player();
+    var uuid = player.getUniqueId();
+    var homeName = this.target.peek(uuid);
+
+    if (homeName == null) {
+      click.close();
+      return;
+    }
+
+    var home = this.service.findHome(uuid, homeName);
+    if (home.isEmpty()) {
+      click.close();
+      return;
+    }
+
+    this.service.setPinned(uuid, homeName, !home.get().pinned());
+    click.refresh();
+  }
+
   void delete(@NonNull ClickContext click) {
     click.switchTo(DeleteHomeDialog.ID);
   }

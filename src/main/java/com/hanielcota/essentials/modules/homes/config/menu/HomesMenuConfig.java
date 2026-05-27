@@ -104,7 +104,20 @@ public record HomesMenuConfig(
     @Comment("Slot of the back button.") int optionsBackSlot,
     @Comment("Material of the back button.") Material optionsBackMaterial,
     @Comment("Name of the back button.") String optionsBackName,
-    @Comment("Lore of the back button.") List<String> optionsBackLore) {
+    @Comment("Lore of the back button.") List<String> optionsBackLore,
+    @Comment("Slot of the pin / unpin button.") int optionsPinSlot,
+    @Comment("Material of the pin button (shown when the home is not pinned).")
+        Material optionsPinMaterial,
+    @Comment("Name of the pin button. Placeholders: {name}.") String optionsPinName,
+    @Comment("Lore of the pin button. Placeholders: {name}.") List<String> optionsPinLore,
+    @Comment("Material of the unpin button (shown when the home is pinned).")
+        Material optionsUnpinMaterial,
+    @Comment("Name of the unpin button. Placeholders: {name}.") String optionsUnpinName,
+    @Comment("Lore of the unpin button. Placeholders: {name}.") List<String> optionsUnpinLore,
+    @Comment(
+            "Prefix added to the home name in /homes when it is pinned. Empty to disable the "
+                + "marker.")
+        String pinnedNamePrefix) {
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
@@ -206,7 +219,15 @@ public record HomesMenuConfig(
         22,
         Material.ARROW,
         "<yellow>Voltar",
-        List.of("<gray>Retorna à lista de homes."));
+        List.of("<gray>Retorna à lista de homes."),
+        13,
+        Material.NETHER_STAR,
+        "<gold>Fixar no topo",
+        List.of("<gray>Move <gold>{name}</gold> para o topo da lista."),
+        Material.NETHER_STAR,
+        "<gold>★ Desfixar",
+        List.of("<gray>Remove o destaque de <gold>{name}</gold>."),
+        "<gold>★ ");
   }
 
   private static Map<MaterialCategory, String> defaultCategoryNames() {

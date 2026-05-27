@@ -28,4 +28,6 @@ public interface HomeRepository {
   boolean rename(@NonNull UUID owner, @NonNull String oldName, @NonNull String newName);
 
   boolean updateMaterial(@NonNull UUID owner, @NonNull String name, @NonNull Material material);
+
+  boolean updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned);
 }

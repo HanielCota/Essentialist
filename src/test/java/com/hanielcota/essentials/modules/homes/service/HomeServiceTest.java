@@ -65,7 +65,7 @@ class HomeServiceTest {
   @Test
   void renameReportsNameTakenWhenSourceExistsButRepositoryRefuses() {
     var owner = UUID.randomUUID();
-    var home = new Home(owner, "base", "world", 0, 64, 0, 0, 0, Material.RED_BED, 1);
+    var home = new Home(owner, "base", "world", 0, 64, 0, 0, 0, Material.RED_BED, 1, false);
     var repository = new RefusingRenameRepository(true);
     repository.home = home;
     var service = new HomeService(repository, new HomeLimitResolver(() -> 1));
@@ -142,6 +142,11 @@ class HomeServiceTest {
     public boolean updateMaterial(UUID owner, String name, Material material) {
       return false;
     }
+
+    @Override
+    public boolean updatePinned(UUID owner, String name, boolean pinned) {
+      return false;
+    }
   }
 
   private static final class RecordingRepository implements HomeRepository {
@@ -182,6 +187,11 @@ class HomeServiceTest {
     @Override
     public boolean updateMaterial(UUID owner, String name, Material material) {
       updateMaterialCalls++;
+      return true;
+    }
+
+    @Override
+    public boolean updatePinned(UUID owner, String name, boolean pinned) {
       return true;
     }
   }

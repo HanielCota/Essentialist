@@ -23,7 +23,8 @@ public record Home(
     float yaw,
     float pitch,
     Material material,
-    long createdAt) {
+    long createdAt,
+    boolean pinned) {
 
   public static Home of(
       @NonNull UUID owner,
@@ -41,7 +42,7 @@ public record Home(
 
     var createdAt = System.currentTimeMillis();
 
-    return new Home(owner, name, worldName, x, y, z, yaw, pitch, material, createdAt);
+    return new Home(owner, name, worldName, x, y, z, yaw, pitch, material, createdAt, false);
   }
 
   public Home withName(@NonNull String newName) {
@@ -55,7 +56,8 @@ public record Home(
         this.yaw,
         this.pitch,
         this.material,
-        this.createdAt);
+        this.createdAt,
+        this.pinned);
   }
 
   public Home withMaterial(@NonNull Material newMaterial) {
@@ -69,7 +71,23 @@ public record Home(
         this.yaw,
         this.pitch,
         newMaterial,
-        this.createdAt);
+        this.createdAt,
+        this.pinned);
+  }
+
+  public Home withPinned(boolean newPinned) {
+    return new Home(
+        this.owner,
+        this.name,
+        this.world,
+        this.x,
+        this.y,
+        this.z,
+        this.yaw,
+        this.pitch,
+        this.material,
+        this.createdAt,
+        newPinned);
   }
 
   public Optional<Location> resolve() {

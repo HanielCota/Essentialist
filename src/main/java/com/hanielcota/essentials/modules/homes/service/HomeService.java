@@ -102,6 +102,10 @@ public final class HomeService implements HomesApi {
     return this.repository.updateMaterial(owner, name, material);
   }
 
+  public boolean setPinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
+    return this.repository.updatePinned(owner, name, pinned);
+  }
+
   public enum CreateResult {
     CREATED,
     ALREADY_EXISTS,

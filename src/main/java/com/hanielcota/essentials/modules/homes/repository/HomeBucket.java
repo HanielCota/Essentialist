@@ -16,9 +16,12 @@ final class HomeBucket {
 
   private final Map<String, Home> homes = new ConcurrentHashMap<>();
 
+  private static final Comparator<Home> BY_PINNED_THEN_NAME =
+      Comparator.comparing(Home::pinned).reversed().thenComparing(Home::name);
+
   private static List<Home> sorted(@NonNull Collection<Home> homes) {
     var list = new ArrayList<>(homes);
-    list.sort(Comparator.comparing(Home::name));
+    list.sort(BY_PINNED_THEN_NAME);
     return List.copyOf(list);
   }
 
@@ -83,6 +86,13 @@ final class HomeBucket {
 
     var updated =
         this.homes.computeIfPresent(homeKey, (k, current) -> current.withMaterial(material));
+    return Optional.ofNullable(updated);
+  }
+
+  Optional<Home> updatePinned(@NonNull String name, boolean pinned) {
+    var homeKey = key(name);
+
+    var updated = this.homes.computeIfPresent(homeKey, (k, current) -> current.withPinned(pinned));
     return Optional.ofNullable(updated);
   }
 }

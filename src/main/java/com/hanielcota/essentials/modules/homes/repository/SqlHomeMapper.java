@@ -26,7 +26,8 @@ final class SqlHomeMapper {
 
     var material = HomeMaterials.parseIcon(rs.getString("material"));
     var createdAt = rs.getLong("created_at");
+    var pinned = rs.getInt("pinned") != 0;
 
-    return new Home(ownerId, name, world, x, y, z, yaw, pitch, material, createdAt);
+    return new Home(ownerId, name, world, x, y, z, yaw, pitch, material, createdAt, pinned);
   }
 }

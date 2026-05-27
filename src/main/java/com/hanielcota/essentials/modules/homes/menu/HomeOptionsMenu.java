@@ -58,6 +58,7 @@ public final class HomeOptionsMenu implements EssentialsMenu {
             MenuLayouts.sanitizeSlot(menuSpec.optionsHomeSlot(), rows, 4),
             MenuLayouts.sanitizeSlot(menuSpec.optionsTeleportSlot(), rows, 11),
             MenuLayouts.sanitizeSlot(menuSpec.optionsRenameSlot(), rows, 12),
+            MenuLayouts.sanitizeSlot(menuSpec.optionsPinSlot(), rows, 13),
             MenuLayouts.sanitizeSlot(menuSpec.optionsIconSlot(), rows, 14),
             MenuLayouts.sanitizeSlot(menuSpec.optionsDeleteSlot(), rows, 15),
             MenuLayouts.sanitizeSlot(menuSpec.optionsBackSlot(), rows, 22));
@@ -81,14 +82,24 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     var uuid = player.getUniqueId();
     var homeName = this.target.peek(uuid);
 
+    var pinned = isPinned(uuid, homeName);
+
     var slots = new ArrayList<SlotDefinition>();
     slots.add(homeSlot(menuSpec, rows, uuid, homeName));
     slots.add(teleportSlot(menuSpec, rows, homeName));
     slots.add(renameSlot(menuSpec, rows, homeName));
+    slots.add(pinSlot(menuSpec, rows, homeName, pinned));
     slots.add(iconSlot(menuSpec, rows, homeName));
     slots.add(deleteSlot(menuSpec, rows, homeName));
     slots.add(backSlot(menuSpec, rows));
     return slots;
+  }
+
+  private boolean isPinned(@NonNull java.util.UUID uuid, String homeName) {
+    if (homeName == null) {
+      return false;
+    }
+    return this.service.findHome(uuid, homeName).map(home -> home.pinned()).orElse(false);
   }
 
   private SlotDefinition homeSlot(
@@ -130,6 +141,18 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsRenameSlot(), rows, 12);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::rename);
+  }
+
+  private SlotDefinition pinSlot(
+      @NonNull HomesMenuConfig menuSpec, int rows, String homeName, boolean pinned) {
+    var material = pinned ? menuSpec.optionsUnpinMaterial() : menuSpec.optionsPinMaterial();
+    var nameTemplate = pinned ? menuSpec.optionsUnpinName() : menuSpec.optionsPinName();
+    var loreTemplate = pinned ? menuSpec.optionsUnpinLore() : menuSpec.optionsPinLore();
+
+    var template = buttonTemplate(material, nameTemplate, loreTemplate, homeName);
+    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsPinSlot(), rows, 13);
+
+    return SlotDefinition.of(safeSlot, template, this.clicks::togglePin);
   }
 
   private SlotDefinition iconSlot(@NonNull HomesMenuConfig menuSpec, int rows, String homeName) {

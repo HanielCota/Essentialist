@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 class HomeCacheTest {
 
   private static Home home(UUID owner, String name) {
-    return new Home(owner, name, "world", 1, 2, 3, 0, 0, Material.RED_BED, 1);
+    return new Home(owner, name, "world", 1, 2, 3, 0, 0, Material.RED_BED, 1, false);
   }
 
   @Test
