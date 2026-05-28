@@ -82,6 +82,9 @@ class MaterialCategoryMenuTest {
         original.defaultLimit(),
         original.defaultMaterial(),
         original.renameTimeoutSeconds(),
+        original.homeNameMinLength(),
+        original.homeNameMaxLength(),
+        original.allowedNamePattern(),
         menu,
         original.messages());
   }

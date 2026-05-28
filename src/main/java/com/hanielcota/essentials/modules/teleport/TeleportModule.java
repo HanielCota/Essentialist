@@ -41,7 +41,8 @@ public final class TeleportModule extends AbstractModule {
     var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
     var historyWriter = writerFactory.create("TeleportHistory");
     registrar.closeable(historyWriter);
-    var history = new SqliteTeleportHistory(executor, historyWriter);
+    var historyDepth = config.value().historyDepth();
+    var history = new SqliteTeleportHistory(executor, historyWriter, historyDepth);
     registrar.provide(TeleportHistory.class, history);
 
     var delayed = new DelayedTeleport(env.service(Scheduler.class));

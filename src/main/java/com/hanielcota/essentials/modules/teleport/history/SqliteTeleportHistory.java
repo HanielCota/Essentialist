@@ -25,6 +25,9 @@ public final class SqliteTeleportHistory implements TeleportHistory {
    */
   private final AsyncDatabaseWriter writer;
 
+  /** How many entries to retain per player on TRIM and return from {@link #list}. */
+  private final int capacity;
+
   /**
    * Maps one row from the {@code teleport_history} table to a {@link HistoryEntry}.
    *
@@ -99,14 +102,14 @@ public final class SqliteTeleportHistory implements TeleportHistory {
       throws SQLException {
     this.sqlExecutor.execute(
         conn, TeleportHistoryTable.INSERT, playerId, worldName, x, y, z, yaw, pitch, createdAt);
-    this.sqlExecutor.execute(conn, TeleportHistoryTable.TRIM, playerId, playerId, CAPACITY);
+    this.sqlExecutor.execute(conn, TeleportHistoryTable.TRIM, playerId, playerId, this.capacity);
   }
 
   @Override
   public List<HistoryEntry> list(@NonNull UUID player) {
     var playerId = player.toString();
     return this.sqlExecutor.query(
-        TeleportHistoryTable.LIST, SqliteTeleportHistory::readEntry, playerId, CAPACITY);
+        TeleportHistoryTable.LIST, SqliteTeleportHistory::readEntry, playerId, this.capacity);
   }
 
   @Override
