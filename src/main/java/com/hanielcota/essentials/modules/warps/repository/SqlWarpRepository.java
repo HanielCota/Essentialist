@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Material;
 
 /**
  * Storage of server warps.
@@ -21,6 +22,8 @@ public final class SqlWarpRepository implements WarpRepository {
 
   private final SqlExecutor sqlExecutor;
   private final WarpTable table;
+
+  private static final Material DEFAULT_ICON = Material.ENDER_PEARL;
 
   private static Warp readRow(@NonNull ResultSet rs) throws SQLException {
     var name = rs.getString("name");
@@ -35,8 +38,18 @@ public final class SqlWarpRepository implements WarpRepository {
 
     var createdAt = rs.getLong("created_at");
     var createdById = UUID.fromString(rs.getString("created_by_id"));
+    var icon = parseIcon(rs.getString("icon"));
 
-    return new Warp(name, world, x, y, z, yaw, pitch, createdAt, createdById);
+    return new Warp(name, world, x, y, z, yaw, pitch, createdAt, createdById, icon);
+  }
+
+  private static Material parseIcon(String iconName) {
+    if (iconName == null) {
+      return DEFAULT_ICON;
+    }
+
+    var material = Material.matchMaterial(iconName);
+    return material != null ? material : DEFAULT_ICON;
   }
 
   public Optional<Warp> find(@NonNull String name) {
@@ -67,9 +80,10 @@ public final class SqlWarpRepository implements WarpRepository {
 
     var createdAt = warp.createdAt();
     var creatorIdStr = warp.createdBy().toString();
+    var iconName = warp.icon().name();
 
     this.sqlExecutor.update(
-        this.table.upsert(), name, world, x, y, z, yaw, pitch, createdAt, creatorIdStr);
+        this.table.upsert(), name, world, x, y, z, yaw, pitch, createdAt, creatorIdStr, iconName);
   }
 
   /** Deletes the warp. Returns {@code true} when a row was removed. */
