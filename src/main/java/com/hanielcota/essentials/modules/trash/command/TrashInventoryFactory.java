@@ -7,8 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
 /**
- * Creates the throwaway inventory used by {@code /lixo}. Encapsulates the static
- * {@code Bukkit.createInventory} call so the command stays decoupled from the static API.
+ * Creates the throwaway inventory used by {@code /lixo}. Encapsulates the static {@code
+ * Bukkit.createInventory} call so the command stays decoupled from the static API.
  */
 public final class TrashInventoryFactory {
 

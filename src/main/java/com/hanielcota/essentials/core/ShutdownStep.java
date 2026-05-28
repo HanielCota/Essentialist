@@ -4,8 +4,8 @@ import lombok.NonNull;
 
 /**
  * One ordered teardown action registered by a bootstrap stage. {@link CoreLifecycle#shutdown()}
- * invokes every step in reverse-registration order so the most recently bootstrapped
- * infrastructure tears down first.
+ * invokes every step in reverse-registration order so the most recently bootstrapped infrastructure
+ * tears down first.
  *
  * <p>Bootstrap rollback uses the same registry, so the close ordering is defined exactly once.
  */

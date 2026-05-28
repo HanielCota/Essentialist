@@ -33,11 +33,11 @@ import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
-import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingActionRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteBrowser;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHelpMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHistoryEntryRenderer;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingActionRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPickPlayerMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaProfileMenuRenderer;
@@ -230,8 +230,7 @@ public final class TpaMenuBootstrap {
     var filters = new TpaPickPlayerFilters();
     var candidates = new TpaPickPlayerCandidates(players, favorites, contacts);
     var pickRenderer = new TpaPickPlayerMenuRenderer();
-    var menu =
-        new TpaPickPlayerMenu(this.config, selections, filters, candidates, pickRenderer);
+    var menu = new TpaPickPlayerMenu(this.config, selections, filters, candidates, pickRenderer);
 
     this.registrar.menu(menu);
 

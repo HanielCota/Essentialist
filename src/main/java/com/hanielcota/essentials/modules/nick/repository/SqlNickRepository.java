@@ -39,8 +39,7 @@ public final class SqlNickRepository implements NickRepository {
   @Override
   public Optional<NickEntry> findById(@NonNull UUID id) {
     var idStr = id.toString();
-    var rows =
-        this.sqlExecutor.query(NickTable.SELECT_BY_ID, SqlNickRepository::readRow, idStr);
+    var rows = this.sqlExecutor.query(NickTable.SELECT_BY_ID, SqlNickRepository::readRow, idStr);
 
     if (rows.isEmpty()) {
       return Optional.empty();

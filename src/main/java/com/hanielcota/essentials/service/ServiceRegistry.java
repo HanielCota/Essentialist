@@ -20,8 +20,8 @@ public interface ServiceRegistry {
   /**
    * Subscribes to future {@link #register(Class, Object)} calls. The listener is invoked
    * synchronously, after the registry has accepted the entry, with the declared type and instance.
-   * Useful for mirroring services into adjacent containers (e.g. the command framework's DI
-   * table) without coupling those callbacks to the registration call sites.
+   * Useful for mirroring services into adjacent containers (e.g. the command framework's DI table)
+   * without coupling those callbacks to the registration call sites.
    */
   void addRegistrationListener(@NonNull BiConsumer<Class<?>, Object> listener);
 }

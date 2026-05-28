@@ -8,8 +8,8 @@ import org.bukkit.Location;
  * One persisted server warp.
  *
  * <p>Stores the world name (not a live {@code World}) so the record stays valid across reloads.
- * Materialization back into a {@link Location} lives in {@code WarpResolver} — the domain record
- * is a pure value carrier.
+ * Materialization back into a {@link Location} lives in {@code WarpResolver} — the domain record is
+ * a pure value carrier.
  */
 public record Warp(
     @NonNull String name,

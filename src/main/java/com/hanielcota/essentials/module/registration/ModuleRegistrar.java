@@ -33,8 +33,8 @@ public interface ModuleRegistrar {
   <T> void provide(@NonNull Class<T> type, @NonNull T instance);
 
   /**
-   * Loads a config and registers {@code service} under {@code serviceType} in one call. Callers pass
-   * the registration type explicitly to avoid the runtime-class inspection that the previous
+   * Loads a config and registers {@code service} under {@code serviceType} in one call. Callers
+   * pass the registration type explicitly to avoid the runtime-class inspection that the previous
    * overload required.
    */
   <C, S> ConfigHandle<C> configure(

@@ -53,7 +53,8 @@ public final class ChatModule extends AbstractModule {
     var audiences = env.service(AudienceProvider.class);
     var players = env.service(PlayerProvider.class);
 
-    var placeholders = env.findService(PlaceholderResolver.class).orElseGet(PlaceholderApiResolver::new);
+    var placeholders =
+        env.findService(PlaceholderResolver.class).orElseGet(PlaceholderApiResolver::new);
 
     var compiler = new ChatTemplateCompiler();
     var resolverFactory = new ChatTagResolverFactory(config, placeholders);

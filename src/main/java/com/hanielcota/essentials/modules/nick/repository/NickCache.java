@@ -9,8 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 
 /**
- * Pure in-memory state holder for nicknames. No persistence orchestration lives here — write-through
- * to SQL is the job of {@link CachedNickRepository}, which uses this cache as its lookup surface.
+ * Pure in-memory state holder for nicknames. No persistence orchestration lives here —
+ * write-through to SQL is the job of {@link CachedNickRepository}, which uses this cache as its
+ * lookup surface.
  */
 public final class NickCache {
 

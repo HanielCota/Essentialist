@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 
 /**
- * Materializes a {@link Warp} record back into a Bukkit {@link Location}. Extracted from the
- * domain record so the {@code Warp} stays a pure value carrier and the world lookup is testable.
+ * Materializes a {@link Warp} record back into a Bukkit {@link Location}. Extracted from the domain
+ * record so the {@code Warp} stays a pure value carrier and the world lookup is testable.
  */
 @RequiredArgsConstructor
 public final class WarpResolver {
@@ -23,8 +23,7 @@ public final class WarpResolver {
     }
 
     var location =
-        new Location(
-            worldHandle.get(), warp.x(), warp.y(), warp.z(), warp.yaw(), warp.pitch());
+        new Location(worldHandle.get(), warp.x(), warp.y(), warp.z(), warp.yaw(), warp.pitch());
     return Optional.of(location);
   }
 }

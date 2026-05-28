@@ -36,8 +36,7 @@ final class CommandSystemBootstrap implements BootstrapStage {
     services.register(ActorFactory.class, new FrameworkActorFactory(framework));
 
     replayExisting(services, framework);
-    services.addRegistrationListener(
-        (type, instance) -> mirror(framework, type, instance));
+    services.addRegistrationListener((type, instance) -> mirror(framework, type, instance));
   }
 
   private static void replayExisting(

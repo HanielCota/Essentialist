@@ -12,7 +12,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-final class TpaFavoriteClickHandler {
+public final class TpaFavoriteClickHandler {
 
   private final @NonNull TpaFavoriteService favorites;
   private final @NonNull TpaProfileService profiles;
@@ -20,14 +20,14 @@ final class TpaFavoriteClickHandler {
   private final @NonNull TpaFavoritePromptOrchestrator prompt;
   private final @NonNull TpaFavoriteAddNotifier addNotifier;
 
-  void selectFavorite(@NonNull ClickContext click, @NonNull TpaFavorite entry) {
+  public void selectFavorite(@NonNull ClickContext click, @NonNull TpaFavorite entry) {
     var viewerId = click.player().getUniqueId();
     this.selections.select(viewerId, entry);
 
     click.switchTo(TpaFavoriteActionMenu.ID);
   }
 
-  void selectSuggestion(@NonNull ClickContext click, @NonNull TpaContact contact) {
+  public void selectSuggestion(@NonNull ClickContext click, @NonNull TpaContact contact) {
     var viewer = click.player();
     var viewerId = viewer.getUniqueId();
     var added = this.favorites.add(viewerId, contact.targetId(), contact.targetName());
@@ -42,14 +42,14 @@ final class TpaFavoriteClickHandler {
     click.switchTo(TpaFavoriteActionMenu.ID);
   }
 
-  void add(@NonNull ClickContext click) {
+  public void add(@NonNull ClickContext click) {
     var player = click.player();
 
     click.close();
     this.prompt.prompt(player);
   }
 
-  void cycleOrdering(@NonNull ClickContext click) {
+  public void cycleOrdering(@NonNull ClickContext click) {
     var viewerId = click.player().getUniqueId();
     this.profiles.cycleFavoriteOrdering(viewerId);
     click.refresh();

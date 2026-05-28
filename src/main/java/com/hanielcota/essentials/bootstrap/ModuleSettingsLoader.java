@@ -15,6 +15,7 @@ final class ModuleSettingsLoader {
 
   ModuleSettings load(@NonNull Collection<Module> modules) {
     var file = this.dataFolder.resolve("modules.yml");
-    return YamlReadWriter.readMerging(file, ModuleSettings.class, () -> ModuleSettings.forModules(modules));
+    return YamlReadWriter.readMerging(
+        file, ModuleSettings.class, () -> ModuleSettings.forModules(modules));
   }
 }
