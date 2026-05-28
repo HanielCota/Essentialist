@@ -19,7 +19,9 @@ public final class FeedModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var feed = new FeedService();
-    var config = registrar.configure("feed", FeedConfig.class, FeedConfig::defaults, feed);
+    var config =
+        registrar.configure(
+            "feed", FeedConfig.class, FeedConfig::defaults, FeedService.class, feed);
 
     var players = env.service(PlayerProvider.class);
     var actors = env.service(ActorFactory.class);

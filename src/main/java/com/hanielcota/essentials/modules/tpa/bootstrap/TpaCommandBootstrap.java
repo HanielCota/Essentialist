@@ -57,6 +57,7 @@ public final class TpaCommandBootstrap {
             menus,
             requestService,
             shared.acceptHandler(),
+            shared.teleportNotifier(),
             shared.incomingResolver(),
             shared.actors(),
             shared.callbacks());

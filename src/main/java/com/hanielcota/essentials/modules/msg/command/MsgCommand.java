@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 @Syntax("/msg <jogador> <mensagem>")
 public record MsgCommand(
     ConfigHandle<MsgConfig> config,
-    MsgDispatcher dispatcher,
+    MsgExchangeOrchestrator dispatcher,
     BiPredicate<Player, Player> visibilityFilter) {
 
   @DefaultSubcommand
@@ -53,7 +53,7 @@ public record MsgCommand(
     }
 
     if (!this.visibilityFilter.test(from, target)) {
-      var notFoundMsg = snap.formatTargetUnavailable(targetName);
+      var notFoundMsg = snap.targetUnavailable().replace("{player}", targetName);
       return CommandResult.invalidUsage(notFoundMsg);
     }
 

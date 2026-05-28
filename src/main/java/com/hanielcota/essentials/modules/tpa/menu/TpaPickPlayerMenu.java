@@ -41,7 +41,7 @@ public final class TpaPickPlayerMenu implements EssentialsMenu {
   private final TpaTargetSelections selections;
   private final TpaPickPlayerFilters filters;
   private final TpaPickPlayerCandidates candidates;
-  private final TpaPickPlayerMenuRenderer renderer = new TpaPickPlayerMenuRenderer();
+  private final TpaPickPlayerMenuRenderer renderer;
 
   static List<Integer> contentSlots(@NonNull TpaPickPlayerMenuConfig settings, int rows) {
     var slotCount = MenuLayouts.slotCount(rows);

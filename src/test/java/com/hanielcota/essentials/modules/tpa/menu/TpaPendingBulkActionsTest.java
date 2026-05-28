@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptTeleportNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingBulkActions;
@@ -118,9 +119,11 @@ class TpaPendingBulkActionsTest {
     var actors = new TpaTestSupport.RecordingActorFactory();
     var replyNotifier = new TpaRequestReplyNotifier(actors, players);
     var acceptHandler = new TpAcceptOutcomeHandler(config, replyNotifier);
+    var teleportNotifier = new TpAcceptTeleportNotifier(config);
     var callbacks = new MainThreadCallbacks(new TpaTestSupport.DirectScheduler());
     var bulk =
-        new TpaPendingBulkActions(config, service, acceptHandler, replyNotifier, callbacks, actors);
+        new TpaPendingBulkActions(
+            config, service, acceptHandler, teleportNotifier, replyNotifier, callbacks, actors);
     return new Fixture(service, players, actors, bulk);
   }
 

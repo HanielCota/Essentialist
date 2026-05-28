@@ -36,6 +36,7 @@ public record TpAcceptCommand(
     MenuService menus,
     TeleportRequestService service,
     TpAcceptOutcomeHandler acceptHandler,
+    TpAcceptTeleportNotifier teleportNotifier,
     TpaIncomingResolver resolver,
     ActorFactory actors,
     MainThreadCallbacks callbacks) {
@@ -67,7 +68,7 @@ public record TpAcceptCommand(
     var pending = this.service.dispatchTeleport(request);
     this.callbacks.hop(
         pending,
-        success -> this.acceptHandler.handleTeleportOutcome(success, actor),
+        success -> this.teleportNotifier.notifyOutcome(success, actor),
         "tpa accept command");
 
     return CommandResult.success();

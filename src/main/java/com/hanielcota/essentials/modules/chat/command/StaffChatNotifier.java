@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.chat.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.format.ChatFormatPipeline;
-import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
+import com.hanielcota.essentials.modules.chat.service.StaffAudience;
 import com.hanielcota.essentials.paper.AudienceProvider;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ComponentUtils;
@@ -75,18 +75,12 @@ public final class StaffChatNotifier {
     var console = this.audiences.console();
 
     console.sendMessage(rendered);
-    sender.sendMessage(rendered);
 
     var online = this.players.all();
     for (var viewer : online) {
-      var viewerId = viewer.getUniqueId();
-      if (viewerId.equals(senderId)) {
+      if (!StaffAudience.canHear(viewer, senderId)) {
         continue;
       }
-      if (!viewer.hasPermission(ChatPermissions.STAFF_RECEIVE)) {
-        continue;
-      }
-
       viewer.sendMessage(rendered);
     }
   }

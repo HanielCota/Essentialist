@@ -10,9 +10,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Builds the {@link PaperCommandFramework} and publishes the framework as a service. Mirroring
- * already-registered infrastructure services to the framework's dependency table is a separate
- * stage ({@link CommandMirrorStage}) so it runs after the rest of the registry has filled up.
+ * Builds the {@link PaperCommandFramework}, publishes it as a service, and wires the registry
+ * listener that mirrors every subsequently-registered service into the framework's dependency
+ * table. Services registered before this stage are replayed once.
  */
 @RequiredArgsConstructor
 final class CommandSystemBootstrap implements BootstrapStage {
@@ -34,5 +34,27 @@ final class CommandSystemBootstrap implements BootstrapStage {
 
     services.register(PaperCommandFramework.class, framework);
     services.register(ActorFactory.class, new FrameworkActorFactory(framework));
+
+    replayExisting(services, framework);
+    services.addRegistrationListener((type, instance) -> mirror(framework, type, instance));
+  }
+
+  private static void replayExisting(
+      @NonNull com.hanielcota.essentials.service.ServiceRegistry services,
+      @NonNull PaperCommandFramework framework) {
+    var existing = services.registered();
+    for (var type : existing) {
+      if (type == PaperCommandFramework.class) {
+        continue;
+      }
+      var instance = services.resolve(type);
+      mirror(framework, type, instance);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> void mirror(
+      @NonNull PaperCommandFramework framework, @NonNull Class<?> type, @NonNull Object instance) {
+    framework.registerDependency((Class<T>) type, (T) instance);
   }
 }

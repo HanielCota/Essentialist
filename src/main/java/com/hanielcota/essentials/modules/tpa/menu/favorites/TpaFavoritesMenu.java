@@ -8,8 +8,6 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
-import com.hanielcota.essentials.modules.tpa.command.favorites.TpaFavoriteAddNotifier;
-import com.hanielcota.essentials.modules.tpa.command.favorites.TpaFavoritePromptOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
@@ -18,42 +16,24 @@ import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteBrowser;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteMenuRenderer;
-import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
-import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSelections;
-import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
-import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public final class TpaFavoritesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.tpa.favorites";
 
-  private final ConfigHandle<TpaConfig> config;
-  private final TpaProfileService profiles;
-  private final TpaFavoriteBrowser browser;
-  private final TpaFavoriteClickHandler clicks;
-  private final TpaFavoriteMenuRenderer renderer;
-
-  public TpaFavoritesMenu(
-      @NonNull ConfigHandle<TpaConfig> config,
-      @NonNull TpaFavoriteService favorites,
-      @NonNull TpaContactService contacts,
-      @NonNull TpaProfileService profiles,
-      @NonNull TpaFavoriteSelections selections,
-      @NonNull TpaFavoritePromptOrchestrator prompt,
-      @NonNull TpaFavoriteAddNotifier addNotifier,
-      @NonNull PlayerProvider players) {
-    this.config = config;
-    this.profiles = profiles;
-    this.browser = new TpaFavoriteBrowser(config, favorites, contacts, players);
-    this.clicks = new TpaFavoriteClickHandler(favorites, profiles, selections, prompt, addNotifier);
-    this.renderer = new TpaFavoriteMenuRenderer(players);
-  }
+  private final @NonNull ConfigHandle<TpaConfig> config;
+  private final @NonNull TpaProfileService profiles;
+  private final @NonNull TpaFavoriteBrowser browser;
+  private final @NonNull TpaFavoriteClickHandler clicks;
+  private final @NonNull TpaFavoriteMenuRenderer renderer;
 
   static List<Integer> contentSlots(@NonNull TpaFavoritesMenuConfig settings, int rows) {
     var slotCount = MenuLayouts.slotCount(rows);

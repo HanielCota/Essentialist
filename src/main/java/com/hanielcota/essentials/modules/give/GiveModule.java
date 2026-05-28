@@ -21,7 +21,9 @@ public final class GiveModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var giveService = new GiveService();
-    var config = registrar.configure("give", GiveConfig.class, GiveConfig::defaults, giveService);
+    var config =
+        registrar.configure(
+            "give", GiveConfig.class, GiveConfig::defaults, GiveService.class, giveService);
     var playerProvider = env.service(PlayerProvider.class);
     var actors = env.service(ActorFactory.class);
     var notifier = new GiveNotifier(config, actors);

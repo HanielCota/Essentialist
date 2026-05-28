@@ -19,7 +19,9 @@ public final class SpeedModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var speed = new SpeedService();
-    var config = registrar.configure("speed", SpeedConfig.class, SpeedConfig::defaults, speed);
+    var config =
+        registrar.configure(
+            "speed", SpeedConfig.class, SpeedConfig::defaults, SpeedService.class, speed);
 
     var actors = env.service(ActorFactory.class);
     var notifier = new SpeedNotifier(actors);

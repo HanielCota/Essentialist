@@ -35,20 +35,16 @@ public final class EnchantService {
     return RemoveResult.REMOVED;
   }
 
-  /**
-   * Removes every enchantment from the held item.
-   *
-   * @return the number of enchantments removed, or {@code -1} when the hand is empty
-   */
-  public int clearAll(@NonNull Player player) {
+  /** Removes every enchantment from the held item. */
+  public ClearResult clearAll(@NonNull Player player) {
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
-      return -1;
+      return ClearResult.EMPTY_HAND;
     }
 
     var enchantments = held.getEnchantments();
     if (enchantments.isEmpty()) {
-      return 0;
+      return ClearResult.NOTHING_TO_CLEAR;
     }
 
     // Snapshot the keys before iterating — Bukkit returns an unmodifiable copy today, but the
@@ -57,7 +53,7 @@ public final class EnchantService {
     var keys = Set.copyOf(originalKeys);
     keys.forEach(held::removeEnchantment);
 
-    return enchantments.size();
+    return new ClearResult.Cleared(enchantments.size());
   }
 
   public enum ApplyResult {
@@ -69,5 +65,24 @@ public final class EnchantService {
     REMOVED,
     NOT_ENCHANTED,
     EMPTY_HAND
+  }
+
+  /**
+   * Outcome of {@link #clearAll(Player)} — sealed so callers can switch exhaustively. {@code
+   * Cleared} carries the removed count; the other two are flag-only states.
+   */
+  public sealed interface ClearResult {
+    ClearResult NOTHING_TO_CLEAR = NothingToClear.INSTANCE;
+    ClearResult EMPTY_HAND = EmptyHand.INSTANCE;
+
+    record Cleared(int removed) implements ClearResult {}
+
+    enum NothingToClear implements ClearResult {
+      INSTANCE
+    }
+
+    enum EmptyHand implements ClearResult {
+      INSTANCE
+    }
   }
 }

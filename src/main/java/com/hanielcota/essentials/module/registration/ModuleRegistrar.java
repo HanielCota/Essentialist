@@ -33,13 +33,14 @@ public interface ModuleRegistrar {
   <T> void provide(@NonNull Class<T> type, @NonNull T instance);
 
   /**
-   * Loads a config and registers {@code service} under its concrete runtime class in one call.
-   * Convenience overload for the common case where the service has no public interface and callers
-   * look it up as {@code service(ConcreteService.class)}.
+   * Loads a config and registers {@code service} under {@code serviceType} in one call. Callers
+   * pass the registration type explicitly to avoid the runtime-class inspection that the previous
+   * overload required.
    */
   <C, S> ConfigHandle<C> configure(
       @NonNull String name,
       @NonNull Class<C> configType,
       @NonNull Supplier<C> defaults,
+      @NonNull Class<S> serviceType,
       @NonNull S service);
 }

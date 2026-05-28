@@ -19,7 +19,9 @@ public final class HealModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var heal = new HealService();
-    var config = registrar.configure("heal", HealConfig.class, HealConfig::defaults, heal);
+    var config =
+        registrar.configure(
+            "heal", HealConfig.class, HealConfig::defaults, HealService.class, heal);
 
     var players = env.service(PlayerProvider.class);
     var actors = env.service(ActorFactory.class);

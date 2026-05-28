@@ -26,7 +26,7 @@ final class ModuleDiscoveryStage implements BootstrapStage {
   @Override
   public void start(@NonNull StageContext context) {
     var dataFolder = this.plugin.getDataFolder().toPath();
-    var modules = new ModuleManager();
+    var modules = ModuleManager.createDefault();
     var classLoader = getClass().getClassLoader();
     var loader = ServiceLoader.load(Module.class, classLoader);
     var discovered = new ArrayList<Module>();

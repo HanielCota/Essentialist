@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
-final class TpaRequestPolicy {
+public final class TpaRequestPolicy {
 
   private final @NonNull TpaProfileService profiles;
   private final @NonNull TpaBlockService blocks;
 
-  boolean canCreate(
+  public boolean canCreate(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {
     var targetId = target.getUniqueId();
     var requesterId = requester.getUniqueId();
@@ -32,15 +32,15 @@ final class TpaRequestPolicy {
     return !isCrossWorldRefused(requester, target);
   }
 
-  boolean isBlockedBy(@NonNull UUID blockerId, @NonNull UUID requesterId) {
+  public boolean isBlockedBy(@NonNull UUID blockerId, @NonNull UUID requesterId) {
     return this.blocks.isBlocked(blockerId, requesterId);
   }
 
-  boolean isDndActive(@NonNull UUID targetId) {
+  public boolean isDndActive(@NonNull UUID targetId) {
     return this.profiles.isDndActive(targetId);
   }
 
-  boolean isCrossWorldRefused(@NonNull Player requester, @NonNull Player target) {
+  public boolean isCrossWorldRefused(@NonNull Player requester, @NonNull Player target) {
     var targetId = target.getUniqueId();
     var targetProfile = this.profiles.profile(targetId);
     if (targetProfile.allowCrossWorld()) {

@@ -61,10 +61,13 @@ public final class WarpsModule extends AbstractModule {
     registrar.provide(WarpService.class, warpService);
 
     var delayed = env.service(DelayedTeleport.class);
+    var worldLookup = env.service(com.hanielcota.essentials.paper.WorldLookup.class);
+    var warpResolver =
+        new com.hanielcota.essentials.modules.warps.service.WarpResolver(worldLookup);
 
     var setWarpCommand = new SetWarpCommand(config, warpService);
     var promptFactory = new WarpPromptFactory();
-    var warpCommand = new WarpCommand(config, warpService, delayed, promptFactory);
+    var warpCommand = new WarpCommand(config, warpService, warpResolver, delayed, promptFactory);
     var delWarpCommand = new DelWarpCommand(config, warpService);
     var warpsNotifier = new WarpsListNotifier(config);
     var warpsCommand = new WarpsCommand(warpService, warpsNotifier);

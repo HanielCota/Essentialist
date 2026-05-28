@@ -21,7 +21,8 @@ public final class ClearModule extends AbstractModule {
     var clearService = new ClearService();
 
     var configHandle =
-        registrar.configure("clear", ClearConfig.class, () -> defaultValues, clearService);
+        registrar.configure(
+            "clear", ClearConfig.class, () -> defaultValues, ClearService.class, clearService);
 
     var actors = env.service(ActorFactory.class);
 

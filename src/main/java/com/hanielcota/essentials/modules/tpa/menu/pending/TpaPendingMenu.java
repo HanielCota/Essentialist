@@ -40,7 +40,7 @@ public final class TpaPendingMenu implements EssentialsMenu {
   private final TeleportRequestService requests;
   private final TpaPendingClickHandler clicks;
   private final PlayerProvider players;
-  private final TpaPendingMenuRenderer renderer = new TpaPendingMenuRenderer();
+  private final TpaPendingMenuRenderer renderer;
 
   public static List<Integer> contentSlots(@NonNull TpaPendingMenuConfig settings, int rows) {
     var fallback = MenuLayouts.fallbackContentSlots(rows, Math.min(7, MenuLayouts.slotCount(rows)));

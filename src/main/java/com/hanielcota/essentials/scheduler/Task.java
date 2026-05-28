@@ -19,7 +19,10 @@ public interface Task {
 
     @Override
     public boolean isCancelled() {
-      return true;
+      // Noop is "never scheduled", not "scheduled then cancelled". Real handles return false until
+      // cancel() is called; honoring that postcondition prevents callers branching on
+      // !task.isCancelled() from silently skipping work that was supposed to be a no-op.
+      return false;
     }
   }
 }

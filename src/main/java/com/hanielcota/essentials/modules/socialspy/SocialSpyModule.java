@@ -23,7 +23,12 @@ public final class SocialSpyModule extends AbstractModule {
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var service = new SocialSpyService();
     var config =
-        registrar.configure("socialspy", SocialSpyConfig.class, SocialSpyConfig::defaults, service);
+        registrar.configure(
+            "socialspy",
+            SocialSpyConfig.class,
+            SocialSpyConfig::defaults,
+            SocialSpyService.class,
+            service);
     var players = env.service(PlayerProvider.class);
     var actors = env.service(ActorFactory.class);
     var broadcaster = new SocialSpyBroadcaster(config, service, players, actors);

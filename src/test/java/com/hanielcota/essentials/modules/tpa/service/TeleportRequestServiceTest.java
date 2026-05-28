@@ -107,14 +107,17 @@ class TeleportRequestServiceTest {
   private static TeleportRequestService newService(
       @NonNull TpaProfileService profiles, @NonNull TpaBlockService blocks) {
     var favorites = new TpaFavoriteService(null, NoopAsyncDatabaseWriter.INSTANCE);
+    var players = new EmptyPlayerProvider();
+    var policy = new TpaRequestPolicy(profiles, blocks);
+    var recorder = new TpaRequestRecorder(new NoopHistory(), profiles, newContactService());
+    var executor = new TeleportRequestExecutor(players);
     return new TeleportRequestService(
         new StaticConfigHandle(),
         new InMemoryRequestRepository(),
-        new NoopHistory(),
-        new EmptyPlayerProvider(),
-        profiles,
-        blocks,
-        newContactService());
+        players,
+        policy,
+        recorder,
+        executor);
   }
 
   private static Player player(@NonNull UUID id, @NonNull String name) {

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.nick.domain.NickEntry;
+import com.hanielcota.essentials.modules.nick.repository.CachedNickRepository;
 import com.hanielcota.essentials.modules.nick.repository.NickCache;
 import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import com.hanielcota.essentials.support.NoopNickRepository;
@@ -65,22 +66,25 @@ class NickServiceTest {
 
   @Test
   void loadAllPopulatesBothLookups() {
-    var cache = newCache();
+    var cache = new NickCache();
     var first = UUID.randomUUID();
     var second = UUID.randomUUID();
 
     cache.loadAll(List.of(new NickEntry(first, "A", "x"), new NickEntry(second, "B", "y")));
 
-    var service = new NickService(cache);
+    var repository =
+        new CachedNickRepository(
+            NoopNickRepository.INSTANCE, cache, NoopAsyncDatabaseWriter.INSTANCE);
+    var service = new NickService(repository);
+
     assertEquals(first, service.idByNick("a").orElseThrow());
     assertEquals(second, service.idByNick("b").orElseThrow());
   }
 
   private static NickService newService() {
-    return new NickService(newCache());
-  }
-
-  private static NickCache newCache() {
-    return new NickCache(NoopNickRepository.INSTANCE, NoopAsyncDatabaseWriter.INSTANCE);
+    var repository =
+        new CachedNickRepository(
+            NoopNickRepository.INSTANCE, new NickCache(), NoopAsyncDatabaseWriter.INSTANCE);
+    return new NickService(repository);
   }
 }

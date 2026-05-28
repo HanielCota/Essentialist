@@ -6,10 +6,13 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
+import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExecutor;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
+import com.hanielcota.essentials.modules.tpa.service.TpaRequestPolicy;
+import com.hanielcota.essentials.modules.tpa.service.TpaRequestRecorder;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
@@ -51,7 +54,10 @@ public final class TpaTestSupport {
       @NonNull TpaContactService contacts) {
     var config = new StaticConfigHandle();
     var favorites = new TpaFavoriteService(null, NoopAsyncDatabaseWriter.INSTANCE);
-    return new TeleportRequestService(config, store, history, players, profiles, blocks, contacts);
+    var policy = new TpaRequestPolicy(profiles, blocks);
+    var recorder = new TpaRequestRecorder(history, profiles, contacts);
+    var executor = new TeleportRequestExecutor(players);
+    return new TeleportRequestService(config, store, players, policy, recorder, executor);
   }
 
   public static TpaProfileService profiles() {

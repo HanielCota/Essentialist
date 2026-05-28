@@ -24,7 +24,7 @@ final class CoreInstanceStage implements BootstrapStage {
   @Override
   public void start(@NonNull StageContext context) {
     var services = context.services();
-    var core = new EssentialsCore(this.plugin, services);
+    var core = EssentialsCore.createDefault(this.plugin, services);
 
     services.register(EssentialsApi.class, core);
     services.register(EssentialsCore.class, core);

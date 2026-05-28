@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.mute.listener;
 
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.mute.command.MuteBlockMessageRenderer;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
-import com.hanielcota.essentials.modules.mute.service.MuteBlockMessageRenderer;
 import com.hanielcota.essentials.modules.mute.service.MuteCommandLineParser;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import lombok.NonNull;

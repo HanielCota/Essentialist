@@ -4,7 +4,7 @@ import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.environment.ModuleEnvironment;
 import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.msg.command.MsgCommand;
-import com.hanielcota.essentials.modules.msg.command.MsgDispatcher;
+import com.hanielcota.essentials.modules.msg.command.MsgExchangeOrchestrator;
 import com.hanielcota.essentials.modules.msg.command.MsgNotifier;
 import com.hanielcota.essentials.modules.msg.command.ReplyCommand;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
@@ -42,12 +42,14 @@ public final class MsgModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var msgService = new MsgService();
-    var config = registrar.configure("msg", MsgConfig.class, MsgConfig::defaults, msgService);
+    var config =
+        registrar.configure(
+            "msg", MsgConfig.class, MsgConfig::defaults, MsgService.class, msgService);
     var actors = env.service(ActorFactory.class);
     var players = env.service(PlayerProvider.class);
     var notifier = new MsgNotifier(config, actors);
     var spyBridge = new SocialSpyBridge(() -> env.findService(SocialSpyBroadcaster.class));
-    var dispatcher = new MsgDispatcher(msgService, notifier, spyBridge);
+    var dispatcher = new MsgExchangeOrchestrator(msgService, notifier, spyBridge);
     var visibilityFilter = visibilityFilter(env);
 
     registrar.command(new MsgCommand(config, dispatcher, visibilityFilter));

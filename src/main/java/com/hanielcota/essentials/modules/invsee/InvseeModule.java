@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.invsee.command.InvseeCommand;
 import com.hanielcota.essentials.modules.invsee.config.InvseeConfig;
 import com.hanielcota.essentials.modules.invsee.listener.InvseeListener;
 import com.hanielcota.essentials.modules.invsee.listener.InvseeProtectionListener;
+import com.hanielcota.essentials.modules.invsee.service.InvseeLocks;
 import com.hanielcota.essentials.modules.invsee.service.InvseeService;
 import com.hanielcota.essentials.modules.invsee.service.InvseeSynchronizer;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -21,7 +22,8 @@ public final class InvseeModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("invsee", InvseeConfig.class, InvseeConfig::defaults);
-    var service = new InvseeService();
+    var locks = new InvseeLocks();
+    var service = new InvseeService(locks);
     var synchronizer = new InvseeSynchronizer(env.service(Scheduler.class), service);
     registrar.listener(new InvseeListener(synchronizer));
     registrar.listener(new InvseeProtectionListener(service));

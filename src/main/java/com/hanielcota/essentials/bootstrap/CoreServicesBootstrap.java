@@ -3,10 +3,15 @@ package com.hanielcota.essentials.bootstrap;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.config.ConfigService;
 import com.hanielcota.essentials.config.YamlConfigService;
+import com.hanielcota.essentials.core.ShutdownRegistry;
 import com.hanielcota.essentials.paper.AudienceProvider;
 import com.hanielcota.essentials.paper.BukkitPlayerProvider;
+import com.hanielcota.essentials.paper.BukkitServerMetricsProvider;
+import com.hanielcota.essentials.paper.BukkitWorldLookup;
 import com.hanielcota.essentials.paper.PaperAudienceProvider;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import com.hanielcota.essentials.paper.ServerMetricsProvider;
+import com.hanielcota.essentials.paper.WorldLookup;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import com.hanielcota.essentials.scheduler.PaperScheduler;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -27,6 +32,7 @@ final class CoreServicesBootstrap implements BootstrapStage {
   @Override
   public void start(@NonNull StageContext context) {
     var services = context.services();
+    services.register(ShutdownRegistry.class, new ShutdownRegistry());
     registerScheduler(services);
     registerPaperAdapters(services);
     registerConfigs(services);
@@ -46,6 +52,9 @@ final class CoreServicesBootstrap implements BootstrapStage {
 
     var playerProvider = new BukkitPlayerProvider(this.plugin);
     services.register(PlayerProvider.class, playerProvider);
+
+    services.register(ServerMetricsProvider.class, new BukkitServerMetricsProvider());
+    services.register(WorldLookup.class, new BukkitWorldLookup());
   }
 
   private void registerConfigs(@NonNull ServiceRegistry services) {

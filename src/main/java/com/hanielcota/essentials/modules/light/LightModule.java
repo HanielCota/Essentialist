@@ -22,7 +22,9 @@ public final class LightModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var light = new LightService(env.plugin());
-    var config = registrar.configure("light", LightConfig.class, LightConfig::defaults, light);
+    var config =
+        registrar.configure(
+            "light", LightConfig.class, LightConfig::defaults, LightService.class, light);
     var scheduler = env.service(Scheduler.class);
     var actors = env.service(ActorFactory.class);
 

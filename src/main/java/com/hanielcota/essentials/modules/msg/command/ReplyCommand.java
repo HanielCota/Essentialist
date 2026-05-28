@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 public record ReplyCommand(
     ConfigHandle<MsgConfig> config,
     MsgService partners,
-    MsgDispatcher dispatcher,
+    MsgExchangeOrchestrator dispatcher,
     PlayerProvider players,
     BiPredicate<Player, Player> visibilityFilter) {
 
@@ -56,7 +56,7 @@ public record ReplyCommand(
 
     if (target == null || !this.visibilityFilter.test(from, target)) {
       var partnerName = PlayerNames.nameOf(this.players, partnerId, target);
-      var offlineMsg = snap.formatReplyPartnerUnavailable(partnerName);
+      var offlineMsg = snap.replyPartnerUnavailable().replace("{player}", partnerName);
       return CommandResult.invalidUsage(offlineMsg);
     }
 

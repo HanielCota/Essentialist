@@ -11,6 +11,7 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.back.config.BackConfig;
+import com.hanielcota.essentials.modules.back.service.BackEntryProvider;
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
@@ -27,10 +28,9 @@ public final class BackMenu implements EssentialsMenu {
   private static final int MIN_ROWS = 1;
 
   private final ConfigHandle<BackConfig> config;
-  private final TeleportHistory history;
   private final BackEntryRenderer renderer;
   private final BackClickHandler clickHandler;
-  private final BackMenuState state;
+  private final BackEntryProvider entryProvider;
 
   @Override
   public @NonNull String id() {
@@ -81,11 +81,7 @@ public final class BackMenu implements EssentialsMenu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var playerId = player.getUniqueId();
-
-    var entries = this.state.consumePrefetch(playerId);
-    if (entries == null) {
-      entries = this.history.list(playerId);
-    }
+    var entries = this.entryProvider.entriesFor(playerId);
 
     var slots = new ArrayList<SlotDefinition>(entries.size());
     for (var i = 0; i < entries.size(); i++) {

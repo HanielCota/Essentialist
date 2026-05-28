@@ -58,11 +58,9 @@ public final class DefaultModuleRegistrar implements ModuleRegistrar {
       @NonNull String name,
       @NonNull Class<C> configType,
       @NonNull Supplier<C> defaults,
+      @NonNull Class<S> serviceType,
       @NonNull S service) {
     var handle = this.env.config(name, configType, defaults);
-
-    @SuppressWarnings("unchecked")
-    var serviceType = (Class<S>) service.getClass();
     provide(serviceType, service);
 
     return handle;

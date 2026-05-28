@@ -10,7 +10,9 @@ import com.hanielcota.essentials.module.ModuleMetadata;
 import com.hanielcota.essentials.module.environment.ModuleEnvironment;
 import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.homes.command.HomeCommand;
+import com.hanielcota.essentials.modules.homes.command.HomeLimitReachedMessageResolver;
 import com.hanielcota.essentials.modules.homes.command.HomesCommand;
+import com.hanielcota.essentials.modules.homes.command.MissingHomeMessageResolver;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
 import com.hanielcota.essentials.modules.homes.create.HomeCreateNotifier;
@@ -44,14 +46,12 @@ import com.hanielcota.essentials.modules.homes.repository.CachedHomeRepository;
 import com.hanielcota.essentials.modules.homes.repository.HomeCache;
 import com.hanielcota.essentials.modules.homes.repository.SqlHomeRepository;
 import com.hanielcota.essentials.modules.homes.repository.SqlHomeTable;
-import com.hanielcota.essentials.modules.homes.service.HomeLimitReachedMessageResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeNameResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeNameValidator;
 import com.hanielcota.essentials.modules.homes.service.HomeOrderingPreferences;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
-import com.hanielcota.essentials.modules.homes.service.MissingHomeMessageResolver;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -179,6 +179,8 @@ public final class HomesModule extends AbstractModule {
     var renderer = new HomeEntryRenderer(config);
     var clickHandler =
         new HomeClickHandler(interaction.teleporter(), actors, interaction.actionTarget());
+    var sortRenderer =
+        new com.hanielcota.essentials.modules.homes.menu.presentation.HomesSortRenderer();
     registrar.menu(
         new HomesMenu(
             config,
@@ -187,7 +189,8 @@ public final class HomesModule extends AbstractModule {
             clickHandler,
             menuState,
             interaction.create(),
-            interaction.orderingPreferences()));
+            interaction.orderingPreferences(),
+            sortRenderer));
 
     var optionsClicks =
         new HomeOptionsClickHandler(

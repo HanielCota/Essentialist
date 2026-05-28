@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.title.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.title.config.TitleConfig;
-import com.hanielcota.essentials.modules.title.domain.TitleRequest;
+import com.hanielcota.essentials.modules.title.service.TitleRequestParser;
 import com.hanielcota.essentials.modules.title.service.TitleService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
@@ -25,7 +25,10 @@ import org.bukkit.entity.Player;
 @Description("Envia um título na tela do jogador.")
 @Syntax("/title [jogador] \"título\" [\"subtítulo\"]")
 public record TitleCommand(
-    ConfigHandle<TitleConfig> config, TitleService service, PlayerProvider players) {
+    ConfigHandle<TitleConfig> config,
+    TitleService service,
+    PlayerProvider players,
+    TitleRequestParser parser) {
 
   @DefaultSubcommand
   @Cooldown(duration = "3s")
@@ -34,7 +37,7 @@ public record TitleCommand(
     var snap = this.config.value();
     var self = sender.isPlayer() ? sender.unwrap(Player.class) : null;
     var input = texto.strip();
-    var request = TitleRequest.from(self, input, this.players);
+    var request = this.parser.parse(self, input);
 
     var targetId = request.targetId();
     var targetName = request.targetName();

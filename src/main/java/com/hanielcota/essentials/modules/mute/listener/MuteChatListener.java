@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.mute.listener;
 
-import com.hanielcota.essentials.modules.mute.service.MuteBlockMessageRenderer;
+import com.hanielcota.essentials.modules.mute.command.MuteBlockMessageRenderer;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.NonNull;

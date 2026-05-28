@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.back.listener;
 
-import com.hanielcota.essentials.modules.back.menu.BackMenuState;
+import com.hanielcota.essentials.modules.back.service.BackPrefetch;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
@@ -10,13 +10,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 @RequiredArgsConstructor
 public final class BackMenuCleanupListener implements Listener {
 
-  private final BackMenuState state;
+  private final BackPrefetch prefetch;
 
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
     var player = event.getPlayer();
     var playerId = player.getUniqueId();
 
-    this.state.clear(playerId);
+    this.prefetch.clear(playerId);
   }
 }

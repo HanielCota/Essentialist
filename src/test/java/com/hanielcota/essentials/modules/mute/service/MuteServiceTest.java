@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.mute.domain.Mute;
+import com.hanielcota.essentials.modules.mute.repository.CachedMuteRepository;
 import com.hanielcota.essentials.modules.mute.repository.MuteCache;
 import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
 import com.hanielcota.essentials.support.NoopMuteRepository;
@@ -17,39 +18,40 @@ class MuteServiceTest {
 
   @Test
   void loadAllPopulatesActiveMutes() {
-    var cache = newCache();
+    var cache = new MuteCache();
     var id = UUID.randomUUID();
     cache.loadAll(List.of(Map.entry(id, Mute.permanent())));
 
-    var service = new MuteService(cache);
+    var service = new MuteService(repository(cache));
     assertTrue(service.activeMute(id).isPresent());
   }
 
   @Test
   void expiredMuteIsEvictedOnRead() {
-    var cache = newCache();
+    var cache = new MuteCache();
     var id = UUID.randomUUID();
     var past = Instant.now().minusSeconds(60);
     cache.loadAll(List.of(Map.entry(id, Mute.until(past))));
 
-    var service = new MuteService(cache);
+    var service = new MuteService(repository(cache));
     assertFalse(service.activeMute(id).isPresent());
     assertFalse(service.activeMute(id).isPresent());
   }
 
   @Test
   void unmuteReturnsTrueOnlyWhenSomethingWasRemoved() {
-    var cache = newCache();
+    var cache = new MuteCache();
     var id = UUID.randomUUID();
     cache.loadAll(List.of(Map.entry(id, Mute.permanent())));
 
-    var service = new MuteService(cache);
+    var service = new MuteService(repository(cache));
     assertTrue(service.unmute(id));
     assertFalse(service.unmute(id));
     assertFalse(service.activeMute(id).isPresent());
   }
 
-  private static MuteCache newCache() {
-    return new MuteCache(NoopMuteRepository.INSTANCE, NoopAsyncDatabaseWriter.INSTANCE);
+  private static CachedMuteRepository repository(MuteCache cache) {
+    return new CachedMuteRepository(
+        NoopMuteRepository.INSTANCE, cache, NoopAsyncDatabaseWriter.INSTANCE);
   }
 }

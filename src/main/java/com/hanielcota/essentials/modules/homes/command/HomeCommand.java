@@ -10,7 +10,6 @@ import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
 import com.hanielcota.essentials.modules.homes.service.HomeNameResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
-import com.hanielcota.essentials.modules.homes.service.MissingHomeMessageResolver;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;

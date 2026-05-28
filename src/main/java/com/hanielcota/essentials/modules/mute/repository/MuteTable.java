@@ -23,6 +23,13 @@ public final class MuteTable extends SqlTable {
       WHERE expires_at IS NULL OR expires_at > ?\
       """;
 
+  static final String SELECT_ACTIVE_BY_ID =
+      """
+      SELECT player_id, expires_at, created_at \
+      FROM mutes \
+      WHERE player_id = ? AND (expires_at IS NULL OR expires_at > ?)\
+      """;
+
   private static final String CREATE_TABLE =
       """
       CREATE TABLE IF NOT EXISTS mutes (

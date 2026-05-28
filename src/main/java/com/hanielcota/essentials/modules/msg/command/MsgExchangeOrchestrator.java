@@ -13,11 +13,11 @@ import org.bukkit.entity.Player;
  * delegated.
  */
 @RequiredArgsConstructor
-public final class MsgDispatcher {
+public final class MsgExchangeOrchestrator {
 
-  private final MsgService partners;
-  private final MsgNotifier notifier;
-  private final SocialSpyBridge spyBridge;
+  private final @NonNull MsgService partners;
+  private final @NonNull MsgNotifier notifier;
+  private final @NonNull SocialSpyBridge spyBridge;
 
   public void send(@NonNull Player sender, @NonNull Player target, @NonNull String body) {
     var senderId = sender.getUniqueId();

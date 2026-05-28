@@ -19,24 +19,6 @@ public final class AuditInterceptor implements RichCommandInterceptor {
 
   private final @NonNull Logger logger;
 
-  private static String jsonPartOf(@NonNull String fullString, int openIndex) {
-    if (openIndex < 0) {
-      return "";
-    }
-    return fullString.substring(openIndex);
-  }
-
-  private static int firstBracketIndex(@NonNull String s) {
-    var earliest = -1;
-    for (var bracket : new char[] {'[', '{', '('}) {
-      var idx = s.indexOf(bracket);
-      if (idx >= 0 && (earliest < 0 || idx < earliest)) {
-        earliest = idx;
-      }
-    }
-    return earliest;
-  }
-
   @Override
   public @NonNull CommandResult before(
       @NonNull CommandContext context, @NonNull List<ParsedParameter<?>> parameters) {
@@ -97,22 +79,6 @@ public final class AuditInterceptor implements RichCommandInterceptor {
       return sender.getName();
     }
 
-    var clazz = value.getClass();
-    if (clazz.isPrimitive()
-        || value instanceof String
-        || value instanceof Number
-        || value instanceof Boolean
-        || clazz.isEnum()) {
-      return value.toString();
-    }
-
-    // toString() of a record is "Class[a=1, b=2]"; Lombok @ToString is "Class(a=1, b=2)";
-    // older Bukkit/Paper classes use "Class{a=1, b=2}". Pick whichever bracket comes first.
-    var fullString = value.toString();
-    var openIndex = firstBracketIndex(fullString);
-    var jsonPart = jsonPartOf(fullString, openIndex);
-
-    var simpleName = clazz.getSimpleName();
-    return simpleName + jsonPart;
+    return value.toString();
   }
 }

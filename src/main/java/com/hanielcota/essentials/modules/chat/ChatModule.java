@@ -12,6 +12,7 @@ import com.hanielcota.essentials.modules.chat.command.ChatCommand;
 import com.hanielcota.essentials.modules.chat.command.ChatNotifier;
 import com.hanielcota.essentials.modules.chat.command.GlobalChatCommand;
 import com.hanielcota.essentials.modules.chat.command.GlobalChatNotifier;
+import com.hanielcota.essentials.modules.chat.command.LocalChannelNotifier;
 import com.hanielcota.essentials.modules.chat.command.StaffChatCommand;
 import com.hanielcota.essentials.modules.chat.command.StaffChatNotifier;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
@@ -25,6 +26,7 @@ import com.hanielcota.essentials.modules.chat.guard.ChatGuardPipeline;
 import com.hanielcota.essentials.modules.chat.guard.CooldownCheck;
 import com.hanielcota.essentials.modules.chat.guard.RepeatedMessageCheck;
 import com.hanielcota.essentials.modules.chat.listener.AsyncChatListener;
+import com.hanielcota.essentials.modules.chat.listener.ChatDispatchOrchestrator;
 import com.hanielcota.essentials.modules.chat.listener.ChatPlayerCleanupListener;
 import com.hanielcota.essentials.modules.chat.placeholder.PlaceholderApiResolver;
 import com.hanielcota.essentials.modules.chat.placeholder.PlaceholderResolver;
@@ -51,7 +53,8 @@ public final class ChatModule extends AbstractModule {
     var audiences = env.service(AudienceProvider.class);
     var players = env.service(PlayerProvider.class);
 
-    var placeholders = createPlaceholderResolver();
+    var placeholders =
+        env.findService(PlaceholderResolver.class).orElseGet(PlaceholderApiResolver::new);
 
     var compiler = new ChatTemplateCompiler();
     var resolverFactory = new ChatTagResolverFactory(config, placeholders);
@@ -68,7 +71,8 @@ public final class ChatModule extends AbstractModule {
     var guards = new ChatGuardPipeline(checks);
 
     var globalChannel = new GlobalChannel();
-    var localChannel = new LocalChannel(config);
+    var localChannelNotifier = new LocalChannelNotifier(config);
+    var localChannel = new LocalChannel(config, localChannelNotifier);
     var staffChannel = new StaffChannel();
 
     var router = new ChannelRouter(toggleService, localChannel, staffChannel);
@@ -82,11 +86,9 @@ public final class ChatModule extends AbstractModule {
     registrar.command(new GlobalChatCommand(globalNotifier));
     registrar.command(new StaffChatCommand(toggleService, staffNotifier));
 
-    registrar.listener(new AsyncChatListener(config, router, formatPipeline, guards, styler));
+    var dispatchOrchestrator =
+        new ChatDispatchOrchestrator(config, router, formatPipeline, guards, styler);
+    registrar.listener(new AsyncChatListener(dispatchOrchestrator));
     registrar.listener(new ChatPlayerCleanupListener(toggleService, cooldowns, antiSpam));
-  }
-
-  protected PlaceholderResolver createPlaceholderResolver() {
-    return new PlaceholderApiResolver();
   }
 }

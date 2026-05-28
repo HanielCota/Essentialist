@@ -19,8 +19,8 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public final class TeleportNotifier {
 
-  private final ConfigHandle<TeleportConfig> config;
-  private final ActorFactory actors;
+  private final @NonNull ConfigHandle<TeleportConfig> config;
+  private final @NonNull ActorFactory actors;
 
   public void notifyToPlayer(
       @NonNull CommandActor senderActor,
@@ -28,18 +28,16 @@ public final class TeleportNotifier {
       @NonNull String senderName,
       @NonNull String targetName,
       @NonNull TeleportOutcome outcome) {
-    var snap = this.config.value();
-    switch (outcome) {
-      case SELF_TARGET -> senderActor.sendError(snap.selfTarget());
-      case INVALID_POSITION -> senderActor.sendError(snap.invalidPosition());
-      case FAILED -> senderActor.sendError(snap.teleportFailed());
-      case SUCCESS -> {
-        var targetActor = this.actors.actorOf(target);
-        var senderMsg = snap.formatToPlayer(targetName);
-        var targetMsg = snap.formatTeleportedTo(senderName);
-        senderActor.sendDualMessage(targetActor, senderMsg, targetMsg);
-      }
+    if (outcome != TeleportOutcome.SUCCESS) {
+      sendFailure(senderActor, outcome);
+      return;
     }
+
+    var snap = this.config.value();
+    var targetActor = this.actors.actorOf(target);
+    var senderMsg = snap.formatToPlayer(targetName);
+    var targetMsg = snap.formatTeleportedTo(senderName);
+    senderActor.sendDualMessage(targetActor, senderMsg, targetMsg);
   }
 
   public void notifyMove(
@@ -50,24 +48,22 @@ public final class TeleportNotifier {
       @NonNull String senderName,
       boolean selfMove,
       @NonNull TeleportOutcome outcome) {
-    var snap = this.config.value();
-    switch (outcome) {
-      case SELF_TARGET -> sender.sendError(snap.selfTarget());
-      case INVALID_POSITION -> sender.sendError(snap.invalidPosition());
-      case FAILED -> sender.sendError(snap.teleportFailed());
-      case SUCCESS -> {
-        var senderMsg = snap.formatMoveSender(fromName, toName);
-        sender.sendSuccess(senderMsg);
-
-        if (selfMove) {
-          return;
-        }
-
-        var fromActor = this.actors.actorOf(from);
-        var notifyMsg = snap.formatMoveNotify(senderName);
-        fromActor.sendSuccess(notifyMsg);
-      }
+    if (outcome != TeleportOutcome.SUCCESS) {
+      sendFailure(sender, outcome);
+      return;
     }
+
+    var snap = this.config.value();
+    var senderMsg = snap.formatMoveSender(fromName, toName);
+    sender.sendSuccess(senderMsg);
+
+    if (selfMove) {
+      return;
+    }
+
+    var fromActor = this.actors.actorOf(from);
+    var notifyMsg = snap.formatMoveNotify(senderName);
+    fromActor.sendSuccess(notifyMsg);
   }
 
   public void notifyToPos(
@@ -76,16 +72,14 @@ public final class TeleportNotifier {
       double y,
       double z,
       @NonNull TeleportOutcome outcome) {
-    var snap = this.config.value();
-    switch (outcome) {
-      case SELF_TARGET -> senderActor.sendError(snap.selfTarget());
-      case INVALID_POSITION -> senderActor.sendError(snap.invalidPosition());
-      case FAILED -> senderActor.sendError(snap.teleportFailed());
-      case SUCCESS -> {
-        var posMsg = snap.formatToPos(x, y, z);
-        senderActor.sendSuccess(posMsg);
-      }
+    if (outcome != TeleportOutcome.SUCCESS) {
+      sendFailure(senderActor, outcome);
+      return;
     }
+
+    var snap = this.config.value();
+    var posMsg = snap.formatToPos(x, y, z);
+    senderActor.sendSuccess(posMsg);
   }
 
   public void notifyBringHere(
@@ -94,17 +88,25 @@ public final class TeleportNotifier {
       @NonNull String senderName,
       @NonNull String targetName,
       @NonNull TeleportOutcome outcome) {
+    if (outcome != TeleportOutcome.SUCCESS) {
+      sendFailure(senderActor, outcome);
+      return;
+    }
+
+    var snap = this.config.value();
+    var targetActor = this.actors.actorOf(target);
+    var senderMsg = snap.formatBroughtPlayer(targetName);
+    var targetMsg = snap.formatBroughtBy(senderName);
+    senderActor.sendDualMessage(targetActor, senderMsg, targetMsg);
+  }
+
+  private void sendFailure(@NonNull CommandActor actor, @NonNull TeleportOutcome outcome) {
     var snap = this.config.value();
     switch (outcome) {
-      case SELF_TARGET -> senderActor.sendError(snap.selfTarget());
-      case INVALID_POSITION -> senderActor.sendError(snap.invalidPosition());
-      case FAILED -> senderActor.sendError(snap.teleportFailed());
-      case SUCCESS -> {
-        var targetActor = this.actors.actorOf(target);
-        var senderMsg = snap.formatBroughtPlayer(targetName);
-        var targetMsg = snap.formatBroughtBy(senderName);
-        senderActor.sendDualMessage(targetActor, senderMsg, targetMsg);
-      }
+      case SELF_TARGET -> actor.sendError(snap.selfTarget());
+      case INVALID_POSITION -> actor.sendError(snap.invalidPosition());
+      case FAILED -> actor.sendError(snap.teleportFailed());
+      case SUCCESS -> throw new IllegalStateException("sendFailure called with SUCCESS");
     }
   }
 }

@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.module.environment.ModuleEnvironment;
 import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptTeleportNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaIncomingResolver;
 import com.hanielcota.essentials.modules.tpa.command.TpaNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
@@ -17,12 +18,15 @@ import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteChatListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaFavoriteSessionCleanupListener;
 import com.hanielcota.essentials.modules.tpa.listener.TpaQuitListener;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
+import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExecutor;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestExpiry;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
 import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
+import com.hanielcota.essentials.modules.tpa.service.TpaRequestPolicy;
+import com.hanielcota.essentials.modules.tpa.service.TpaRequestRecorder;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSessions;
@@ -49,9 +53,11 @@ public final class TpaRuntimeBootstrap {
     var store = new InMemoryRequestRepository();
     var players = this.env.service(PlayerProvider.class);
     var notifier = new TpaNotifier(this.config, players, profiles, favorites);
+    var policy = new TpaRequestPolicy(profiles, blocks);
+    var recorder = new TpaRequestRecorder(history, profiles, contacts);
+    var executor = new TeleportRequestExecutor(players);
     var requestService =
-        new TeleportRequestService(
-            this.config, store, history, players, profiles, blocks, contacts);
+        new TeleportRequestService(this.config, store, players, policy, recorder, executor);
 
     var scheduler = this.env.service(Scheduler.class);
     var expiry = new TeleportRequestExpiry(scheduler, store, requestService, notifier);
@@ -67,10 +73,17 @@ public final class TpaRuntimeBootstrap {
     var callbacks = this.env.service(MainThreadCallbacks.class);
     var replyNotifier = new TpaRequestReplyNotifier(actors, players);
     var acceptHandler = new TpAcceptOutcomeHandler(this.config, replyNotifier);
+    var teleportNotifier = new TpAcceptTeleportNotifier(this.config);
     var incomingResolver = new TpaIncomingResolver(this.config, requestService);
 
     return new TpaShared(
-        actors, players, callbacks, replyNotifier, acceptHandler, incomingResolver);
+        actors,
+        players,
+        callbacks,
+        replyNotifier,
+        acceptHandler,
+        teleportNotifier,
+        incomingResolver);
   }
 
   public FavoriteRuntime favoriteRuntime(
@@ -106,6 +119,7 @@ public final class TpaRuntimeBootstrap {
         favorites,
         profiles,
         shared.acceptHandler(),
+        shared.teleportNotifier(),
         shared.callbacks(),
         shared.actors(),
         notifier);
@@ -133,5 +147,6 @@ public final class TpaRuntimeBootstrap {
       MainThreadCallbacks callbacks,
       TpaRequestReplyNotifier replyNotifier,
       TpAcceptOutcomeHandler acceptHandler,
+      TpAcceptTeleportNotifier teleportNotifier,
       TpaIncomingResolver incomingResolver) {}
 }
