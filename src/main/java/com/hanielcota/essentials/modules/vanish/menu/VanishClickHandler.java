@@ -48,7 +48,7 @@ public record VanishClickHandler(
     var location = target.getLocation();
     var world = location.getWorld();
     if (world == null) {
-      var failedMsg = snap.teleportFailed();
+      var failedMsg = snap.messages().teleportFailed();
       click.reply(failedMsg);
       return;
     }
@@ -61,7 +61,7 @@ public record VanishClickHandler(
     var name = target.getName();
 
     var teleportedMsg = VanishMessages.teleported(snap, name, worldName, x, y, z);
-    var failedMsg = snap.teleportFailed();
+    var failedMsg = snap.messages().teleportFailed();
     var afterTeleport = afterTeleport(click, teleportedMsg, failedMsg);
 
     click.close();

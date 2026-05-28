@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.menu.MenuTemplates;
-import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuConfig;
 import com.hanielcota.essentials.modules.homes.domain.HomeOrdering;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import lombok.NonNull;
 public final class HomesSortRenderer {
 
   public ItemTemplate sortTemplate(
-      @NonNull HomesMenuConfig settings, @NonNull HomeOrdering ordering) {
+      @NonNull HomesMainMenuConfig settings, @NonNull HomeOrdering ordering) {
     var stateLabel = orderingLabel(settings, ordering);
     var name = settings.sortName().replace("{state}", stateLabel);
     var lore = renderLore(settings, stateLabel, ordering);
@@ -24,7 +24,7 @@ public final class HomesSortRenderer {
   }
 
   private static String orderingLabel(
-      @NonNull HomesMenuConfig settings, @NonNull HomeOrdering ordering) {
+      @NonNull HomesMainMenuConfig settings, @NonNull HomeOrdering ordering) {
     return switch (ordering) {
       case NAME -> settings.sortLabelName();
       case MOST_USED -> settings.sortLabelMostUsed();
@@ -33,7 +33,7 @@ public final class HomesSortRenderer {
   }
 
   private static List<String> renderLore(
-      @NonNull HomesMenuConfig settings,
+      @NonNull HomesMainMenuConfig settings,
       @NonNull String stateLabel,
       @NonNull HomeOrdering ordering) {
     var lines = new ArrayList<String>(settings.sortLore().size() + 4);
@@ -48,7 +48,7 @@ public final class HomesSortRenderer {
   }
 
   private static List<String> options(
-      @NonNull HomesMenuConfig settings, @NonNull HomeOrdering current) {
+      @NonNull HomesMainMenuConfig settings, @NonNull HomeOrdering current) {
     var marker = settings.sortActiveMarker();
     return List.of(
         markActive(settings.sortLabelName(), marker, current == HomeOrdering.NAME),

@@ -31,12 +31,8 @@ public record InfoConfig(
     @Comment("Material of the about category.") Material aboutMaterial,
     @Comment("Name of the about category.") String aboutName,
     @Comment("Lore of the about category.") List<String> aboutLore,
-    @Comment("Label shown for GameMode SURVIVAL on the player info card.") String gameModeSurvival,
-    @Comment("Label shown for GameMode CREATIVE on the player info card.") String gameModeCreative,
-    @Comment("Label shown for GameMode ADVENTURE on the player info card.")
-        String gameModeAdventure,
-    @Comment("Label shown for GameMode SPECTATOR on the player info card.")
-        String gameModeSpectator,
+    @Comment("Display labels for each GameMode on the player info card.")
+        GameModeLabels gameModeLabels,
     @Comment("Templates for entries shown under the Servidor tab.") ServerEntriesSection server,
     @Comment("Templates for entries shown under the Jogador tab.") PlayerEntriesSection player,
     @Comment("Templates for entries shown under the Essentialist tab.") PluginEntriesSection plugin,
@@ -65,10 +61,7 @@ public record InfoConfig(
         Material.ENCHANTED_BOOK,
         "<yellow>Essentialist",
         List.of("<gray>Sobre o plugin."),
-        "Sobrevivência",
-        "Criativo",
-        "Aventura",
-        "Espectador",
+        GameModeLabels.defaults(),
         ServerEntriesSection.defaults(),
         PlayerEntriesSection.defaults(),
         PluginEntriesSection.defaults(),
@@ -123,11 +116,6 @@ public record InfoConfig(
   }
 
   public String gameModeLabel(@NonNull GameMode mode) {
-    return switch (mode) {
-      case SURVIVAL -> gameModeSurvival;
-      case CREATIVE -> gameModeCreative;
-      case ADVENTURE -> gameModeAdventure;
-      case SPECTATOR -> gameModeSpectator;
-    };
+    return gameModeLabels.label(mode);
   }
 }

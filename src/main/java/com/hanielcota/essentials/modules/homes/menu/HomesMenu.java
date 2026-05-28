@@ -11,8 +11,8 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuSection;
-import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.create.HomeCreateOrchestrator;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.domain.HomeOrdering;
@@ -42,18 +42,18 @@ public final class HomesMenu implements EssentialsMenu {
   private final HomeOrderingPreferences orderings;
   private final HomesSortRenderer sortRenderer = new HomesSortRenderer();
 
-  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMenuConfig menuSpec) {
-    var infoMaterial = menuSpec.infoMaterial();
-    var infoName = menuSpec.infoName();
-    var infoLore = menuSpec.infoLore();
+  private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMainMenuConfig mainMenu) {
+    var infoMaterial = mainMenu.infoMaterial();
+    var infoName = mainMenu.infoName();
+    var infoLore = mainMenu.infoLore();
 
     return MenuTemplates.simple(infoMaterial, infoName, infoLore);
   }
 
-  private static @NonNull ItemTemplate buildCreateTemplate(@NonNull HomesMenuConfig menuSpec) {
-    var createMaterial = menuSpec.createMaterial();
-    var createName = menuSpec.createName();
-    var createLore = menuSpec.createLore();
+  private static @NonNull ItemTemplate buildCreateTemplate(@NonNull HomesMainMenuConfig mainMenu) {
+    var createMaterial = mainMenu.createMaterial();
+    var createName = mainMenu.createName();
+    var createLore = mainMenu.createLore();
 
     return MenuTemplates.simple(createMaterial, createName, createLore);
   }
@@ -80,15 +80,16 @@ public final class HomesMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
     var menuSpec = snap.menu();
+    var mainMenu = menuSpec.main();
 
-    var rows = HomesMainMenuSection.rows(menuSpec);
-    var titleText = menuSpec.title();
-    var contentSlots = HomesMainMenuSection.contentSlots(menuSpec);
-    var navigation = menuSpec.navigation();
-    var infoTemplate = buildInfoTemplate(menuSpec);
-    var infoSlot = HomesMainMenuSection.infoSlot(menuSpec);
-    var createTemplate = buildCreateTemplate(menuSpec);
-    var createSlot = HomesMainMenuSection.createSlot(menuSpec);
+    var rows = HomesMainMenuSection.rows(mainMenu);
+    var titleText = mainMenu.title();
+    var contentSlots = HomesMainMenuSection.contentSlots(mainMenu);
+    var navigation = mainMenu.navigation();
+    var infoTemplate = buildInfoTemplate(mainMenu);
+    var infoSlot = HomesMainMenuSection.infoSlot(mainMenu);
+    var createTemplate = buildCreateTemplate(mainMenu);
+    var createSlot = HomesMainMenuSection.createSlot(mainMenu);
 
     PaginatedInfoMenus.register(
         menus,
@@ -147,25 +148,25 @@ public final class HomesMenu implements EssentialsMenu {
   // so each viewer sees their own head in the info slot. Skipped when the admin disabled
   // infoUsePlayerHead to keep the static template visible.
   private SlotDefinition perViewerInfoSlot(@NonNull Player player) {
-    var menuSpec = this.config.value().menu();
-    if (!menuSpec.infoUsePlayerHead()) {
+    var mainMenu = this.config.value().menu().main();
+    if (!mainMenu.infoUsePlayerHead()) {
       return null;
     }
 
-    var infoSlot = HomesMainMenuSection.infoSlot(menuSpec);
-    var builder = ItemTemplate.builder(menuSpec.infoMaterial());
+    var infoSlot = HomesMainMenuSection.infoSlot(mainMenu);
+    var builder = ItemTemplate.builder(mainMenu.infoMaterial());
     PlayerHeadTextures.applyTo(builder, player);
-    builder.name(menuSpec.infoName());
-    builder.lore(menuSpec.infoLore().toArray(String[]::new));
+    builder.name(mainMenu.infoName());
+    builder.lore(mainMenu.infoLore().toArray(String[]::new));
     builder.italic(false);
 
     return SlotDefinition.of(infoSlot, builder.build(), click -> {});
   }
 
   private SlotDefinition sortSlot(@NonNull HomeOrdering ordering) {
-    var menuSpec = this.config.value().menu();
-    var template = this.sortRenderer.sortTemplate(menuSpec, ordering);
-    var safeSlot = HomesMainMenuSection.sortSlot(menuSpec);
+    var mainMenu = this.config.value().menu().main();
+    var template = this.sortRenderer.sortTemplate(mainMenu, ordering);
+    var safeSlot = HomesMainMenuSection.sortSlot(mainMenu);
 
     return SlotDefinition.of(safeSlot, template, this::onSortClicked);
   }

@@ -157,7 +157,7 @@ public final class HomesModule extends AbstractModule {
     var configSnap = config.value();
     var menuConfig = configSnap.menu();
     var materialNamesSnap = materialNames.value();
-    var iconRegistry = new MaterialIconRegistry(menuConfig, materialNamesSnap);
+    var iconRegistry = new MaterialIconRegistry(menuConfig.picker(), materialNamesSnap);
     var pickerPresentation = new MaterialPickerPresentation(materialNames);
 
     var categoryClickHandler = new MaterialCategoryClickHandler(actionTarget);

@@ -42,12 +42,12 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menusRef) {
     var snap = this.config.value();
-    var menuSpec = snap.menu();
+    var categoryMenu = snap.menu().category();
 
-    var rows = MaterialCategorySection.rows(menuSpec);
-    var titleText = menuSpec.categoryTitle();
+    var rows = MaterialCategorySection.rows(categoryMenu);
+    var titleText = categoryMenu.title();
     var title = ComponentUtils.mini(titleText);
-    var contentSlots = MaterialCategorySection.contentSlots(menuSpec);
+    var contentSlots = MaterialCategorySection.contentSlots(categoryMenu);
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
     var pagination = paginationBuilder.build();
@@ -91,16 +91,15 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
   }
 
   private @Nullable SlotDefinition backButtonSlot() {
-    var snap = this.config.value();
-    var menuSpec = snap.menu();
+    var categoryMenu = this.config.value().menu().category();
 
-    if (!menuSpec.categoryBackEnabled()) {
+    if (!categoryMenu.backEnabled()) {
       return null;
     }
 
-    var material = menuSpec.categoryBackMaterial();
-    var name = menuSpec.categoryBackName();
-    var lore = menuSpec.categoryBackLore();
+    var material = categoryMenu.backMaterial();
+    var name = categoryMenu.backName();
+    var lore = categoryMenu.backLore();
     var loreArray = lore.toArray(String[]::new);
 
     var templateBuilder = ItemTemplate.builder(material);
@@ -109,19 +108,18 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
     templateBuilder.italic(false);
     var template = templateBuilder.build();
 
-    var slot = MaterialCategorySection.backSlot(menuSpec);
+    var slot = MaterialCategorySection.backSlot(categoryMenu);
 
     return SlotDefinition.of(slot, template, this.clickHandler::back);
   }
 
   private @NonNull ItemTemplate representativeItem(@NonNull MaterialCategory category) {
-    var snap = this.config.value();
-    var menuSpec = snap.menu();
+    var categoryMenu = this.config.value().menu().category();
 
     var icon = category.icon();
-    var categoryName = MaterialCategorySection.displayName(menuSpec, category);
-    var name = MaterialCategorySection.itemName(menuSpec, categoryName);
-    var lore = MaterialCategorySection.itemLore(menuSpec, categoryName);
+    var categoryName = MaterialCategorySection.displayName(categoryMenu, category);
+    var name = MaterialCategorySection.itemName(categoryMenu, categoryName);
+    var lore = MaterialCategorySection.itemLore(categoryMenu, categoryName);
 
     var builder = ItemTemplate.builder(icon);
     builder.name(name);

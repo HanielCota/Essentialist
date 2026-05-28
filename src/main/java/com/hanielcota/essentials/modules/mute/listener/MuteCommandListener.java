@@ -36,7 +36,7 @@ public final class MuteCommandListener implements Listener {
     }
 
     var snap = this.config.value();
-    if (!snap.isBlockedCommand(commandName)) {
+    if (!snap.blockedCommands().isBlocked(commandName)) {
       return;
     }
 

@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
-import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuConfig;
 import com.hanielcota.essentials.shared.Numbers;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ public record HomeMenuPlaceholders(
       long createdAt,
       long teleportCount,
       long lastUsedAt,
-      @NonNull HomesMenuConfig settings) {
+      @NonNull HomesMainMenuConfig settings) {
     var instant = Instant.ofEpochMilli(createdAt);
     var zone = ZoneId.systemDefault();
     var moment = LocalDateTime.ofInstant(instant, zone);
@@ -60,7 +60,7 @@ public record HomeMenuPlaceholders(
         lastUsedStr);
   }
 
-  private static String formatLastUsed(long lastUsedAt, @NonNull HomesMenuConfig settings) {
+  private static String formatLastUsed(long lastUsedAt, @NonNull HomesMainMenuConfig settings) {
     if (lastUsedAt <= 0) {
       return settings.lastUsedNever();
     }
@@ -81,7 +81,7 @@ public record HomeMenuPlaceholders(
     return DIRECTIONS[index];
   }
 
-  private static String displayWorld(@NonNull String world, @NonNull HomesMenuConfig settings) {
+  private static String displayWorld(@NonNull String world, @NonNull HomesMainMenuConfig settings) {
     var configured = settings.worldNames();
     var direct = configured.get(world);
     if (direct != null) {

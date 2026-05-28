@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
-import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesPickerMenuConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialPickerSection;
 import java.util.ArrayList;
@@ -33,7 +33,8 @@ public final class MaterialIconRegistry {
   private final Map<MaterialCategory, List<MaterialIcon>> iconsByCategory;
   private final List<MaterialIcon> miscIcons;
 
-  public MaterialIconRegistry(@NonNull HomesMenuConfig menu, @NonNull MaterialNamesConfig names) {
+  public MaterialIconRegistry(
+      @NonNull HomesPickerMenuConfig menu, @NonNull MaterialNamesConfig names) {
     this.iconsByCategory = new EnumMap<>(MaterialCategory.class);
 
     for (var category : MaterialCategory.browsable()) {
@@ -48,7 +49,7 @@ public final class MaterialIconRegistry {
 
   private static @NonNull List<MaterialIcon> buildIcons(
       @NonNull MaterialCategory category,
-      @NonNull HomesMenuConfig menu,
+      @NonNull HomesPickerMenuConfig menu,
       @NonNull MaterialNamesConfig names) {
 
     var icons = new ArrayList<MaterialIcon>(category.materials().size());
@@ -65,7 +66,7 @@ public final class MaterialIconRegistry {
 
   private static @NonNull ItemTemplate renderTemplate(
       @NonNull Material material,
-      @NonNull HomesMenuConfig menu,
+      @NonNull HomesPickerMenuConfig menu,
       @NonNull MaterialNamesConfig names) {
 
     var pretty = names.displayName(material);
@@ -89,7 +90,7 @@ public final class MaterialIconRegistry {
   }
 
   private @NonNull List<MaterialIcon> buildMiscIcons(
-      @NonNull HomesMenuConfig menu, @NonNull MaterialNamesConfig names) {
+      @NonNull HomesPickerMenuConfig menu, @NonNull MaterialNamesConfig names) {
     var known = new ArrayList<Material>();
 
     for (var category : MaterialCategory.browsable()) {

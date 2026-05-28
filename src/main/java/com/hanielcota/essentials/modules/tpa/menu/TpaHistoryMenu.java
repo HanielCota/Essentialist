@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
 import com.github.hanielcota.menuframework.MenuFramework;
-import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -13,7 +12,6 @@ import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaMenuConfig;
-import com.hanielcota.essentials.modules.tpa.domain.Destination;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
@@ -41,6 +39,7 @@ public final class TpaHistoryMenu implements EssentialsMenu {
   private final TpaHistory history;
   private final TpaHistoryEntryRenderer renderer;
   private final TpaHistoryMenuState state;
+  private final TpaHistoryClickHandler clicks;
 
   private static List<Integer> resolveContentSlots(@NonNull TpaMenuConfig settings, int rows) {
     var totalSlots = MenuLayouts.slotCount(rows);
@@ -51,15 +50,6 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     var fallback = MenuLayouts.fallbackContentSlots(rows, fallbackSize);
 
     return MenuLayouts.sanitizeSlots(configured, rows, fallback);
-  }
-
-  private static String formatDestinationCopy(
-      @NonNull String template, @NonNull Destination destination) {
-    return template
-        .replace("{world}", destination.world())
-        .replace("{x}", Long.toString(Math.round(destination.x())))
-        .replace("{y}", Long.toString(Math.round(destination.y())))
-        .replace("{z}", Long.toString(Math.round(destination.z())));
   }
 
   @Override
@@ -146,21 +136,7 @@ public final class TpaHistoryMenu implements EssentialsMenu {
 
   private SlotDefinition entrySlot(@NonNull TpaHistoryEntry entry, int humanIndex) {
     var template = this.renderer.render(entry, humanIndex);
-    return SlotDefinition.of(-1, template, click -> onEntryClicked(click, entry));
-  }
-
-  private void onEntryClicked(@NonNull ClickContext click, @NonNull TpaHistoryEntry entry) {
-    if (entry.status() != TeleportRequestStatus.ACCEPTED) {
-      return;
-    }
-    var destination = entry.destination();
-    if (destination == null) {
-      return;
-    }
-
-    var settings = this.config.value().menu();
-    var copyMsg = formatDestinationCopy(settings.destinationCopyMessage(), destination);
-    click.reply(copyMsg);
+    return SlotDefinition.of(-1, template, click -> this.clicks.onEntryClicked(click, entry));
   }
 
   private SlotDefinition filterSlot(
@@ -171,13 +147,7 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     var template = filterTemplate(settings, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.filterSlot(), rows, 0);
 
-    return SlotDefinition.of(safeSlot, template, this::onFilterClicked);
-  }
-
-  private void onFilterClicked(@NonNull ClickContext click) {
-    var viewerId = click.player().getUniqueId();
-    this.state.cycleFilter(viewerId);
-    click.refresh();
+    return SlotDefinition.of(safeSlot, template, this.clicks::onFilterClicked);
   }
 
   private List<SlotDefinition> emptyState() {

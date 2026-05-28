@@ -23,8 +23,8 @@ public record NavigationButtonsConfig(
         Material.ARROW,
         previousSlot,
         nextSlot,
-        "<yellow>« Página anterior",
-        "<yellow>Próxima página »");
+        "<yellow> Página anterior",
+        "<yellow>Próxima página ");
   }
 
   public int effectivePreviousSlot(int rows) {

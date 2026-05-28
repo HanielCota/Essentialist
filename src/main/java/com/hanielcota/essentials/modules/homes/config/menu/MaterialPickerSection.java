@@ -6,34 +6,29 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-/**
- * Layout + formatter helpers for the material picker submenu (rows / content slots / back slot /
- * navigation, plus item formatters and a fallback title). Stateless — every call takes a config
- * snapshot.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MaterialPickerSection {
 
-  public static int rows(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.clampRows(snap.pickerRows());
+  public static int rows(@NonNull HomesPickerMenuConfig snap) {
+    return MenuLayouts.clampRows(snap.rows());
   }
 
-  public static List<Integer> contentSlots(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.sanitizeSlots(snap.pickerContentSlots(), rows(snap));
+  public static List<Integer> contentSlots(@NonNull HomesPickerMenuConfig snap) {
+    return MenuLayouts.sanitizeSlots(snap.contentSlots(), rows(snap));
   }
 
-  public static int backSlot(@NonNull HomesMenuConfig snap) {
+  public static int backSlot(@NonNull HomesPickerMenuConfig snap) {
     var rowCount = rows(snap);
 
-    return MenuLayouts.sanitizeSlot(snap.pickerBackSlot(), rowCount, rowCount * 9 - 5);
+    return MenuLayouts.sanitizeSlot(snap.backSlot(), rowCount, rowCount * 9 - 5);
   }
 
-  public static String itemName(@NonNull HomesMenuConfig snap, @NonNull String material) {
-    return snap.pickerItemName().replace("{material}", material);
+  public static String itemName(@NonNull HomesPickerMenuConfig snap, @NonNull String material) {
+    return snap.itemName().replace("{material}", material);
   }
 
-  public static String[] itemLore(@NonNull HomesMenuConfig snap, @NonNull String material) {
-    var template = snap.pickerItemLore();
+  public static String[] itemLore(@NonNull HomesPickerMenuConfig snap, @NonNull String material) {
+    var template = snap.itemLore();
     var rendered = new String[template.size()];
     for (var i = 0; i < template.size(); i++) {
       rendered[i] = template.get(i).replace("{material}", material);
@@ -42,13 +37,8 @@ public final class MaterialPickerSection {
     return rendered;
   }
 
-  /**
-   * Title without a per-home {name} placeholder. Falls back to a static label when the template
-   * still contains the placeholder so the picker submenu (which is rendered before a home is
-   * selected) doesn't show a literal "{name}".
-   */
-  public static String staticTitle(@NonNull HomesMenuConfig snap) {
-    var template = snap.pickerTitle();
+  public static String staticTitle(@NonNull HomesPickerMenuConfig snap) {
+    var template = snap.title();
     if (template.contains("{name}")) {
       return "<dark_gray>Pick an icon";
     }

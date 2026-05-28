@@ -52,11 +52,11 @@ public final class VanishMessages {
     var yStr = Numbers.display(y);
     var zStr = Numbers.display(z);
 
-    return formatLine(snap.teleported(), player, world, xStr, yStr, zStr);
+    return formatLine(snap.messages().teleported(), player, world, xStr, yStr, zStr);
   }
 
   public static String teleportTargetGone(@NonNull VanishConfig snap, @NonNull String player) {
-    return snap.teleportTargetGone().replace(PLAYER_PLACEHOLDER, player);
+    return snap.messages().teleportTargetGone().replace(PLAYER_PLACEHOLDER, player);
   }
 
   private static String formatLine(

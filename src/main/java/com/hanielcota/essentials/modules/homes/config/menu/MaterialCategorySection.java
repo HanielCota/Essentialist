@@ -7,30 +7,26 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-/**
- * Layout + formatter helpers for the material category submenu (rows / content slots / back slot,
- * plus category display names and item formatters). Stateless — every call takes a config snapshot.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MaterialCategorySection {
 
-  public static int rows(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.clampRows(snap.categoryRows());
+  public static int rows(@NonNull HomesCategoryMenuConfig snap) {
+    return MenuLayouts.clampRows(snap.rows());
   }
 
-  public static List<Integer> contentSlots(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.sanitizeSlots(snap.categoryContentSlots(), rows(snap));
+  public static List<Integer> contentSlots(@NonNull HomesCategoryMenuConfig snap) {
+    return MenuLayouts.sanitizeSlots(snap.contentSlots(), rows(snap));
   }
 
-  public static int backSlot(@NonNull HomesMenuConfig snap) {
+  public static int backSlot(@NonNull HomesCategoryMenuConfig snap) {
     var rowCount = rows(snap);
 
-    return MenuLayouts.sanitizeSlot(snap.categoryBackSlot(), rowCount, rowCount * 9 - 5);
+    return MenuLayouts.sanitizeSlot(snap.backSlot(), rowCount, rowCount * 9 - 5);
   }
 
   public static String displayName(
-      @NonNull HomesMenuConfig snap, @NonNull MaterialCategory category) {
-    var configured = snap.categoryNames().get(category);
+      @NonNull HomesCategoryMenuConfig snap, @NonNull MaterialCategory category) {
+    var configured = snap.names().get(category);
     if (configured != null) {
       return configured;
     }
@@ -38,12 +34,12 @@ public final class MaterialCategorySection {
     return category.name();
   }
 
-  public static String itemName(@NonNull HomesMenuConfig snap, @NonNull String category) {
-    return snap.categoryItemName().replace("{category}", category);
+  public static String itemName(@NonNull HomesCategoryMenuConfig snap, @NonNull String category) {
+    return snap.itemName().replace("{category}", category);
   }
 
-  public static String[] itemLore(@NonNull HomesMenuConfig snap, @NonNull String category) {
-    var template = snap.categoryItemLore();
+  public static String[] itemLore(@NonNull HomesCategoryMenuConfig snap, @NonNull String category) {
+    var template = snap.itemLore();
     var rendered = new String[template.size()];
     for (var i = 0; i < template.size(); i++) {
       rendered[i] = template.get(i).replace("{category}", category);

@@ -44,12 +44,13 @@ public record WhitelistCommand(
 
     return switch (result) {
       case ADDED -> {
-        var addedMsg = snap.formatAdded(name);
+        var addedMsg = snap.messages().formatAdded(name);
         sender.sendSuccess(addedMsg);
         yield CommandResult.success();
       }
-      case ALREADY_WHITELISTED -> CommandResult.invalidUsage(snap.formatAlreadyAdded(name));
-      case UNKNOWN_PLAYER -> CommandResult.invalidUsage(snap.formatUnknownPlayer(name));
+      case ALREADY_WHITELISTED ->
+          CommandResult.invalidUsage(snap.messages().formatAlreadyAdded(name));
+      case UNKNOWN_PLAYER -> CommandResult.invalidUsage(snap.messages().formatUnknownPlayer(name));
     };
   }
 
@@ -59,12 +60,12 @@ public record WhitelistCommand(
     var removed = this.service.remove(name);
 
     if (removed) {
-      var removedMsg = snap.formatRemoved(name);
+      var removedMsg = snap.messages().formatRemoved(name);
       sender.sendSuccess(removedMsg);
       return CommandResult.success();
     }
 
-    var notWhitelistedMsg = snap.formatNotWhitelisted(name);
+    var notWhitelistedMsg = snap.messages().formatNotWhitelisted(name);
     return CommandResult.invalidUsage(notWhitelistedMsg);
   }
 }
