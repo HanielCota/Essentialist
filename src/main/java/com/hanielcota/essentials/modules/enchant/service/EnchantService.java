@@ -1,21 +1,48 @@
 package com.hanielcota.essentials.modules.enchant.service;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.enchant.config.EnchantConfig;
 import java.util.Set;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 
+@RequiredArgsConstructor
 public final class EnchantService {
 
-  /** Adds an enchantment to the held item at any level — unsafe, no vanilla checks. */
+  private final ConfigHandle<EnchantConfig> config;
+
+  /** Adds an enchantment to the held item, gated by the configured limits and block list. */
   public ApplyResult apply(@NonNull Player player, @NonNull Enchantment enchantment, int level) {
     var held = player.getInventory().getItemInMainHand();
     if (held.getType().isAir()) {
       return ApplyResult.EMPTY_HAND;
     }
 
-    held.addUnsafeEnchantment(enchantment, level);
+    var snap = this.config.value();
+    var key = enchantment.getKey().getKey();
 
+    if (snap.isBlocked(key)) {
+      return ApplyResult.BLOCKED;
+    }
+    if (level > snap.maxLevel()) {
+      return ApplyResult.LEVEL_TOO_HIGH;
+    }
+
+    if (snap.allowUnsafe()) {
+      held.addUnsafeEnchantment(enchantment, level);
+      return ApplyResult.APPLIED;
+    }
+
+    if (!enchantment.canEnchantItem(held)) {
+      return ApplyResult.INCOMPATIBLE;
+    }
+    if (level > enchantment.getMaxLevel()) {
+      return ApplyResult.LEVEL_TOO_HIGH;
+    }
+
+    held.addEnchantment(enchantment, level);
     return ApplyResult.APPLIED;
   }
 
@@ -58,7 +85,10 @@ public final class EnchantService {
 
   public enum ApplyResult {
     APPLIED,
-    EMPTY_HAND
+    EMPTY_HAND,
+    LEVEL_TOO_HIGH,
+    BLOCKED,
+    INCOMPATIBLE
   }
 
   public enum RemoveResult {

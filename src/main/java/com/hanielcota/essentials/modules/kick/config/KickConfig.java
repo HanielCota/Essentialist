@@ -9,15 +9,17 @@ public record KickConfig(
     @Comment("Reason used when /kick is run without one.") String defaultReason,
     @Comment("Kick screen shown to the kicked player. Placeholder: {reason}.") String screen,
     @Comment("Confirmation shown to the sender. Placeholders: {player}, {reason}.") String kicked,
-    @Comment("Shown when the target has essentials.kick.exempt. Placeholder: {player}.")
-        String exempt) {
+    @Comment("Shown when the target has the exempt permission. Placeholder: {player}.")
+        String exempt,
+    @Comment("Permission node that protects a player from being kicked.") String exemptPermission) {
 
   public static KickConfig defaults() {
     return new KickConfig(
         "Você foi expulso do servidor.",
         "<red>{reason}",
         "<green>Você expulsou <gold>{player}</gold>.",
-        "<red><gold>{player}</gold> não pode ser expulso.");
+        "<red><gold>{player}</gold> não pode ser expulso.",
+        "essentials.kick.exempt");
   }
 
   public String formatExempt(@NonNull String player) {

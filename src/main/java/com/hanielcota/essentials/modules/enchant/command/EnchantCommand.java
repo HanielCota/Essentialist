@@ -41,17 +41,20 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
     }
 
     var player = sender.unwrap(Player.class);
+    var label = enchantment.getKey().getKey();
     var result = this.service.apply(player, enchantment, level);
 
-    if (result == EnchantService.ApplyResult.EMPTY_HAND) {
-      return CommandResult.invalidUsage(snap.emptyHand());
-    }
-
-    var label = enchantment.getKey().getKey();
-    var appliedMsg = snap.formatApplied(label, level);
-
-    sender.sendSuccess(appliedMsg);
-    return CommandResult.success();
+    return switch (result) {
+      case EMPTY_HAND -> CommandResult.invalidUsage(snap.emptyHand());
+      case BLOCKED -> CommandResult.invalidUsage(snap.formatBlocked(label));
+      case LEVEL_TOO_HIGH -> CommandResult.invalidUsage(snap.formatLevelTooHigh());
+      case INCOMPATIBLE -> CommandResult.invalidUsage(snap.formatIncompatible(label));
+      case APPLIED -> {
+        var appliedMsg = snap.formatApplied(label, level);
+        sender.sendSuccess(appliedMsg);
+        yield CommandResult.success();
+      }
+    };
   }
 
   @Subcommand("remove")

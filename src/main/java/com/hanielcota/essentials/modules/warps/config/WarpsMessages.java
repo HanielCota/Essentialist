@@ -30,7 +30,8 @@ public record WarpsMessages(
     @Comment("Shown after /warp completes successfully. Placeholders: {name}.") String teleported,
     @Comment("Shown when the delayed teleport is cancelled by damage or disconnect.")
         String cancelled,
-    @Comment("Shown when the teleport itself fails.") String failed) {
+    @Comment("Shown when the teleport itself fails.") String failed,
+    @Comment("/setwarp rejection for a malformed name. Placeholder: {max}.") String invalidName) {
 
   public static WarpsMessages defaults() {
     return new WarpsMessages(
@@ -48,6 +49,7 @@ public record WarpsMessages(
             + "Não tome dano.",
         "<green>Você foi teleportado para <gold>{name}</gold>.",
         "<red>Teleporte cancelado.",
-        "<red>O teleporte não pôde ser concluído.");
+        "<red>O teleporte não pôde ser concluído.",
+        "<red>Nome de warp inválido. Use até {max} caracteres: letras, números, '_' ou '-'.");
   }
 }
