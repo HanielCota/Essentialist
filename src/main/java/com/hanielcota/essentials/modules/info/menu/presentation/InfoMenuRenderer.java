@@ -5,6 +5,7 @@ import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.modules.info.menu.InfoTab;
+import com.hanielcota.essentials.shared.Log;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -14,6 +15,8 @@ import org.bukkit.entity.Player;
 
 @RequiredArgsConstructor
 public final class InfoMenuRenderer {
+
+  private static final Log LOG = Log.of(InfoMenuRenderer.class);
 
   private final ConfigHandle<InfoConfig> config;
   private final ServerInfoEntries serverEntries;
@@ -89,8 +92,20 @@ public final class InfoMenuRenderer {
       @NonNull List<InfoEntry> entries, @NonNull BiConsumer<ClickContext, InfoTab> tabSwitcher) {
     var snap = this.config.value();
     var detailSlots = snap.effectiveDetailSlots();
-    var visibleEntries = Math.min(entries.size(), detailSlots.size());
-    var startIdx = (detailSlots.size() - visibleEntries) / 2;
+    var entryCount = entries.size();
+    var slotCount = detailSlots.size();
+    var visibleEntries = Math.min(entryCount, slotCount);
+
+    if (entryCount > slotCount) {
+      var dropped = entryCount - slotCount;
+      LOG.warn(
+          "Info menu has {} entries but only {} detailSlots configured — {} entries hidden.",
+          entryCount,
+          slotCount,
+          dropped);
+    }
+
+    var startIdx = (slotCount - visibleEntries) / 2;
 
     var slots = new ArrayList<SlotDefinition>(visibleEntries + 1);
 

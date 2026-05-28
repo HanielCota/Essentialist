@@ -51,6 +51,11 @@ public final class CropsNotifier {
     player.sendMessage(component);
   }
 
+  /** Drops a player's throttle timestamp so the map does not grow unbounded over server uptime. */
+  public void forget(@NonNull UUID playerId) {
+    this.lastSent.remove(playerId);
+  }
+
   private boolean onCooldown(@NonNull UUID playerId, long cooldownMs) {
     var now = System.currentTimeMillis();
     var last = lastSent.getOrDefault(playerId, 0L);

@@ -74,8 +74,8 @@ public record EnchantConfig(
     return cleared.replace("{count}", countText);
   }
 
-  public String formatLevelTooHigh() {
-    var maxText = Integer.toString(maxLevel);
+  public String formatLevelTooHigh(int effectiveMax) {
+    var maxText = Integer.toString(effectiveMax);
     return levelTooHigh.replace("{max}", maxText);
   }
 

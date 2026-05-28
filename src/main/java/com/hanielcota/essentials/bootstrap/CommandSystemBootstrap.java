@@ -40,21 +40,16 @@ final class CommandSystemBootstrap implements BootstrapStage {
     services.register(PaperCommandFramework.class, framework);
     services.register(ActorFactory.class, new FrameworkActorFactory(framework));
 
-    replayExisting(services, framework);
-    services.addRegistrationListener((type, instance) -> mirror(framework, type, instance));
-  }
-
-  private static void replayExisting(
-      @NonNull com.hanielcota.essentials.service.ServiceRegistry services,
-      @NonNull PaperCommandFramework framework) {
-    var existing = services.registered();
-    for (var type : existing) {
-      if (type == PaperCommandFramework.class) {
-        continue;
-      }
-      var instance = services.resolve(type);
-      mirror(framework, type, instance);
-    }
+    // addRegistrationListener replays already-registered services, so the listener also covers the
+    // ones registered before this stage. The framework itself is skipped — it is not a dependency
+    // of its own command routes.
+    services.addRegistrationListener(
+        (type, instance) -> {
+          if (type == PaperCommandFramework.class) {
+            return;
+          }
+          mirror(framework, type, instance);
+        });
   }
 
   @SuppressWarnings("unchecked")

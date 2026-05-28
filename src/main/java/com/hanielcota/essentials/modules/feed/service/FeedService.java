@@ -11,9 +11,11 @@ public final class FeedService {
   public boolean feed(@NonNull Player player) {
     var food = player.getFoodLevel();
     var saturation = player.getSaturation();
-    var exhaustion = player.getExhaustion();
 
-    var alreadyFull = food >= MAX_FOOD && saturation >= MAX_SATURATION && exhaustion <= 0f;
+    // Exhaustion is deliberately excluded: it is a near-always-positive hidden counter, so folding
+    // it into the check made "already full" practically unreachable. Food + saturation are what the
+    // player perceives as "full".
+    var alreadyFull = food >= MAX_FOOD && saturation >= MAX_SATURATION;
     if (alreadyFull) {
       return false;
     }

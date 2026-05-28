@@ -18,10 +18,11 @@ public interface ServiceRegistry {
   Set<Class<?>> registered();
 
   /**
-   * Subscribes to future {@link #register(Class, Object)} calls. The listener is invoked
-   * synchronously, after the registry has accepted the entry, with the declared type and instance.
-   * Useful for mirroring services into adjacent containers (e.g. the command framework's DI table)
-   * without coupling those callbacks to the registration call sites.
+   * Subscribes to future {@link #register(Class, Object)} calls and immediately replays every
+   * already-registered service to the listener, so a late subscriber sees the full set regardless
+   * of registration order. The listener is invoked synchronously with the declared type and
+   * instance. Useful for mirroring services into adjacent containers (e.g. the command framework's
+   * DI table) without coupling those callbacks to the registration call sites.
    */
   void addRegistrationListener(@NonNull BiConsumer<Class<?>, Object> listener);
 }
