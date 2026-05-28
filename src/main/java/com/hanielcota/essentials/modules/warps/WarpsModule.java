@@ -19,6 +19,7 @@ import com.hanielcota.essentials.modules.warps.repository.SqlWarpRepository;
 import com.hanielcota.essentials.modules.warps.repository.WarpCache;
 import com.hanielcota.essentials.modules.warps.repository.WarpRepository;
 import com.hanielcota.essentials.modules.warps.repository.WarpTable;
+import com.hanielcota.essentials.modules.warps.service.WarpNameValidator;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import java.util.Set;
 import lombok.NonNull;
@@ -65,7 +66,8 @@ public final class WarpsModule extends AbstractModule {
     var warpResolver =
         new com.hanielcota.essentials.modules.warps.service.WarpResolver(worldLookup);
 
-    var setWarpCommand = new SetWarpCommand(config, warpService);
+    var nameValidator = new WarpNameValidator();
+    var setWarpCommand = new SetWarpCommand(config, warpService, nameValidator);
     var promptFactory = new WarpPromptFactory();
     var warpCommand = new WarpCommand(config, warpService, warpResolver, delayed, promptFactory);
     var delWarpCommand = new DelWarpCommand(config, warpService);

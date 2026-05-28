@@ -42,7 +42,7 @@ public final class AfkModule extends AbstractModule {
 
     registrar.command(new AfkCommand(service, transitions));
 
-    registrar.listener(new AfkActivityListener(service, transitions));
+    registrar.listener(new AfkActivityListener(config, service, transitions));
     registrar.listener(new AfkJoinListener(service));
     registrar.listener(new AfkQuitListener(service));
   }

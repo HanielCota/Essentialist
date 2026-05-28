@@ -1,5 +1,7 @@
 package com.hanielcota.essentials.modules.afk.listener;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.afk.config.AfkConfig;
 import com.hanielcota.essentials.modules.afk.service.AfkService;
 import com.hanielcota.essentials.modules.afk.service.AfkTransitions;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -21,15 +23,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
  * and chat. Commands intentionally do not count — they would force a special-case for {@code /afk}
  * itself.
  *
- * <p>{@link PlayerMoveEvent} fires up to 20× per second per player; debouncing per-player to
- * {@value #MOVE_RECORD_INTERVAL_MS} ms keeps the activity write cost off the hot path without
- * losing the "user is moving" signal.
+ * <p>{@link PlayerMoveEvent} fires up to 20× per second per player; debouncing per-player to the
+ * configured interval keeps the activity write cost off the hot path without losing the "user is
+ * moving" signal.
  */
 @RequiredArgsConstructor
 public final class AfkActivityListener implements Listener {
 
-  private static final long MOVE_RECORD_INTERVAL_MS = 250L;
-
+  private final ConfigHandle<AfkConfig> config;
   private final AfkService service;
   private final AfkTransitions transitions;
   private final ConcurrentHashMap<UUID, Long> lastMoveRecord = new ConcurrentHashMap<>();
@@ -49,7 +50,8 @@ public final class AfkActivityListener implements Listener {
     var id = player.getUniqueId();
     var now = System.currentTimeMillis();
     var previous = this.lastMoveRecord.get(id);
-    if (previous != null && now - previous < MOVE_RECORD_INTERVAL_MS) {
+    var debounceMillis = this.config.value().moveDebounceMillis();
+    if (previous != null && now - previous < debounceMillis) {
       return;
     }
     this.lastMoveRecord.put(id, now);

@@ -17,7 +17,7 @@ public final class EnchantModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("enchant", EnchantConfig.class, EnchantConfig::defaults);
-    var enchantService = new EnchantService();
+    var enchantService = new EnchantService(config);
     var enchantCommand = new EnchantCommand(config, enchantService);
     registrar.command(enchantCommand);
   }

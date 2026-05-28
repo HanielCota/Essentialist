@@ -26,8 +26,6 @@ import org.bukkit.entity.Player;
 @Syntax("/kick <jogador> [motivo]")
 public record KickCommand(ConfigHandle<KickConfig> config) {
 
-  private static final String EXEMPT_PERMISSION = "essentials.kick.exempt";
-
   @DefaultSubcommand
   public CommandResult execute(
       @NonNull CommandActor sender,
@@ -35,8 +33,9 @@ public record KickCommand(ConfigHandle<KickConfig> config) {
       @GreedyString @Arg("motivo") Optional<String> motivo) {
     var snap = this.config.value();
     var name = target.getName();
+    var exemptPermission = snap.exemptPermission();
 
-    if (target.hasPermission(EXEMPT_PERMISSION)) {
+    if (target.hasPermission(exemptPermission)) {
       var exemptMsg = snap.formatExempt(name);
       return CommandResult.failure(CommandStatus.NO_PERMISSION, exemptMsg);
     }

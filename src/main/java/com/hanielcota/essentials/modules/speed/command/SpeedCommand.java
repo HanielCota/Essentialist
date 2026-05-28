@@ -10,7 +10,6 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PermissionForOther;
-import io.github.hanielcota.commandframework.annotation.Range;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
@@ -30,7 +29,7 @@ public record SpeedCommand(
   @DefaultSubcommand
   public CommandResult showUsage(@NonNull CommandActor sender) {
     var snap = this.config.value();
-    var usageMsg = snap.usage();
+    var usageMsg = snap.formatUsage();
     sender.sendMessage(usageMsg);
     return CommandResult.success();
   }
@@ -38,13 +37,11 @@ public record SpeedCommand(
   @Subcommand("walk")
   @PermissionForOther(".others")
   public CommandResult walk(
-      @NonNull CommandActor sender,
-      @Range(min = 1, max = 10) @Arg("valor") int valor,
-      @TargetOrSelf Player subject) {
+      @NonNull CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
     var snap = this.config.value();
 
     if (!this.service.setWalkSpeed(subject, valor)) {
-      var invalidMsg = snap.invalid();
+      var invalidMsg = snap.formatInvalid();
       return CommandResult.invalidUsage(invalidMsg);
     }
 
@@ -56,13 +53,11 @@ public record SpeedCommand(
   @Subcommand("fly")
   @PermissionForOther(".others")
   public CommandResult fly(
-      @NonNull CommandActor sender,
-      @Range(min = 1, max = 10) @Arg("valor") int valor,
-      @TargetOrSelf Player subject) {
+      @NonNull CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
     var snap = this.config.value();
 
     if (!this.service.setFlySpeed(subject, valor)) {
-      var invalidMsg = snap.invalid();
+      var invalidMsg = snap.formatInvalid();
       return CommandResult.invalidUsage(invalidMsg);
     }
 

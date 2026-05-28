@@ -29,18 +29,17 @@ import org.bukkit.entity.Player;
 @Syntax("/matar [jogador]")
 public record KillCommand(ConfigHandle<KillConfig> config, ActorFactory actors) {
 
-  private static final String EXEMPT_PERMISSION = "essentials.kill.exempt";
-
   @DefaultSubcommand
   public CommandResult execute(
       @NonNull CommandActor sender, @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
     var name = subject.getName();
     var self = Senders.isSelf(sender, subject);
+    var exemptPermission = snap.exemptPermission();
 
     // Exempt only applies when killing someone else — a staff member with both essentials.kill and
-    // essentials.kill.exempt can still kill themselves.
-    if (!self && subject.hasPermission(EXEMPT_PERMISSION)) {
+    // the exempt node can still kill themselves.
+    if (!self && subject.hasPermission(exemptPermission)) {
       var exemptMsg = snap.formatExempt(name);
       return CommandResult.failure(CommandStatus.NO_PERMISSION, exemptMsg);
     }
