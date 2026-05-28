@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.teleport.service.TeleportService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
 @Command("tphere")
 @EssentialsCommand
 @Permission("essentials.tphere")
-@Cooldown(duration = "3s")
 @Description("Teleporta um jogador até você.")
 @Syntax("/tphere <jogador>")
 public record TeleportHereCommand(

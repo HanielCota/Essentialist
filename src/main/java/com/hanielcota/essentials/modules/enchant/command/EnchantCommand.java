@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.enchant.config.EnchantConfig;
 import com.hanielcota.essentials.modules.enchant.service.EnchantService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
@@ -25,7 +24,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.enchant")
 @PlayerOnly
-@Cooldown(duration = "3s")
 @Description("Encanta o item na mão.")
 @Syntax("/enchant <encantamento> [nível] | /enchant remove <encantamento> | /enchant clear")
 public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService service) {

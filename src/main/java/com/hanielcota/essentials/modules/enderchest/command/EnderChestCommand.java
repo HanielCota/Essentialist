@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.enderchest.config.EnderChestConfig;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -21,7 +20,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.echest")
 @PlayerOnly
-@Cooldown(duration = "3s")
 @Description("Abre o seu Ender Chest ou o de outro jogador.")
 @Syntax("/echest [jogador]")
 public record EnderChestCommand(ConfigHandle<EnderChestConfig> config) {

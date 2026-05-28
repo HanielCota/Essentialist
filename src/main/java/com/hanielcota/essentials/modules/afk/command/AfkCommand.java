@@ -4,7 +4,6 @@ import com.hanielcota.essentials.modules.afk.service.AfkService;
 import com.hanielcota.essentials.modules.afk.service.AfkTransitions;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -21,7 +20,6 @@ import org.bukkit.entity.Player;
     value = "afk",
     aliases = {"away", "idle"})
 @Permission("essentials.afk")
-@Cooldown(duration = "1s")
 @Description("Marca ou remove o seu status AFK.")
 @Syntax("/afk [motivo]")
 public record AfkCommand(AfkService service, AfkTransitions transitions) {

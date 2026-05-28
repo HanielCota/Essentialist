@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.config.TeleportConfig;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
 @Command("tpcancel")
 @EssentialsCommand
 @Permission("essentials.teleport.cancel")
-@Cooldown(duration = "1s")
 @Description("Cancels the warm-up countdown of a pending teleport.")
 @Syntax("/tpcancel")
 public record TeleportCancelCommand(ConfigHandle<TeleportConfig> config, DelayedTeleport delayed) {

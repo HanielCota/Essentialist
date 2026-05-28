@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.workstations.config.WorkstationsConfig;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -19,7 +18,6 @@ import org.bukkit.inventory.MenuType;
 @EssentialsCommand
 @Permission("essentials.loom")
 @PlayerOnly
-@Cooldown(duration = "2s")
 @Description("Opens a virtual loom.")
 @Syntax("/tear")
 public record LoomCommand(ConfigHandle<WorkstationsConfig> config) {

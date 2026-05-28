@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
@@ -22,7 +21,6 @@ import org.bukkit.entity.Player;
 
 @Command("give")
 @Permission("essentials.give")
-@Cooldown(duration = "3s")
 @Description("Dá itens a um jogador.")
 @Syntax("/give <item> [quantidade] | /give para <jogador> <item> [quantidade]")
 public record GiveCommand(GiveOrchestrator orchestrator, PlayerProvider players) {

@@ -12,7 +12,6 @@ import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -26,7 +25,6 @@ import org.bukkit.entity.Player;
 @Command("home")
 @EssentialsCommand
 @Permission("essentials.home.use")
-@Cooldown(duration = "2s")
 @Description("Teleporta para a home indicada ou abre o menu /homes quando sem argumento.")
 @Syntax("/home [nome]")
 public record HomeCommand(

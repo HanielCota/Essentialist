@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
 import com.hanielcota.essentials.modules.speed.service.SpeedService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 
 @Command("speed")
 @Permission("essentials.speed")
-@Cooldown(duration = "3s")
 @Description("Ajusta a velocidade de andar ou voar do jogador.")
 @Syntax("/speed walk <valor> [jogador] | /speed fly <valor> [jogador] | /speed reset [jogador]")
 public record SpeedCommand(

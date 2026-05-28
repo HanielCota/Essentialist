@@ -7,7 +7,6 @@ import com.hanielcota.essentials.paper.PlayerNames;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -22,7 +21,6 @@ import org.bukkit.entity.Player;
 
 @Command(value = "r", aliases = "reply")
 @Permission("essentials.msg.reply")
-@Cooldown(duration = "1s")
 @Description("Responde ao último jogador que enviou ou recebeu sua mensagem.")
 @Syntax("/r <mensagem>")
 public record ReplyCommand(

@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.feed.service.FeedService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -23,7 +22,6 @@ import org.bukkit.entity.Player;
 
 @Command(value = "alimentar", aliases = "feed")
 @Permission("essentials.feed")
-@Cooldown(duration = "5s")
 @Description("Alimenta o jogador restaurando fome e saturação.")
 @Syntax("/alimentar [jogador] | /alimentar todos")
 public record FeedCommand(

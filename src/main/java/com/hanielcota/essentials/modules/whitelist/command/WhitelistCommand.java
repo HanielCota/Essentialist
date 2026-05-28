@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.whitelist.menu.WhitelistMenu;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -22,7 +21,6 @@ import org.bukkit.entity.Player;
 
 @Command("whitelist")
 @Permission("essentials.whitelist")
-@Cooldown(duration = "3s")
 @Description("Gerencia a whitelist do servidor.")
 @Syntax("/whitelist [add|remove] [jogador]")
 public record WhitelistCommand(

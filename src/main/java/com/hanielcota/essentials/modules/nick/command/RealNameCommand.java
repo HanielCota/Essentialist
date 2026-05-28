@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.nick.service.NickService;
 import com.hanielcota.essentials.modules.nick.service.RealNameResolver;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -17,7 +16,6 @@ import lombok.NonNull;
 
 @Command("realname")
 @Permission("essentials.realname")
-@Cooldown(duration = "1s")
 @Description("Mostra o nome real de um jogador a partir do apelido.")
 @Syntax("/realname <apelido>")
 public record RealNameCommand(

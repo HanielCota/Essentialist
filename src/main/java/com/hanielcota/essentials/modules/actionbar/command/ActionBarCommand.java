@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.actionbar.config.ActionBarConfig;
 import com.hanielcota.essentials.modules.actionbar.service.ActionBarService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 
 @Command("actionbar")
 @Permission("essentials.actionbar")
-@Cooldown(duration = "3s")
 @Description("Envia uma mensagem na action bar.")
 @Syntax("/actionbar <mensagem> | /actionbar broadcast <mensagem>")
 public record ActionBarCommand(ConfigHandle<ActionBarConfig> config, ActionBarService service) {

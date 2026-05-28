@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.warps.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -17,7 +16,6 @@ import org.bukkit.entity.Player;
 @Command("warps")
 @EssentialsCommand
 @Permission("essentials.warp.list")
-@Cooldown(duration = "3s")
 @Description("Lista as warps que você pode usar, clicáveis para teleporte.")
 @Syntax("/warps")
 public record WarpsCommand(@NonNull WarpService service, @NonNull WarpsListNotifier notifier) {

@@ -9,7 +9,6 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaBlockedMenu;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -30,7 +29,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.tpa")
 @PlayerOnly
-@Cooldown(duration = "1s")
 @Description("Abre o menu de bloqueados; com nick, desbloqueia o jogador antes de abrir.")
 @Syntax("/tpaunblock [jogador]")
 public record TpaUnblockCommand(

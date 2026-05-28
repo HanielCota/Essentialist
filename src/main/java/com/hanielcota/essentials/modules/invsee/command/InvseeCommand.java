@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.invsee.config.InvseeConfig;
 import com.hanielcota.essentials.modules.invsee.service.InvseeService;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
@@ -21,7 +20,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.invsee")
 @PlayerOnly
-@Cooldown(duration = "3s")
 @Description("Abre o inventário, a armadura e a off-hand de outro jogador.")
 @Syntax("/invsee <jogador>")
 public record InvseeCommand(ConfigHandle<InvseeConfig> config, InvseeService service) {
