@@ -18,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class AfkAutoChecker {
 
-  private static final Duration INTERVAL = Duration.ofSeconds(5);
-
   private final ConfigHandle<AfkConfig> config;
   private final AfkService service;
   private final AfkTransitions transitions;
@@ -29,7 +27,11 @@ public final class AfkAutoChecker {
   private Task task;
 
   public void start() {
-    this.task = this.scheduler.runTimer(this::sweep, INTERVAL, INTERVAL);
+    var snap = this.config.value();
+    var seconds = Math.max(1, snap.checkIntervalSeconds());
+    var interval = Duration.ofSeconds(seconds);
+
+    this.task = this.scheduler.runTimer(this::sweep, interval, interval);
   }
 
   public void stop() {

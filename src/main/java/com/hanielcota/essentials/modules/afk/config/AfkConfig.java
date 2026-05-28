@@ -10,6 +10,12 @@ public record AfkConfig(
             "Seconds of inactivity before the auto checker marks a player AFK. Set <= 0 to"
                 + " disable.")
         int idleThresholdSeconds,
+    @Comment("How often (seconds) the auto checker sweeps online players for idleness. Minimum 1.")
+        int checkIntervalSeconds,
+    @Comment(
+            "Per-player movement debounce in milliseconds before movement counts as activity. Keeps"
+                + " the move event off the hot path.")
+        int moveDebounceMillis,
     @Comment("Broadcast when a player goes AFK without a reason. Placeholder: {player}.")
         String enterFormat,
     @Comment("Broadcast when a player goes AFK with a reason. Placeholders: {player}, {reason}.")
@@ -20,6 +26,8 @@ public record AfkConfig(
   public static AfkConfig defaults() {
     return new AfkConfig(
         300,
+        5,
+        250,
         "<gray><gold>{player}</gold> está agora <yellow>AFK</yellow>.",
         "<gray><gold>{player}</gold> está agora <yellow>AFK</yellow><gray>: <white>{reason}",
         "<gray><gold>{player}</gold> não está mais <yellow>AFK</yellow><gray>.");

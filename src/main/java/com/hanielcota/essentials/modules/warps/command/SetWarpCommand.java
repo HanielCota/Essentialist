@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.warps.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
+import com.hanielcota.essentials.modules.warps.service.WarpNameValidator;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -22,13 +23,23 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "2s")
 @Description("Cria ou sobrescreve uma warp na sua localização atual.")
 @Syntax("/setwarp <nome>")
-public record SetWarpCommand(ConfigHandle<WarpsConfig> config, WarpService service) {
+public record SetWarpCommand(
+    ConfigHandle<WarpsConfig> config, WarpService service, WarpNameValidator validator) {
 
   @DefaultSubcommand
   public CommandResult execute(@NonNull CommandActor actor, @Arg("nome") String name) {
     var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
     var messages = snap.messages();
+
+    var maxLength = snap.warpNameMaxLength();
+    var pattern = snap.allowedNamePattern();
+
+    if (!this.validator.isValid(name, maxLength, pattern)) {
+      var maxText = Integer.toString(maxLength);
+      var invalidMsg = messages.invalidName().replace("{max}", maxText);
+      return CommandResult.invalidUsage(invalidMsg);
+    }
 
     var warpOpt = this.service.findWarp(name);
     var existed = warpOpt.isPresent();
