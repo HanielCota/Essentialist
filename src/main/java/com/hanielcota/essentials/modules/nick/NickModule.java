@@ -56,7 +56,7 @@ public final class NickModule extends AbstractModule {
     var actors = env.service(ActorFactory.class);
     var players = env.service(PlayerProvider.class);
 
-    var operations = new NickOperationService(config, service);
+    var operations = new NickOperationService(config, service, players);
     var notifier = new NickNotifier(config, actors);
 
     var realNameResolver = new RealNameResolver(service, players);

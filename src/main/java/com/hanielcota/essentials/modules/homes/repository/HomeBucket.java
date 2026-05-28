@@ -72,6 +72,14 @@ final class HomeBucket {
     }
 
     var renamed = existing.withName(newName);
+
+    // A case-only rename (e.g. "Home" -> "home") keeps the same key; replace in place to update the
+    // stored display case instead of colliding with the entry already under that key.
+    if (oldKey.equals(newKey)) {
+      this.homes.put(newKey, renamed);
+      return Optional.of(renamed);
+    }
+
     var conflict = this.homes.putIfAbsent(newKey, renamed);
     if (conflict != null) {
       return Optional.empty();

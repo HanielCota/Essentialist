@@ -14,7 +14,12 @@ public final class ModuleCloseables {
   }
 
   public void closeAll(@NonNull String moduleId, @NonNull Log log) {
-    for (var closeable : this.closeables) {
+    // Reverse (LIFO) teardown: a closeable registered later may depend on an earlier one (e.g. a
+    // cache that flushes through an async writer), so close it first. Mirrors the reverse-order
+    // shutdown used elsewhere in the lifecycle.
+    for (var index = this.closeables.size() - 1; index >= 0; index--) {
+      var closeable = this.closeables.get(index);
+
       try {
         closeable.close();
       } catch (Exception e) {

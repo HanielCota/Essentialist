@@ -14,6 +14,8 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 @RequiredArgsConstructor
 public final class InvseeListener implements Listener {
 
+  private static final String MODIFY_PERMISSION = "essentials.invsee.modify";
+
   private final InvseeSynchronizer synchronizer;
 
   // Run at MONITOR with ignoreCancelled=true so we only sync the view back to the target after the
@@ -27,6 +29,12 @@ public final class InvseeListener implements Listener {
     var topHolder = top.getHolder();
 
     if (!(topHolder instanceof InvseeHolder holder)) {
+      return;
+    }
+
+    var viewer = event.getWhoClicked();
+    if (!viewer.hasPermission(MODIFY_PERMISSION)) {
+      event.setCancelled(true);
       return;
     }
 
@@ -48,6 +56,12 @@ public final class InvseeListener implements Listener {
     var topHolder = top.getHolder();
 
     if (!(topHolder instanceof InvseeHolder holder)) {
+      return;
+    }
+
+    var viewer = event.getWhoClicked();
+    if (!viewer.hasPermission(MODIFY_PERMISSION)) {
+      event.setCancelled(true);
       return;
     }
 
