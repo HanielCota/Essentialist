@@ -4,6 +4,8 @@ import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.MenuOpenings;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaIncomingResolver;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
 import com.hanielcota.essentials.modules.tpa.service.request.TeleportRequestService;

@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.homes.menu.delete;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

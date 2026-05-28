@@ -5,6 +5,8 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
+import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
+import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import java.time.Duration;
 import java.util.UUID;
 import lombok.NonNull;

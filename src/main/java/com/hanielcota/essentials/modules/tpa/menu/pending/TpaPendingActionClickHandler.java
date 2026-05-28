@@ -8,8 +8,8 @@ import com.hanielcota.essentials.modules.tpa.command.send.TpaRequestReplyNotifie
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
-import com.hanielcota.essentials.modules.tpa.service.request.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
+import com.hanielcota.essentials.modules.tpa.service.request.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.selection.TpaPendingSelections;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;

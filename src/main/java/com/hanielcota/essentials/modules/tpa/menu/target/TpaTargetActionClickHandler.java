@@ -2,13 +2,13 @@ package com.hanielcota.essentials.modules.tpa.menu.target;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.command.send.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.command.favorites.TpaFavoriteAddNotifier;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
-import com.hanielcota.essentials.modules.tpa.service.selection.TpaTargetSelections;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
+import com.hanielcota.essentials.modules.tpa.service.selection.TpaTargetSelections;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import lombok.NonNull;

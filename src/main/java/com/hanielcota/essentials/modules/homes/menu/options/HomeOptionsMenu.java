@@ -12,6 +12,7 @@ import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesOptionsMenuConfig;
+import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.shared.ComponentUtils;

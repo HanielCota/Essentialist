@@ -1,6 +1,8 @@
 package com.hanielcota.essentials.modules.tpa.service.request;
 
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
+import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
+import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

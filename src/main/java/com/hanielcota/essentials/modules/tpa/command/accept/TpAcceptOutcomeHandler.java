@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.tpa.command.accept;
 
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
 import com.hanielcota.essentials.modules.tpa.domain.AcceptOutcome;
