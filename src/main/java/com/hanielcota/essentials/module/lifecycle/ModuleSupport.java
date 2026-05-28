@@ -1,9 +1,7 @@
-package com.hanielcota.essentials.module;
+package com.hanielcota.essentials.module.lifecycle;
 
+import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.environment.ModuleServices;
-import com.hanielcota.essentials.module.lifecycle.ModuleCloseables;
-import com.hanielcota.essentials.module.lifecycle.ModuleListeners;
-import com.hanielcota.essentials.module.lifecycle.ModuleMenus;
 import lombok.NonNull;
 
 /**
