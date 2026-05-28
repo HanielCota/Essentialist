@@ -46,4 +46,5 @@ com.hanielcota.essentials.modules.list.ListModule
 com.hanielcota.essentials.modules.silencer.SilencerModule
 com.hanielcota.essentials.modules.weather.WeatherModule
 com.hanielcota.essentials.modules.crops.CropsModule
+com.hanielcota.essentials.modules.leaves.LeavesModule
 com.hanielcota.essentials.modules.chat.ChatModule
