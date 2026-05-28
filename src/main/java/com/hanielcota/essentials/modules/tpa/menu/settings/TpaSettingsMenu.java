@@ -8,6 +8,7 @@ import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaSettingsMenuConfig;
+import com.hanielcota.essentials.modules.tpa.menu.help.TpaHelpMenu;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.List;
 import lombok.NonNull;

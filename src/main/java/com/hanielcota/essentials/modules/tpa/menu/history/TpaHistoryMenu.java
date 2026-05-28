@@ -15,6 +15,7 @@ import com.hanielcota.essentials.modules.tpa.config.menu.TpaMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
+import com.hanielcota.essentials.modules.tpa.menu.help.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHistoryEntryRenderer;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;

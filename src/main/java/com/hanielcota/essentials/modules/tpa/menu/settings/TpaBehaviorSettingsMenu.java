@@ -12,6 +12,7 @@ import com.hanielcota.essentials.menu.PaginatedMenus;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaBehaviorSettingsMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
+import com.hanielcota.essentials.modules.tpa.menu.TpaDndPresenter;
 import com.hanielcota.essentials.modules.tpa.service.TpaDndCycle;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;
 import com.hanielcota.essentials.shared.Placeholders;

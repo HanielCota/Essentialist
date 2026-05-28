@@ -12,6 +12,7 @@ import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PaginatedMenus;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaBlockedMenuConfig;
+import com.hanielcota.essentials.modules.tpa.menu.settings.TpaPrivacySettingsMenu;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import java.util.ArrayList;
 import java.util.List;

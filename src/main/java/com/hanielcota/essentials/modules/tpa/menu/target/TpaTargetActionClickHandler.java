@@ -7,6 +7,7 @@ import com.hanielcota.essentials.modules.tpa.command.send.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
+import com.hanielcota.essentials.modules.tpa.menu.help.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.modules.tpa.service.selection.TpaTargetSelections;
 import com.hanielcota.essentials.paper.ActorFactory;

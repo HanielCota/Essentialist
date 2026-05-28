@@ -2,6 +2,8 @@ package com.hanielcota.essentials.modules.homes.menu.options;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
+import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
+import com.hanielcota.essentials.modules.homes.menu.delete.DeleteHomeDialog;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameOrchestrator;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
