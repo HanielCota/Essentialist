@@ -12,7 +12,7 @@ public final class EssentialsPlugin extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    var bootstrap = new EssentialsBootstrap(this);
+    var bootstrap = createBootstrap();
 
     try {
       this.core = bootstrap.start();
@@ -24,6 +24,10 @@ public final class EssentialsPlugin extends JavaPlugin {
       var pluginManager = server.getPluginManager();
       pluginManager.disablePlugin(this);
     }
+  }
+
+  protected EssentialsBootstrap createBootstrap() {
+    return new EssentialsBootstrap(this);
   }
 
   @Override

@@ -62,9 +62,14 @@ public final class YamlConfigService implements ConfigService {
 
   private <T> YamlConfigHandle<T> createHandle(
       @NonNull String key, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {
-    var newHandle = new YamlConfigHandle<>(this.baseDir, key, type, defaults);
+    var newHandle = createYamlHandle(key, type, defaults);
     newHandle.refresh();
     return newHandle;
+  }
+
+  protected <T> YamlConfigHandle<T> createYamlHandle(
+      @NonNull String key, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {
+    return new YamlConfigHandle<>(this.baseDir, key, type, defaults);
   }
 
   @Override

@@ -5,18 +5,15 @@ import com.hanielcota.essentials.modules.chat.channel.ChatChannel;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.service.AntiSpamService;
 import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 
 /**
- * Blocks back-to-back duplicate messages. The comparison is exact (case + whitespace) and only runs
- * when {@link com.hanielcota.essentials.modules.chat.config.AntiSpamConfig#blockRepeated() the
- * feature is enabled}. {@link ChatPermissions#BYPASS_ANTISPAM} skips the check entirely.
- *
- * <p>An empty {@code repeatedWarning} suppresses the warning component while still blocking —
- * useful when admins want a silent drop.
+ * Blocks back-to-back duplicate messages. Owns both the check and the anti-spam side-effect — the
+ * pipeline only iterates checks and calls {@link #onPass} after the full chain clears.
  */
 @RequiredArgsConstructor
 public final class RepeatedMessageCheck implements ChatGuardCheck {
@@ -53,5 +50,10 @@ public final class RepeatedMessageCheck implements ChatGuardCheck {
     sender.sendMessage(component);
 
     return ChatGuardOutcome.BLOCK;
+  }
+
+  @Override
+  public void onPass(@NonNull String message, @NonNull UUID senderId, @NonNull String channelId) {
+    this.antiSpam.record(senderId, message);
   }
 }

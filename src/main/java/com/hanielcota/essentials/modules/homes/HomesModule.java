@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes;
 
 import com.github.hanielcota.menuframework.api.MenuService;
+import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.database.executor.SqlExecutor;
 import com.hanielcota.essentials.database.schema.SqlDialect;
@@ -61,11 +62,6 @@ import lombok.NonNull;
 /**
  * Per-player homes: {@code /home} (fast teleport) plus the menu-driven {@code /homes} that owns
  * create / teleport / delete / rename / change-icon.
- *
- * <p>/homes opens an interactive menu (paginated) with a "+ Nova home" button (chat prompt for the
- * name) plus the per-home actions: left click teleports (via the shared {@link DelayedTeleport}
- * warm-up), right click opens a delete confirmation, shift+click starts a chat-driven rename, drop
- * (Q) opens a material picker submenu.
  */
 public final class HomesModule extends AbstractModule {
 
@@ -84,10 +80,21 @@ public final class HomesModule extends AbstractModule {
     var actors = env.service(ActorFactory.class);
     var scheduler = env.service(Scheduler.class);
     var delayed = env.service(DelayedTeleport.class);
+
+    var homeService = wireStorage(env, registrar, config);
+    var interaction = wireInteraction(config, homeService, scheduler, delayed, registrar);
+    var menuState = new HomesMenuState();
+    wireMenus(config, materialNames, homeService, actors, interaction, menuState, registrar);
+    wireCommands(config, homeService, menus, interaction, menuState, registrar);
+  }
+
+  private HomeService wireStorage(
+      @NonNull ModuleEnvironment env,
+      @NonNull ModuleRegistrar registrar,
+      @NonNull ConfigHandle<HomesConfig> config) {
     var sqlExecutor = env.service(SqlExecutor.class);
     var dialect = env.service(SqlDialect.class);
 
-    // 1. Storage + service layer.
     var homeTable = new SqlHomeTable(dialect);
     homeTable.install(sqlExecutor);
     var sqlRepository = new SqlHomeRepository(sqlExecutor, homeTable);
@@ -103,7 +110,15 @@ public final class HomesModule extends AbstractModule {
     registrar.listener(new HomesCacheListener(repository));
     registrar.provide(HomeService.class, homeService);
 
-    // 2. Interaction layer (rename + create flows + teleport + per-player action target).
+    return homeService;
+  }
+
+  private HomesInteraction wireInteraction(
+      @NonNull ConfigHandle<HomesConfig> config,
+      @NonNull HomeService homeService,
+      @NonNull Scheduler scheduler,
+      @NonNull DelayedTeleport delayed,
+      @NonNull ModuleRegistrar registrar) {
     var actionTarget = new HomesActionTarget();
     var renameSessions = new HomeRenameSessions();
     var createSessions = new HomeCreateSessions();
@@ -142,17 +157,48 @@ public final class HomesModule extends AbstractModule {
     registrar.listener(new HomeRenameChatListener(rename, renameSessions));
     registrar.listener(new HomeCreateChatListener(create, createSessions));
 
-    // 3. Menus + dialogs.
-    var menuState = new HomesMenuState();
+    return new HomesInteraction(
+        actionTarget,
+        renameSessions,
+        createSessions,
+        orderingPreferences,
+        nameResolver,
+        teleporter,
+        rename,
+        create);
+  }
+
+  private void wireMenus(
+      @NonNull ConfigHandle<HomesConfig> config,
+      @NonNull ConfigHandle<MaterialNamesConfig> materialNames,
+      @NonNull HomeService homeService,
+      @NonNull ActorFactory actors,
+      @NonNull HomesInteraction interaction,
+      @NonNull HomesMenuState menuState,
+      @NonNull ModuleRegistrar registrar) {
     var renderer = new HomeEntryRenderer(config);
-    var clickHandler = new HomeClickHandler(teleporter, actors, actionTarget);
+    var clickHandler =
+        new HomeClickHandler(interaction.teleporter(), actors, interaction.actionTarget());
     registrar.menu(
         new HomesMenu(
-            config, homeService, renderer, clickHandler, menuState, create, orderingPreferences));
+            config,
+            homeService,
+            renderer,
+            clickHandler,
+            menuState,
+            interaction.create(),
+            interaction.orderingPreferences()));
 
     var optionsClicks =
-        new HomeOptionsClickHandler(actionTarget, homeService, teleporter, rename, actors);
-    registrar.menu(new HomeOptionsMenu(config, homeService, renderer, actionTarget, optionsClicks));
+        new HomeOptionsClickHandler(
+            interaction.actionTarget(),
+            homeService,
+            interaction.teleporter(),
+            interaction.rename(),
+            actors);
+    registrar.menu(
+        new HomeOptionsMenu(
+            config, homeService, renderer, interaction.actionTarget(), optionsClicks));
 
     var configSnap = config.value();
     var menuConfig = configSnap.menu();
@@ -160,21 +206,48 @@ public final class HomesModule extends AbstractModule {
     var iconRegistry = new MaterialIconRegistry(menuConfig.picker(), materialNamesSnap);
     var pickerPresentation = new MaterialPickerPresentation(materialNames);
 
-    var categoryClickHandler = new MaterialCategoryClickHandler(actionTarget);
+    var categoryClickHandler = new MaterialCategoryClickHandler(interaction.actionTarget());
     var pickerClickHandler =
-        new MaterialPickerClickHandler(config, homeService, actionTarget, pickerPresentation);
-    var deleteClickHandler = new DeleteHomeClickHandler(config, homeService, actionTarget);
+        new MaterialPickerClickHandler(
+            config, homeService, interaction.actionTarget(), pickerPresentation);
+    var deleteClickHandler =
+        new DeleteHomeClickHandler(config, homeService, interaction.actionTarget());
 
     registrar.menu(new MaterialCategoryMenu(config, categoryClickHandler));
-    registrar.menu(new MaterialPickerMenu(config, actionTarget, iconRegistry, pickerClickHandler));
+    registrar.menu(
+        new MaterialPickerMenu(
+            config, interaction.actionTarget(), iconRegistry, pickerClickHandler));
     registrar.menu(new DeleteHomeDialog(config, deleteClickHandler));
     registrar.listener(new HomesMenuCleanupListener(menuState));
+  }
 
-    // 4. Commands.
+  private void wireCommands(
+      @NonNull ConfigHandle<HomesConfig> config,
+      @NonNull HomeService homeService,
+      @NonNull MenuService menus,
+      @NonNull HomesInteraction interaction,
+      @NonNull HomesMenuState menuState,
+      @NonNull ModuleRegistrar registrar) {
     var missingResolver = new MissingHomeMessageResolver(config, homeService);
     registrar.command(
         new HomeCommand(
-            config, homeService, teleporter, nameResolver, missingResolver, menus, menuState));
+            config,
+            homeService,
+            interaction.teleporter(),
+            interaction.nameResolver(),
+            missingResolver,
+            menus,
+            menuState));
     registrar.command(new HomesCommand(homeService, menus, menuState));
   }
+
+  private record HomesInteraction(
+      HomesActionTarget actionTarget,
+      HomeRenameSessions renameSessions,
+      HomeCreateSessions createSessions,
+      HomeOrderingPreferences orderingPreferences,
+      HomeNameResolver nameResolver,
+      HomeTeleporter teleporter,
+      HomeRenameOrchestrator rename,
+      HomeCreateOrchestrator create) {}
 }

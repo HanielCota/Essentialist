@@ -10,9 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 /**
- * Runs the {@code /give} use cases: validate the requested item and amount against the configured
- * maximums, delegate to {@link GiveService}, and route every outcome through {@link GiveNotifier}.
- * Keeps the command thin — it only forwards sender / subject / item / amount.
+ * Runs the {@code /give} use cases: validate the requested item and amount, delegate to {@link
+ * GiveService}, and route every outcome through {@link GiveNotifier}.
  */
 @RequiredArgsConstructor
 public final class GiveOrchestrator {
@@ -27,12 +26,16 @@ public final class GiveOrchestrator {
       @NonNull Material item,
       int amount,
       boolean self) {
-    if (!validate(sender, item, amount)) {
-      return;
-    }
+    var validation = validate(item, amount);
 
-    var result = this.service.giveResult(subject, item, amount);
-    this.notifier.notifyDelivered(sender, subject, self, item, result);
+    switch (validation) {
+      case INVALID_ITEM -> this.notifier.sendInvalidItem(sender);
+      case AMOUNT_TOO_LARGE -> this.notifier.sendAmountTooLarge(sender);
+      case OK -> {
+        var result = this.service.giveResult(subject, item, amount);
+        this.notifier.notifyDelivered(sender, subject, self, item, result);
+      }
+    }
   }
 
   public void giveAll(
@@ -40,32 +43,40 @@ public final class GiveOrchestrator {
       @NonNull Iterable<? extends Player> roster,
       @NonNull Material item,
       int amount) {
-    if (!validate(sender, item, amount)) {
-      return;
+    var validation = validate(item, amount);
+
+    switch (validation) {
+      case INVALID_ITEM -> this.notifier.sendInvalidItem(sender);
+      case AMOUNT_TOO_LARGE -> this.notifier.sendAmountTooLarge(sender);
+      case OK -> {
+        var count =
+            this.service.giveAll(
+                roster,
+                item,
+                amount,
+                (recipient, result) -> this.notifier.notifyRecipient(recipient, item, result));
+
+        this.notifier.sendAllSummary(sender, item, amount, count);
+      }
     }
-
-    var count =
-        this.service.giveAll(
-            roster,
-            item,
-            amount,
-            (recipient, result) -> this.notifier.notifyRecipient(recipient, item, result));
-
-    this.notifier.sendAllSummary(sender, item, amount, count);
   }
 
-  private boolean validate(@NonNull CommandActor sender, @NonNull Material item, int amount) {
+  private ValidationResult validate(@NonNull Material item, int amount) {
     if (!item.isItem()) {
-      this.notifier.sendInvalidItem(sender);
-      return false;
+      return ValidationResult.INVALID_ITEM;
     }
 
     var snap = this.config.value();
     if (amount > snap.maxAmount()) {
-      this.notifier.sendAmountTooLarge(sender);
-      return false;
+      return ValidationResult.AMOUNT_TOO_LARGE;
     }
 
-    return true;
+    return ValidationResult.OK;
+  }
+
+  private enum ValidationResult {
+    OK,
+    INVALID_ITEM,
+    AMOUNT_TOO_LARGE
   }
 }

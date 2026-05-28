@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.rename;
 
 import com.hanielcota.essentials.modules.homes.config.HomesMessages;
-import com.hanielcota.essentials.modules.homes.service.HomeService.RenameResult;
+import com.hanielcota.essentials.modules.homes.domain.RenameResult;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

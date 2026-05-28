@@ -13,29 +13,38 @@ import org.bukkit.entity.Player;
 public final class MenuOpenings {
 
   private static final Log LOG = Log.of(MenuOpenings.class);
-  private static final String OPEN_FAILURE = "Não foi possível abrir o menu.";
+  private static final String DEFAULT_OPEN_FAILURE = "Não foi possível abrir o menu.";
 
   public static void open(
       @NonNull MenuService menus,
       @NonNull Player player,
       @NonNull String menuId,
       @NonNull CommandActor actor) {
-    var openFuture = menus.open(player, menuId);
-
-    openFuture.exceptionally(error -> handleOpenFailure(error, menuId, player, actor));
+    open(menus, player, menuId, actor, DEFAULT_OPEN_FAILURE);
   }
 
-  // Returns null typed as MenuSession to match the CompletableFuture<MenuSession> contract —
-  // an open failure has no session to recover with, just feedback for the actor.
+  public static void open(
+      @NonNull MenuService menus,
+      @NonNull Player player,
+      @NonNull String menuId,
+      @NonNull CommandActor actor,
+      @NonNull String openFailureMessage) {
+    var openFuture = menus.open(player, menuId);
+
+    openFuture.exceptionally(
+        error -> handleOpenFailure(error, menuId, player, actor, openFailureMessage));
+  }
+
   private static MenuSession handleOpenFailure(
       @NonNull Throwable error,
       @NonNull String menuId,
       @NonNull Player player,
-      @NonNull CommandActor actor) {
+      @NonNull CommandActor actor,
+      @NonNull String failureMessage) {
     var playerName = player.getName();
 
     LOG.warn(error, "Menu {} failed to open for {}", menuId, playerName);
-    actor.sendError(OPEN_FAILURE);
+    actor.sendError(failureMessage);
 
     return null;
   }

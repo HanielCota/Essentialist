@@ -9,7 +9,21 @@ import lombok.NonNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DurationFormatter {
 
+  private static final String SUFFIX_DAYS = "d";
+  private static final String SUFFIX_HOURS = "h";
+  private static final String SUFFIX_MINUTES = "m";
+  private static final String SUFFIX_SECONDS = "s";
+
   public static String format(@NonNull Duration duration) {
+    return format(duration, SUFFIX_DAYS, SUFFIX_HOURS, SUFFIX_MINUTES, SUFFIX_SECONDS);
+  }
+
+  public static String format(
+      @NonNull Duration duration,
+      @NonNull String daySuffix,
+      @NonNull String hourSuffix,
+      @NonNull String minuteSuffix,
+      @NonNull String secondSuffix) {
     var totalSeconds = Math.max(0L, duration.toSeconds());
 
     var days = totalSeconds / 86_400L;
@@ -20,19 +34,19 @@ public final class DurationFormatter {
     var parts = new ArrayList<String>();
 
     if (days > 0) {
-      parts.add(days + "d");
+      parts.add(days + daySuffix);
     }
 
     if (hours > 0) {
-      parts.add(hours + "h");
+      parts.add(hours + hourSuffix);
     }
 
     if (minutes > 0) {
-      parts.add(minutes + "m");
+      parts.add(minutes + minuteSuffix);
     }
 
     if (seconds > 0 || parts.isEmpty()) {
-      parts.add(seconds + "s");
+      parts.add(seconds + secondSuffix);
     }
 
     return String.join(" ", parts);

@@ -1,8 +1,6 @@
 package com.hanielcota.essentials.modules.chat.guard;
 
 import com.hanielcota.essentials.modules.chat.channel.ChatChannel;
-import com.hanielcota.essentials.modules.chat.service.AntiSpamService;
-import com.hanielcota.essentials.modules.chat.service.CooldownService;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
@@ -14,17 +12,14 @@ import org.bukkit.entity.Player;
  * ChatGuardOutcome#BLOCK}. Adding a new check (caps filter, slow mode, mute lookup, profanity
  * filter…) means appending to the list at wiring time — no edits here.
  *
- * <p>{@link #touch} updates the cooldown + last-message records after the chain clears, so a
- * blocked attempt never shifts the cooldown window nor poisons the next anti-spam comparison. Touch
- * is intentionally outside the chain: the chain is "may this proceed?", touch is "we are about to
- * publish — record it".
+ * <p>After the chain clears, {@link ChatGuardCheck#onPass} is called on every check so each check
+ * owns its own side-effects (cooldown, anti-spam). The pipeline is agnostic about which services
+ * individual checks touch.
  */
 @RequiredArgsConstructor
 public final class ChatGuardPipeline {
 
   private final List<ChatGuardCheck> checks;
-  private final CooldownService cooldowns;
-  private final AntiSpamService antiSpam;
 
   public boolean shouldBlock(
       @NonNull Player sender, @NonNull ChatChannel channel, @NonNull String message) {
@@ -37,8 +32,9 @@ public final class ChatGuardPipeline {
     return false;
   }
 
-  public void touch(@NonNull UUID senderId, @NonNull String channelId, @NonNull String message) {
-    this.cooldowns.touch(senderId, channelId);
-    this.antiSpam.record(senderId, message);
+  public void onPass(@NonNull String message, @NonNull UUID senderId, @NonNull String channelId) {
+    for (var check : this.checks) {
+      check.onPass(message, senderId, channelId);
+    }
   }
 }

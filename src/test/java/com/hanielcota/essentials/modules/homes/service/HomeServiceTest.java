@@ -59,7 +59,7 @@ class HomeServiceTest {
 
     var result = service.rename(UUID.randomUUID(), "base", "main");
 
-    assertEquals(HomeService.RenameResult.NOT_FOUND, result);
+    assertEquals(com.hanielcota.essentials.modules.homes.domain.RenameResult.NOT_FOUND, result);
   }
 
   @Test
@@ -72,7 +72,7 @@ class HomeServiceTest {
 
     var result = service.rename(owner, "base", "main");
 
-    assertEquals(HomeService.RenameResult.NAME_TAKEN, result);
+    assertEquals(com.hanielcota.essentials.modules.homes.domain.RenameResult.NAME_TAKEN, result);
   }
 
   @Test

@@ -19,6 +19,8 @@ public final class ActionBarModule extends AbstractModule {
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("actionbar", ActionBarConfig.class, ActionBarConfig::defaults);
     var players = env.service(PlayerProvider.class);
-    registrar.command(new ActionBarCommand(config, new ActionBarService(players)));
+    var service = new ActionBarService(players);
+
+    registrar.command(new ActionBarCommand(config, service));
   }
 }

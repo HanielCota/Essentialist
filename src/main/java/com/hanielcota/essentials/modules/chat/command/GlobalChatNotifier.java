@@ -38,7 +38,7 @@ public final class GlobalChatNotifier {
     }
 
     var senderId = sender.getUniqueId();
-    this.guards.touch(senderId, this.channel.id(), body);
+    this.guards.onPass(body, senderId, this.channel.id());
 
     var snap = this.config.value();
     var template = this.channel.template(snap);

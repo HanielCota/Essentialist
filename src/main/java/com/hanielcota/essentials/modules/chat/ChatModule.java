@@ -37,19 +37,6 @@ import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.List;
 import lombok.NonNull;
 
-/**
- * Chat module wiring. Composition root for the three sub-systems:
- *
- * <ul>
- *   <li><b>format/</b> — parse → placeholders → render pipeline ({@link ChatFormatPipeline}).
- *   <li><b>guard/</b> — pluggable pre-send checks composed into {@link ChatGuardPipeline}.
- *   <li><b>channel/</b> — sealed routing + viewer filtering ({@link ChannelRouter}).
- * </ul>
- *
- * <p>The PlaceholderAPI integration is chosen here at startup: {@link PlaceholderApiResolver}
- * inspects the plugin manager and falls back to a no-op internally if PAPI is absent, so wiring is
- * unconditional — callers only see the {@link PlaceholderResolver} abstraction.
- */
 public final class ChatModule extends AbstractModule {
 
   public ChatModule() {
@@ -64,7 +51,7 @@ public final class ChatModule extends AbstractModule {
     var audiences = env.service(AudienceProvider.class);
     var players = env.service(PlayerProvider.class);
 
-    PlaceholderResolver placeholders = new PlaceholderApiResolver();
+    var placeholders = createPlaceholderResolver();
 
     var compiler = new ChatTemplateCompiler();
     var resolverFactory = new ChatTagResolverFactory(config, placeholders);
@@ -78,7 +65,7 @@ public final class ChatModule extends AbstractModule {
 
     List<ChatGuardCheck> checks =
         List.of(new CooldownCheck(config, cooldowns), new RepeatedMessageCheck(config, antiSpam));
-    var guards = new ChatGuardPipeline(checks, cooldowns, antiSpam);
+    var guards = new ChatGuardPipeline(checks);
 
     var globalChannel = new GlobalChannel();
     var localChannel = new LocalChannel(config);
@@ -97,5 +84,9 @@ public final class ChatModule extends AbstractModule {
 
     registrar.listener(new AsyncChatListener(config, router, formatPipeline, guards, styler));
     registrar.listener(new ChatPlayerCleanupListener(toggleService, cooldowns, antiSpam));
+  }
+
+  protected PlaceholderResolver createPlaceholderResolver() {
+    return new PlaceholderApiResolver();
   }
 }

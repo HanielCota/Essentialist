@@ -50,12 +50,25 @@ public abstract class AbstractModule implements Module {
   public final void enable(@NonNull ModuleContext context) {
     this.context = context;
 
-    var env = new DefaultModuleEnvironment(context);
+    var env = createEnvironment(context);
     var registrar =
-        new DefaultModuleRegistrar(
-            context, env, this.listeners, this.closeables, this.services, this.menus);
+        createRegistrar(context, env, this.listeners, this.closeables, this.services, this.menus);
 
     onEnable(env, registrar);
+  }
+
+  protected ModuleEnvironment createEnvironment(@NonNull ModuleContext context) {
+    return new DefaultModuleEnvironment(context);
+  }
+
+  protected ModuleRegistrar createRegistrar(
+      @NonNull ModuleContext context,
+      @NonNull ModuleEnvironment env,
+      @NonNull ModuleListeners listeners,
+      @NonNull ModuleCloseables closeables,
+      @NonNull ModuleServices services,
+      @NonNull ModuleMenus menus) {
+    return new DefaultModuleRegistrar(context, env, listeners, closeables, services, menus);
   }
 
   @Override

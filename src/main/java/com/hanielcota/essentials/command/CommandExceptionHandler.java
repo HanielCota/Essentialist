@@ -10,34 +10,40 @@ import java.util.logging.Logger;
 import lombok.NonNull;
 
 /**
- * Registers exception handlers for the command framework. Extracted from {@link CommandBootstrap}
- * so error presentation and logging are separate from framework wiring.
+ * Registers exception handlers for the command framework. Error message templates are injectable so
+ * presentation logic can change (i18n, branding) without modifying this class.
  */
 public final class CommandExceptionHandler {
 
   private CommandExceptionHandler() {}
 
   public static void register(
-      @NonNull PaperCommandFramework.Builder builder, @NonNull Logger logger) {
+      @NonNull PaperCommandFramework.Builder builder,
+      @NonNull Logger logger,
+      @NonNull String illegalArgTemplate,
+      @NonNull String unexpectedTemplate) {
     builder.onException(
-        IllegalArgumentException.class, (ctx, ex) -> handleIllegalArgument(ctx, ex));
-    builder.onException(RuntimeException.class, (ctx, ex) -> handleUnexpected(ctx, ex, logger));
+        IllegalArgumentException.class,
+        (ctx, ex) -> handleIllegalArgument(ctx, ex, illegalArgTemplate));
+    builder.onException(
+        RuntimeException.class, (ctx, ex) -> handleUnexpected(ctx, ex, logger, unexpectedTemplate));
   }
 
-  private static CommandResult handleIllegalArgument(CommandContext ctx, RuntimeException ex) {
+  private static CommandResult handleIllegalArgument(
+      CommandContext ctx, RuntimeException ex, @NonNull String template) {
     var actor = ctx.actor();
     var errorMessage = ex.getMessage();
 
-    var displayMessage = "<red>Erro: " + errorMessage;
+    var displayMessage = template + errorMessage;
     actor.sendError(displayMessage);
 
     return CommandResult.failure(CommandStatus.INVALID_USAGE, errorMessage);
   }
 
   private static CommandResult handleUnexpected(
-      CommandContext ctx, RuntimeException ex, Logger logger) {
+      CommandContext ctx, RuntimeException ex, Logger logger, @NonNull String template) {
     var actor = ctx.actor();
-    actor.sendError("<red>Ocorreu um erro inesperado.");
+    actor.sendError(template);
 
     Supplier<String> messageSupplier = () -> "Unhandled command exception";
     logger.log(Level.WARNING, ex, messageSupplier);
