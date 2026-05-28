@@ -8,7 +8,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.config.menu.DeleteDialogSection;
+import com.hanielcota.essentials.modules.homes.menu.presentation.DeleteDialogSection;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,8 @@
 package com.hanielcota.essentials.modules.workstations.command;
 
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.workstations.config.WorkstationsConfig;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -20,11 +22,12 @@ import org.bukkit.inventory.MenuType;
 @Cooldown(duration = "2s")
 @Description("Opens a virtual stonecutter.")
 @Syntax("/cortador")
-public final class StonecutterCommand {
+public record StonecutterCommand(ConfigHandle<WorkstationsConfig> config) {
 
   @DefaultSubcommand
   public CommandResult execute(@NonNull CommandActor actor) {
     WorkstationOpener.open(actor, MenuType.STONECUTTER);
+
     return CommandResult.success();
   }
 }

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeMenuPlaceholders;
+import com.hanielcota.essentials.modules.homes.menu.presentation.HomesMainMenuSection;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialPickerSection;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;

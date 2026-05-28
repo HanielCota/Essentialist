@@ -10,6 +10,7 @@ import com.hanielcota.essentials.modules.workstations.command.LoomCommand;
 import com.hanielcota.essentials.modules.workstations.command.SmithingTableCommand;
 import com.hanielcota.essentials.modules.workstations.command.StonecutterCommand;
 import com.hanielcota.essentials.modules.workstations.command.WorkbenchCommand;
+import com.hanielcota.essentials.modules.workstations.config.WorkstationsConfig;
 import lombok.NonNull;
 
 public final class WorkstationsModule extends AbstractModule {
@@ -20,12 +21,14 @@ public final class WorkstationsModule extends AbstractModule {
 
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
-    registrar.command(new WorkbenchCommand());
-    registrar.command(new AnvilCommand());
-    registrar.command(new GrindstoneCommand());
-    registrar.command(new StonecutterCommand());
-    registrar.command(new LoomCommand());
-    registrar.command(new CartographyTableCommand());
-    registrar.command(new SmithingTableCommand());
+    var config = env.config("workstations", WorkstationsConfig.class, WorkstationsConfig::defaults);
+
+    registrar.command(new WorkbenchCommand(config));
+    registrar.command(new AnvilCommand(config));
+    registrar.command(new GrindstoneCommand(config));
+    registrar.command(new StonecutterCommand(config));
+    registrar.command(new LoomCommand(config));
+    registrar.command(new CartographyTableCommand(config));
+    registrar.command(new SmithingTableCommand(config));
   }
 }
