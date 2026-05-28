@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.vanish.menu;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
-import com.hanielcota.essentials.modules.vanish.config.VanishMessages;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
@@ -39,7 +38,7 @@ public record VanishClickHandler(
     var target = this.players.online(targetId).orElse(null);
 
     if (target == null || !this.service.isVanished(targetId)) {
-      var goneMsg = VanishMessages.teleportTargetGone(snap, targetName);
+      var goneMsg = VanishMessageRenderer.teleportTargetGone(snap, targetName);
       click.reply(goneMsg);
       click.refresh();
       return;
@@ -60,7 +59,7 @@ public record VanishClickHandler(
     var z = location.getZ();
     var name = target.getName();
 
-    var teleportedMsg = VanishMessages.teleported(snap, name, worldName, x, y, z);
+    var teleportedMsg = VanishMessageRenderer.teleported(snap, name, worldName, x, y, z);
     var failedMsg = snap.messages().teleportFailed();
     var afterTeleport = afterTeleport(click, teleportedMsg, failedMsg);
 

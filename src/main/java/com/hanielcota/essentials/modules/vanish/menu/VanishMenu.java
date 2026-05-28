@@ -10,7 +10,6 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PaginatedInfoMenus;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
-import com.hanielcota.essentials.modules.vanish.config.VanishMenuLayout;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
-package com.hanielcota.essentials.modules.homes.config.menu;
+package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesPickerMenuConfig;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

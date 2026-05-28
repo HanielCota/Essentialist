@@ -9,7 +9,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesCategoryMenuConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
-import com.hanielcota.essentials.modules.homes.config.menu.MaterialCategorySection;
+import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategorySection;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.List;

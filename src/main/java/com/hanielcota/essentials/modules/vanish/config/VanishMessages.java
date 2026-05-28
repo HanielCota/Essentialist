@@ -1,76 +1,41 @@
 package com.hanielcota.essentials.modules.vanish.config;
 
-import com.hanielcota.essentials.shared.Numbers;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.NonNull;
+import com.hanielcota.essentials.config.MessagePair;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
 
-/**
- * Renders vanish menu messages: player heads, lore, teleport-success line and target-gone line.
- * Multi-placeholder interpolation with {@link Numbers#compact} for coordinate compaction lives here
- * so the config record stays a plain data holder.
- */
-public final class VanishMessages {
+@ConfigSerializable
+public record VanishMessages(
+    @Comment("Shown to the player when they enter vanish.") String enabled,
+    @Comment("Placeholders: {player}.") String enabledOther,
+    @Comment("Shown to the player when they leave vanish.") String disabled,
+    @Comment("Placeholders: {player}.") String disabledOther,
+    @Comment("Shown when the target player is not online.") String targetNotFound,
+    @Comment(
+            "Shown after clicking a head and teleporting. Placeholders: {player}, {world}, {x},"
+                + " {y}, {z}.")
+        String teleported,
+    @Comment("Shown when the clicked player is no longer online. Placeholder: {player}.")
+        String teleportTargetGone,
+    @Comment("Shown when the teleport call itself fails.") String teleportFailed) {
 
-  private static final String PLAYER_PLACEHOLDER = "{player}";
-
-  private VanishMessages() {}
-
-  public static String itemName(@NonNull VanishConfig snap, @NonNull String player) {
-    return snap.itemName().replace(PLAYER_PLACEHOLDER, player);
+  public static VanishMessages defaults() {
+    return new VanishMessages(
+        "<gray>You are now <green>vanished</green>.",
+        "<gray>You vanished <gold>{player}</gold>.",
+        "<gray>You are no longer vanished.",
+        "<gray>You unvanished <gold>{player}</gold>.",
+        "<red>That player is not online.",
+        "<green>Teleported to <gold>{player}</gold> at <gold>{world} {x}, {y}, {z}</gold>.",
+        "<red><gold>{player}</gold> is no longer online.",
+        "<red>Teleport failed.");
   }
 
-  public static List<String> itemLore(
-      @NonNull VanishConfig snap,
-      @NonNull String player,
-      @NonNull String world,
-      double x,
-      double y,
-      double z) {
-    var xStr = Numbers.display(x);
-    var yStr = Numbers.display(y);
-    var zStr = Numbers.display(z);
-
-    var template = snap.itemLore();
-    var lines = new ArrayList<String>(template.size());
-    for (var line : template) {
-      var formatted = formatLine(line, player, world, xStr, yStr, zStr);
-      lines.add(formatted);
+  public MessagePair toggle(boolean vanished) {
+    if (vanished) {
+      return new MessagePair(enabled, enabledOther);
     }
 
-    return lines;
-  }
-
-  public static String teleported(
-      @NonNull VanishConfig snap,
-      @NonNull String player,
-      @NonNull String world,
-      double x,
-      double y,
-      double z) {
-    var xStr = Numbers.display(x);
-    var yStr = Numbers.display(y);
-    var zStr = Numbers.display(z);
-
-    return formatLine(snap.messages().teleported(), player, world, xStr, yStr, zStr);
-  }
-
-  public static String teleportTargetGone(@NonNull VanishConfig snap, @NonNull String player) {
-    return snap.messages().teleportTargetGone().replace(PLAYER_PLACEHOLDER, player);
-  }
-
-  private static String formatLine(
-      @NonNull String template,
-      @NonNull String player,
-      @NonNull String world,
-      @NonNull String x,
-      @NonNull String y,
-      @NonNull String z) {
-    var withPlayer = template.replace(PLAYER_PLACEHOLDER, player);
-    var withWorld = withPlayer.replace("{world}", world);
-    var withX = withWorld.replace("{x}", x);
-    var withY = withX.replace("{y}", y);
-
-    return withY.replace("{z}", z);
+    return new MessagePair(disabled, disabledOther);
   }
 }

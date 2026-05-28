@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuSection;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import lombok.NonNull;
 

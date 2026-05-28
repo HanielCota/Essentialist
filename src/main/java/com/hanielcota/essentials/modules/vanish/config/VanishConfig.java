@@ -9,7 +9,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 @ConfigSerializable
 public record VanishConfig(
-    VanishChatMessages messages,
+    VanishMessages messages,
     @Comment("/vanish list menu title.") String menuTitle,
     @Comment("Rows in the /vanish list menu (clamped to 1-6).") int menuRows,
     @Comment("Slots used by vanish entries. Leave empty to use every row except the last.")
@@ -28,7 +28,7 @@ public record VanishConfig(
 
   public static VanishConfig defaults() {
     return new VanishConfig(
-        VanishChatMessages.defaults(),
+        VanishMessages.defaults(),
         "<dark_gray>Vanished players",
         6,
         List.of(

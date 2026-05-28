@@ -11,7 +11,8 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 @ConfigSerializable
 public record ListConfig(
-    ListMessages messages,
+    @Comment("Shown when the console runs /list, since the menu needs a player.")
+        String menuPlayerOnly,
     @Comment("List menu title.") String menuTitle,
     @Comment("Rows in the list menu (clamped to 1-6).") int menuRows,
     @Comment("Slots used by player entries. Leave empty to use every row except the last.")
@@ -35,7 +36,7 @@ public record ListConfig(
 
   public static ListConfig defaults() {
     return new ListConfig(
-        ListMessages.defaults(),
+        "<red>O menu da lista só pode ser aberto por jogadores.",
         "<dark_gray>Jogadores online",
         6,
         List.of(),

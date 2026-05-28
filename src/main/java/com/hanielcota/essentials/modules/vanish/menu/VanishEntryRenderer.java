@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.vanish.menu;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
-import com.hanielcota.essentials.modules.vanish.config.VanishMessages;
 import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -24,8 +23,8 @@ public record VanishEntryRenderer(ConfigHandle<VanishConfig> config) {
     var y = location.getY();
     var z = location.getZ();
 
-    var displayName = VanishMessages.itemName(snap, name);
-    var loreList = VanishMessages.itemLore(snap, name, worldName, x, y, z);
+    var displayName = VanishMessageRenderer.itemName(snap, name);
+    var loreList = VanishMessageRenderer.itemLore(snap, name, worldName, x, y, z);
     var loreArray = loreList.toArray(String[]::new);
 
     var builder = ItemTemplate.builder(Material.PLAYER_HEAD);

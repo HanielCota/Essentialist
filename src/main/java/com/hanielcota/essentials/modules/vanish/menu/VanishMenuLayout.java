@@ -1,22 +1,17 @@
-package com.hanielcota.essentials.modules.vanish.config;
+package com.hanielcota.essentials.modules.vanish.menu;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
 
-/**
- * Pure layout sanitization for the /vanish list menu. Filters the configured content slots so the
- * static info item never collides with a vanished-player head. Stateless — takes the config
- * snapshot on each call.
- */
 public final class VanishMenuLayout {
 
   private static final int MIN_ROWS = 1;
 
   private VanishMenuLayout() {}
 
-  /** Content slots minus the info slot, so the static info item never collides with a head. */
   public static List<Integer> contentSlots(@NonNull VanishConfig snap) {
     var rows = snap.effectiveRows();
     var info = snap.effectiveInfoSlot();

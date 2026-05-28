@@ -1,7 +1,7 @@
-package com.hanielcota.essentials.modules.homes.config.menu;
+package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
-import com.hanielcota.essentials.modules.homes.menu.presentation.HomeMenuPlaceholders;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuConfig;
 import com.hanielcota.essentials.shared.Placeholders;
 import java.util.List;
 import java.util.Map;
