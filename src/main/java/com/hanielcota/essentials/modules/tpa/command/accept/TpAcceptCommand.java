@@ -12,7 +12,6 @@ import com.hanielcota.essentials.modules.tpa.service.request.TeleportRequestServ
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -29,7 +28,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.tpa")
 @PlayerOnly
-@Cooldown(duration = "1s")
 @Description("Aceita um pedido de teleporte (ou abre o menu se nenhum nick for passado).")
 @Syntax("/tpaccept [jogador]")
 public record TpAcceptCommand(

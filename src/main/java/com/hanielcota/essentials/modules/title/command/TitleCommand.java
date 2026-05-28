@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.title.service.TitleService;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -31,7 +30,6 @@ public record TitleCommand(
     TitleRequestParser parser) {
 
   @DefaultSubcommand
-  @Cooldown(duration = "3s")
   public CommandResult execute(
       @NonNull CommandActor sender, @GreedyString @Arg("texto") String texto) {
     var snap = this.config.value();

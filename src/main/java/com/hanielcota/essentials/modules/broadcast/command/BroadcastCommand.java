@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.broadcast.config.BroadcastConfig;
 import com.hanielcota.essentials.modules.broadcast.service.BroadcastService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -19,7 +18,6 @@ import lombok.NonNull;
     value = "broadcast",
     aliases = {"bc", "anuncio"})
 @Permission("essentials.broadcast")
-@Cooldown(duration = "1s")
 @Description("Envia um anúncio para todo o servidor.")
 @Syntax("/broadcast <mensagem>")
 public record BroadcastCommand(ConfigHandle<BroadcastConfig> config, BroadcastService service) {

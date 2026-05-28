@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.gamemode.service.GamemodeService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -26,7 +25,6 @@ import org.bukkit.entity.Player;
 @Permission("essentials.gamemode")
 @PermissionForOther(".others")
 @PermissionTemplate("essentials.gamemode.{modo}")
-@Cooldown(duration = "3s")
 @Description("Altera o modo de jogo do jogador.")
 @Syntax("/gamemode <modo> [jogador]")
 public record GamemodeCommand(

@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.teleport.command;
 
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -14,7 +13,6 @@ import lombok.NonNull;
 
 @Command("tp")
 @Permission("essentials.tp")
-@Cooldown(duration = "3s")
 @Description("Teleports to a player, moves a player to another, or teleports to coordinates.")
 @Syntax("/tp <player> | /tp <from> <to> | /tp <x> <y> <z>")
 public record TeleportCommand(TeleportDispatcher dispatcher) {

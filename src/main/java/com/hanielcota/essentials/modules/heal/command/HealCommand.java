@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.heal.service.HealService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -23,7 +22,6 @@ import org.bukkit.entity.Player;
 
 @Command(value = "curar", aliases = "heal")
 @Permission("essentials.heal")
-@Cooldown(duration = "5s")
 @Description("Restaura a vida do jogador.")
 @Syntax("/curar [jogador] | /curar todos")
 public record HealCommand(

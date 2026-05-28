@@ -6,7 +6,6 @@ import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.info.menu.InfoMenu;
 import com.hanielcota.essentials.modules.info.menu.InfoMenuState;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -24,7 +23,6 @@ import org.bukkit.entity.Player;
 @Permission("essentials.info")
 @PermissionForOther(".others")
 @PlayerOnly
-@Cooldown(duration = "3s")
 @Description("Abre o painel de informações suas ou de outro jogador.")
 @Syntax("/informacoes [jogador]")
 public record InfoCommand(InfoMenuState state, MenuService menus) {

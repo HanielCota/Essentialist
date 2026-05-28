@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.fly.command;
 
 import com.hanielcota.essentials.modules.fly.service.FlyService;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
 @Command("fly")
 @Permission("essentials.fly")
 @PermissionForOther(".others")
-@Cooldown(duration = "5s")
 @Description("Ativa ou desativa o modo voo do jogador.")
 @Syntax("/fly [jogador] | /fly on [jogador] | /fly off [jogador]")
 public record FlyCommand(FlyService service, FlyNotifier notifier) {

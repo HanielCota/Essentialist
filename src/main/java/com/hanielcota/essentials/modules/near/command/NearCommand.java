@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.near.config.NearConfig;
 import com.hanielcota.essentials.modules.near.service.NearService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 @Command("near")
 @EssentialsCommand
 @Permission("essentials.near")
-@Cooldown(duration = "3s")
 @Description("Lista os jogadores próximos.")
 @Syntax("/near [raio]")
 public record NearCommand(

@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.warps.service.WarpResolver;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -21,7 +20,6 @@ import org.bukkit.entity.Player;
 @Command("warp")
 @EssentialsCommand
 @Permission("essentials.warp")
-@Cooldown(duration = "2s")
 @Description("Teleporta para uma warp do servidor.")
 @Syntax("/warp <nome>")
 public record WarpCommand(

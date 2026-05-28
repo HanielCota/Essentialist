@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 @Command("tpahistory")
 @EssentialsCommand
 @Permission("essentials.tpa.history")
-@Cooldown(duration = "3s")
 @Description("Abre o histórico dos últimos pedidos de teleporte enviados.")
 @Syntax("/tpahistory [jogador]")
 public record TpaHistoryCommand(

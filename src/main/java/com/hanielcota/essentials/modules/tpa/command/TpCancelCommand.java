@@ -5,7 +5,6 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.tpa.menu.help.TpaHelpMenu;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.tpa")
 @PlayerOnly
-@Cooldown(duration = "1s")
 @Description("Abre o menu de TPA — o slot \"Pedido enviado\" tem o botão de cancelar.")
 @Syntax("/tpacancel")
 public record TpCancelCommand(MenuService menus) {

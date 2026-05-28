@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.kill.config.KillConfig;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Confirm;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -23,7 +22,6 @@ import org.bukkit.entity.Player;
 @Command(value = "matar", aliases = "kill")
 @Permission("essentials.kill")
 @PermissionForOther(".others")
-@Cooldown(duration = "5s")
 @Confirm(duration = "3s")
 @Description("Mata o jogador.")
 @Syntax("/matar [jogador]")

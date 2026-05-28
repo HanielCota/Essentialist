@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.smelt.config.SmeltConfig;
 import com.hanielcota.essentials.modules.smelt.service.SmeltService;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.smelt")
 @PlayerOnly
-@Cooldown(duration = "5s")
 @Description("Derrete minérios no seu inventário.")
 @Syntax("/derreter")
 public record SmeltCommand(ConfigHandle<SmeltConfig> config, SmeltService service) {

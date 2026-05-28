@@ -4,7 +4,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.clearchat.config.ClearChatConfig;
 import com.hanielcota.essentials.modules.clearchat.service.ClearChatService;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -15,7 +14,6 @@ import lombok.NonNull;
 
 @Command("clearchat")
 @Permission("essentials.clearchat")
-@Cooldown(duration = "3s")
 @Description("Limpa o chat de todos os jogadores online.")
 @Syntax("/clearchat")
 public record ClearChatCommand(ConfigHandle<ClearChatConfig> config, ClearChatService service) {

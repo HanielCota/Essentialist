@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.warps.service.WarpNameValidator;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 @Command("setwarp")
 @EssentialsCommand
 @Permission("essentials.warp.set")
-@Cooldown(duration = "2s")
 @Description("Cria ou sobrescreve uma warp na sua localização atual.")
 @Syntax("/setwarp <nome>")
 public record SetWarpCommand(
