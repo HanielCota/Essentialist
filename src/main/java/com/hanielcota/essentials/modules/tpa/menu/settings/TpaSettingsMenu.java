@@ -27,7 +27,7 @@ public final class TpaSettingsMenu implements EssentialsMenu {
 
   private final ConfigHandle<TpaConfig> config;
 
-  static List<Integer> contentSlots(@NonNull TpaSettingsMenuConfig settings, int rows) {
+  public static List<Integer> contentSlots(@NonNull TpaSettingsMenuConfig settings, int rows) {
     return List.of(
         MenuLayouts.sanitizeSlot(settings.privacySlot(), rows, 0),
         MenuLayouts.sanitizeSlot(settings.notificationsSlot(), rows, 0),

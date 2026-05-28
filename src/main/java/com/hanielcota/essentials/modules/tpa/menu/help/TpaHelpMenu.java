@@ -62,7 +62,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
   private final TpaHubClickHandler clicks;
   private final TpaHelpMenuRenderer renderer;
 
-  static List<Integer> contentSlots(@NonNull TpaHelpMenuConfig helpMenu, int rows) {
+  public static List<Integer> contentSlots(@NonNull TpaHelpMenuConfig helpMenu, int rows) {
     return List.of(
         MenuLayouts.sanitizeSlot(helpMenu.profileSlot(), rows, 0),
         MenuLayouts.sanitizeSlot(helpMenu.tpaSlot(), rows, 0),
