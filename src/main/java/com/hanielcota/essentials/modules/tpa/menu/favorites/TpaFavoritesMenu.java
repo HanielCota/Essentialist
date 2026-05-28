@@ -13,7 +13,7 @@ import com.hanielcota.essentials.modules.tpa.config.menu.TpaFavoritesMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
-import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
+import com.hanielcota.essentials.modules.tpa.menu.help.TpaHelpMenu;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteBrowser;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.service.TpaProfileService;

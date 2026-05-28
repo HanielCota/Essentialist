@@ -9,8 +9,8 @@ import com.hanielcota.essentials.modules.tpa.bootstrap.TpaMenuBootstrap;
 import com.hanielcota.essentials.modules.tpa.bootstrap.TpaPersistenceBootstrap;
 import com.hanielcota.essentials.modules.tpa.bootstrap.TpaRuntimeBootstrap;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
-import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
-import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
+import com.hanielcota.essentials.modules.tpa.service.selection.TpaPendingSelections;
+import com.hanielcota.essentials.modules.tpa.service.selection.TpaTargetSelections;
 import java.util.Set;
 import lombok.NonNull;
 

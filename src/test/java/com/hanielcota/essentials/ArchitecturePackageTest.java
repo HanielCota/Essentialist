@@ -64,17 +64,21 @@ class ArchitecturePackageTest {
               "com/hanielcota/essentials/modules/tpa/menu/favorites/TpaFavoritesMenu.java", 180),
           Map.entry(
               "com/hanielcota/essentials/modules/tpa/menu/pending/TpaPendingActionMenu.java", 180),
-          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaHelpMenu.java", 260),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/help/TpaHelpMenu.java", 260),
           Map.entry("com/hanielcota/essentials/modules/tpa/menu/pending/TpaPendingMenu.java", 180),
           Map.entry(
-              "com/hanielcota/essentials/modules/tpa/service/TeleportRequestService.java", 220),
-          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaHistoryMenu.java", 250),
+              "com/hanielcota/essentials/modules/tpa/service/request/TeleportRequestService.java",
+              220),
+          Map.entry("com/hanielcota/essentials/modules/tpa/menu/history/TpaHistoryMenu.java", 250),
           Map.entry(
               "com/hanielcota/essentials/modules/tpa/menu/favorites/TpaFavoriteActionMenu.java",
               240),
-          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaTargetActionMenu.java", 280),
+          Map.entry(
+              "com/hanielcota/essentials/modules/tpa/menu/target/TpaTargetActionMenu.java", 280),
           Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaPickPlayerMenu.java", 200),
-          Map.entry("com/hanielcota/essentials/modules/tpa/menu/TpaBehaviorSettingsMenu.java", 230),
+          Map.entry(
+              "com/hanielcota/essentials/modules/tpa/menu/settings/TpaBehaviorSettingsMenu.java",
+              230),
           Map.entry(
               "com/hanielcota/essentials/modules/tpa/menu/presentation/TpaFavoriteMenuRenderer.java",
               220),

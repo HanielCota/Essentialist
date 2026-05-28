@@ -4,7 +4,7 @@ import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
-import com.hanielcota.essentials.modules.tpa.repository.TpaProfileRepository;
+import com.hanielcota.essentials.modules.tpa.repository.profile.TpaProfileRepository;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;

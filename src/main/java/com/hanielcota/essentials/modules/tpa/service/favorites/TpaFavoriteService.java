@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.tpa.service.favorites;
 
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
-import com.hanielcota.essentials.modules.tpa.repository.TpaFavoriteRepository;
+import com.hanielcota.essentials.modules.tpa.repository.favorite.TpaFavoriteRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;

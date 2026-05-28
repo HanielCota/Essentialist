@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
-import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
-import com.hanielcota.essentials.modules.tpa.command.TpAcceptTeleportNotifier;
-import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
+import com.hanielcota.essentials.modules.tpa.command.accept.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.accept.TpAcceptTeleportNotifier;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
-import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.modules.tpa.service.request.TeleportRequestService;
 import com.hanielcota.essentials.scheduler.MainThreadCallbacks;
 import java.util.List;
 import lombok.NonNull;

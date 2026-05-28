@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.modules.tpa.listener;
 
 import com.github.hanielcota.menuframework.api.MenuService;
-import com.hanielcota.essentials.modules.tpa.menu.TpaTargetActionMenu;
-import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
+import com.hanielcota.essentials.modules.tpa.menu.target.TpaTargetActionMenu;
+import com.hanielcota.essentials.modules.tpa.service.selection.TpaTargetSelections;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;

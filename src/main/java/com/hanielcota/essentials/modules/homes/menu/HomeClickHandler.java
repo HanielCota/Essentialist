@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.modules.homes.domain.Home;
+import com.hanielcota.essentials.modules.homes.menu.options.HomeOptionsMenu;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
 import com.hanielcota.essentials.paper.ActorFactory;
 import lombok.NonNull;

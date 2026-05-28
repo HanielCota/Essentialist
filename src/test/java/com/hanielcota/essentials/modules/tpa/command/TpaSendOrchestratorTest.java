@@ -3,6 +3,11 @@ package com.hanielcota.essentials.modules.tpa.command;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.hanielcota.essentials.modules.tpa.TpaTestSupport;
+import com.hanielcota.essentials.modules.tpa.command.accept.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.accept.TpAcceptTeleportNotifier;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaNotifier;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaRequestReplyNotifier;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.repository.InMemoryRequestRepository;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
