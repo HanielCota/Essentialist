@@ -8,6 +8,8 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 @ConfigSerializable
 public record TeleportConfig(
+    @Comment("How many previous locations /back keeps per player (and lists in its menu).")
+        int historyDepth,
     @Comment("/tp <player> sender message. Placeholders: {player}.") String toPlayer,
     @Comment("/tp <player> destination notification. Placeholders: {player}.") String teleportedTo,
     @Comment("Self-target error.") String selfTarget,
@@ -32,6 +34,7 @@ public record TeleportConfig(
 
   public static TeleportConfig defaults() {
     return new TeleportConfig(
+        5,
         "<green>Teleported to <gold>{player}</gold>.",
         "<yellow><gold>{player}</gold> teleported to you.",
         "<red>You are already there.",
