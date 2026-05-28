@@ -15,4 +15,6 @@ public interface ServiceRegistry {
   <T> boolean unregister(@NonNull Class<T> type);
 
   Set<Class<?>> registered();
+
+  <T> Optional<T> findAssignable(@NonNull Class<T> targetType);
 }

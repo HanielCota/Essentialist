@@ -64,7 +64,7 @@ public final class AsyncChatListener implements Listener {
       return;
     }
 
-    this.guards.touch(senderId, channel.id(), routedMessage);
+    this.guards.onPass(routedMessage, senderId, channel.id());
 
     channel.filterViewers(event, sender);
 

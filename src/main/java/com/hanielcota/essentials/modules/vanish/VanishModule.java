@@ -12,6 +12,7 @@ import com.hanielcota.essentials.modules.vanish.listener.VanishQuitListener;
 import com.hanielcota.essentials.modules.vanish.menu.VanishClickHandler;
 import com.hanielcota.essentials.modules.vanish.menu.VanishEntryRenderer;
 import com.hanielcota.essentials.modules.vanish.menu.VanishMenu;
+import com.hanielcota.essentials.modules.vanish.service.VanishCleanupService;
 import com.hanielcota.essentials.modules.vanish.service.VanishService;
 import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
@@ -22,9 +23,7 @@ import lombok.NonNull;
 
 public final class VanishModule extends AbstractModule {
 
-  private VanishService service;
-  private VanishVisibilityApplier applier;
-  private PlayerProvider players;
+  private VanishCleanupService cleanup;
 
   public VanishModule() {
     super("vanish");
@@ -33,25 +32,27 @@ public final class VanishModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var config = env.config("vanish", VanishConfig.class, VanishConfig::defaults);
-    this.players = env.service(PlayerProvider.class);
+    var players = env.service(PlayerProvider.class);
 
-    this.service = new VanishService();
-    registrar.provide(VanishService.class, this.service);
+    var service = new VanishService();
+    registrar.provide(VanishService.class, service);
 
-    this.applier = new VanishVisibilityApplier(env.plugin(), this.players);
-    var transitions = new VanishTransitions(this.service, this.applier);
+    var applier = new VanishVisibilityApplier(env.plugin(), players);
+    this.cleanup = new VanishCleanupService(service, applier, players);
 
-    var joinListener = new VanishJoinListener(this.service, this.applier);
-    var quitListener = new VanishQuitListener(this.service, transitions);
-    var protectionListener = new VanishProtectionListener(this.service);
+    var transitions = new VanishTransitions(service, applier);
+
+    var joinListener = new VanishJoinListener(service, applier);
+    var quitListener = new VanishQuitListener(service, transitions);
+    var protectionListener = new VanishProtectionListener(service);
     registrar.listener(joinListener);
     registrar.listener(quitListener);
     registrar.listener(protectionListener);
 
     var renderer = new VanishEntryRenderer(config);
     var callbacks = env.service(MainThreadCallbacks.class);
-    var clickHandler = new VanishClickHandler(config, this.service, this.players, callbacks);
-    var menu = new VanishMenu(config, this.service, renderer, clickHandler, this.players);
+    var clickHandler = new VanishClickHandler(config, service, players, callbacks);
+    var menu = new VanishMenu(config, service, renderer, clickHandler, players);
     registrar.menu(menu);
 
     var actors = env.service(ActorFactory.class);
@@ -62,23 +63,9 @@ public final class VanishModule extends AbstractModule {
 
   @Override
   protected void onDisable() {
-    if (this.service == null || this.applier == null) {
-      return;
+    if (this.cleanup != null) {
+      this.cleanup.revertAll();
+      this.cleanup = null;
     }
-
-    // setInvulnerable / setCanPickupItems persist to player NBT — every still-vanished player
-    // must be unapplied or they rejoin permanently invulnerable.
-    var vanishedIds = this.service.vanished();
-    for (var id : vanishedIds) {
-      var player = this.players.online(id).orElse(null);
-      if (player == null) {
-        continue;
-      }
-      this.applier.unapply(player);
-    }
-
-    this.service = null;
-    this.applier = null;
-    this.players = null;
   }
 }

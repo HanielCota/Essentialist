@@ -3,6 +3,7 @@ package com.hanielcota.essentials.bootstrap;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.core.EssentialsCore;
 import com.hanielcota.essentials.service.DefaultServiceRegistry;
+import com.hanielcota.essentials.service.ServiceRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +13,6 @@ import lombok.RequiredArgsConstructor;
  * state through the {@link com.hanielcota.essentials.service.ServiceRegistry}; on failure of any
  * stage the {@link BootstrapRollbackHandler} tears down every already-registered piece of
  * infrastructure.
- *
- * <p>To extend the bootstrap from an addon, subclass and override {@link #stages(EssentialsPlugin)}
- * to insert, reorder or replace stages. The default list is produced by {@link StageFactory}.
  */
 @RequiredArgsConstructor
 public class EssentialsBootstrap {
@@ -22,14 +20,17 @@ public class EssentialsBootstrap {
   private final EssentialsPlugin plugin;
 
   public final EssentialsCore start() {
-    var services = new DefaultServiceRegistry();
+    var services = createServiceRegistry();
     var context = new StageContext(this.plugin, services);
     var stages = stages(this.plugin);
 
     return runStages(stages, context);
   }
 
-  /** Override in a subclass to customise the stage sequence. Defaults to {@link StageFactory}. */
+  protected ServiceRegistry createServiceRegistry() {
+    return new DefaultServiceRegistry();
+  }
+
   protected List<BootstrapStage> stages(EssentialsPlugin plugin) {
     return StageFactory.defaultStages(plugin);
   }

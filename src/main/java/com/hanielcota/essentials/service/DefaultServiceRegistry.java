@@ -50,4 +50,18 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
     var keys = this.services.keySet();
     return Set.copyOf(keys);
   }
+
+  @Override
+  public <T> Optional<T> findAssignable(@NonNull Class<T> targetType) {
+    for (var entry : this.services.entrySet()) {
+      var registeredType = entry.getKey();
+
+      if (targetType.isAssignableFrom(registeredType)) {
+        var instance = targetType.cast(entry.getValue());
+        return Optional.of(instance);
+      }
+    }
+
+    return Optional.empty();
+  }
 }

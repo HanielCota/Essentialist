@@ -5,6 +5,7 @@ import com.hanielcota.essentials.command.CommandBootstrap;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.FrameworkActorFactory;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
+import io.papermc.paper.registry.RegistryAccess;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,8 @@ final class CommandSystemBootstrap implements BootstrapStage {
   public void start(@NonNull StageContext context) {
     var services = context.services();
 
-    var commandBootstrap = new CommandBootstrap(this.plugin);
+    var registryAccess = RegistryAccess.registryAccess();
+    var commandBootstrap = new CommandBootstrap(this.plugin, registryAccess);
     var framework = commandBootstrap.createFramework();
 
     services.register(PaperCommandFramework.class, framework);

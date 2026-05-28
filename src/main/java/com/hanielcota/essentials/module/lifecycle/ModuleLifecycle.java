@@ -13,9 +13,10 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Drives the enable/disable transitions of registered modules in the order produced by {@link
- * ModuleDependencyResolver}. A failure during {@code enableAll} triggers a reverse-order rollback
- * of the already-enabled modules and then propagates the {@link ModuleLoadException}.
+ * Drives the enable/disable transitions of registered modules. The ordering is computed fresh on
+ * every call — no mutable state stored between {@code enableAll} and {@code disableAll}. A failure
+ * during {@code enableAll} triggers a reverse-order rollback of the already-enabled modules and
+ * then propagates the {@link ModuleLoadException}.
  */
 @RequiredArgsConstructor
 public final class ModuleLifecycle {
@@ -24,15 +25,12 @@ public final class ModuleLifecycle {
 
   private final ModuleRegistry registry;
 
-  private List<Module> enableOrder = List.of();
-
   public void enableAll(@NonNull ModuleContext context) {
-    this.enableOrder = ModuleDependencyResolver.resolve(this.registry.all());
+    var orderedModules = resolveOrder();
 
-    var size = this.enableOrder.size();
-    var succeeded = new ArrayList<Module>(size);
+    var succeeded = new ArrayList<Module>(orderedModules.size());
 
-    for (var module : this.enableOrder) {
+    for (var module : orderedModules) {
       var moduleId = module.id();
       try {
         module.enable(context);
@@ -47,7 +45,9 @@ public final class ModuleLifecycle {
   }
 
   public void disableAll() {
-    for (var module : this.enableOrder.reversed()) {
+    var orderedModules = resolveOrder();
+
+    for (var module : orderedModules.reversed()) {
       var moduleId = module.id();
       var currentState = this.registry.stateOf(moduleId);
       if (currentState != ModuleState.ENABLED) {
@@ -62,6 +62,10 @@ public final class ModuleLifecycle {
         LOG.error(e, "Module disable failed: {}", moduleId);
       }
     }
+  }
+
+  private List<Module> resolveOrder() {
+    return ModuleDependencyResolver.resolve(this.registry.all());
   }
 
   private void rollback(@NonNull List<Module> succeeded) {

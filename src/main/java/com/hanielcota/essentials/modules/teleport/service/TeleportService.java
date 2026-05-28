@@ -5,6 +5,7 @@ import com.hanielcota.essentials.modules.teleport.domain.TeleportOutcome;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public final class TeleportService implements TeleportsApi {
@@ -64,12 +65,9 @@ public final class TeleportService implements TeleportsApi {
     var currentPitch = currentLocation.getPitch();
     var destination = new Location(world, x, y, z, currentYaw, currentPitch);
 
-    var minHeight = world.getMinHeight();
-    var maxHeight = world.getMaxHeight();
-    var worldBorder = world.getWorldBorder();
-    var insideBorder = worldBorder.isInside(destination);
-    if (y < minHeight || y >= maxHeight || !insideBorder) {
-      return rejected(TeleportOutcome.INVALID_POSITION);
+    var invalidReason = validatePosition(destination, world);
+    if (invalidReason != null) {
+      return rejected(invalidReason);
     }
 
     return dispatch(sender, destination);
@@ -84,5 +82,19 @@ public final class TeleportService implements TeleportsApi {
     var destination = viewer.getLocation();
 
     return dispatch(target, destination);
+  }
+
+  private static TeleportOutcome validatePosition(
+      @NonNull Location destination, @NonNull World world) {
+    var minHeight = world.getMinHeight();
+    var maxHeight = world.getMaxHeight();
+    var worldBorder = world.getWorldBorder();
+    var insideBorder = worldBorder.isInside(destination);
+
+    if (destination.getY() < minHeight || destination.getY() >= maxHeight || !insideBorder) {
+      return TeleportOutcome.INVALID_POSITION;
+    }
+
+    return null;
   }
 }

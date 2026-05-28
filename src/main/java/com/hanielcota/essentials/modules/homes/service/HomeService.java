@@ -1,7 +1,9 @@
 package com.hanielcota.essentials.modules.homes.service;
 
 import com.hanielcota.essentials.api.HomesApi;
+import com.hanielcota.essentials.modules.homes.domain.CreateResult;
 import com.hanielcota.essentials.modules.homes.domain.Home;
+import com.hanielcota.essentials.modules.homes.domain.RenameResult;
 import com.hanielcota.essentials.modules.homes.repository.HomeRepository;
 import java.util.List;
 import java.util.Optional;
@@ -14,11 +16,8 @@ import org.bukkit.entity.Player;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Application service for the homes use cases.
- *
- * <p>Sole responsibility: enforce the per-player limit and delegate persistence to a {@link
- * HomeRepository}. Owns no state of its own; reads ({@link #find}, {@link #list}) hit the
- * repository directly.
+ * Application service for the homes use cases. Enforces the per-player limit and delegates
+ * persistence to a {@link HomeRepository}.
  */
 @RequiredArgsConstructor
 public final class HomeService implements HomesApi {
@@ -74,10 +73,6 @@ public final class HomeService implements HomesApi {
 
   public RenameResult rename(
       @NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
-    // Try the atomic rename first — the bucket's own check is the source of
-    // truth. Pre-checking with two finds risked reporting NAME_TAKEN when the
-    // cache was actually empty (or NOT_FOUND when it actually had the entry)
-    // if eviction interleaved between the finds and the rename.
     var renamed = this.repository.rename(owner, oldName, newName);
 
     if (renamed) {
@@ -108,17 +103,5 @@ public final class HomeService implements HomesApi {
 
   public boolean recordUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
     return this.repository.bumpUsage(owner, name, timestampMs);
-  }
-
-  public enum CreateResult {
-    CREATED,
-    ALREADY_EXISTS,
-    LIMIT_REACHED
-  }
-
-  public enum RenameResult {
-    RENAMED,
-    NOT_FOUND,
-    NAME_TAKEN
   }
 }

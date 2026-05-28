@@ -41,9 +41,27 @@ public final class BackMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
 
-    var configuredRows = snap.menuRows();
-    var rows = MenuLayouts.clampRows(configuredRows);
+    var pagination = buildPaginationConfig(snap, menus);
+    var rawTitle = snap.menuTitle();
+    var menuTitle = ComponentUtils.mini(rawTitle);
 
+    var builder = MenuFramework.builder(ID, menus);
+    builder.rows(menuRows(snap));
+    builder.title(menuTitle);
+    builder.pagination(pagination);
+    builder.dynamicContent(this::buildSlots);
+
+    builder.buildAndRegister();
+  }
+
+  private static int menuRows(@NonNull BackConfig snap) {
+    var configuredRows = snap.menuRows();
+    return MenuLayouts.clampRows(configuredRows);
+  }
+
+  private PaginationConfig buildPaginationConfig(
+      @NonNull BackConfig snap, @NonNull MenuService menus) {
+    var rows = menuRows(snap);
     var rowSlotCount = MenuLayouts.slotCount(rows);
     var fallbackSize = Math.min(rowSlotCount, TeleportHistory.CAPACITY);
 
@@ -52,22 +70,13 @@ public final class BackMenu implements EssentialsMenu {
     var slots = MenuLayouts.sanitizeSlots(configuredSlots, rows, fallbackSlots);
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(slots);
+
     if (rows > MIN_ROWS) {
       var navigation = snap.navigation();
       PageNavigation.apply(menus, paginationBuilder, ID, rows, navigation);
     }
-    var pagination = paginationBuilder.build();
 
-    var rawTitle = snap.menuTitle();
-    var menuTitle = ComponentUtils.mini(rawTitle);
-
-    var builder = MenuFramework.builder(ID, menus);
-    builder.rows(rows);
-    builder.title(menuTitle);
-    builder.pagination(pagination);
-    builder.dynamicContent(this::buildSlots);
-
-    builder.buildAndRegister();
+    return paginationBuilder.build();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

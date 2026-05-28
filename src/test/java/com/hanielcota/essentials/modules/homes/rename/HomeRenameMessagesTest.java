@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.homes.config.HomesMessages;
-import com.hanielcota.essentials.modules.homes.service.HomeService.RenameResult;
+import com.hanielcota.essentials.modules.homes.domain.RenameResult;
 import org.junit.jupiter.api.Test;
 
 class HomeRenameMessagesTest {
