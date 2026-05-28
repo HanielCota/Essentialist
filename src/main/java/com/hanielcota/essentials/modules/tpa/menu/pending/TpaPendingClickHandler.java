@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.tpa.menu.pending;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
-import com.hanielcota.essentials.modules.tpa.service.TpaPendingSelections;
+import com.hanielcota.essentials.modules.tpa.service.selection.TpaPendingSelections;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.tpa.command;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.menu.MenuOpenings;
-import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
+import com.hanielcota.essentials.modules.tpa.menu.help.TpaHelpMenu;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;

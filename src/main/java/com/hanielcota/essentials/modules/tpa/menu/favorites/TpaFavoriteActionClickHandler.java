@@ -2,11 +2,11 @@ package com.hanielcota.essentials.modules.tpa.menu.favorites;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
+import com.hanielcota.essentials.modules.tpa.command.send.TpaSendOrchestrator;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaFavorite;
-import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
+import com.hanielcota.essentials.modules.tpa.service.request.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteSelections;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
 import com.hanielcota.essentials.paper.ActorFactory;

@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.tpa.domain.TpaContact;
-import com.hanielcota.essentials.modules.tpa.repository.TpaContactRepository;
+import com.hanielcota.essentials.modules.tpa.repository.contact.TpaContactRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.listener;
 
-import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
+import com.hanielcota.essentials.modules.tpa.menu.history.TpaHistoryMenuState;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;

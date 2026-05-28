@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.tpa.listener;
 
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPickPlayerMenu;
-import com.hanielcota.essentials.modules.tpa.service.TpaPickPlayerFilters;
+import com.hanielcota.essentials.modules.tpa.service.selection.TpaPickPlayerFilters;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
