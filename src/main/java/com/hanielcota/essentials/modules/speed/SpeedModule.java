@@ -6,6 +6,7 @@ import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.speed.command.SpeedCommand;
 import com.hanielcota.essentials.modules.speed.command.SpeedNotifier;
 import com.hanielcota.essentials.modules.speed.config.SpeedConfig;
+import com.hanielcota.essentials.modules.speed.listener.SpeedQuitListener;
 import com.hanielcota.essentials.modules.speed.service.SpeedService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import lombok.NonNull;
@@ -28,5 +29,8 @@ public final class SpeedModule extends AbstractModule {
 
     var command = new SpeedCommand(config, speed, notifier);
     registrar.command(command);
+
+    var quitListener = new SpeedQuitListener(speed);
+    registrar.listener(quitListener);
   }
 }

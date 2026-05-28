@@ -32,7 +32,7 @@ public final class WhitelistService {
     var whitelisted = this.players.whitelisted();
 
     for (var player : whitelisted) {
-      var playerName = player.getName();
+      var playerName = nameOf(player);
       if (name.equalsIgnoreCase(playerName)) {
         return player;
       }

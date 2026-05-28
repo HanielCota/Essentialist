@@ -120,7 +120,9 @@ public final class TeleportRequestService {
       return AcceptOutcome.TARGET_OFFLINE;
     }
 
-    this.recorder.recordTerminal(request, TeleportRequestStatus.ACCEPTED);
+    // The terminal ACCEPTED history row is owned by dispatchTeleport (success -> ACCEPTED with a
+    // destination, failure -> CANCELLED); recording it here too would push a second,
+    // destination-less ACCEPTED row for every accepted request.
     return AcceptOutcome.ACCEPTED;
   }
 

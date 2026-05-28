@@ -107,10 +107,14 @@ public final class SqlHomeRepository implements HomeRepository {
       return false;
     }
 
-    var collision = find(owner, newName);
+    var caseOnlyRename = oldName.equalsIgnoreCase(newName);
 
-    if (collision.isPresent()) {
-      return false;
+    if (!caseOnlyRename) {
+      var collision = find(owner, newName);
+
+      if (collision.isPresent()) {
+        return false;
+      }
     }
 
     var ownerStr = owner.toString();

@@ -4,6 +4,8 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
 import com.hanielcota.essentials.modules.nick.domain.NickResetOutcome;
 import com.hanielcota.essentials.modules.nick.domain.NickSetOutcome;
+import com.hanielcota.essentials.paper.PlayerProvider;
+import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -18,6 +20,7 @@ public final class NickOperationService {
 
   private final ConfigHandle<NickConfig> config;
   private final NickService service;
+  private final PlayerProvider players;
 
   public NickSetOutcome set(@NonNull Player subject, @NonNull String nickname) {
     var snap = this.config.value();
@@ -32,6 +35,9 @@ public final class NickOperationService {
 
     var subjectId = subject.getUniqueId();
     if (this.service.isTakenByOther(nickname, subjectId)) {
+      return new NickSetOutcome.Taken();
+    }
+    if (impersonatesRealPlayer(nickname, subjectId)) {
       return new NickSetOutcome.Taken();
     }
 
@@ -52,5 +58,20 @@ public final class NickOperationService {
     NickApplier.reset(subject);
 
     return NickResetOutcome.OK;
+  }
+
+  // A nickname matching a known player's real name (other than the subject) would let one player
+  // impersonate that account, so reject it. Names the server has never resolved can't be checked
+  // and are allowed through.
+  private boolean impersonatesRealPlayer(@NonNull String nickname, @NonNull UUID subjectId) {
+    var known = this.players.offlineByName(nickname);
+    if (known.isEmpty()) {
+      return false;
+    }
+
+    var owner = known.get();
+    var ownerId = owner.getUniqueId();
+
+    return !ownerId.equals(subjectId);
   }
 }
