@@ -4,7 +4,6 @@ import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.modules.nick.service.NickOperationService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -19,7 +18,6 @@ import org.bukkit.entity.Player;
 @Command("nick")
 @Permission("essentials.nick")
 @PermissionForOther(".others")
-@Cooldown(duration = "3s")
 @Description("Define ou remove o apelido de um jogador.")
 @Syntax("/nick <nome|off> [jogador]")
 public record NickCommand(NickOperationService operations, NickNotifier notifier) {

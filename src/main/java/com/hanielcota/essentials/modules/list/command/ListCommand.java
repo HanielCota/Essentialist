@@ -4,7 +4,6 @@ import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.list.menu.ListMenu;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -19,7 +18,6 @@ import org.bukkit.entity.Player;
     value = "list",
     aliases = {"who", "players"})
 @Permission("essentials.list")
-@Cooldown(duration = "2s")
 @Description("Abre o menu com os jogadores online agrupados.")
 @Syntax("/list")
 public record ListCommand(MenuService menus) {

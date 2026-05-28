@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.seen.config.SeenConfig;
 import com.hanielcota.essentials.modules.seen.service.SeenService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -17,7 +16,6 @@ import lombok.NonNull;
 
 @Command("seen")
 @Permission("essentials.seen")
-@Cooldown(duration = "1s")
 @Description("Mostra a última vez em que o jogador esteve online.")
 @Syntax("/seen <jogador>")
 public record SeenCommand(ConfigHandle<SeenConfig> config, SeenService service) {

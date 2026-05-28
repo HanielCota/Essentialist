@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Player;
 @Command("homes")
 @EssentialsCommand
 @Permission("essentials.home.list")
-@Cooldown(duration = "3s")
 @Description("Abre o menu de homes com teleporte, deletar, renomear e trocar ícone.")
 @Syntax("/homes")
 public record HomesCommand(HomeService service, MenuService menus, HomesMenuState state) {

@@ -1,6 +1,10 @@
 package com.hanielcota.essentials.command;
 
+import com.hanielcota.essentials.command.cooldown.CommandCooldownService;
+import com.hanielcota.essentials.command.cooldown.CooldownInterceptor;
+import com.hanielcota.essentials.command.cooldown.CooldownsConfig;
 import com.hanielcota.essentials.command.interceptor.AuditInterceptor;
+import com.hanielcota.essentials.config.ConfigHandle;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import io.papermc.paper.registry.RegistryAccess;
 import lombok.NonNull;
@@ -21,6 +25,7 @@ public final class CommandBootstrap {
 
   private final @NonNull JavaPlugin plugin;
   private final @NonNull RegistryAccess registryAccess;
+  private final @NonNull ConfigHandle<CooldownsConfig> cooldownConfig;
 
   public PaperCommandFramework createFramework() {
     var logger = this.plugin.getLogger();
@@ -28,10 +33,13 @@ public final class CommandBootstrap {
     var messageProvider =
         io.github.hanielcota.commandframework.core.message.CommandMessages.portugueseBrazil();
     var auditInterceptor = new AuditInterceptor(logger);
+    var cooldownService = new CommandCooldownService();
+    var cooldownInterceptor = new CooldownInterceptor(this.cooldownConfig, cooldownService);
 
     var rawBuilder = PaperCommandFramework.builder(this.plugin);
     var withMessages = rawBuilder.messageProvider(messageProvider);
-    var builder = withMessages.interceptor(auditInterceptor);
+    var withAudit = withMessages.interceptor(auditInterceptor);
+    var builder = withAudit.interceptor(cooldownInterceptor);
 
     registerGameModeAliases(builder);
 

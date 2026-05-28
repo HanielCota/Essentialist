@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.repair.config.RepairConfig;
 import com.hanielcota.essentials.modules.repair.service.RepairService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -24,7 +23,6 @@ import org.bukkit.entity.Player;
 @Command(value = "reparar", aliases = "repair")
 @Permission("essentials.repair")
 @PermissionForOther(".others")
-@Cooldown(duration = "5s")
 @Description("Repara o item na mão ou o inventário inteiro.")
 @Syntax("/reparar [jogador] | /reparar tudo [jogador]")
 public record RepairCommand(

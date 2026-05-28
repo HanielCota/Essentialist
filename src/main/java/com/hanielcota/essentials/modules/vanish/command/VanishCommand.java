@@ -11,7 +11,6 @@ import com.hanielcota.essentials.modules.vanish.service.VanishTransitions;
 import com.hanielcota.essentials.modules.vanish.service.VanishVisibilityApplier;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -28,7 +27,6 @@ import org.bukkit.entity.Player;
 @Command("vanish")
 @EssentialsCommand
 @Permission("essentials.vanish")
-@Cooldown(duration = "1s")
 @Description("Toggles vanish for the sender or another player.")
 @Syntax("/vanish [jogador] | /vanish list")
 public record VanishCommand(

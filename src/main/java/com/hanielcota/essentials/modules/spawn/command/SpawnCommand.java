@@ -6,7 +6,6 @@ import com.hanielcota.essentials.modules.spawn.config.SpawnConfig;
 import com.hanielcota.essentials.modules.spawn.service.SpawnService;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -19,7 +18,6 @@ import org.bukkit.entity.Player;
 @Command("spawn")
 @EssentialsCommand
 @Permission("essentials.spawn.use")
-@Cooldown(duration = "2s")
 @Description("Teleporta para o spawn do servidor.")
 @Syntax("/spawn")
 public record SpawnCommand(

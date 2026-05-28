@@ -10,7 +10,6 @@ import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
 import com.hanielcota.essentials.modules.tpa.menu.target.TpaTargetActionMenu;
 import com.hanielcota.essentials.modules.tpa.service.selection.TpaTargetSelections;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
@@ -26,7 +25,6 @@ import org.bukkit.entity.Player;
 @EssentialsCommand
 @Permission("essentials.tpa")
 @PlayerOnly
-@Cooldown(duration = "5s")
 @Description("Abre o menu de ações de TPA com o jogador, sugerindo /tpahere.")
 @Syntax("/tpahere <jogador>")
 public record TpaHereCommand(

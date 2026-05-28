@@ -5,7 +5,6 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -23,7 +22,6 @@ import org.bukkit.entity.Player;
     value = "msg",
     aliases = {"tell", "w", "whisper"})
 @Permission("essentials.msg")
-@Cooldown(duration = "1s")
 @Description("Envia uma mensagem privada para outro jogador.")
 @Syntax("/msg <jogador> <mensagem>")
 public record MsgCommand(

@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.socialspy.command;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.modules.socialspy.service.SocialSpyService;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
 @Command("socialspy")
 @Permission("essentials.socialspy")
 @PermissionForOther(".others")
-@Cooldown(duration = "2s")
 @Description("Ativa ou desativa a observação de mensagens privadas.")
 @Syntax("/socialspy [jogador]")
 public record SocialSpyCommand(SocialSpyService service, SocialSpyNotifier notifier) {

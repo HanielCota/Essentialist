@@ -2,6 +2,8 @@ package com.hanielcota.essentials.bootstrap;
 
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.command.CommandBootstrap;
+import com.hanielcota.essentials.command.cooldown.CooldownsConfig;
+import com.hanielcota.essentials.config.ConfigService;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.paper.FrameworkActorFactory;
 import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
@@ -29,7 +31,10 @@ final class CommandSystemBootstrap implements BootstrapStage {
     var services = context.services();
 
     var registryAccess = RegistryAccess.registryAccess();
-    var commandBootstrap = new CommandBootstrap(this.plugin, registryAccess);
+    var configService = services.resolve(ConfigService.class);
+    var cooldownConfig =
+        configService.load("cooldowns", CooldownsConfig.class, CooldownsConfig::defaults);
+    var commandBootstrap = new CommandBootstrap(this.plugin, registryAccess, cooldownConfig);
     var framework = commandBootstrap.createFramework();
 
     services.register(PaperCommandFramework.class, framework);

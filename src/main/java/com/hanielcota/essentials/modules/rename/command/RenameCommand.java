@@ -7,7 +7,6 @@ import com.hanielcota.essentials.modules.rename.service.RenameService;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -27,7 +26,6 @@ import org.jspecify.annotations.Nullable;
 @EssentialsCommand
 @Permission("essentials.rename")
 @PlayerOnly
-@Cooldown(duration = "3s")
 @Description("Renomeia o item na mão; sem nome, remove o nome customizado.")
 @Syntax("/rename [nome]")
 public record RenameCommand(ConfigHandle<RenameConfig> config, RenameService service) {

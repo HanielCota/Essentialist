@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.kick.config.KickConfig;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
@@ -21,7 +20,6 @@ import org.bukkit.entity.Player;
 
 @Command("kick")
 @Permission("essentials.kick")
-@Cooldown(duration = "3s")
 @Description("Expulsa um jogador do servidor.")
 @Syntax("/kick <jogador> [motivo]")
 public record KickCommand(ConfigHandle<KickConfig> config) {

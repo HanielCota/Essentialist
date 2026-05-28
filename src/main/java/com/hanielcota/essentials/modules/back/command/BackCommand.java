@@ -2,7 +2,6 @@ package com.hanielcota.essentials.modules.back.command;
 
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import io.github.hanielcota.commandframework.annotation.Command;
-import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
@@ -16,7 +15,6 @@ import lombok.NonNull;
 @EssentialsCommand
 @Permission("essentials.back")
 @PlayerOnly
-@Cooldown(duration = "5s")
 @Description("Retorna à localização anterior ou abre o histórico de teleportes.")
 @Syntax("/back")
 public record BackCommand(BackOrchestrator orchestrator) {
