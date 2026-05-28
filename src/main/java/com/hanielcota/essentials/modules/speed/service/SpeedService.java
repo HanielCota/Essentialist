@@ -23,6 +23,12 @@ public final class SpeedService {
     return value < snap.minSpeed() || value > snap.maxSpeed();
   }
 
+  // Bukkit's setWalkSpeed/setFlySpeed throw outside [-1, 1]. A config with minSpeed below -maxSpeed
+  // would scale past that bound, so clamp defensively before applying.
+  private static float clampToBukkitRange(float scaled) {
+    return Math.max(-1f, Math.min(1f, scaled));
+  }
+
   public boolean setWalkSpeed(@NonNull Player player, int value) {
     var snap = this.config.value();
     if (isOutOfRange(snap, value)) {
@@ -32,7 +38,8 @@ public final class SpeedService {
     // Scale by the configured max so the top value maps to Bukkit's 1.0 ceiling regardless of
     // range.
     var scaled = value / (float) snap.maxSpeed();
-    player.setWalkSpeed(scaled);
+    var clamped = clampToBukkitRange(scaled);
+    player.setWalkSpeed(clamped);
     this.modified.add(player.getUniqueId());
     return true;
   }
@@ -44,7 +51,8 @@ public final class SpeedService {
     }
 
     var scaled = value / (float) snap.maxSpeed();
-    player.setFlySpeed(scaled);
+    var clamped = clampToBukkitRange(scaled);
+    player.setFlySpeed(clamped);
     this.modified.add(player.getUniqueId());
     return true;
   }

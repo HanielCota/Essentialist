@@ -63,8 +63,25 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
     return Set.copyOf(keys);
   }
 
+  /**
+   * Subscribes {@code listener} to future registrations and immediately replays every
+   * already-registered service to it, so a late subscriber never misses services registered before
+   * it. Replay runs before the listener is wired to avoid double-delivering a concurrent
+   * registration.
+   */
   @Override
   public void addRegistrationListener(@NonNull BiConsumer<Class<?>, Object> listener) {
+    replayExistingTo(listener);
+
     this.listeners.add(listener);
+  }
+
+  private void replayExistingTo(@NonNull BiConsumer<Class<?>, Object> listener) {
+    for (var entry : this.services.entrySet()) {
+      var type = entry.getKey();
+      var instance = entry.getValue();
+
+      listener.accept(type, instance);
+    }
   }
 }

@@ -6,6 +6,7 @@ import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.crops.config.CropsConfig;
 import com.hanielcota.essentials.modules.crops.listener.AutoReplantListener;
 import com.hanielcota.essentials.modules.crops.listener.CropBreakListener;
+import com.hanielcota.essentials.modules.crops.listener.CropsNotifierCleanupListener;
 import com.hanielcota.essentials.modules.crops.listener.ExplosionCropListener;
 import com.hanielcota.essentials.modules.crops.listener.FarmlandHydrationListener;
 import com.hanielcota.essentials.modules.crops.listener.FarmlandTrampleListener;
@@ -35,6 +36,7 @@ public final class CropsModule extends AbstractModule {
 
     registrar.listener(new CropBreakListener(config, notifier));
     registrar.listener(new FarmlandTrampleListener(config, notifier));
+    registrar.listener(new CropsNotifierCleanupListener(notifier));
     registrar.listener(new AutoReplantListener(config));
     registrar.listener(new MobCropProtectionListener(config));
     registrar.listener(new ExplosionCropListener(config));

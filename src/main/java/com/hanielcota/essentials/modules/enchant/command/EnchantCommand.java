@@ -42,10 +42,14 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
     var label = enchantment.getKey().getKey();
     var result = this.service.apply(player, enchantment, level);
 
+    var configuredMax = snap.maxLevel();
+    var vanillaMax = enchantment.getMaxLevel();
+    var effectiveMax = snap.allowUnsafe() ? configuredMax : Math.min(configuredMax, vanillaMax);
+
     return switch (result) {
       case EMPTY_HAND -> CommandResult.invalidUsage(snap.emptyHand());
       case BLOCKED -> CommandResult.invalidUsage(snap.formatBlocked(label));
-      case LEVEL_TOO_HIGH -> CommandResult.invalidUsage(snap.formatLevelTooHigh());
+      case LEVEL_TOO_HIGH -> CommandResult.invalidUsage(snap.formatLevelTooHigh(effectiveMax));
       case INCOMPATIBLE -> CommandResult.invalidUsage(snap.formatIncompatible(label));
       case APPLIED -> {
         var appliedMsg = snap.formatApplied(label, level);

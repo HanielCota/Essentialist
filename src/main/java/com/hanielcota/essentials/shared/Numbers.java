@@ -12,7 +12,9 @@ public final class Numbers {
       return Double.toString(value);
     }
     if (value == Math.floor(value)) {
-      if (value < Long.MIN_VALUE || value > Long.MAX_VALUE) {
+      // (double) Long.MAX_VALUE rounds up to 2^63, which overflows the long cast, so the upper edge
+      // must be excluded with >=. Whole doubles inside [-2^63, 2^63) cast to long losslessly.
+      if (value < (double) Long.MIN_VALUE || value >= (double) Long.MAX_VALUE) {
         return Double.toString(value);
       }
       var longValue = (long) value;

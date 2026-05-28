@@ -34,7 +34,11 @@ public final class AutoReplantListener implements Listener {
     var blockState = event.getBlockState();
     var material = blockState.getType();
 
-    if (!Tag.CROPS.isTagged(material)) {
+    // NETHER_WART is Ageable but is not part of the vanilla minecraft:crops tag, so it must be
+    // admitted explicitly or its seedOf/replant branch is unreachable.
+    var replantable = Tag.CROPS.isTagged(material) || material == Material.NETHER_WART;
+
+    if (!replantable) {
       return;
     }
 

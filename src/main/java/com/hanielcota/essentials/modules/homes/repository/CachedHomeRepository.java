@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.repository;
 
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.homes.domain.Home;
+import com.hanielcota.essentials.shared.Log;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +24,8 @@ import org.bukkit.Material;
  */
 @RequiredArgsConstructor
 public final class CachedHomeRepository implements HomeRepository, AutoCloseable {
+
+  private static final Log LOG = Log.of(CachedHomeRepository.class);
 
   private final HomeRepository delegate;
   private final AsyncDatabaseWriter writer;
@@ -101,7 +104,7 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
       return false;
     }
 
-    Runnable persist = () -> this.delegate.rename(owner, oldName, newName);
+    Runnable persist = () -> persistRename(owner, oldName, newName);
     this.writer.submit("rename home", persist);
 
     return true;
@@ -153,6 +156,24 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
   @Override
   public void close() {
     this.writer.close();
+  }
+
+  // The cache already validated and committed the rename. If the async SQL persist disagrees (a
+  // no-op), cache and DB have diverged — surface it instead of silently dropping the boolean.
+  private void persistRename(
+      @NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
+    var persisted = this.delegate.rename(owner, oldName, newName);
+
+    if (persisted) {
+      return;
+    }
+
+    LOG.warn(
+        "Home rename persisted as a no-op while the cache committed it (owner={}, {} -> {});"
+            + " cache and database may have diverged.",
+        owner,
+        oldName,
+        newName);
   }
 
   private void ensureLoaded(@NonNull UUID owner) {

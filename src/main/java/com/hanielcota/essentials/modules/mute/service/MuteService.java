@@ -4,12 +4,14 @@ import com.hanielcota.essentials.api.MutesApi;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.modules.mute.domain.MuteOutcome;
 import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Application service for the mute use cases. Owns the {@link Mute} domain-object factory and
@@ -35,7 +37,7 @@ public final class MuteService implements MutesApi {
    * rawDuration} produces a permanent mute. The caller is responsible for checking permissions and
    * validating the duration format before calling this method.
    */
-  public MuteOutcome mute(@NonNull Player target, @NonNull java.time.Duration duration) {
+  public MuteOutcome mute(@NonNull Player target, @Nullable Duration duration) {
     var now = Instant.now();
     var mute = Mute.from(duration, now);
     var id = target.getUniqueId();
