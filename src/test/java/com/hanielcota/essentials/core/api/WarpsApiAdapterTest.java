@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.NonNull;
+import org.bukkit.Material;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
@@ -29,7 +30,7 @@ class WarpsApiAdapterTest {
     cache.put(warp("Zulu"));
     cache.put(warp("Alpha"));
 
-    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE, null, null);
 
     var names = api.warps().stream().map(Warp::name).toList();
     assertEquals(List.of("Alpha", "Zulu"), names);
@@ -40,7 +41,7 @@ class WarpsApiAdapterTest {
     var cache = new WarpCache();
     cache.put(warp("Spawn"));
 
-    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE, null, null);
 
     assertTrue(api.findWarp("SPAWN").isPresent());
     assertTrue(api.findWarp("spawn").isPresent());
@@ -51,7 +52,7 @@ class WarpsApiAdapterTest {
     var cache = new WarpCache();
     cache.put(warp("Vip"));
 
-    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE, null, null);
 
     assertFalse(api.canUse(new StubPermissible(Set.of()), "Vip"));
     assertTrue(api.canUse(new StubPermissible(Set.of("essentials.warp.use.vip")), "Vip"));
@@ -64,7 +65,7 @@ class WarpsApiAdapterTest {
     cache.put(warp("Public"));
     cache.put(warp("Vip"));
 
-    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE);
+    var api = new WarpService(null, cache, NoopAsyncDatabaseWriter.INSTANCE, null, null);
 
     var viewer = new StubPermissible(Set.of("essentials.warp.use.public"));
     var visible = api.visibleTo(viewer).stream().map(Warp::name).toList();
@@ -73,7 +74,7 @@ class WarpsApiAdapterTest {
   }
 
   private static Warp warp(@NonNull String name) {
-    return new Warp(name, "world", 0, 64, 0, 0, 0, 0L, CREATOR);
+    return new Warp(name, "world", 0, 64, 0, 0, 0, 0L, CREATOR, Material.ENDER_PEARL);
   }
 
   private static final class StubPermissible implements Permissible {

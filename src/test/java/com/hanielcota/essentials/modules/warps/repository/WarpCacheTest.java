@@ -7,12 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.hanielcota.essentials.modules.warps.domain.Warp;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 
 class WarpCacheTest {
 
   private static Warp w(String name) {
-    return new Warp(name, "world", 0.0, 64.0, 0.0, 0.0f, 0.0f, 1L, UUID.randomUUID());
+    return new Warp(
+        name, "world", 0.0, 64.0, 0.0, 0.0f, 0.0f, 1L, UUID.randomUUID(), Material.ENDER_PEARL);
   }
 
   @Test

@@ -6,31 +6,30 @@ import com.hanielcota.essentials.modules.warps.domain.Warp;
 import com.hanielcota.essentials.modules.warps.repository.WarpCache;
 import com.hanielcota.essentials.modules.warps.repository.WarpRepository;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 
 /**
- * Application service for the warps use cases.
- *
- * <p>Reads come from {@link WarpCache} (no SQL on the hot path), writes update the cache
- * synchronously and queue the SQL persist on {@link AsyncDatabaseWriter}. Permission gating on
- * {@code essentials.warp.use.<name>} (lowercased) — or the bypass node {@code
- * essentials.warp.use.*} — stays here so menu and command paths agree.
+ * Application service for the warps use cases: cache-backed reads, cache-then-async writes. The
+ * per-warp access rule lives in {@link WarpPermissions}; this service just delegates to it so menu
+ * and command paths agree.
  */
 @RequiredArgsConstructor
 public final class WarpService implements WarpsApi {
 
-  private static final String USE_PREFIX = "essentials.warp.use.";
-  private static final String USE_WILDCARD = "essentials.warp.use.*";
-
   private final WarpRepository repository;
   private final WarpCache cache;
   private final AsyncDatabaseWriter writer;
+  private final WarpFavorites favorites;
+  private final WarpLikes likes;
+
+  private final WarpPermissions permissions = new WarpPermissions();
 
   public Optional<Warp> findWarp(@NonNull String name) {
     return this.cache.find(name);
@@ -47,15 +46,38 @@ public final class WarpService implements WarpsApi {
     return allWarps.stream().filter(usableByPermissible).toList();
   }
 
-  public void save(@NonNull String name, @NonNull Player creator) {
+  /** Whether {@code permissible} may use the warp named {@code name}. */
+  public boolean canUse(@NonNull Permissible permissible, @NonNull String name) {
+    return this.permissions.canUse(permissible, name);
+  }
+
+  public void save(@NonNull String name, @NonNull Player creator, @NonNull Material icon) {
     var location = creator.getLocation();
-    var uniqueId = creator.getUniqueId();
-    var warp = Warp.of(name, location, uniqueId);
+    var existing = this.cache.find(name);
+
+    // Overwriting (/setwarp on an existing warp) relocates it but keeps the original creation
+    // time and author; only a brand-new warp stamps the current creator and time.
+    var warp = build(name, location, creator, icon, existing);
 
     this.cache.put(warp);
 
     Runnable persist = () -> this.repository.save(warp);
     this.writer.submit("save warp", persist);
+  }
+
+  private static Warp build(
+      @NonNull String name,
+      @NonNull Location location,
+      @NonNull Player creator,
+      @NonNull Material icon,
+      @NonNull Optional<Warp> existing) {
+    if (existing.isEmpty()) {
+      var uniqueId = creator.getUniqueId();
+      return Warp.of(name, location, uniqueId, icon);
+    }
+
+    var previous = existing.get();
+    return previous.movedTo(location, icon);
   }
 
   public boolean delete(@NonNull String name) {
@@ -69,16 +91,11 @@ public final class WarpService implements WarpsApi {
     Runnable persist = () -> this.repository.delete(canonicalName);
     this.writer.submit("delete warp", persist);
 
+    // Drop the social data so a warp recreated with the same name starts clean and the join
+    // tables don't accumulate orphan rows.
+    this.favorites.forgetWarp(canonicalName);
+    this.likes.forgetWarp(canonicalName);
+
     return true;
-  }
-
-  /** Whether {@code permissible} may use the warp named {@code name}. */
-  public boolean canUse(@NonNull Permissible permissible, @NonNull String name) {
-    if (permissible.hasPermission(USE_WILDCARD)) {
-      return true;
-    }
-
-    var permissionNode = USE_PREFIX + name.toLowerCase(Locale.ROOT);
-    return permissible.hasPermission(permissionNode);
   }
 }

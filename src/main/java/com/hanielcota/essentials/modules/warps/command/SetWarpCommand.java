@@ -13,19 +13,24 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
+import java.util.Optional;
 import lombok.NonNull;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @Command("setwarp")
 @EssentialsCommand
 @Permission("essentials.warp.set")
 @Description("Cria ou sobrescreve uma warp na sua localização atual.")
-@Syntax("/setwarp <nome>")
+@Syntax("/setwarp <nome> [ícone]")
 public record SetWarpCommand(
     ConfigHandle<WarpsConfig> config, WarpService service, WarpNameValidator validator) {
 
   @DefaultSubcommand
-  public CommandResult execute(@NonNull CommandActor actor, @Arg("nome") String name) {
+  public CommandResult execute(
+      @NonNull CommandActor actor,
+      @Arg("nome") String name,
+      @Arg("ícone") Optional<Material> icon) {
     var sender = actor.unwrap(Player.class);
     var snap = this.config.value();
     var messages = snap.messages();
@@ -47,7 +52,11 @@ public record SetWarpCommand(
     // per-warp permission node derived from it) stays stable.
     var persistedName = existed ? warpOpt.get().name() : name;
 
-    this.service.save(persistedName, sender);
+    // Keep the existing icon when overwriting without specifying a new one.
+    var fallbackIcon = warpOpt.map(w -> w.icon()).orElse(snap.defaultIcon());
+    var iconMaterial = icon.orElse(fallbackIcon);
+
+    this.service.save(persistedName, sender, iconMaterial);
 
     var template = existed ? messages.warpUpdated() : messages.warpSet();
     var successMsg = template.replace("{name}", persistedName);

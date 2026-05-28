@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 class HomeNameValidatorTest {
 
-  private final HomeNameValidator validator = new HomeNameValidator();
+  private final HomeNameValidator validator = new HomeNameValidator(1, 16, "[A-Za-z0-9_-]+");
 
   @Test
   void acceptsSimpleNamesWithLettersNumbersUnderscoreAndHyphen() {
@@ -22,6 +22,11 @@ class HomeNameValidatorTest {
     assertFalse(validator.isValid("two words"));
     assertFalse(validator.isValid("<red>home"));
     assertFalse(validator.isValid("home/name"));
-    assertFalse(validator.isValid("a".repeat(33)));
+  }
+
+  @Test
+  void enforcesTheConfiguredMaxLength() {
+    assertTrue(validator.isValid("a".repeat(16)));
+    assertFalse(validator.isValid("a".repeat(17)));
   }
 }

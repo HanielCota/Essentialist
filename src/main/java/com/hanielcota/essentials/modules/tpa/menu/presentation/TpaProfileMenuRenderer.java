@@ -38,8 +38,7 @@ public final class TpaProfileMenuRenderer {
     var playerId = player.getUniqueId();
     var profile = this.profiles.profile(playerId);
     var pending = this.requests.incoming(playerId).size();
-    var mostContacted =
-        this.contacts.mostContacted(playerId).map(TpaContact::targetName).orElse(null);
+    var mostContacted = this.contacts.mostContacted(playerId).orElse(null);
 
     var slots = new ArrayList<SlotDefinition>(7);
     slots.add(headSlot(settings, rows, player));
@@ -126,12 +125,21 @@ public final class TpaProfileMenuRenderer {
   }
 
   private SlotDefinition mostContactedSlot(
-      @NonNull TpaProfileMenuConfig settings, int rows, @Nullable String mostContacted) {
+      @NonNull TpaProfileMenuConfig settings, int rows, @Nullable TpaContact mostContacted) {
     var fallback = settings.statsFallback();
-    var label = TpaProfileStatsFormatter.mostContactedName(mostContacted, fallback);
+    var contactName = mostContacted != null ? mostContacted.targetName() : null;
+    var label = TpaProfileStatsFormatter.mostContactedName(contactName, fallback);
     var name = settings.mostContactedName().replace("{most_contacted}", label);
     var lore = replaceAll(settings.mostContactedLore(), "{most_contacted}", label);
-    var template = MenuTemplates.simple(settings.mostContactedIcon(), name, lore);
+
+    var builder = ItemTemplate.builder(settings.mostContactedIcon());
+    if (settings.mostContactedIcon() == Material.PLAYER_HEAD && mostContacted != null) {
+      PlayerHeadTextures.applyTo(builder, mostContacted.targetId());
+    }
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+    var template = builder.build();
 
     var safeSlot = MenuLayouts.sanitizeSlot(settings.mostContactedSlot(), rows, 0);
     return SlotDefinition.of(safeSlot, template, click -> {});

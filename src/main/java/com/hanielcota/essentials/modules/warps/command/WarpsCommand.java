@@ -1,12 +1,13 @@
 package com.hanielcota.essentials.modules.warps.command;
 
+import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.modules.warps.service.WarpService;
+import com.hanielcota.essentials.menu.MenuOpenings;
+import com.hanielcota.essentials.modules.warps.menu.WarpsMenu;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
-import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -16,22 +17,14 @@ import org.bukkit.entity.Player;
 @Command("warps")
 @EssentialsCommand
 @Permission("essentials.warp.list")
-@Description("Lista as warps que você pode usar, clicáveis para teleporte.")
+@Description("Abre o menu de warps do servidor.")
 @Syntax("/warps")
-public record WarpsCommand(@NonNull WarpService service, @NonNull WarpsListNotifier notifier) {
+public record WarpsCommand(@NonNull MenuService menus) {
 
   @DefaultSubcommand
-  @PlayerOnly
   public CommandResult execute(@NonNull CommandActor actor) {
-    var sender = actor.unwrap(Player.class);
-    var warps = this.service.visibleTo(sender);
-
-    if (warps.isEmpty()) {
-      this.notifier.sendEmpty(actor);
-      return CommandResult.invalidUsage();
-    }
-
-    this.notifier.sendList(sender, warps);
+    var player = actor.unwrap(Player.class);
+    MenuOpenings.open(this.menus, player, WarpsMenu.ID, actor);
     return CommandResult.success();
   }
 }
