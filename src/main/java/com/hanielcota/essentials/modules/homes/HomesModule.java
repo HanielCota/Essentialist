@@ -123,7 +123,12 @@ public final class HomesModule extends AbstractModule {
     var renameSessions = new HomeRenameSessions();
     var createSessions = new HomeCreateSessions();
     var orderingPreferences = new HomeOrderingPreferences();
-    var nameValidator = new HomeNameValidator();
+    var nameRules = config.value();
+    var nameValidator =
+        new HomeNameValidator(
+            nameRules.homeNameMinLength(),
+            nameRules.homeNameMaxLength(),
+            nameRules.allowedNamePattern());
     var nameResolver = new HomeNameResolver(nameValidator);
     var teleporter = new HomeTeleporter(config, delayed, homeService);
     var renameTimer = new HomeRenameTimer(scheduler);
