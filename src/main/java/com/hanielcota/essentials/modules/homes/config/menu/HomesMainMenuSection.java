@@ -9,32 +9,28 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-/**
- * Layout + formatter helpers for the /homes main menu (rows / content slots / info slot, plus
- * per-home item name/lore rendering). Stateless — every call takes a config snapshot.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HomesMainMenuSection {
 
   private static final int MIN_ROWS = 1;
 
-  public static int rows(@NonNull HomesMenuConfig snap) {
+  public static int rows(@NonNull HomesMainMenuConfig snap) {
     return MenuLayouts.clampRows(snap.rows());
   }
 
-  public static int infoSlot(@NonNull HomesMenuConfig snap) {
+  public static int infoSlot(@NonNull HomesMainMenuConfig snap) {
     return MenuLayouts.sanitizeSlot(snap.infoSlot(), rows(snap), 10);
   }
 
-  public static int createSlot(@NonNull HomesMenuConfig snap) {
+  public static int createSlot(@NonNull HomesMainMenuConfig snap) {
     return MenuLayouts.sanitizeSlot(snap.createSlot(), rows(snap), 16);
   }
 
-  public static int sortSlot(@NonNull HomesMenuConfig snap) {
+  public static int sortSlot(@NonNull HomesMainMenuConfig snap) {
     return MenuLayouts.sanitizeSlot(snap.sortSlot(), rows(snap), 8);
   }
 
-  public static List<Integer> contentSlots(@NonNull HomesMenuConfig snap) {
+  public static List<Integer> contentSlots(@NonNull HomesMainMenuConfig snap) {
     var configured = snap.contentSlots();
     if (configured.isEmpty()) {
       var effRows = rows(snap);
@@ -45,12 +41,12 @@ public final class HomesMainMenuSection {
     return MenuLayouts.sanitizeSlots(configured, rows(snap));
   }
 
-  public static String itemName(@NonNull HomesMenuConfig snap, @NonNull String name) {
+  public static String itemName(@NonNull HomesMainMenuConfig snap, @NonNull String name) {
     return snap.itemName().replace("{name}", name);
   }
 
   public static String[] itemLore(
-      @NonNull HomesMenuConfig snap, @NonNull HomeMenuPlaceholders placeholders) {
+      @NonNull HomesMainMenuConfig snap, @NonNull HomeMenuPlaceholders placeholders) {
     var template = snap.itemLore();
     var usage = snap.usageLore();
     var values = placeholderValues(placeholders);

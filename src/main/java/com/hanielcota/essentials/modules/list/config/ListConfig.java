@@ -11,6 +11,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 @ConfigSerializable
 public record ListConfig(
+    ListMessages messages,
     @Comment("List menu title.") String menuTitle,
     @Comment("Rows in the list menu (clamped to 1-6).") int menuRows,
     @Comment("Slots used by player entries. Leave empty to use every row except the last.")
@@ -28,14 +29,13 @@ public record ListConfig(
     @Comment("Lore of the empty-state placeholder.") List<String> emptyLore,
     @Comment("Groups in descending priority order. First match wins.") List<GroupDefinition> groups,
     @Comment("Fallback group for players that don't match any entry above.")
-        DefaultGroup defaultGroup,
-    @Comment("Shown when the console runs /list, since the menu needs a player.")
-        String menuPlayerOnly) {
+        DefaultGroup defaultGroup) {
 
   private static final int MIN_ROWS = 1;
 
   public static ListConfig defaults() {
     return new ListConfig(
+        ListMessages.defaults(),
         "<dark_gray>Jogadores online",
         6,
         List.of(),
@@ -60,8 +60,7 @@ public record ListConfig(
                 "admin", "<gold>Admin", "essentials.list.group.admin", Material.GOLDEN_HELMET, 100),
             new GroupDefinition(
                 "vip", "<aqua>VIP", "essentials.list.group.vip", Material.DIAMOND_HELMET, 50)),
-        new DefaultGroup("<gray>Membro", Material.PLAYER_HEAD),
-        "<red>O menu da lista só pode ser aberto por jogadores.");
+        new DefaultGroup("<gray>Membro", Material.PLAYER_HEAD));
   }
 
   public int effectiveRows() {

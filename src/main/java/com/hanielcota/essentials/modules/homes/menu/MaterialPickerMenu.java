@@ -56,16 +56,16 @@ public final class MaterialPickerMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menusRef) {
     var snap = this.config.value();
-    var menuSpec = snap.menu();
+    var pickerMenu = snap.menu().picker();
 
-    var titleText = MaterialPickerSection.staticTitle(menuSpec);
+    var titleText = MaterialPickerSection.staticTitle(pickerMenu);
     var menuTitle = ComponentUtils.mini(titleText);
-    var rows = MaterialPickerSection.rows(menuSpec);
-    var contentSlots = MaterialPickerSection.contentSlots(menuSpec);
+    var rows = MaterialPickerSection.rows(pickerMenu);
+    var contentSlots = MaterialPickerSection.contentSlots(pickerMenu);
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
     if (rows > MIN_ROWS) {
-      var navigation = menuSpec.pickerNavigation();
+      var navigation = pickerMenu.navigation();
       PageNavigation.apply(menusRef, paginationBuilder, ID, rows, navigation);
     }
     var pagination = paginationBuilder.build();
@@ -106,12 +106,11 @@ public final class MaterialPickerMenu implements EssentialsMenu {
   }
 
   private @NonNull SlotDefinition backButtonSlot() {
-    var snap = this.config.value();
-    var menuSpec = snap.menu();
+    var pickerMenu = this.config.value().menu().picker();
 
-    var material = menuSpec.pickerBackMaterial();
-    var name = menuSpec.pickerBackName();
-    var lore = menuSpec.pickerBackLore();
+    var material = pickerMenu.backMaterial();
+    var name = pickerMenu.backName();
+    var lore = pickerMenu.backLore();
     var loreArray = lore.toArray(String[]::new);
 
     var templateBuilder = ItemTemplate.builder(material);
@@ -120,7 +119,7 @@ public final class MaterialPickerMenu implements EssentialsMenu {
     templateBuilder.italic(false);
     var template = templateBuilder.build();
 
-    var slot = MaterialPickerSection.backSlot(menuSpec);
+    var slot = MaterialPickerSection.backSlot(pickerMenu);
 
     return SlotDefinition.of(slot, template, this.clickHandler::back);
   }

@@ -5,26 +5,22 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
-/**
- * Layout helpers for the delete-confirmation submenu (rows / prompt / yes / no slots). Stateless —
- * every call takes a config snapshot.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DeleteDialogSection {
 
-  public static int rows(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.clampRows(snap.deleteRows());
+  public static int rows(@NonNull HomesDeleteDialogConfig snap) {
+    return MenuLayouts.clampRows(snap.rows());
   }
 
-  public static int promptSlot(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.sanitizeSlot(snap.deletePromptSlot(), rows(snap), 13);
+  public static int promptSlot(@NonNull HomesDeleteDialogConfig snap) {
+    return MenuLayouts.sanitizeSlot(snap.promptSlot(), rows(snap), 13);
   }
 
-  public static int yesSlot(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.sanitizeSlot(snap.deleteYesSlot(), rows(snap), 11);
+  public static int yesSlot(@NonNull HomesDeleteDialogConfig snap) {
+    return MenuLayouts.sanitizeSlot(snap.yesSlot(), rows(snap), 11);
   }
 
-  public static int noSlot(@NonNull HomesMenuConfig snap) {
-    return MenuLayouts.sanitizeSlot(snap.deleteNoSlot(), rows(snap), 15);
+  public static int noSlot(@NonNull HomesDeleteDialogConfig snap) {
+    return MenuLayouts.sanitizeSlot(snap.noSlot(), rows(snap), 15);
   }
 }

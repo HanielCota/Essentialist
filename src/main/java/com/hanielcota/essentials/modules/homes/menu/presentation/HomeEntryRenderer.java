@@ -11,7 +11,7 @@ public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) {
 
   public @NonNull ItemTemplate render(@NonNull Home home) {
     var snap = this.config.value();
-    var menu = snap.menu();
+    var mainMenu = snap.menu().main();
 
     var world = home.world();
     var x = home.x();
@@ -24,13 +24,14 @@ public record HomeEntryRenderer(ConfigHandle<HomesConfig> config) {
 
     var homeName = home.name();
     var material = home.material();
-    var displayName = home.pinned() ? menu.pinnedNamePrefix() + homeName : homeName;
+    var displayName = home.pinned() ? mainMenu.pinnedNamePrefix() + homeName : homeName;
 
-    var name = HomesMainMenuSection.itemName(menu, displayName);
+    var name = HomesMainMenuSection.itemName(mainMenu, displayName);
     var placeholders =
-        HomeMenuPlaceholders.of(world, x, y, z, yaw, createdAt, teleportCount, lastUsedAt, menu);
-    var lore = HomesMainMenuSection.itemLore(menu, placeholders);
-    var glow = menu.itemGlow() || home.pinned();
+        HomeMenuPlaceholders.of(
+            world, x, y, z, yaw, createdAt, teleportCount, lastUsedAt, mainMenu);
+    var lore = HomesMainMenuSection.itemLore(mainMenu, placeholders);
+    var glow = mainMenu.itemGlow() || home.pinned();
 
     var builder = ItemTemplate.builder(material);
     builder.name(name);

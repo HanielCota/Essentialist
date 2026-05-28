@@ -16,7 +16,7 @@ public record WhitelistClickHandler(
 
     var snap = this.config.value();
     var playerName = WhitelistService.nameOf(player);
-    var removedMsg = snap.formatRemoved(playerName);
+    var removedMsg = snap.messages().formatRemoved(playerName);
 
     click.reply(removedMsg);
     click.refresh();

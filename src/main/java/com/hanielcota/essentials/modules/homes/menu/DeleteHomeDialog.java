@@ -34,17 +34,17 @@ public final class DeleteHomeDialog implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var configSnap = this.config.value();
-    var menuSpec = configSnap.menu();
+    var deleteDialog = configSnap.menu().deleteDialog();
 
     var title = title(configSnap);
     var prompt = promptItem(configSnap);
     var yes = yesButton(configSnap);
     var no = noButton(configSnap);
 
-    var rows = DeleteDialogSection.rows(menuSpec);
-    var promptSlot = DeleteDialogSection.promptSlot(menuSpec);
-    var yesSlot = DeleteDialogSection.yesSlot(menuSpec);
-    var noSlot = DeleteDialogSection.noSlot(menuSpec);
+    var rows = DeleteDialogSection.rows(deleteDialog);
+    var promptSlot = DeleteDialogSection.promptSlot(deleteDialog);
+    var yesSlot = DeleteDialogSection.yesSlot(deleteDialog);
+    var noSlot = DeleteDialogSection.noSlot(deleteDialog);
 
     ClickHandler noopClick = click -> {};
     ClickHandler confirmClick = this.clickHandler::confirm;
@@ -69,27 +69,27 @@ public final class DeleteHomeDialog implements EssentialsMenu {
   }
 
   private @NonNull ItemTemplate promptItem(@NonNull HomesConfig configSnap) {
-    var menuSpec = configSnap.menu();
+    var deleteDialog = configSnap.menu().deleteDialog();
     var messages = configSnap.messages();
-    var material = menuSpec.deletePromptMaterial();
+    var material = deleteDialog.promptMaterial();
     var promptName = messages.deleteConfirmPrompt();
 
     return MenuTemplates.simple(material, promptName);
   }
 
   private @NonNull ItemTemplate yesButton(@NonNull HomesConfig configSnap) {
-    var menuSpec = configSnap.menu();
+    var deleteDialog = configSnap.menu().deleteDialog();
     var messages = configSnap.messages();
-    var material = menuSpec.deleteYesMaterial();
+    var material = deleteDialog.yesMaterial();
     var yesName = messages.deleteConfirmYes();
 
     return MenuTemplates.simple(material, yesName);
   }
 
   private @NonNull ItemTemplate noButton(@NonNull HomesConfig configSnap) {
-    var menuSpec = configSnap.menu();
+    var deleteDialog = configSnap.menu().deleteDialog();
     var messages = configSnap.messages();
-    var material = menuSpec.deleteNoMaterial();
+    var material = deleteDialog.noMaterial();
     var noName = messages.deleteConfirmNo();
 
     return MenuTemplates.simple(material, noName);

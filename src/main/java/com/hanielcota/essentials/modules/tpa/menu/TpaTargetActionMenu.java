@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.tpa.menu;
 
-import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
@@ -10,16 +9,12 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PaginatedMenus;
-import com.hanielcota.essentials.modules.tpa.command.TpaSendOrchestrator;
-import com.hanielcota.essentials.modules.tpa.command.favorites.TpaFavoriteAddNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaTargetActionMenuConfig;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaTargetSelection;
 import com.hanielcota.essentials.modules.tpa.service.TpaTargetSelections;
 import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteService;
-import com.hanielcota.essentials.paper.ActorFactory;
-import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,10 +30,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
   private final ConfigHandle<TpaConfig> config;
   private final TpaTargetSelections selections;
   private final TpaFavoriteService favorites;
-  private final TpaFavoriteAddNotifier addNotifier;
-  private final PlayerProvider players;
-  private final ActorFactory actors;
-  private final TpaSendOrchestrator dispatcher;
+  private final TpaTargetActionClickHandler clicks;
 
   static List<Integer> contentSlots(@NonNull TpaTargetActionMenuConfig settings, int rows) {
     var configured =
@@ -113,7 +105,8 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(slot, rows, 0);
 
-    return SlotDefinition.of(safeSlot, template, click -> sendRequest(click, entry, type));
+    return SlotDefinition.of(
+        safeSlot, template, click -> this.clicks.sendRequest(click, entry, type));
   }
 
   private List<String> buildActionLore(
@@ -150,7 +143,8 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
     var template = MenuTemplates.simple(icon, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(slot, rows, 0);
 
-    return SlotDefinition.of(safeSlot, template, click -> toggleFavorite(click, entry, isFavorite));
+    return SlotDefinition.of(
+        safeSlot, template, click -> this.clicks.toggleFavorite(click, entry, isFavorite));
   }
 
   private SlotDefinition backSlotDefinition(@NonNull TpaTargetActionMenuConfig settings, int rows) {
@@ -158,67 +152,7 @@ public final class TpaTargetActionMenu implements EssentialsMenu {
         MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
-    return SlotDefinition.of(safeSlot, template, this::onBackClicked);
-  }
-
-  private void sendRequest(
-      @NonNull ClickContext click,
-      @NonNull TpaTargetSelection entry,
-      @NonNull TeleportRequestType type) {
-    var viewer = click.player();
-    var actor = this.actors.actorOf(viewer);
-    var snap = this.config.value();
-    var messages = snap.messages();
-
-    var resolved = this.players.online(entry.targetId());
-    if (resolved.isEmpty()) {
-      var offlineText = messages.favoriteOffline().replace("{player}", entry.targetName());
-      actor.sendError(offlineText);
-      return;
-    }
-
-    var target = resolved.get();
-    var confirmationTemplate =
-        type == TeleportRequestType.TPA ? messages.requestSent() : messages.requestSentHere();
-
-    click.close();
-    this.selections.clear(viewer.getUniqueId());
-    this.dispatcher.send(actor, target, type, confirmationTemplate);
-  }
-
-  private void toggleFavorite(
-      @NonNull ClickContext click, @NonNull TpaTargetSelection entry, boolean isFavorite) {
-    var viewer = click.player();
-    var viewerId = viewer.getUniqueId();
-    var actor = this.actors.actorOf(viewer);
-    var messages = this.config.value().messages();
-
-    if (isFavorite) {
-      this.favorites.remove(viewerId, entry.targetId());
-      var removedText = messages.favoriteRemoved().replace("{player}", entry.targetName());
-      actor.sendSuccess(removedText);
-      click.refresh();
-      return;
-    }
-
-    var added = this.favorites.add(viewerId, entry.targetId(), entry.targetName());
-    if (!added) {
-      var alreadyText = messages.favoriteAlready().replace("{player}", entry.targetName());
-      actor.sendError(alreadyText);
-      return;
-    }
-
-    var addedText = messages.favoriteAdded().replace("{player}", entry.targetName());
-    actor.sendSuccess(addedText);
-    this.addNotifier.notify(viewer.getName(), entry.targetId());
-    click.refresh();
-  }
-
-  private void onBackClicked(@NonNull ClickContext click) {
-    var viewerId = click.player().getUniqueId();
-    this.selections.clear(viewerId);
-
-    click.switchTo(TpaHelpMenu.ID);
+    return SlotDefinition.of(safeSlot, template, this.clicks::back);
   }
 
   private ItemTemplate targetTemplate(

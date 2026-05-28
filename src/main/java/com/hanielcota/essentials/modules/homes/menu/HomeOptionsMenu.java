@@ -11,7 +11,7 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
-import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesOptionsMenuConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.HomeEntryRenderer;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.shared.ComponentUtils;
@@ -46,22 +46,22 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   @Override
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
-    var menuSpec = snap.menu();
-    var rows = MenuLayouts.clampRows(menuSpec.optionsRows());
+    var options = snap.menu().options();
+    var rows = MenuLayouts.clampRows(options.rows());
 
-    var titleTemplate = menuSpec.optionsTitle();
+    var titleTemplate = options.title();
     var titleRaw = stripNamePlaceholder(titleTemplate);
     var title = ComponentUtils.mini(titleRaw);
 
     var contentSlots =
         List.of(
-            MenuLayouts.sanitizeSlot(menuSpec.optionsHomeSlot(), rows, 4),
-            MenuLayouts.sanitizeSlot(menuSpec.optionsTeleportSlot(), rows, 11),
-            MenuLayouts.sanitizeSlot(menuSpec.optionsRenameSlot(), rows, 12),
-            MenuLayouts.sanitizeSlot(menuSpec.optionsPinSlot(), rows, 13),
-            MenuLayouts.sanitizeSlot(menuSpec.optionsIconSlot(), rows, 14),
-            MenuLayouts.sanitizeSlot(menuSpec.optionsDeleteSlot(), rows, 15),
-            MenuLayouts.sanitizeSlot(menuSpec.optionsBackSlot(), rows, 22));
+            MenuLayouts.sanitizeSlot(options.homeSlot(), rows, 4),
+            MenuLayouts.sanitizeSlot(options.teleportSlot(), rows, 11),
+            MenuLayouts.sanitizeSlot(options.renameSlot(), rows, 12),
+            MenuLayouts.sanitizeSlot(options.pinSlot(), rows, 13),
+            MenuLayouts.sanitizeSlot(options.iconSlot(), rows, 14),
+            MenuLayouts.sanitizeSlot(options.deleteSlot(), rows, 15),
+            MenuLayouts.sanitizeSlot(options.backSlot(), rows, 22));
     var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
 
     var builder = MenuFramework.builder(ID, menus);
@@ -74,9 +74,8 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
-    var snap = this.config.value();
-    var menuSpec = snap.menu();
-    var rows = MenuLayouts.clampRows(menuSpec.optionsRows());
+    var options = this.config.value().menu().options();
+    var rows = MenuLayouts.clampRows(options.rows());
 
     var uuid = player.getUniqueId();
     var homeName = this.target.peek(uuid);
@@ -84,13 +83,13 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     var pinned = isPinned(uuid, homeName);
 
     var slots = new ArrayList<SlotDefinition>();
-    slots.add(homeSlot(menuSpec, rows, uuid, homeName));
-    slots.add(teleportSlot(menuSpec, rows, homeName));
-    slots.add(renameSlot(menuSpec, rows, homeName));
-    slots.add(pinSlot(menuSpec, rows, homeName, pinned));
-    slots.add(iconSlot(menuSpec, rows, homeName));
-    slots.add(deleteSlot(menuSpec, rows, homeName));
-    slots.add(backSlot(menuSpec, rows));
+    slots.add(homeSlot(options, rows, uuid, homeName));
+    slots.add(teleportSlot(options, rows, homeName));
+    slots.add(renameSlot(options, rows, homeName));
+    slots.add(pinSlot(options, rows, homeName, pinned));
+    slots.add(iconSlot(options, rows, homeName));
+    slots.add(deleteSlot(options, rows, homeName));
+    slots.add(backSlot(options, rows));
     return slots;
   }
 
@@ -102,15 +101,18 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   }
 
   private SlotDefinition homeSlot(
-      @NonNull HomesMenuConfig menuSpec, int rows, @NonNull java.util.UUID uuid, String homeName) {
-    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsHomeSlot(), rows, 4);
+      @NonNull HomesOptionsMenuConfig options,
+      int rows,
+      @NonNull java.util.UUID uuid,
+      String homeName) {
+    var safeSlot = MenuLayouts.sanitizeSlot(options.homeSlot(), rows, 4);
     if (homeName == null) {
-      return SlotDefinition.of(safeSlot, missingTemplate(menuSpec), click -> {});
+      return SlotDefinition.of(safeSlot, missingTemplate(options), click -> {});
     }
 
     var home = this.service.findHome(uuid, homeName);
     if (home.isEmpty()) {
-      return SlotDefinition.of(safeSlot, missingTemplate(menuSpec), click -> {});
+      return SlotDefinition.of(safeSlot, missingTemplate(options), click -> {});
     }
 
     var template = this.renderer.render(home.get());
@@ -118,71 +120,60 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   }
 
   private SlotDefinition teleportSlot(
-      @NonNull HomesMenuConfig menuSpec, int rows, String homeName) {
+      @NonNull HomesOptionsMenuConfig options, int rows, String homeName) {
     var template =
         buttonTemplate(
-            menuSpec.optionsTeleportMaterial(),
-            menuSpec.optionsTeleportName(),
-            menuSpec.optionsTeleportLore(),
-            homeName);
-    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsTeleportSlot(), rows, 11);
+            options.teleportMaterial(), options.teleportName(), options.teleportLore(), homeName);
+    var safeSlot = MenuLayouts.sanitizeSlot(options.teleportSlot(), rows, 11);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::teleport);
   }
 
-  private SlotDefinition renameSlot(@NonNull HomesMenuConfig menuSpec, int rows, String homeName) {
+  private SlotDefinition renameSlot(
+      @NonNull HomesOptionsMenuConfig options, int rows, String homeName) {
     var template =
         buttonTemplate(
-            menuSpec.optionsRenameMaterial(),
-            menuSpec.optionsRenameName(),
-            menuSpec.optionsRenameLore(),
-            homeName);
-    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsRenameSlot(), rows, 12);
+            options.renameMaterial(), options.renameName(), options.renameLore(), homeName);
+    var safeSlot = MenuLayouts.sanitizeSlot(options.renameSlot(), rows, 12);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::rename);
   }
 
   private SlotDefinition pinSlot(
-      @NonNull HomesMenuConfig menuSpec, int rows, String homeName, boolean pinned) {
-    var material = pinned ? menuSpec.optionsUnpinMaterial() : menuSpec.optionsPinMaterial();
-    var nameTemplate = pinned ? menuSpec.optionsUnpinName() : menuSpec.optionsPinName();
-    var loreTemplate = pinned ? menuSpec.optionsUnpinLore() : menuSpec.optionsPinLore();
+      @NonNull HomesOptionsMenuConfig options, int rows, String homeName, boolean pinned) {
+    var material = pinned ? options.unpinMaterial() : options.pinMaterial();
+    var nameTemplate = pinned ? options.unpinName() : options.pinName();
+    var loreTemplate = pinned ? options.unpinLore() : options.pinLore();
 
     var template = buttonTemplate(material, nameTemplate, loreTemplate, homeName);
-    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsPinSlot(), rows, 13);
+    var safeSlot = MenuLayouts.sanitizeSlot(options.pinSlot(), rows, 13);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::togglePin);
   }
 
-  private SlotDefinition iconSlot(@NonNull HomesMenuConfig menuSpec, int rows, String homeName) {
+  private SlotDefinition iconSlot(
+      @NonNull HomesOptionsMenuConfig options, int rows, String homeName) {
     var template =
-        buttonTemplate(
-            menuSpec.optionsIconMaterial(),
-            menuSpec.optionsIconName(),
-            menuSpec.optionsIconLore(),
-            homeName);
-    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsIconSlot(), rows, 14);
+        buttonTemplate(options.iconMaterial(), options.iconName(), options.iconLore(), homeName);
+    var safeSlot = MenuLayouts.sanitizeSlot(options.iconSlot(), rows, 14);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::changeIcon);
   }
 
-  private SlotDefinition deleteSlot(@NonNull HomesMenuConfig menuSpec, int rows, String homeName) {
+  private SlotDefinition deleteSlot(
+      @NonNull HomesOptionsMenuConfig options, int rows, String homeName) {
     var template =
         buttonTemplate(
-            menuSpec.optionsDeleteMaterial(),
-            menuSpec.optionsDeleteName(),
-            menuSpec.optionsDeleteLore(),
-            homeName);
-    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsDeleteSlot(), rows, 15);
+            options.deleteMaterial(), options.deleteName(), options.deleteLore(), homeName);
+    var safeSlot = MenuLayouts.sanitizeSlot(options.deleteSlot(), rows, 15);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::delete);
   }
 
-  private SlotDefinition backSlot(@NonNull HomesMenuConfig menuSpec, int rows) {
+  private SlotDefinition backSlot(@NonNull HomesOptionsMenuConfig options, int rows) {
     var template =
-        MenuTemplates.simple(
-            menuSpec.optionsBackMaterial(), menuSpec.optionsBackName(), menuSpec.optionsBackLore());
-    var safeSlot = MenuLayouts.sanitizeSlot(menuSpec.optionsBackSlot(), rows, 22);
+        MenuTemplates.simple(options.backMaterial(), options.backName(), options.backLore());
+    var safeSlot = MenuLayouts.sanitizeSlot(options.backSlot(), rows, 22);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::back);
   }
@@ -199,9 +190,8 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     return MenuTemplates.simple(material, name, lore);
   }
 
-  private static ItemTemplate missingTemplate(@NonNull HomesMenuConfig menuSpec) {
-    return MenuTemplates.simple(
-        menuSpec.optionsBackMaterial(), "<red>Home indisponível", List.of());
+  private static ItemTemplate missingTemplate(@NonNull HomesOptionsMenuConfig options) {
+    return MenuTemplates.simple(options.backMaterial(), "<red>Home indisponível", List.of());
   }
 
   // The inventory title is fixed at menu registration, so the {name} placeholder cannot be

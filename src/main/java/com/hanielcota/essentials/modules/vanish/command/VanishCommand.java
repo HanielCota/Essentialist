@@ -46,7 +46,7 @@ public record VanishCommand(
     var self = Senders.isSelf(sender, subject);
 
     var newlyVanished = this.transitions.toggle(subject);
-    var messages = snap.toggle(newlyVanished);
+    var messages = snap.messages().toggle(newlyVanished);
 
     if (self) {
       var selfMsg = messages.forSender(true, name);

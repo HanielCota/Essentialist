@@ -7,6 +7,7 @@ import com.github.hanielcota.menuframework.api.MenuSession;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesCategoryMenuConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialCategorySection;
 import java.lang.reflect.InvocationHandler;
@@ -24,7 +25,7 @@ class MaterialCategoryMenuTest {
         new MaterialCategoryMenu(
             config(config), new MaterialCategoryClickHandler(new HomesActionTarget()));
     var slots = dynamicSlotsOf(menu);
-    var backSlot = MaterialCategorySection.backSlot(config.menu());
+    var backSlot = MaterialCategorySection.backSlot(config.menu().category());
 
     var hasBackButton = slots.stream().anyMatch(slot -> slot.slot() == backSlot);
 
@@ -85,22 +86,27 @@ class MaterialCategoryMenuTest {
 
   private static HomesMenuConfig menuWithCategoryBack(HomesMenuConfig original, boolean enabled)
       throws Exception {
-    var components = HomesMenuConfig.class.getRecordComponents();
-    var values = new Object[components.length];
-    var types = new Class<?>[components.length];
+    var originalCategory = original.category();
+    var newCategory =
+        new HomesCategoryMenuConfig(
+            originalCategory.title(),
+            originalCategory.rows(),
+            originalCategory.contentSlots(),
+            originalCategory.itemName(),
+            originalCategory.itemLore(),
+            originalCategory.names(),
+            enabled,
+            originalCategory.backSlot(),
+            originalCategory.backMaterial(),
+            originalCategory.backName(),
+            originalCategory.backLore());
 
-    for (var i = 0; i < components.length; i++) {
-      var component = components[i];
-      types[i] = component.getType();
-      values[i] = component.getAccessor().invoke(original);
-
-      if ("categoryBackEnabled".equals(component.getName())) {
-        values[i] = enabled;
-      }
-    }
-
-    var constructor = HomesMenuConfig.class.getDeclaredConstructor(types);
-    return constructor.newInstance(values);
+    return new HomesMenuConfig(
+        original.main(),
+        newCategory,
+        original.picker(),
+        original.deleteDialog(),
+        original.options());
   }
 
   private static ConfigHandle<HomesConfig> config(HomesConfig value) {

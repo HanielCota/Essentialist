@@ -15,6 +15,7 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaBehaviorSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaBlockedMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHelpInfoMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHelpMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHistoryMenuState;
 import com.hanielcota.essentials.modules.tpa.menu.TpaHubClickHandler;
@@ -23,6 +24,7 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaPickPlayerMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaPrivacySettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaProfileMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaSettingsMenu;
+import com.hanielcota.essentials.modules.tpa.menu.TpaTargetActionClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.TpaTargetActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.favorites.TpaFavoriteActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.favorites.TpaFavoritesMenu;
@@ -31,6 +33,7 @@ import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHistoryEntryRenderer;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaProfileMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
 import com.hanielcota.essentials.modules.tpa.service.TpaContactService;
@@ -55,7 +58,8 @@ public final class TpaMenuBootstrap {
   public TpaHistoryMenuState registerHistoryMenu(@NonNull AsyncTpaHistory history) {
     var menuState = new TpaHistoryMenuState();
     var entryRenderer = new TpaHistoryEntryRenderer(this.config);
-    var menu = new TpaHistoryMenu(this.config, history, entryRenderer, menuState);
+    var clickHandler = new TpaHistoryClickHandler(this.config, menuState);
+    var menu = new TpaHistoryMenu(this.config, history, entryRenderer, menuState, clickHandler);
 
     this.registrar.menu(menu);
 
@@ -77,7 +81,8 @@ public final class TpaMenuBootstrap {
         new TpaHelpMenu(this.config, profiles, requests, favorites, contacts, clickHandler);
     this.registrar.menu(helpMenu);
 
-    var profileMenu = new TpaProfileMenu(this.config, profiles, requests, contacts);
+    var profileRenderer = new TpaProfileMenuRenderer(this.config, profiles, requests, contacts);
+    var profileMenu = new TpaProfileMenu(this.config, profileRenderer);
     this.registrar.menu(profileMenu);
 
     var helpInfoMenu = new TpaHelpInfoMenu(this.config);
@@ -185,8 +190,8 @@ public final class TpaMenuBootstrap {
       @NonNull TpaSendOrchestrator dispatcher) {
     var players = this.env.service(PlayerProvider.class);
     var actors = this.env.service(ActorFactory.class);
-    var menu =
-        new TpaTargetActionMenu(
+    var clickHandler =
+        new TpaTargetActionClickHandler(
             this.config,
             selections,
             favorites,
@@ -194,6 +199,7 @@ public final class TpaMenuBootstrap {
             players,
             actors,
             dispatcher);
+    var menu = new TpaTargetActionMenu(this.config, selections, favorites, clickHandler);
 
     this.registrar.menu(menu);
 

@@ -2,7 +2,7 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
+import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuConfig;
 import java.lang.reflect.Constructor;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,7 +13,7 @@ class HomeMenuPlaceholdersTest {
 
   @Test
   void formatsCreatedDateAndTimeFromMillis() {
-    var settings = HomesMenuConfig.defaults();
+    var settings = HomesMainMenuConfig.defaults();
     var moment = LocalDateTime.of(2026, 5, 25, 15, 42);
     var millis = moment.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
@@ -26,7 +26,7 @@ class HomeMenuPlaceholdersTest {
 
   @Test
   void convertsMinecraftYawToCardinalDirection() {
-    var settings = HomesMenuConfig.defaults();
+    var settings = HomesMainMenuConfig.defaults();
     var millis = System.currentTimeMillis();
 
     assertEquals(
@@ -57,7 +57,7 @@ class HomeMenuPlaceholdersTest {
 
   @Test
   void fallsBackToStoredWorldNameWhenDisplayNameIsNotConfigured() {
-    var settings = HomesMenuConfig.defaults();
+    var settings = HomesMainMenuConfig.defaults();
     var millis = System.currentTimeMillis();
 
     var placeholders = HomeMenuPlaceholders.of("arena", 0, 0, 0, 0, millis, 0L, 0L, settings);
@@ -65,10 +65,10 @@ class HomeMenuPlaceholdersTest {
     assertEquals("arena", placeholders.world());
   }
 
-  private static HomesMenuConfig settingsWithWorldNames(Map<String, String> worldNames)
+  private static HomesMainMenuConfig settingsWithWorldNames(Map<String, String> worldNames)
       throws Exception {
-    var original = HomesMenuConfig.defaults();
-    var components = HomesMenuConfig.class.getRecordComponents();
+    var original = HomesMainMenuConfig.defaults();
+    var components = HomesMainMenuConfig.class.getRecordComponents();
     var values = new Object[components.length];
     var types = new Class<?>[components.length];
 
@@ -82,7 +82,8 @@ class HomeMenuPlaceholdersTest {
       }
     }
 
-    Constructor<HomesMenuConfig> constructor = HomesMenuConfig.class.getDeclaredConstructor(types);
+    Constructor<HomesMainMenuConfig> constructor =
+        HomesMainMenuConfig.class.getDeclaredConstructor(types);
     return constructor.newInstance(values);
   }
 }

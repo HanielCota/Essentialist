@@ -13,6 +13,7 @@ public final class ModuleFilter {
 
   public static List<Module> enabled(
       @NonNull Collection<Module> modules, @NonNull ModuleSettings settings) {
+
     var enabled = new ArrayList<Module>();
 
     for (var module : modules) {
