@@ -1,7 +1,8 @@
-package com.hanielcota.essentials.modules.homes.service;
+package com.hanielcota.essentials.modules.homes.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
+import com.hanielcota.essentials.modules.homes.service.HomeService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;

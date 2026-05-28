@@ -27,12 +27,19 @@ import com.hanielcota.essentials.modules.tpa.menu.TpaSettingsMenu;
 import com.hanielcota.essentials.modules.tpa.menu.TpaTargetActionClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.TpaTargetActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.favorites.TpaFavoriteActionMenu;
+import com.hanielcota.essentials.modules.tpa.menu.favorites.TpaFavoriteClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.favorites.TpaFavoritesMenu;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingActionMenu;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingBulkActions;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingClickHandler;
 import com.hanielcota.essentials.modules.tpa.menu.pending.TpaPendingMenu;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingActionRenderer;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteBrowser;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaFavoriteMenuRenderer;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHelpMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaHistoryEntryRenderer;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPendingMenuRenderer;
+import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaPickPlayerMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.menu.presentation.TpaProfileMenuRenderer;
 import com.hanielcota.essentials.modules.tpa.service.TeleportRequestService;
 import com.hanielcota.essentials.modules.tpa.service.TpaBlockService;
@@ -77,8 +84,10 @@ public final class TpaMenuBootstrap {
       @NonNull TpaSendOrchestrator dispatcher) {
     var actors = this.env.service(ActorFactory.class);
     var clickHandler = new TpaHubClickHandler(this.config, requests, actors);
+    var helpRenderer = new TpaHelpMenuRenderer();
     var helpMenu =
-        new TpaHelpMenu(this.config, profiles, requests, favorites, contacts, clickHandler);
+        new TpaHelpMenu(
+            this.config, profiles, requests, favorites, contacts, clickHandler, helpRenderer);
     this.registrar.menu(helpMenu);
 
     var profileRenderer = new TpaProfileMenuRenderer(this.config, profiles, requests, contacts);
@@ -99,14 +108,18 @@ public final class TpaMenuBootstrap {
             this.config,
             requestService,
             shared.acceptHandler(),
+            shared.teleportNotifier(),
             shared.replyNotifier(),
             shared.callbacks(),
             shared.actors());
     var clickHandler = new TpaPendingClickHandler(selections, bulkActions);
+    var pendingRenderer = new TpaPendingMenuRenderer();
     var pendingMenu =
-        new TpaPendingMenu(this.config, requestService, clickHandler, shared.players());
+        new TpaPendingMenu(
+            this.config, requestService, clickHandler, shared.players(), pendingRenderer);
     this.registrar.menu(pendingMenu);
 
+    var actionRenderer = new TpaPendingActionRenderer();
     var actionMenu =
         new TpaPendingActionMenu(
             this.config,
@@ -114,9 +127,11 @@ public final class TpaMenuBootstrap {
             blocks,
             selections,
             shared.acceptHandler(),
+            shared.teleportNotifier(),
             shared.replyNotifier(),
             shared.callbacks(),
-            shared.actors());
+            shared.actors(),
+            actionRenderer);
     this.registrar.menu(actionMenu);
 
     var menus = this.env.service(MenuService.class);
@@ -149,16 +164,16 @@ public final class TpaMenuBootstrap {
       @NonNull TpaProfileService profiles,
       @NonNull TpaRuntimeBootstrap.FavoriteRuntime favoriteRuntime) {
     var players = this.env.service(PlayerProvider.class);
-    var menu =
-        new TpaFavoritesMenu(
-            this.config,
+    var browser = new TpaFavoriteBrowser(this.config, favorites, contacts, players);
+    var clicks =
+        new TpaFavoriteClickHandler(
             favorites,
-            contacts,
             profiles,
             favoriteRuntime.selections(),
             favoriteRuntime.orchestrator(),
-            favoriteRuntime.addNotifier(),
-            players);
+            favoriteRuntime.addNotifier());
+    var renderer = new TpaFavoriteMenuRenderer(players);
+    var menu = new TpaFavoritesMenu(this.config, profiles, browser, clicks, renderer);
 
     this.registrar.menu(menu);
   }
@@ -214,7 +229,9 @@ public final class TpaMenuBootstrap {
     var players = this.env.service(PlayerProvider.class);
     var filters = new TpaPickPlayerFilters();
     var candidates = new TpaPickPlayerCandidates(players, favorites, contacts);
-    var menu = new TpaPickPlayerMenu(this.config, selections, filters, candidates);
+    var pickRenderer = new TpaPickPlayerMenuRenderer();
+    var menu =
+        new TpaPickPlayerMenu(this.config, selections, filters, candidates, pickRenderer);
 
     this.registrar.menu(menu);
 

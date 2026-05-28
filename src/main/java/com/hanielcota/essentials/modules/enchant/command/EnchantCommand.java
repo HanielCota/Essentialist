@@ -82,18 +82,18 @@ public record EnchantCommand(ConfigHandle<EnchantConfig> config, EnchantService 
   public CommandResult clear(@NonNull CommandActor sender) {
     var snap = this.config.value();
     var player = sender.unwrap(Player.class);
-    var removed = this.service.clearAll(player);
+    var result = this.service.clearAll(player);
 
-    if (removed < 0) {
-      return CommandResult.invalidUsage(snap.emptyHand());
-    }
-
-    if (removed == 0) {
-      return CommandResult.invalidUsage(snap.nothingToClear());
-    }
-
-    var clearedMsg = snap.formatCleared(removed);
-    sender.sendSuccess(clearedMsg);
-    return CommandResult.success();
+    return switch (result) {
+      case EnchantService.ClearResult.EmptyHand ignored ->
+          CommandResult.invalidUsage(snap.emptyHand());
+      case EnchantService.ClearResult.NothingToClear ignored ->
+          CommandResult.invalidUsage(snap.nothingToClear());
+      case EnchantService.ClearResult.Cleared cleared -> {
+        var clearedMsg = snap.formatCleared(cleared.removed());
+        sender.sendSuccess(clearedMsg);
+        yield CommandResult.success();
+      }
+    };
   }
 }

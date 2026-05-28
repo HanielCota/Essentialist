@@ -11,12 +11,10 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
 import com.hanielcota.essentials.modules.info.menu.presentation.InfoMenuRenderer;
-import com.hanielcota.essentials.modules.info.menu.presentation.PlayerInfoEntries;
-import com.hanielcota.essentials.modules.info.menu.presentation.PluginInfoEntries;
-import com.hanielcota.essentials.modules.info.menu.presentation.ServerInfoEntries;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.List;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 /**
@@ -24,26 +22,16 @@ import org.bukkit.entity.Player;
  * via {@link ClickContext#refresh()} — it never opens a separate menu, which keeps the framework's
  * navigation history and session intact.
  */
+@RequiredArgsConstructor
 public final class InfoMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.info";
 
   private static final int MIN_ROWS = 1;
 
-  private final ConfigHandle<InfoConfig> config;
-  private final InfoMenuState state;
-  private final InfoMenuRenderer renderer;
-
-  public InfoMenu(
-      @NonNull ConfigHandle<InfoConfig> config,
-      @NonNull ServerInfoEntries serverEntries,
-      @NonNull PlayerInfoEntries playerEntries,
-      @NonNull PluginInfoEntries pluginEntries,
-      @NonNull InfoMenuState state) {
-    this.config = config;
-    this.state = state;
-    this.renderer = new InfoMenuRenderer(config, serverEntries, playerEntries, pluginEntries);
-  }
+  private final @NonNull ConfigHandle<InfoConfig> config;
+  private final @NonNull InfoMenuState state;
+  private final @NonNull InfoMenuRenderer renderer;
 
   @Override
   public @NonNull String id() {

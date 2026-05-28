@@ -11,6 +11,7 @@ import com.hanielcota.essentials.modules.nick.command.NickNotifier;
 import com.hanielcota.essentials.modules.nick.command.RealNameCommand;
 import com.hanielcota.essentials.modules.nick.config.NickConfig;
 import com.hanielcota.essentials.modules.nick.listener.NickJoinListener;
+import com.hanielcota.essentials.modules.nick.repository.CachedNickRepository;
 import com.hanielcota.essentials.modules.nick.repository.NickCache;
 import com.hanielcota.essentials.modules.nick.repository.NickRepository;
 import com.hanielcota.essentials.modules.nick.repository.NickTable;
@@ -36,17 +37,19 @@ public final class NickModule extends AbstractModule {
     var table = new NickTable(dialect);
     table.install(executor);
 
-    var repository = new SqlNickRepository(executor, table);
-    var existing = repository.list();
+    var sqlRepository = new SqlNickRepository(executor, table);
+    var existing = sqlRepository.list();
 
     var writerFactory = env.service(AsyncDatabaseWriter.Factory.class);
     var writer = writerFactory.create("Nicks");
     registrar.closeable(writer);
 
-    var cache = new NickCache(repository, writer);
+    var cache = new NickCache();
     cache.loadAll(existing);
 
-    var service = new NickService(cache);
+    var repository = new CachedNickRepository(sqlRepository, cache, writer);
+    var service = new NickService(repository);
+
     registrar.provide(NickRepository.class, repository);
     registrar.provide(NickService.class, service);
 

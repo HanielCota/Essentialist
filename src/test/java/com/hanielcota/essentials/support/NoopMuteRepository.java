@@ -5,6 +5,7 @@ import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 
@@ -14,6 +15,11 @@ public enum NoopMuteRepository implements MuteRepository {
   @Override
   public List<Map.Entry<UUID, Mute>> listActive(@NonNull Instant now) {
     return List.of();
+  }
+
+  @Override
+  public Optional<Mute> findActive(@NonNull UUID id, @NonNull Instant now) {
+    return Optional.empty();
   }
 
   @Override

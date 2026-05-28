@@ -11,24 +11,26 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-final class TpaRequestRecorder {
+public final class TpaRequestRecorder {
 
   private final @NonNull TpaHistory history;
   private final @NonNull TpaProfileService profiles;
   private final @NonNull TpaContactService contacts;
 
-  void recordCreated(@NonNull UUID requesterId, @NonNull UUID targetId) {
+  public void recordCreated(@NonNull UUID requesterId, @NonNull UUID targetId) {
     this.profiles.recordSent(requesterId);
     this.profiles.recordReceived(targetId);
   }
 
-  void recordTerminal(@NonNull TeleportRequest request, @NonNull TeleportRequestStatus status) {
+  public void recordTerminal(
+      @NonNull TeleportRequest request, @NonNull TeleportRequestStatus status) {
     var entry = TpaHistoryEntry.of(request, status);
 
     this.history.push(entry);
   }
 
-  boolean recordExecution(@NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
+  public boolean recordExecution(
+      @NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
     if (!execution.succeeded()) {
       recordTerminal(request, TeleportRequestStatus.CANCELLED);
       return false;
@@ -42,11 +44,11 @@ final class TpaRequestRecorder {
     return true;
   }
 
-  void recordTeleportFailure(@NonNull TeleportRequest request) {
+  public void recordTeleportFailure(@NonNull TeleportRequest request) {
     recordTerminal(request, TeleportRequestStatus.CANCELLED);
   }
 
-  void recordTeleportSuccess(
+  public void recordTeleportSuccess(
       @NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
     var destination = execution.optionalDestination().orElseThrow();
     var entry = TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, destination);

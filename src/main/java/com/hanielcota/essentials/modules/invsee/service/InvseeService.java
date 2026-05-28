@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.invsee.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -13,9 +14,10 @@ import org.bukkit.inventory.Inventory;
  * <p>Inventory slot layout constants live in {@link InvseeLayout} so listeners can reason about
  * locked-slot ranges without depending on the service.
  */
+@RequiredArgsConstructor
 public final class InvseeService {
 
-  private final InvseeLocks locks = new InvseeLocks();
+  private final @NonNull InvseeLocks locks;
 
   /**
    * Builds the /invsee GUI for {@code target}. Returns empty when another viewer already holds the

@@ -1,14 +1,18 @@
 package com.hanielcota.essentials.service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiConsumer;
 import lombok.NonNull;
 
 public final class DefaultServiceRegistry implements ServiceRegistry {
 
   private final Map<Class<?>, Object> services = new ConcurrentHashMap<>();
+  private final List<BiConsumer<Class<?>, Object>> listeners = new CopyOnWriteArrayList<>();
 
   @Override
   public <T> void register(@NonNull Class<T> type, @NonNull T instance) {
@@ -17,6 +21,14 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
     if (previous != null) {
       var typeName = type.getName();
       throw new IllegalStateException("Service already registered: " + typeName);
+    }
+
+    notifyListeners(type, instance);
+  }
+
+  private void notifyListeners(@NonNull Class<?> type, @NonNull Object instance) {
+    for (var listener : this.listeners) {
+      listener.accept(type, instance);
     }
   }
 
@@ -52,16 +64,7 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
   }
 
   @Override
-  public <T> Optional<T> findAssignable(@NonNull Class<T> targetType) {
-    for (var entry : this.services.entrySet()) {
-      var registeredType = entry.getKey();
-
-      if (targetType.isAssignableFrom(registeredType)) {
-        var instance = targetType.cast(entry.getValue());
-        return Optional.of(instance);
-      }
-    }
-
-    return Optional.empty();
+  public void addRegistrationListener(@NonNull BiConsumer<Class<?>, Object> listener) {
+    this.listeners.add(listener);
   }
 }

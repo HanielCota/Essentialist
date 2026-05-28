@@ -12,15 +12,17 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Routes the two phases of a {@code /tpaccept}: the synchronous claim outcome (so accepter and
- * requester are notified immediately) and the deferred teleport outcome (so a teleport failure can
- * be reported without making the success messages wait for the async teleport to land).
+ * Routes the synchronous claim outcome of {@code /tpaccept}: each {@link AcceptOutcome} variant is
+ * dispatched onto a notification method via the {@link #routes} table.
+ *
+ * <p>The deferred teleport outcome (success/failure messaging after the async teleport lands) lives
+ * in {@link TpAcceptTeleportNotifier} — keeping the two flows in separate classes preserves SRP.
  */
 @RequiredArgsConstructor
 public final class TpAcceptOutcomeHandler {
 
-  private final ConfigHandle<TpaConfig> config;
-  private final TpaRequestReplyNotifier replyNotifier;
+  private final @NonNull ConfigHandle<TpaConfig> config;
+  private final @NonNull TpaRequestReplyNotifier replyNotifier;
   private final Map<AcceptOutcome, ResultRoute> routes = buildRoutes();
 
   private Map<AcceptOutcome, ResultRoute> buildRoutes() {
@@ -52,17 +54,6 @@ public final class TpAcceptOutcomeHandler {
     if (route != null) {
       route.handle(request, messages, actor);
     }
-  }
-
-  public void handleTeleportOutcome(boolean success, @NonNull CommandActor actor) {
-    if (success) {
-      return;
-    }
-
-    var snap = this.config.value();
-    var messages = snap.messages();
-
-    actor.sendError(messages.teleportFailed());
   }
 
   private void notifyAccepted(

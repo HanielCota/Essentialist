@@ -1,16 +1,15 @@
 package com.hanielcota.essentials.modules.warps.domain;
 
-import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 /**
  * One persisted server warp.
  *
  * <p>Stores the world name (not a live {@code World}) so the record stays valid across reloads.
- * {@link #resolve()} returns empty when the world is no longer available.
+ * Materialization back into a {@link Location} lives in {@code WarpResolver} — the domain record
+ * is a pure value carrier.
  */
 public record Warp(
     @NonNull String name,
@@ -37,17 +36,5 @@ public record Warp(
     var currentTime = System.currentTimeMillis();
 
     return new Warp(name, worldName, x, y, z, yaw, pitch, currentTime, createdBy);
-  }
-
-  /** Materializes the warp back into a Bukkit location, or empty when the world is unloaded. */
-  public Optional<Location> resolve() {
-    var worldInstance = Bukkit.getWorld(this.world);
-
-    if (worldInstance == null) {
-      return Optional.empty();
-    }
-
-    var location = new Location(worldInstance, this.x, this.y, this.z, this.yaw, this.pitch);
-    return Optional.of(location);
   }
 }

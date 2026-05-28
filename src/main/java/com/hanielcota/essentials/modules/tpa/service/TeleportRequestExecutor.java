@@ -10,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Location;
 
 @RequiredArgsConstructor
-final class TeleportRequestExecutor {
+public final class TeleportRequestExecutor {
 
-  private final PlayerProvider players;
+  private final @NonNull PlayerProvider players;
 
   private static TeleportExecution mapOutcome(Boolean success, @NonNull Location landing) {
     if (!Boolean.TRUE.equals(success)) {
@@ -23,7 +23,7 @@ final class TeleportRequestExecutor {
     return TeleportExecution.success(destination);
   }
 
-  CompletableFuture<TeleportExecution> execute(@NonNull TeleportRequest request) {
+  public CompletableFuture<TeleportExecution> execute(@NonNull TeleportRequest request) {
     var requesterId = request.requester().id();
     var requester = this.players.online(requesterId).orElse(null);
 

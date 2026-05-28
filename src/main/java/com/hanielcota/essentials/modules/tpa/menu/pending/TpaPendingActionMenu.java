@@ -9,6 +9,7 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.PaginatedMenus;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptTeleportNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.menu.TpaPendingActionMenuConfig;
@@ -39,15 +40,25 @@ public final class TpaPendingActionMenu implements EssentialsMenu {
       @NonNull TpaBlockService blocks,
       @NonNull TpaPendingSelections selections,
       @NonNull TpAcceptOutcomeHandler acceptHandler,
+      @NonNull TpAcceptTeleportNotifier teleportNotifier,
       @NonNull TpaRequestReplyNotifier replyNotifier,
       @NonNull MainThreadCallbacks callbacks,
-      @NonNull ActorFactory actors) {
+      @NonNull ActorFactory actors,
+      @NonNull TpaPendingActionRenderer renderer) {
     this.config = config;
     this.selections = selections;
-    this.renderer = new TpaPendingActionRenderer();
+    this.renderer = renderer;
     this.handler =
         new TpaPendingActionClickHandler(
-            config, service, blocks, selections, acceptHandler, replyNotifier, callbacks, actors);
+            config,
+            service,
+            blocks,
+            selections,
+            acceptHandler,
+            teleportNotifier,
+            replyNotifier,
+            callbacks,
+            actors);
   }
 
   static List<Integer> contentSlots(@NonNull TpaPendingActionMenuConfig settings, int rows) {

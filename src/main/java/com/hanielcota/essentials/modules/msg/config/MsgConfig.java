@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.msg.config;
 
-import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
@@ -27,34 +26,5 @@ public record MsgConfig(
         "<red>O jogador <gold>{player}</gold> não está online.",
         "<red>Você ainda não conversou com ninguém.",
         "<red>O jogador <gold>{player}</gold> não está mais online.");
-  }
-
-  private static String fill(
-      @NonNull String template,
-      @NonNull String sender,
-      @NonNull String target,
-      @NonNull String body) {
-    var withSender = template.replace("{sender}", sender);
-    var withTarget = withSender.replace("{target}", target);
-
-    return withTarget.replace("{message}", body);
-  }
-
-  public String formatOutgoing(
-      @NonNull String sender, @NonNull String target, @NonNull String body) {
-    return fill(outgoingFormat, sender, target, body);
-  }
-
-  public String formatIncoming(
-      @NonNull String sender, @NonNull String target, @NonNull String body) {
-    return fill(incomingFormat, sender, target, body);
-  }
-
-  public String formatTargetUnavailable(@NonNull String player) {
-    return targetUnavailable.replace("{player}", player);
-  }
-
-  public String formatReplyPartnerUnavailable(@NonNull String player) {
-    return replyPartnerUnavailable.replace("{player}", player);
   }
 }

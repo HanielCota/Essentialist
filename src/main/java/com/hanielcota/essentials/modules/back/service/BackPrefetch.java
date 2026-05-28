@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.back.menu;
+package com.hanielcota.essentials.modules.back.service;
 
 import com.hanielcota.essentials.modules.teleport.history.TeleportHistory.HistoryEntry;
 import java.util.List;
@@ -7,7 +7,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 
-public final class BackMenuState {
+/**
+ * Stores the history snapshot that {@code /back} read on the main thread so the menu can render it
+ * without a second SQL hit on the click thread. Used by the menu via {@link BackEntryProvider},
+ * cleared on inventory close / quit.
+ */
+public final class BackPrefetch {
 
   private final Map<UUID, List<HistoryEntry>> prefetched = new ConcurrentHashMap<>();
 
@@ -15,7 +20,7 @@ public final class BackMenuState {
     this.prefetched.put(viewer, List.copyOf(entries));
   }
 
-  public List<HistoryEntry> consumePrefetch(@NonNull UUID viewer) {
+  public List<HistoryEntry> consume(@NonNull UUID viewer) {
     return this.prefetched.remove(viewer);
   }
 

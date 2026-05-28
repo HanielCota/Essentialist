@@ -3,7 +3,7 @@ package com.hanielcota.essentials.modules.mute.service;
 import com.hanielcota.essentials.api.MutesApi;
 import com.hanielcota.essentials.modules.mute.domain.Mute;
 import com.hanielcota.essentials.modules.mute.domain.MuteOutcome;
-import com.hanielcota.essentials.modules.mute.repository.MuteCache;
+import com.hanielcota.essentials.modules.mute.repository.MuteRepository;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,25 +12,22 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 /**
- * Application service for the mute use cases. Owns the {@link Mute} domain-object factory and cache
- * coordination so commands stay thin. Duration parsing is delegated to {@link MuteDurationParser}.
- * Permission checks are the caller's responsibility.
- *
- * <p>In-memory caching is delegated to {@link MuteCache} which handles cache eviction and async
- * persistence coordination.
+ * Application service for the mute use cases. Owns the {@link Mute} domain-object factory and
+ * delegates lookup/persistence to {@link MuteRepository} so the cache split stays invisible to
+ * callers.
  */
 @RequiredArgsConstructor
 public final class MuteService implements MutesApi {
 
-  private final @NonNull MuteCache cache;
+  private final @NonNull MuteRepository repository;
 
   public Optional<Mute> activeMute(@NonNull UUID id) {
-    return this.cache.activeMute(id);
+    return this.repository.findActive(id, Instant.now());
   }
 
   @Override
   public boolean isMuted(@NonNull UUID id) {
-    return this.cache.activeMute(id).isPresent();
+    return activeMute(id).isPresent();
   }
 
   /**
@@ -42,12 +39,12 @@ public final class MuteService implements MutesApi {
     var now = Instant.now();
     var mute = Mute.from(duration, now);
     var id = target.getUniqueId();
-    this.cache.apply(id, mute);
+    this.repository.save(id, mute);
 
     return new MuteOutcome.Muted(mute);
   }
 
   public boolean unmute(@NonNull UUID id) {
-    return this.cache.remove(id);
+    return this.repository.delete(id);
   }
 }

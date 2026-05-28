@@ -22,7 +22,8 @@ public final class FlyModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var fly = new FlyService();
-    var config = registrar.configure("fly", FlyConfig.class, FlyConfig::defaults, fly);
+    var config =
+        registrar.configure("fly", FlyConfig.class, FlyConfig::defaults, FlyService.class, fly);
     var scheduler = env.service(Scheduler.class);
     var actors = env.service(ActorFactory.class);
 

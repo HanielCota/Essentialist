@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.chat.channel;
 
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.chat.command.LocalChannelNotifier;
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -8,7 +9,6 @@ import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -31,9 +31,8 @@ public final class LocalChannel implements ChatChannel {
 
   public static final String ID = "local";
 
-  private static final MiniMessage MINI = MiniMessage.miniMessage();
-
-  private final ConfigHandle<ChatConfig> config;
+  private final @NonNull ConfigHandle<ChatConfig> config;
+  private final @NonNull LocalChannelNotifier notifier;
 
   @Override
   public String id() {
@@ -81,16 +80,7 @@ public final class LocalChannel implements ChatChannel {
       return false;
     }
 
-    var snap = this.config.value();
-    var local = snap.local();
-    var warning = local.noListenerWarning();
-    if (warning.isEmpty()) {
-      return true;
-    }
-
-    var component = MINI.deserialize(warning);
-    sender.sendMessage(component);
-
+    this.notifier.warnNoListeners(sender);
     return true;
   }
 

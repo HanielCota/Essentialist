@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.create.HomeCreateSessions;
 import com.hanielcota.essentials.modules.homes.service.HomeNameValidator;
+import com.hanielcota.essentials.modules.homes.service.HomePromptCancellation;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +29,6 @@ public final class HomeRenameOrchestrator {
   private final HomeRenameTimer timer;
   private final HomeRenameNotifier notifier;
 
-  private static boolean isCancel(@NonNull String input) {
-    return input.equalsIgnoreCase("cancel") || input.equalsIgnoreCase("cancelar");
-  }
-
   public void prompt(@NonNull Player player, @NonNull String homeName) {
     var snap = this.config.value();
     var timeout = snap.renameTimeout();
@@ -48,7 +45,7 @@ public final class HomeRenameOrchestrator {
   }
 
   public void handleInput(@NonNull Player player, @NonNull String oldName, @NonNull String input) {
-    if (isCancel(input)) {
+    if (HomePromptCancellation.isCancel(input)) {
       this.notifier.sendCancelled(player);
       return;
     }

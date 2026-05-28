@@ -1,13 +1,15 @@
 package com.hanielcota.essentials.bootstrap;
 
-import com.github.hanielcota.menuframework.api.MenuService;
 import com.hanielcota.essentials.core.EssentialsCore;
-import com.hanielcota.essentials.database.connection.DatabaseProvider;
-import java.util.function.Consumer;
+import com.hanielcota.essentials.core.ShutdownRegistry;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
- * Tears down already-registered infrastructure when a bootstrap stage fails. Extracted from {@link
- * EssentialsBootstrap} so rollback knowledge of concrete service types lives in one place.
+ * Tears down already-registered infrastructure when a bootstrap stage fails. The teardown order is
+ * defined exactly once, by the {@link ShutdownRegistry} that each successful stage populates —
+ * adding a new ordered service only requires registering a step in that stage, not editing this
+ * class.
  */
 final class BootstrapRollbackHandler {
 
@@ -15,20 +17,23 @@ final class BootstrapRollbackHandler {
 
   static void rollback(StageContext context, RuntimeException cause) {
     var services = context.services();
-    var core = services.find(EssentialsCore.class).orElse(null);
+    var coreHandle = services.find(EssentialsCore.class);
 
-    if (core != null) {
-      suppressAndRun(cause, core::shutdown);
+    if (coreHandle.isPresent()) {
+      suppressAndRun(cause, coreHandle.get()::shutdown);
       return;
     }
 
-    var databaseHandle = services.find(DatabaseProvider.class);
-    Consumer<DatabaseProvider> closeDatabase = db -> suppressAndRun(cause, db::close);
-    databaseHandle.ifPresent(closeDatabase);
+    var registryHandle = services.find(ShutdownRegistry.class);
+    if (registryHandle.isEmpty()) {
+      return;
+    }
 
-    var menuHandle = services.find(MenuService.class);
-    Consumer<MenuService> shutdownMenu = menu -> suppressAndRun(cause, menu::shutdown);
-    menuHandle.ifPresent(shutdownMenu);
+    var steps = new ArrayList<>(registryHandle.get().steps());
+    Collections.reverse(steps);
+    for (var step : steps) {
+      suppressAndRun(cause, step::run);
+    }
   }
 
   private static void suppressAndRun(RuntimeException primary, Runnable cleanup) {

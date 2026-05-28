@@ -3,37 +3,29 @@ package com.hanielcota.essentials.core;
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.api.EssentialsApi;
 import com.hanielcota.essentials.core.lifecycle.LifecyclePhase;
-import com.hanielcota.essentials.module.environment.ModuleContext;
-import com.hanielcota.essentials.module.registration.ModuleManager;
 import com.hanielcota.essentials.service.ServiceRegistry;
 import java.util.Optional;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Thin public API facade for the Essentialist plugin. Delegates lifecycle management to {@link
  * CoreLifecycle} and service resolution to {@link ServiceRegistry}.
  */
+@RequiredArgsConstructor
 public final class EssentialsCore implements EssentialsApi {
 
-  private final EssentialsPlugin plugin;
-  private final ServiceRegistry services;
-  private final CoreLifecycle lifecycle;
+  private final @NonNull ServiceRegistry services;
+  private final @NonNull CoreLifecycle lifecycle;
 
-  public EssentialsCore(@NonNull EssentialsPlugin plugin, @NonNull ServiceRegistry services) {
-    this.plugin = plugin;
-    this.services = services;
-    this.lifecycle = new CoreLifecycle(services);
+  public static EssentialsCore createDefault(
+      @NonNull EssentialsPlugin plugin, @NonNull ServiceRegistry services) {
+    var lifecycle = new CoreLifecycle(plugin, services);
+    return new EssentialsCore(services, lifecycle);
   }
 
   public void advance(@NonNull LifecyclePhase next) {
     this.lifecycle.advance(next);
-
-    if (next == LifecyclePhase.ENABLED) {
-      var moduleManager = this.services.resolve(ModuleManager.class);
-      var context = new ModuleContext(this.plugin, this.services);
-
-      moduleManager.enableAll(context);
-    }
   }
 
   public void shutdown() {
@@ -46,6 +38,6 @@ public final class EssentialsCore implements EssentialsApi {
 
   @Override
   public <T> Optional<T> api(@NonNull Class<T> apiType) {
-    return this.services.findAssignable(apiType);
+    return this.services.find(apiType);
   }
 }

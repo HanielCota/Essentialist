@@ -31,6 +31,7 @@ public final class TpaSendOrchestrator {
   private final TpaFavoriteService favorites;
   private final TpaProfileService profiles;
   private final TpAcceptOutcomeHandler acceptHandler;
+  private final TpAcceptTeleportNotifier teleportNotifier;
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
   private final TpaNotifier notifier;
@@ -103,7 +104,7 @@ public final class TpaSendOrchestrator {
     var pending = this.service.dispatchTeleport(request);
     this.callbacks.hop(
         pending,
-        success -> this.acceptHandler.handleTeleportOutcome(success, targetActor),
+        success -> this.teleportNotifier.notifyOutcome(success, targetActor),
         "tpa auto-accept");
   }
 

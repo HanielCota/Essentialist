@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.trash.command;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.trash.config.TrashConfig;
-import com.hanielcota.essentials.shared.ComponentUtils;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.Cooldown;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -14,7 +13,6 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
 import lombok.NonNull;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 @Command(value = "lixo", aliases = "trash")
@@ -24,7 +22,7 @@ import org.bukkit.entity.Player;
 @Cooldown(duration = "3s")
 @Description("Abre uma lixeira temporária para descartar itens.")
 @Syntax("/lixo")
-public record TrashCommand(ConfigHandle<TrashConfig> config) {
+public record TrashCommand(ConfigHandle<TrashConfig> config, TrashInventoryFactory factory) {
 
   @DefaultSubcommand
   public CommandResult execute(@NonNull CommandActor actor) {
@@ -32,11 +30,8 @@ public record TrashCommand(ConfigHandle<TrashConfig> config) {
     var snap = this.config.value();
     var size = snap.size();
     var title = snap.title();
-    var titleComponent = ComponentUtils.mini(title);
 
-    // No holder: nothing persists the inventory, so whatever is placed inside is discarded when
-    // the menu closes.
-    var trash = Bukkit.createInventory(null, size, titleComponent);
+    var trash = this.factory.create(size, title);
     player.openInventory(trash);
 
     return CommandResult.success();

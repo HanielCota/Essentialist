@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.module.environment;
 
-import io.github.hanielcota.commandframework.paper.PaperCommandFramework;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -18,14 +17,6 @@ public final class ModuleServices {
     // decides the winner, which is invisible at runtime.
     services.register(type, instance);
     this.owned.add(type);
-
-    var commandFrameworkOpt = services.find(PaperCommandFramework.class);
-    if (commandFrameworkOpt.isEmpty()) {
-      return;
-    }
-
-    var framework = commandFrameworkOpt.get();
-    framework.registerDependency(type, instance);
   }
 
   public void unregisterOwned(ModuleContext context) {

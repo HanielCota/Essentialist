@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.modules.mute.domain.Mute;
+import com.hanielcota.essentials.modules.mute.repository.CachedMuteRepository;
 import com.hanielcota.essentials.modules.mute.repository.MuteCache;
 import com.hanielcota.essentials.modules.mute.service.MuteService;
 import com.hanielcota.essentials.support.NoopAsyncDatabaseWriter;
@@ -18,11 +19,11 @@ class MutesApiAdapterTest {
 
   @Test
   void isMutedFollowsActiveMute() {
-    var cache = new MuteCache(NoopMuteRepository.INSTANCE, NoopAsyncDatabaseWriter.INSTANCE);
+    var cache = new MuteCache();
     var id = UUID.randomUUID();
     cache.loadAll(List.of(Map.entry(id, Mute.permanent())));
 
-    var api = new MuteService(cache);
+    var api = new MuteService(repository(cache));
 
     assertTrue(api.isMuted(id));
     assertFalse(api.isMuted(UUID.randomUUID()));
@@ -30,13 +31,18 @@ class MutesApiAdapterTest {
 
   @Test
   void activeMuteExposesTheUnderlyingMuteWhenPresent() {
-    var cache = new MuteCache(NoopMuteRepository.INSTANCE, NoopAsyncDatabaseWriter.INSTANCE);
+    var cache = new MuteCache();
     var id = UUID.randomUUID();
     var mute = Mute.permanent();
     cache.loadAll(List.of(Map.entry(id, mute)));
 
-    var api = new MuteService(cache);
+    var api = new MuteService(repository(cache));
 
     assertEquals(mute, api.activeMute(id).orElseThrow());
+  }
+
+  private static CachedMuteRepository repository(MuteCache cache) {
+    return new CachedMuteRepository(
+        NoopMuteRepository.INSTANCE, cache, NoopAsyncDatabaseWriter.INSTANCE);
   }
 }

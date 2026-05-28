@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.chat.channel;
 
 import com.hanielcota.essentials.modules.chat.config.ChatConfig;
 import com.hanielcota.essentials.modules.chat.service.ChatPermissions;
+import com.hanielcota.essentials.modules.chat.service.StaffAudience;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import java.util.UUID;
 import lombok.NonNull;
@@ -48,11 +49,6 @@ public final class StaffChannel implements ChatChannel {
       return false;
     }
 
-    var viewerId = viewer.getUniqueId();
-    if (viewerId.equals(senderId)) {
-      return false;
-    }
-
-    return !viewer.hasPermission(ChatPermissions.STAFF_RECEIVE);
+    return !StaffAudience.canHear(viewer, senderId);
   }
 }

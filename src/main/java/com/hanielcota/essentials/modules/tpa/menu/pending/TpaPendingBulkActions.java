@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.tpa.menu.pending;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.tpa.command.TpAcceptOutcomeHandler;
+import com.hanielcota.essentials.modules.tpa.command.TpAcceptTeleportNotifier;
 import com.hanielcota.essentials.modules.tpa.command.TpaRequestReplyNotifier;
 import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.config.TpaMessages;
@@ -27,6 +28,7 @@ public final class TpaPendingBulkActions {
   private final ConfigHandle<TpaConfig> config;
   private final TeleportRequestService service;
   private final TpAcceptOutcomeHandler acceptHandler;
+  private final TpAcceptTeleportNotifier teleportNotifier;
   private final TpaRequestReplyNotifier replyNotifier;
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
@@ -120,7 +122,7 @@ public final class TpaPendingBulkActions {
       var pendingTeleport = this.service.dispatchTeleport(request);
       this.callbacks.hop(
           pendingTeleport,
-          success -> this.acceptHandler.handleTeleportOutcome(success, actor),
+          success -> this.teleportNotifier.notifyOutcome(success, actor),
           "tpa accept-all");
       accepted++;
     }

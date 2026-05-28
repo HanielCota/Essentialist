@@ -20,7 +20,6 @@ public final class StageFactory {
         new MenuBootstrap(plugin),
         new UserStackBootstrap(plugin),
         new CoreInstanceStage(plugin),
-        new CommandMirrorStage(),
         new EnableModulesStage());
   }
 }

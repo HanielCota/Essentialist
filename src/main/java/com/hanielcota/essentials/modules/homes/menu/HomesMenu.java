@@ -40,7 +40,7 @@ public final class HomesMenu implements EssentialsMenu {
   private final HomesMenuState state;
   private final HomeCreateOrchestrator create;
   private final HomeOrderingPreferences orderings;
-  private final HomesSortRenderer sortRenderer = new HomesSortRenderer();
+  private final HomesSortRenderer sortRenderer;
 
   private static @NonNull ItemTemplate buildInfoTemplate(@NonNull HomesMainMenuConfig mainMenu) {
     var infoMaterial = mainMenu.infoMaterial();

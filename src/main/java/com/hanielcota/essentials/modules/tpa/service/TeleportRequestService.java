@@ -8,7 +8,6 @@ import com.hanielcota.essentials.modules.tpa.domain.TeleportRequest;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestStatus;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaCreationResult;
-import com.hanielcota.essentials.modules.tpa.history.TpaHistory;
 import com.hanielcota.essentials.modules.tpa.repository.RequestRepository;
 import com.hanielcota.essentials.paper.PlayerProvider;
 import java.util.List;
@@ -16,39 +15,25 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 /**
  * Application service for the teleport-request use cases: create, accept, deny, cancel, expire.
  *
  * <p>Sole responsibility: lifecycle and storage orchestration. It owns no state and renders no
- * messages — it delegates storage to {@link RequestRepository} and persistence to {@link
- * TpaHistory}. Player-facing notifications are the caller's responsibility.
+ * messages — it delegates storage to {@link RequestRepository} and bookkeeping to {@link
+ * TpaRequestRecorder}. Player-facing notifications are the caller's responsibility.
  */
+@RequiredArgsConstructor
 public final class TeleportRequestService {
 
-  private final ConfigHandle<TpaConfig> config;
-  private final RequestRepository store;
-  private final PlayerProvider players;
-  private final TpaRequestPolicy policy;
-  private final TpaRequestRecorder recorder;
-  private final TeleportRequestExecutor executor;
-
-  public TeleportRequestService(
-      @NonNull ConfigHandle<TpaConfig> config,
-      @NonNull RequestRepository store,
-      @NonNull TpaHistory history,
-      @NonNull PlayerProvider players,
-      @NonNull TpaProfileService profiles,
-      @NonNull TpaBlockService blocks,
-      @NonNull TpaContactService contacts) {
-    this.config = config;
-    this.store = store;
-    this.players = players;
-    this.policy = new TpaRequestPolicy(profiles, blocks);
-    this.recorder = new TpaRequestRecorder(history, profiles, contacts);
-    this.executor = new TeleportRequestExecutor(players);
-  }
+  private final @NonNull ConfigHandle<TpaConfig> config;
+  private final @NonNull RequestRepository store;
+  private final @NonNull PlayerProvider players;
+  private final @NonNull TpaRequestPolicy policy;
+  private final @NonNull TpaRequestRecorder recorder;
+  private final @NonNull TeleportRequestExecutor executor;
 
   public Optional<TpaCreationResult> create(
       @NonNull Player requester, @NonNull Player target, @NonNull TeleportRequestType type) {

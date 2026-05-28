@@ -20,7 +20,11 @@ public final class GamemodeModule extends AbstractModule {
     var gamemodeService = new GamemodeService();
     var config =
         registrar.configure(
-            "gamemode", GamemodeConfig.class, GamemodeConfig::defaults, gamemodeService);
+            "gamemode",
+            GamemodeConfig.class,
+            GamemodeConfig::defaults,
+            GamemodeService.class,
+            gamemodeService);
 
     var actors = env.service(ActorFactory.class);
     var gamemodeCommand = new GamemodeCommand(config, gamemodeService, actors);

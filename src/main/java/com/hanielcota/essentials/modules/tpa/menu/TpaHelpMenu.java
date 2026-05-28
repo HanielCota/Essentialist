@@ -56,7 +56,7 @@ public final class TpaHelpMenu implements EssentialsMenu {
   private final TpaFavoriteService favorites;
   private final TpaContactService contacts;
   private final TpaHubClickHandler clicks;
-  private final TpaHelpMenuRenderer renderer = new TpaHelpMenuRenderer();
+  private final TpaHelpMenuRenderer renderer;
 
   static List<Integer> contentSlots(@NonNull TpaHelpMenuConfig helpMenu, int rows) {
     return List.of(

@@ -3,8 +3,9 @@ package com.hanielcota.essentials.modules.homes.create;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.rename.HomeRenameSessions;
-import com.hanielcota.essentials.modules.homes.service.HomeLimitReachedMessageResolver;
+import com.hanielcota.essentials.modules.homes.command.HomeLimitReachedMessageResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeNameValidator;
+import com.hanielcota.essentials.modules.homes.service.HomePromptCancellation;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.scheduler.Scheduler;
 import com.hanielcota.essentials.scheduler.Task;
@@ -35,10 +36,6 @@ public final class HomeCreateOrchestrator {
   private final HomeCreateNotifier notifier;
   private final HomeLimitReachedMessageResolver limitReachedResolver;
 
-  private static boolean isCancel(@NonNull String input) {
-    return input.equalsIgnoreCase("cancel") || input.equalsIgnoreCase("cancelar");
-  }
-
   public void prompt(@NonNull Player player) {
     var snap = this.config.value();
     var timeout = snap.renameTimeout();
@@ -57,7 +54,7 @@ public final class HomeCreateOrchestrator {
 
   public void handleInput(
       @NonNull Player player, @NonNull Location location, @NonNull String input) {
-    if (isCancel(input)) {
+    if (HomePromptCancellation.isCancel(input)) {
       this.notifier.sendCancelled(player);
       return;
     }

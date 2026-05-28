@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +34,28 @@ public final class SqlMuteRepository implements MuteRepository {
   }
 
   /** Active mutes — permanent rows plus timed rows still in the future relative to {@code now}. */
+  @Override
   public List<Map.Entry<UUID, Mute>> listActive(@NonNull Instant now) {
     var cutoff = now.toEpochMilli();
 
     return this.sqlExecutor.query(MuteTable.SELECT_ACTIVE, SqlMuteRepository::readRow, cutoff);
   }
 
+  @Override
+  public Optional<Mute> findActive(@NonNull UUID id, @NonNull Instant now) {
+    var cutoff = now.toEpochMilli();
+    var idStr = id.toString();
+    var rows =
+        this.sqlExecutor.query(
+            MuteTable.SELECT_ACTIVE_BY_ID, SqlMuteRepository::readRow, idStr, cutoff);
+
+    if (rows.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(rows.get(0).getValue());
+  }
+
+  @Override
   public void save(@NonNull UUID id, @NonNull Mute mute) {
     var idStr = id.toString();
     var expiresAt = mute.expiresAt();
@@ -49,6 +66,7 @@ public final class SqlMuteRepository implements MuteRepository {
   }
 
   /** Deletes the mute. Returns {@code true} when a row was removed. */
+  @Override
   public boolean delete(@NonNull UUID id) {
     var idStr = id.toString();
     var affected = this.sqlExecutor.updateCount(MuteTable.DELETE, idStr);
@@ -57,6 +75,7 @@ public final class SqlMuteRepository implements MuteRepository {
   }
 
   /** Batch-evicts every timed mute whose expiry has already passed. */
+  @Override
   public int deleteExpired(@NonNull Instant now) {
     var cutoff = now.toEpochMilli();
 

@@ -4,6 +4,7 @@ import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.modules.warps.config.WarpsConfig;
+import com.hanielcota.essentials.modules.warps.service.WarpResolver;
 import com.hanielcota.essentials.modules.warps.service.WarpService;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 public record WarpCommand(
     ConfigHandle<WarpsConfig> config,
     WarpService service,
+    WarpResolver resolver,
     DelayedTeleport delayed,
     WarpPromptFactory promptFactory) {
 
@@ -53,7 +55,7 @@ public record WarpCommand(
       return CommandResult.invalidUsage(noPermMsg);
     }
 
-    var locationOpt = warp.resolve();
+    var locationOpt = this.resolver.resolve(warp);
     if (locationOpt.isEmpty()) {
       var worldGoneMsg = messages.worldGone();
       return CommandResult.invalidUsage(worldGoneMsg);

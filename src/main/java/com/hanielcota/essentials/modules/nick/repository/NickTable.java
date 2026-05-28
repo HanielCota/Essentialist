@@ -12,6 +12,17 @@ public final class NickTable extends SqlTable {
       FROM nicks\
       """;
 
+  static final String SELECT_BY_ID =
+      """
+      SELECT player_id, nickname, real_name \
+      FROM nicks WHERE player_id = ?\
+      """;
+
+  static final String SELECT_BY_NICKNAME =
+      """
+      SELECT player_id FROM nicks WHERE nickname = ?\
+      """;
+
   static final String DELETE =
       """
       DELETE FROM nicks WHERE player_id = ?\

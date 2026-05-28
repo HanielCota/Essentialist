@@ -15,13 +15,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class DefaultSqlExecutor implements SqlExecutor {
 
-  private final SqlConnectionFactory connectionFactory;
-  private final TransactionManager transactionManager;
-
-  public DefaultSqlExecutor(@NonNull SqlConnectionFactory connectionFactory) {
-    this.connectionFactory = connectionFactory;
-    this.transactionManager = new TransactionManager(connectionFactory);
-  }
+  private final @NonNull SqlConnectionFactory connectionFactory;
+  private final @NonNull TransactionManager transactionManager;
 
   @Override
   public <T> List<T> query(

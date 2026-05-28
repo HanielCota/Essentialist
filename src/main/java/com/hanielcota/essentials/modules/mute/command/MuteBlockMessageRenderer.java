@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.mute.service;
+package com.hanielcota.essentials.modules.mute.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.mute.config.MuteConfig;
