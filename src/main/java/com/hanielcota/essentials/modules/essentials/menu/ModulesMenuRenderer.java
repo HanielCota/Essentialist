@@ -5,7 +5,6 @@ import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.module.control.ModuleControl;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
@@ -24,25 +23,23 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class ModulesMenuRenderer {
 
-  private static final int ROW_WIDTH = 9;
-
   private final @NonNull ConfigHandle<EssentialsConfig> config;
   private final @NonNull ModuleControl control;
   private final @NonNull ModulesFilterRenderer filterRenderer;
 
   public List<SlotDefinition> slots(
       @NonNull ModuleCategory selected,
+      @NonNull ModulesMenuLayout layout,
       @NonNull ClickHandler onCycle,
       @NonNull BiConsumer<ClickContext, String> toggler) {
     var snap = this.config.value();
     var menu = snap.menu();
-    var rows = menu.effectiveRows();
 
     var slots = new ArrayList<SlotDefinition>();
 
     appendModules(slots, menu, selected, toggler);
-    appendInfo(slots, menu, rows);
-    appendFilter(slots, menu, selected, rows, onCycle);
+    appendInfo(slots, menu, layout.infoSlot());
+    appendFilter(slots, menu, selected, layout.filterSlot(), onCycle);
 
     return slots;
   }
@@ -62,9 +59,8 @@ public final class ModulesMenuRenderer {
   }
 
   private void appendInfo(
-      @NonNull List<SlotDefinition> slots, @NonNull ModulesMenuConfig menu, int rows) {
+      @NonNull List<SlotDefinition> slots, @NonNull ModulesMenuConfig menu, int infoSlot) {
     var info = menu.info();
-    var infoSlot = MenuLayouts.sanitizeSlot(info.slot(), rows, 4);
 
     var template = MenuTemplates.simple(info.material(), info.name(), info.lore());
 
@@ -75,11 +71,9 @@ public final class ModulesMenuRenderer {
       @NonNull List<SlotDefinition> slots,
       @NonNull ModulesMenuConfig menu,
       @NonNull ModuleCategory selected,
-      int rows,
+      int filterSlot,
       @NonNull ClickHandler onCycle) {
     var filter = menu.filter();
-    var fallbackSlot = (rows - 1) * ROW_WIDTH;
-    var filterSlot = MenuLayouts.sanitizeSlot(filter.slot(), rows, fallbackSlot);
 
     var filterItem = this.filterRenderer.render(filter, selected);
 
@@ -87,13 +81,21 @@ public final class ModulesMenuRenderer {
   }
 
   private List<String> modulesOf(@NonNull ModuleCategory category) {
+    var all = this.control.moduleIds();
+
+    return all.stream()
+        .filter(id -> !this.control.isProtected(id))
+        .filter(id -> matchesCategory(id, category))
+        .toList();
+  }
+
+  private static boolean matchesCategory(
+      @NonNull String moduleId, @NonNull ModuleCategory category) {
     if (category == ModuleCategory.ALL) {
-      return this.control.moduleIds();
+      return true;
     }
 
-    return this.control.moduleIds().stream()
-        .filter(id -> ModuleCategoryCatalog.categoryOf(id) == category)
-        .toList();
+    return ModuleCategoryCatalog.categoryOf(moduleId) == category;
   }
 
   private SlotDefinition moduleItem(

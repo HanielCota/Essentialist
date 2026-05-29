@@ -18,7 +18,7 @@ class ModuleControlTest {
 
   private ModuleControl control(Set<String> running, Map<String, Boolean> boot) {
     var file = this.tempDir.resolve("modules.yml");
-    return new ModuleControl(file, List.of("alpha", "beta"), running, boot);
+    return new ModuleControl(file, List.of("alpha", "beta"), running, boot, Runnable::run);
   }
 
   @Test
@@ -51,6 +51,14 @@ class ModuleControlTest {
     assertFalse(control.persistedEnabled("alpha"));
     assertTrue(control.runningEnabled("alpha"));
     assertTrue(control.pendingRestart("alpha"));
+  }
+
+  @Test
+  void protectsCoreModulesFromToggling() {
+    var control = control(Set.of("alpha"), Map.of());
+
+    assertTrue(control.isProtected("essentials"));
+    assertFalse(control.isProtected("alpha"));
   }
 
   @Test

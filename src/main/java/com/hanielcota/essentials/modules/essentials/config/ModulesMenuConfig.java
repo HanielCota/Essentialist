@@ -12,7 +12,7 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 @ConfigSerializable
 public record ModulesMenuConfig(
     @Comment("Inventory title of the module-control menu.") String title,
-    @Comment("Menu height in rows (1-6).") int rows,
+    @Comment("Menu height in rows (3-6).") int rows,
     @Comment("Slots (0-based) the module items are placed in, in order.")
         List<Integer> contentSlots,
     @Comment("Icon for an enabled module.") Material enabledMaterial,
@@ -30,9 +30,13 @@ public record ModulesMenuConfig(
     @Comment("Previous/next page buttons (used when a category overflows the content slots).")
         NavigationButtonsConfig navigation) {
 
-  private static final int MIN_ROWS = 1;
+  // The menu needs content rows plus a bottom control row (filter + page buttons), so anything
+  // below 3 cannot lay out coherently — such values fall back to the default height.
+  private static final int MIN_ROWS = 3;
   private static final int MAX_ROWS = 6;
   private static final int DEFAULT_ROWS = 6;
+  private static final int SLOTS_PER_ROW = 9;
+  private static final int DEFAULT_INFO_SLOT = 4;
 
   // Inner grid of a 6-row chest (cols 2-8 of rows 2-5), so the border frames the content.
   private static final List<Integer> DEFAULT_CONTENT_SLOTS =
@@ -80,6 +84,19 @@ public record ModulesMenuConfig(
     var rows = effectiveRows();
 
     return MenuLayouts.sanitizeSlots(this.contentSlots, rows);
+  }
+
+  public int effectiveInfoSlot(int rows) {
+    var slot = this.info.slot();
+
+    return MenuLayouts.sanitizeSlot(slot, rows, DEFAULT_INFO_SLOT);
+  }
+
+  public int effectiveFilterSlot(int rows) {
+    var slot = this.filter.slot();
+    var fallback = (rows - 1) * SLOTS_PER_ROW;
+
+    return MenuLayouts.sanitizeSlot(slot, rows, fallback);
   }
 
   public Material material(boolean enabled) {

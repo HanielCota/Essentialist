@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +61,21 @@ final class ModuleDiscoveryStage implements BootstrapStage {
     var runningIds =
         enabledModules.stream().map(Module::id).collect(Collectors.toUnmodifiableSet());
     var settingsFile = dataFolder.resolve("modules.yml");
+    var ioExecutor = newIoExecutor();
 
-    return new ModuleControl(settingsFile, allIds, runningIds, settings.modules());
+    return new ModuleControl(settingsFile, allIds, runningIds, settings.modules(), ioExecutor);
+  }
+
+  // Daemon-backed so module.yml writes leave the main thread without needing an explicit shutdown
+  // hook; toggles are rare and serialized through this single thread, preserving write order.
+  private static Executor newIoExecutor() {
+    return Executors.newSingleThreadExecutor(ModuleDiscoveryStage::ioThread);
+  }
+
+  private static Thread ioThread(@NonNull Runnable runnable) {
+    var thread = new Thread(runnable, "essentials-module-control-io");
+    thread.setDaemon(true);
+
+    return thread;
   }
 }
