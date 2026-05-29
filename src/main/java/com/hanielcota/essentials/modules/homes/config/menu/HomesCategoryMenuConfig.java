@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.homes.config.menu;
 
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
 import java.util.EnumMap;
 import java.util.List;
@@ -21,21 +22,24 @@ public record HomesCategoryMenuConfig(
     @Comment("Slot of the category back button.") int backSlot,
     @Comment("Material of the category back button.") Material backMaterial,
     @Comment("Name of the category back button.") String backName,
-    @Comment("Lore of the category back button.") List<String> backLore) {
+    @Comment("Lore of the category back button.") List<String> backLore,
+    @Comment("Previous/next page buttons (used when the categories overflow the content slots).")
+        NavigationButtonsConfig navigation) {
 
   public static HomesCategoryMenuConfig defaults() {
     return new HomesCategoryMenuConfig(
         "<dark_gray>Pick a category",
-        4,
-        List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25),
+        5,
+        List.of(11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33),
         "<gold>{category}",
         List.of("<gray>Click to browse the items"),
         defaultNames(),
         true,
-        31,
+        40,
         Material.ARROW,
         "<yellow>Back to homes",
-        List.of());
+        List.of(),
+        NavigationButtonsConfig.defaults(39, 41));
   }
 
   private static Map<MaterialCategory, String> defaultNames() {

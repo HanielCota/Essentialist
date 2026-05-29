@@ -68,8 +68,8 @@ public record HomesMainMenuConfig(
         "<dark_gray>Your homes",
         6,
         List.of(
-            11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34,
-            36, 37, 38, 39, 40, 41, 42, 43),
+            11, 12, 13, 14, 15, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31, 32, 33, 34, 36,
+            37, 38, 39, 40, 41, 42, 43),
         NavigationButtonsConfig.defaults(48, 50),
         4,
         Material.PLAYER_HEAD,

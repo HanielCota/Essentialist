@@ -3,8 +3,11 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuConfig;
 import com.hanielcota.essentials.shared.Placeholders;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -31,14 +34,45 @@ public final class HomesMainMenuSection {
   }
 
   public static List<Integer> contentSlots(@NonNull HomesMainMenuConfig snap) {
-    var configured = snap.contentSlots();
-    if (configured.isEmpty()) {
-      var effRows = rows(snap);
-      var count = effRows > MIN_ROWS ? (effRows - 1) * 9 : 9;
-      return MenuLayouts.fallbackContentSlots(effRows, count);
+    var rows = rows(snap);
+    var base = baseContentSlots(snap, rows);
+    var reserved = reservedSlots(snap, rows);
+
+    var result = new ArrayList<Integer>(base.size());
+    for (var slot : base) {
+      if (reserved.contains(slot)) {
+        continue;
+      }
+      result.add(slot);
     }
 
-    return MenuLayouts.sanitizeSlots(configured, rows(snap));
+    return List.copyOf(result);
+  }
+
+  private static List<Integer> baseContentSlots(@NonNull HomesMainMenuConfig snap, int rows) {
+    var configured = snap.contentSlots();
+    if (configured.isEmpty()) {
+      var count = rows > MIN_ROWS ? (rows - 1) * 9 : 9;
+      return MenuLayouts.fallbackContentSlots(rows, count);
+    }
+
+    return MenuLayouts.sanitizeSlots(configured, rows);
+  }
+
+  // The guide, sort, create and page buttons sit at fixed slots; the framework does not skip them
+  // when distributing the paginated home items, so they are carved out here to stop a home landing
+  // on top of a control (the create button shares the default content range otherwise).
+  private static Set<Integer> reservedSlots(@NonNull HomesMainMenuConfig snap, int rows) {
+    var navigation = snap.navigation();
+
+    var reserved = new HashSet<Integer>();
+    reserved.add(infoSlot(snap));
+    reserved.add(sortSlot(snap));
+    reserved.add(createSlot(snap));
+    reserved.add(navigation.effectivePreviousSlot(rows));
+    reserved.add(navigation.effectiveNextSlot(rows));
+
+    return reserved;
   }
 
   public static String itemName(@NonNull HomesMainMenuConfig snap, @NonNull String name) {
