@@ -3,10 +3,10 @@ package com.hanielcota.essentials.module.control;
 import com.hanielcota.essentials.config.YamlReadWriter;
 import com.hanielcota.essentials.module.discovery.ModuleSettings;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import lombok.NonNull;
 
@@ -45,7 +45,7 @@ public final class ModuleControl {
     this.settingsFile = settingsFile;
     this.moduleIds = List.copyOf(moduleIds);
     this.runningIds = Set.copyOf(runningIds);
-    this.persisted = new LinkedHashMap<>(bootSettings);
+    this.persisted = new ConcurrentHashMap<>(bootSettings);
     this.ioExecutor = ioExecutor;
   }
 

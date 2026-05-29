@@ -3,9 +3,9 @@ package com.hanielcota.essentials.module.registry;
 import com.hanielcota.essentials.module.Module;
 import com.hanielcota.essentials.shared.Log;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 
 /**
@@ -16,8 +16,8 @@ public final class ModuleRegistry {
 
   private static final Log LOG = Log.of(ModuleRegistry.class);
 
-  private final Map<String, Module> registered = new LinkedHashMap<>();
-  private final Map<String, ModuleState> states = new LinkedHashMap<>();
+  private final Map<String, Module> registered = new ConcurrentHashMap<>();
+  private final Map<String, ModuleState> states = new ConcurrentHashMap<>();
 
   /**
    * Registers {@code module} in {@code REGISTERED} state. A duplicate id is ignored — the first

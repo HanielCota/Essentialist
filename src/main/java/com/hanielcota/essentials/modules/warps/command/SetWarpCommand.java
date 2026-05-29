@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -20,6 +21,7 @@ import org.bukkit.entity.Player;
 
 @Command("setwarp")
 @EssentialsCommand
+@PlayerOnly
 @Permission("essentials.warp.set")
 @Description("Cria ou sobrescreve uma warp na sua localização atual.")
 @Syntax("/setwarp <nome> [ícone]")

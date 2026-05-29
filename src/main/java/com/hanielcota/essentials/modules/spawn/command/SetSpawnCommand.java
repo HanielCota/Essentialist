@@ -9,6 +9,7 @@ import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Player;
 
 @Command("setspawn")
 @EssentialsCommand
+@PlayerOnly
 @Permission("essentials.spawn.set")
 @Description("Define o spawn do servidor na sua localização atual.")
 @Syntax("/setspawn")

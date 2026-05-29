@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.crops.listener;
 
 import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.crops.CropsNotifier;
+import com.hanielcota.essentials.modules.crops.command.CropsNotifier;
 import com.hanielcota.essentials.modules.crops.config.CropsConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

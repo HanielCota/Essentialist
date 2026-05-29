@@ -15,6 +15,7 @@ import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -24,6 +25,7 @@ import org.bukkit.entity.Player;
 
 @Command("home")
 @EssentialsCommand
+@PlayerOnly
 @Permission("essentials.home.use")
 @Description("Teleporta para a home indicada ou abre o menu /homes quando sem argumento.")
 @Syntax("/home [nome]")
@@ -46,13 +48,14 @@ public record HomeCommand(
 
     var snap = this.config.value();
     var messages = snap.messages();
-    var name = this.nameResolver.resolve(rawName.get());
+    var nameOpt = this.nameResolver.resolve(rawName.get());
 
-    if (name == null) {
+    if (nameOpt.isEmpty()) {
       var invalidNameMsg = messages.invalidName();
       return CommandResult.invalidUsage(invalidNameMsg);
     }
 
+    var name = nameOpt.get();
     var uuid = sender.getUniqueId();
     var home = this.service.findHome(uuid, name);
 

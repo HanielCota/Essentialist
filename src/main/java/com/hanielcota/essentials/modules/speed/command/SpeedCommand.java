@@ -35,7 +35,9 @@ public record SpeedCommand(
   @Subcommand("walk")
   @PermissionForOther(".others")
   public CommandResult walk(
-      @NonNull CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
+      @NonNull CommandActor sender,
+      @Arg("valor") int valor,
+      @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
 
     if (!this.service.setWalkSpeed(subject, valor)) {
@@ -51,7 +53,9 @@ public record SpeedCommand(
   @Subcommand("fly")
   @PermissionForOther(".others")
   public CommandResult fly(
-      @NonNull CommandActor sender, @Arg("valor") int valor, @TargetOrSelf Player subject) {
+      @NonNull CommandActor sender,
+      @Arg("valor") int valor,
+      @TargetOrSelf @NonNull Player subject) {
     var snap = this.config.value();
 
     if (!this.service.setFlySpeed(subject, valor)) {

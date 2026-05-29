@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.teleport.service;
 
 import com.hanielcota.essentials.api.TeleportsApi;
 import com.hanielcota.essentials.modules.teleport.domain.TeleportOutcome;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import lombok.NonNull;
 import org.bukkit.Location;
@@ -65,9 +66,9 @@ public final class TeleportService implements TeleportsApi {
     var currentPitch = currentLocation.getPitch();
     var destination = new Location(world, x, y, z, currentYaw, currentPitch);
 
-    var invalidReason = validatePosition(destination, world);
-    if (invalidReason != null) {
-      return rejected(invalidReason);
+    var validationError = validatePosition(destination, world);
+    if (validationError.isPresent()) {
+      return rejected(validationError.get());
     }
 
     return dispatch(sender, destination);
@@ -84,7 +85,7 @@ public final class TeleportService implements TeleportsApi {
     return dispatch(target, destination);
   }
 
-  private static TeleportOutcome validatePosition(
+  private static Optional<TeleportOutcome> validatePosition(
       @NonNull Location destination, @NonNull World world) {
     var minHeight = world.getMinHeight();
     var maxHeight = world.getMaxHeight();
@@ -92,9 +93,9 @@ public final class TeleportService implements TeleportsApi {
     var insideBorder = worldBorder.isInside(destination);
 
     if (destination.getY() < minHeight || destination.getY() >= maxHeight || !insideBorder) {
-      return TeleportOutcome.INVALID_POSITION;
+      return Optional.of(TeleportOutcome.INVALID_POSITION);
     }
 
-    return null;
+    return Optional.empty();
   }
 }

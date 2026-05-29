@@ -1,7 +1,7 @@
 package com.hanielcota.essentials.modules.homes.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,20 +11,20 @@ class HomeNameResolverTest {
   void rejectsBlankInput() {
     var resolver = new HomeNameResolver(new HomeNameValidator());
 
-    assertNull(resolver.resolve(""));
+    assertTrue(resolver.resolve("").isEmpty());
   }
 
   @Test
   void rejectsInvalidCharacters() {
     var resolver = new HomeNameResolver(new HomeNameValidator());
 
-    assertNull(resolver.resolve("<red>base"));
+    assertTrue(resolver.resolve("<red>base").isEmpty());
   }
 
   @Test
   void passesThroughValidName() {
     var resolver = new HomeNameResolver(new HomeNameValidator());
 
-    assertEquals("base", resolver.resolve("base"));
+    assertEquals("base", resolver.resolve("base").orElseThrow());
   }
 }

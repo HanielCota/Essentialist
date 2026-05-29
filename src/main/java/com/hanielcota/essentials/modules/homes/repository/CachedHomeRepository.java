@@ -181,6 +181,12 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
       return;
     }
 
-    loadFor(owner);
+    synchronized (this.cache) {
+      if (this.cache.isLoaded(owner)) {
+        return;
+      }
+
+      loadFor(owner);
+    }
   }
 }

@@ -28,15 +28,27 @@ public record SmeltService(ConfigHandle<SmeltConfig> config) {
         continue;
       }
 
-      // Clamp to the result's max stack size: a misconfigured mapping to a low-stack
-      // material would otherwise produce an oversized ItemStack (dupe/visual issues).
       var current = item.getAmount();
       var max = result.getMaxStackSize();
-      var amount = Math.min(current, max);
-      var resultStack = new ItemStack(result, amount);
 
+      if (current <= max) {
+        var resultStack = new ItemStack(result, current);
+        inv.setItem(slot, resultStack);
+        count += current;
+        continue;
+      }
+
+      var resultStack = new ItemStack(result, max);
       inv.setItem(slot, resultStack);
-      count += amount;
+      count += max;
+
+      var leftover = current - max;
+      var leftoverStack = new ItemStack(type, leftover);
+      var leftoverSlots = inv.addItem(leftoverStack);
+
+      if (!leftoverSlots.isEmpty()) {
+        count -= leftover;
+      }
     }
 
     return count;

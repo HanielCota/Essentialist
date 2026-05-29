@@ -1,8 +1,8 @@
 package com.hanielcota.essentials.core;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.NonNull;
 
 /**
@@ -15,7 +15,7 @@ import lombok.NonNull;
  */
 public final class ShutdownRegistry {
 
-  private final List<ShutdownStep> steps = new ArrayList<>();
+  private final List<ShutdownStep> steps = new CopyOnWriteArrayList<>();
 
   public void register(@NonNull ShutdownStep step) {
     this.steps.add(step);

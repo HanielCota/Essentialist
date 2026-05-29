@@ -23,7 +23,7 @@ public final class TitleService {
       var parsed = ComponentUtils.mini(raw);
 
       return parsed;
-    } catch (RuntimeException _) {
+    } catch (net.kyori.adventure.text.minimessage.ParsingException _) {
       var fallback = Component.text(raw);
 
       return fallback;

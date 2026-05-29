@@ -8,6 +8,7 @@ import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -16,6 +17,7 @@ import org.bukkit.entity.Player;
 
 @Command("warps")
 @EssentialsCommand
+@PlayerOnly
 @Permission("essentials.warp.list")
 @Description("Abre o menu de warps do servidor.")
 @Syntax("/warps")

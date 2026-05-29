@@ -64,7 +64,8 @@ public record StaffChatCommand(StaffChatToggleService toggleService, StaffChatNo
       @NonNull CommandActor actor, @GreedyString @Arg("message") Optional<String> message) {
     var body = message.map(String::strip).orElse("");
     if (body.isEmpty()) {
-      return CommandResult.invalidUsage("");
+      this.notifier.sendUsage(actor);
+      return CommandResult.success();
     }
 
     var player = actor.unwrap(Player.class);
