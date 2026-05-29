@@ -7,5 +7,6 @@ public enum KitClaimResult {
   ALREADY_CLAIMED,
   NO_PERMISSION,
   EMPTY,
+  INVENTORY_FULL,
   UNKNOWN_KIT
 }

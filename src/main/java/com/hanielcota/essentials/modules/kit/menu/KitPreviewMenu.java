@@ -38,6 +38,10 @@ public final class KitPreviewMenu implements EssentialsMenu {
   private final KitMenuState state;
   private final KitPreviewClickHandler clicks;
 
+  // Frozen at register() so the claim/back buttons stay aligned with the built inventory even if a
+  // later /essentials reload changes the configured row count (same fix as the homes menus).
+  private int registeredRows;
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -48,6 +52,8 @@ public final class KitPreviewMenu implements EssentialsMenu {
     var cfg = this.config.value().previewMenu();
     var rows = MenuLayouts.clampRows(cfg.rows());
     var title = ComponentUtils.mini(cfg.title());
+
+    this.registeredRows = rows;
 
     var contentSlots = contentSlots(cfg, rows);
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
@@ -67,7 +73,7 @@ public final class KitPreviewMenu implements EssentialsMenu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var cfg = this.config.value().previewMenu();
-    var rows = MenuLayouts.clampRows(cfg.rows());
+    var rows = this.registeredRows;
 
     var slots = new ArrayList<SlotDefinition>();
     appendItems(slots, player);

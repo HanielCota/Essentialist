@@ -21,7 +21,9 @@ public record KitMessages(
     @Comment("Shown when /kit create is run with an empty inventory.") String createEmpty,
     @Comment("Shown to the admin after /kit delete. Placeholders: {kit}.") String deleted,
     @Comment("Shown after /kit reload. Placeholders: {count}.") String reloaded,
-    @Comment("Shown when the console runs /kit (the menu needs a player).") String menuPlayerOnly) {
+    @Comment("Shown when the console runs /kit (the menu needs a player).") String menuPlayerOnly,
+    @Comment("Shown when the inventory has no room and overflow dropping is disabled.")
+        String inventoryNoSpace) {
 
   public static KitMessages defaults() {
     return new KitMessages(
@@ -36,7 +38,8 @@ public record KitMessages(
         "<red>Your inventory is empty — there is nothing to save.",
         "<yellow>Kit <gold>{kit}</gold> deleted.",
         "<green>Reloaded <gold>{count}</gold> kit(s).",
-        "<red>The kit menu can only be opened by players.");
+        "<red>The kit menu can only be opened by players.",
+        "<red>Your inventory is full — free some space and try again.");
   }
 
   public String formatClaimed(@NonNull String kit) {

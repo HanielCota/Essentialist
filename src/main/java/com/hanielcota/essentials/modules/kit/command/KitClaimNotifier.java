@@ -30,6 +30,7 @@ public final class KitClaimNotifier {
           case ALREADY_CLAIMED -> messages.formatAlreadyClaimed(name);
           case NO_PERMISSION -> messages.formatNoPermission(name);
           case EMPTY -> messages.formatEmpty(name);
+          case INVENTORY_FULL -> messages.inventoryNoSpace();
           case UNKNOWN_KIT -> messages.formatUnknownKit(name);
         };
 

@@ -35,11 +35,15 @@ public final class KitClaimService {
     }
 
     var snap = this.config.value();
-    var overflowDropped = this.giver.give(player, kit, snap.dropWhenInventoryFull());
+    var giveResult = this.giver.give(player, kit, snap.dropWhenInventoryFull());
+    if (giveResult == KitGiver.GiveResult.REJECTED_FULL) {
+      return ClaimOutcome.of(KitClaimResult.INVENTORY_FULL);
+    }
 
     this.cooldowns.markClaimed(uuid, kit);
     playClaimSound(player, snap);
 
+    var overflowDropped = giveResult == KitGiver.GiveResult.OVERFLOW_DROPPED;
     return new ClaimOutcome(KitClaimResult.CLAIMED, overflowDropped);
   }
 
