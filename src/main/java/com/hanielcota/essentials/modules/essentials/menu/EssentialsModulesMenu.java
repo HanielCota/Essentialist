@@ -4,6 +4,7 @@ import com.github.hanielcota.menuframework.MenuFramework;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.github.hanielcota.menuframework.api.MenuService;
 import com.github.hanielcota.menuframework.api.MenuSession;
+import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
@@ -11,6 +12,7 @@ import com.hanielcota.essentials.module.control.ModuleControl;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -24,6 +26,8 @@ import org.bukkit.entity.Player;
 public final class EssentialsModulesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.modules";
+
+  private static final int ROW_WIDTH = 9;
 
   private final @NonNull ConfigHandle<EssentialsConfig> config;
   private final @NonNull EssentialsModulesMenuState state;
@@ -44,9 +48,17 @@ public final class EssentialsModulesMenu implements EssentialsMenu {
     var rawTitle = menu.title();
     var menuTitle = ComponentUtils.mini(rawTitle);
 
+    // The framework requires content slots whenever dynamicContent is used. Every item is placed at
+    // an explicit slot (modules in the content area, tabs on the bottom row), so the whole grid is
+    // declared as content and pagination never has to project a -1 item.
+    var slotCount = rows * ROW_WIDTH;
+    var contentSlots = IntStream.range(0, slotCount).boxed().toList();
+    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
+
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);
     builder.title(menuTitle);
+    builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
 
     builder.buildAndRegister();
