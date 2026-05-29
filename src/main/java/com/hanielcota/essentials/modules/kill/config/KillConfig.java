@@ -18,11 +18,11 @@ public record KillConfig(
 
   public static KillConfig defaults() {
     return new KillConfig(
-        "<red>Você foi morto.",
-        "<red>Você matou <gold>{player}</gold>.",
-        "<red>Você já está morto.",
-        "<red><gold>{player}</gold> já está morto.",
-        "<red><gold>{player}</gold> não pode ser morto.",
+        "<red>You have been killed.",
+        "<red>You killed <gold>{player}</gold>.",
+        "<red>You are already dead.",
+        "<red><gold>{player}</gold> is already dead.",
+        "<red><gold>{player}</gold> cannot be killed.",
         "essentials.kill.exempt");
   }
 

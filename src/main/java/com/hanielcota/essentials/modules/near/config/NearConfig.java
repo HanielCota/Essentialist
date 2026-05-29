@@ -19,12 +19,12 @@ public record NearConfig(
     return new NearConfig(
         100,
         500,
-        "<yellow>Jogadores num raio de <gold>{radius}</gold>m <gray>(<gold>{count}</gold>)<gray>:"
+        "<yellow>Players within <gold>{radius}</gold>m <gray>(<gold>{count}</gold>)<gray>:"
             + " {players}",
         "<white>{player} <gray>({distance}m)",
         "<gray>, ",
-        "<yellow>Nenhum jogador num raio de <gold>{radius}</gold> blocos.",
-        "<red>O raio precisa estar entre <gold>1</gold> e <gold>{max}</gold>.");
+        "<yellow>No players within <gold>{radius}</gold> blocks.",
+        "<red>The radius must be between <gold>1</gold> and <gold>{max}</gold>.");
   }
 
   public String formatEntry(@NonNull String player, int distance) {

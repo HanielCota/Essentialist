@@ -33,18 +33,18 @@ public record NickConfig(
     return new NickConfig(
         3,
         16,
-        "<green>O seu apelido agora é <gold>{nick}</gold>.",
-        "<green>Apelido de <gold>{player}</gold> definido como <gold>{nick}</gold>.",
-        "<green>O seu apelido foi removido.",
-        "<green>Apelido de <gold>{player}</gold> removido.",
-        "<gray>O seu apelido foi alterado para <gold>{nick}</gold>.",
-        "<gray>O seu apelido foi removido.",
-        "<gold>{nick}</gold> <gray>é</gray> <gold>{player}</gold>.",
-        "<red>Nenhum jogador usa o apelido <gold>{nick}</gold>.",
-        "<red>Você não tem um apelido para remover.",
-        "<red>O apelido deve ter entre <gold>{min}</gold> e <gold>{max}</gold> caracteres.",
-        "<red>O apelido só pode conter letras, números e underscore.",
-        "<red>Esse apelido já está em uso.");
+        "<green>Your nickname is now <gold>{nick}</gold>.",
+        "<green>Nickname of <gold>{player}</gold> set to <gold>{nick}</gold>.",
+        "<green>Your nickname has been removed.",
+        "<green>Nickname of <gold>{player}</gold> removed.",
+        "<gray>Your nickname has been changed to <gold>{nick}</gold>.",
+        "<gray>Your nickname has been removed.",
+        "<gold>{nick}</gold> <gray>is</gray> <gold>{player}</gold>.",
+        "<red>No player is using the nickname <gold>{nick}</gold>.",
+        "<red>You don't have a nickname to remove.",
+        "<red>The nickname must be between <gold>{min}</gold> and <gold>{max}</gold> characters.",
+        "<red>The nickname can only contain letters, numbers and underscores.",
+        "<red>That nickname is already in use.");
   }
 
   public String formatNickSetSelf(@NonNull String nick) {

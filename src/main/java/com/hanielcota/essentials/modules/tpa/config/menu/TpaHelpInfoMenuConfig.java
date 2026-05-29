@@ -6,7 +6,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
- * Help/tutorial sub-menu opened from the "Como funciona" slot in {@code TpaHelpMenu}. Holds three
+ * Help/tutorial sub-menu opened from the "How it works" slot in {@code TpaHelpMenu}. Holds three
  * cards (commands, examples, FAQ) plus a back button.
  */
 @ConfigSerializable
@@ -32,58 +32,58 @@ public record TpaHelpInfoMenuConfig(
 
   public static TpaHelpInfoMenuConfig defaults() {
     return new TpaHelpInfoMenuConfig(
-        "Como funciona o TPA",
+        "How TPA works",
         3,
         10,
         Material.WRITABLE_BOOK,
-        "Comandos",
+        "Commands",
         List.of(
-            "/tpa <jogador>",
-            "Pede para ir até o jogador.",
+            "/tpa <player>",
+            "Request to go to the player.",
             "",
-            "/tpahere <jogador>",
-            "Pede para o jogador vir até você.",
+            "/tpahere <player>",
+            "Request the player to come to you.",
             "",
-            "/tpaccept [jogador]",
-            "Aceita um pedido pendente.",
+            "/tpaccept [player]",
+            "Accept a pending request.",
             "",
-            "/tpdeny [jogador]",
-            "Recusa um pedido pendente.",
+            "/tpdeny [player]",
+            "Deny a pending request.",
             "",
             "/tpacancel",
-            "Cancela um pedido que você enviou."),
+            "Cancel a request you sent."),
         13,
         Material.MAP,
-        "Exemplos",
+        "Examples",
         List.of(
-            "Visitar alguém:",
-            "1. Você usa /tpa Notch",
-            "2. Notch recebe o pedido no chat",
-            "3. Notch clica em ACEITAR",
-            "4. Você teleporta até ele",
+            "Visit someone:",
+            "1. You run /tpa Notch",
+            "2. Notch gets the request in chat",
+            "3. Notch clicks ACCEPT",
+            "4. You teleport to them",
             "",
-            "Chamar alguém:",
-            "1. Você usa /tpahere Notch",
-            "2. Notch clica em ACEITAR",
-            "3. Notch teleporta até você"),
+            "Summon someone:",
+            "1. You run /tpahere Notch",
+            "2. Notch clicks ACCEPT",
+            "3. Notch teleports to you"),
         16,
         Material.BOOK,
-        "Perguntas frequentes",
+        "Frequently asked questions",
         List.of(
-            "Quanto tempo dura um pedido?",
-            "60 segundos por padrão.",
+            "How long does a request last?",
+            "60 seconds by default.",
             "",
-            "Posso bloquear alguém?",
-            "Sim. Use /tpablock <jogador>.",
+            "Can I block someone?",
+            "Yes. Use /tpablock <player>.",
             "",
-            "O outro recusou, e agora?",
-            "Você recebe um aviso no chat e pode tentar novamente depois.",
+            "They denied it, now what?",
+            "You get a chat notice and can try again later.",
             "",
-            "Posso ver meus teleportes?",
-            "Sim. Use /tpahistory para abrir o histórico."),
+            "Can I see my teleports?",
+            "Yes. Use /tpahistory to open the history."),
         22,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para o menu de TPA."));
+        "Back",
+        List.of("Back to the TPA menu."));
   }
 }

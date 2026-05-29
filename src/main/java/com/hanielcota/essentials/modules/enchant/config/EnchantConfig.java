@@ -34,16 +34,16 @@ public record EnchantConfig(
         10,
         true,
         List.of(),
-        "<red>Você precisa segurar um item.",
-        "<green>Encantamento <gold>{enchantment} {level}</gold> aplicado.",
-        "<green>Encantamento <gold>{enchantment}</gold> removido.",
-        "<red>O item não possui o encantamento <gold>{enchantment}</gold>.",
-        "<green>Encantamentos removidos: <gold>{count}</gold>.",
-        "<red>O item não possui encantamentos.",
-        "<red>O nível precisa ser no mínimo 1.",
-        "<red>O nível máximo é <gold>{max}</gold>.",
-        "<red>O encantamento <gold>{enchantment}</gold> está bloqueado.",
-        "<red>O item não pode receber o encantamento <gold>{enchantment}</gold>.");
+        "<red>You need to be holding an item.",
+        "<green>Enchantment <gold>{enchantment} {level}</gold> applied.",
+        "<green>Enchantment <gold>{enchantment}</gold> removed.",
+        "<red>The item does not have the <gold>{enchantment}</gold> enchantment.",
+        "<green>Enchantments removed: <gold>{count}</gold>.",
+        "<red>The item has no enchantments.",
+        "<red>The level must be at least 1.",
+        "<red>The maximum level is <gold>{max}</gold>.",
+        "<red>The <gold>{enchantment}</gold> enchantment is blocked.",
+        "<red>The item cannot receive the <gold>{enchantment}</gold> enchantment.");
   }
 
   public boolean isBlocked(@NonNull String enchantmentKey) {

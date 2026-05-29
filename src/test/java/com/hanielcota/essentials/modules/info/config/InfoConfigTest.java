@@ -12,10 +12,10 @@ class InfoConfigTest {
 
   @Test
   void gameModeLabelExhaustivelyMapsEveryMode() {
-    assertEquals("Sobrevivência", defaults.gameModeLabel(GameMode.SURVIVAL));
-    assertEquals("Criativo", defaults.gameModeLabel(GameMode.CREATIVE));
-    assertEquals("Aventura", defaults.gameModeLabel(GameMode.ADVENTURE));
-    assertEquals("Espectador", defaults.gameModeLabel(GameMode.SPECTATOR));
+    assertEquals("Survival", defaults.gameModeLabel(GameMode.SURVIVAL));
+    assertEquals("Creative", defaults.gameModeLabel(GameMode.CREATIVE));
+    assertEquals("Adventure", defaults.gameModeLabel(GameMode.ADVENTURE));
+    assertEquals("Spectator", defaults.gameModeLabel(GameMode.SPECTATOR));
   }
 
   @Test
@@ -36,8 +36,8 @@ class InfoConfigTest {
     var player = defaults.player();
     var plugin = defaults.plugin();
 
-    assertEquals("agora mesmo", player.noSessionLabel());
-    assertEquals("Desconhecido", plugin.unknownAuthorsLabel());
+    assertEquals("just now", player.noSessionLabel());
+    assertEquals("Unknown", plugin.unknownAuthorsLabel());
 
     assertTrue(server.tps().name().contains("TPS"));
     assertTrue(player.head().name().contains("{player}"));

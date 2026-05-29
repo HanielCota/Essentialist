@@ -11,7 +11,8 @@ public record BroadcastConfig(
 
   public static BroadcastConfig defaults() {
     return new BroadcastConfig(
-        "<gray>[<gold>Anúncio<gray>] <white>{message}", "<red>Informe a mensagem do anúncio.");
+        "<gray>[<gold>Announcement<gray>] <white>{message}",
+        "<red>Provide the announcement message.");
   }
 
   public String formatLine(@NonNull String message) {

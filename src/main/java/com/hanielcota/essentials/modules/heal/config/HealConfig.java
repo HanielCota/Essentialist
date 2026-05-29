@@ -12,17 +12,17 @@ public record HealConfig(
     @Comment("Placeholders: {player}.") String alreadyFullOther,
     @Comment("Shown when trying to heal a dead player.") String dead,
     @Comment("Placeholders: {player}.") String deadOther,
-    @Comment("Shown after /curar todos. Placeholders: {count}.") String healedAll) {
+    @Comment("Shown after /heal all. Placeholders: {count}.") String healedAll) {
 
   public static HealConfig defaults() {
     return new HealConfig(
-        "<green>Vida restaurada.",
-        "<green>Curou <gold>{player}</gold>.",
-        "<red>Sua vida já está cheia.",
-        "<red>A vida de <gold>{player}</gold> já está cheia.",
-        "<red>Você não pode se curar enquanto está morto.",
-        "<red><gold>{player}</gold> está morto.",
-        "<green>Vida de <gold>{count}</gold> jogador(es) restaurada.");
+        "<green>Health restored.",
+        "<green>Healed <gold>{player}</gold>.",
+        "<red>Your health is already full.",
+        "<red><gold>{player}</gold>'s health is already full.",
+        "<red>You cannot heal yourself while you are dead.",
+        "<red><gold>{player}</gold> is dead.",
+        "<green>Restored the health of <gold>{count}</gold> player(s).");
   }
 
   public MessagePair whenHealed() {

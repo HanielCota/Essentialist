@@ -14,9 +14,9 @@ public record SeenConfig(
 
   public static SeenConfig defaults() {
     return new SeenConfig(
-        "<gold>{player}</gold> <gray>está online agora (entrou há <gold>{duration}</gold>).",
-        "<gold>{player}</gold> <gray>esteve online pela última vez há <gold>{duration}</gold>.",
-        "<red><gold>{player}</gold> nunca entrou no servidor.");
+        "<gold>{player}</gold> <gray>is online now (joined <gold>{duration}</gold> ago).",
+        "<gold>{player}</gold> <gray>was last seen <gold>{duration}</gold> ago.",
+        "<red><gold>{player}</gold> has never joined the server.");
   }
 
   public String formatOnline(@NonNull String player, @NonNull String duration) {

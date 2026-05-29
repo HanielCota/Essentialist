@@ -13,10 +13,10 @@ public record LightConfig(
 
   public static LightConfig defaults() {
     return new LightConfig(
-        "<green>Visão noturna ativada.",
-        "<green>Ativou a visão noturna de <gold>{player}</gold>.",
-        "<red>Visão noturna desativada.",
-        "<red>Desativou a visão noturna de <gold>{player}</gold>.");
+        "<green>Night vision enabled.",
+        "<green>Enabled night vision for <gold>{player}</gold>.",
+        "<red>Night vision disabled.",
+        "<red>Disabled night vision for <gold>{player}</gold>.");
   }
 
   public MessagePair toggle(boolean lightEnabled) {

@@ -20,8 +20,8 @@ public record AntiSpamConfig(
   public static AntiSpamConfig defaults() {
     return new AntiSpamConfig(
         true,
-        "<red>Aguarde <gold>{seconds}s</gold> antes de enviar outra mensagem.",
-        "<red>Você acabou de enviar essa mensagem.");
+        "<red>Wait <gold>{seconds}s</gold> before sending another message.",
+        "<red>You just sent that message.");
   }
 
   public String formatCooldownWarning(long seconds) {

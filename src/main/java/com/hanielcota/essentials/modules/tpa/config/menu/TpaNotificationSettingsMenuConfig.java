@@ -32,27 +32,21 @@ public record TpaNotificationSettingsMenuConfig(
 
   public static TpaNotificationSettingsMenuConfig defaults() {
     return new TpaNotificationSettingsMenuConfig(
-        "Notificações",
+        "Notifications",
         3,
         10,
         12,
         Material.LIME_DYE,
         Material.GRAY_DYE,
-        "Sons de notificação: {state}",
-        List.of(
-            "Toca um som quando você recebe um pedido de TPA.",
-            "",
-            "Clique para ligar ou desligar."),
-        "Avisar ao ser favoritado: {state}",
-        List.of(
-            "Recebe uma mensagem no chat quando alguém te favorita.",
-            "",
-            "Clique para ligar ou desligar."),
+        "Notification sounds: {state}",
+        List.of("Plays a sound when you receive a TPA request.", "", "Click to turn on or off."),
+        "Notify when favorited: {state}",
+        List.of("Get a chat message when someone favorites you.", "", "Click to turn on or off."),
         22,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para as configurações."),
-        "ligado",
-        "desligado");
+        "Back",
+        List.of("Back to the settings."),
+        "on",
+        "off");
   }
 }

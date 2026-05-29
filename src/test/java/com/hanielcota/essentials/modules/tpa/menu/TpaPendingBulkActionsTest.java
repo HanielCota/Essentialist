@@ -76,8 +76,10 @@ class TpaPendingBulkActionsTest {
 
     fixture.bulk.acceptAll(TpaTestSupport.click(viewer));
 
-    assertTrue(messages(fixture, firstRequester).stream().anyMatch(msg -> msg.contains("aceito")));
-    assertTrue(messages(fixture, secondRequester).stream().anyMatch(msg -> msg.contains("aceito")));
+    assertTrue(
+        messages(fixture, firstRequester).stream().anyMatch(msg -> msg.contains("accepted")));
+    assertTrue(
+        messages(fixture, secondRequester).stream().anyMatch(msg -> msg.contains("accepted")));
   }
 
   @Test
@@ -94,9 +96,8 @@ class TpaPendingBulkActionsTest {
 
     fixture.bulk.denyAll(TpaTestSupport.click(viewer));
 
-    assertTrue(messages(fixture, firstRequester).stream().anyMatch(msg -> msg.contains("recusou")));
-    assertTrue(
-        messages(fixture, secondRequester).stream().anyMatch(msg -> msg.contains("recusou")));
+    assertTrue(messages(fixture, firstRequester).stream().anyMatch(msg -> msg.contains("denied")));
+    assertTrue(messages(fixture, secondRequester).stream().anyMatch(msg -> msg.contains("denied")));
   }
 
   private static List<String> messages(@NonNull Fixture fixture, @NonNull Player player) {

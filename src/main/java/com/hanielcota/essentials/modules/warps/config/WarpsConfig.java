@@ -31,13 +31,13 @@ public record WarpsConfig(
     @Comment("Full layout and texts of the warps menu.") WarpsMenuConfig menu,
     @Comment(
             "Per-warp menu settings, keyed by warp name (lowercase): icon, display name, lore and"
-                + " the PVP flag. Warps with no entry use sensible defaults. The 'exemplo' entry"
+                + " the PVP flag. Warps with no entry use sensible defaults. The 'example' entry"
                 + " below only shows the shape — copy it under a real warp name.")
         Map<String, WarpMenuEntry> warpSettings,
     WarpsMessages messages) {
 
   public static WarpsConfig defaults() {
-    var sample = Map.of("exemplo", WarpMenuEntry.example());
+    var sample = Map.of("example", WarpMenuEntry.example());
 
     return new WarpsConfig(
         3,

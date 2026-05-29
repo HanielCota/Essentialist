@@ -15,10 +15,10 @@ public record KickConfig(
 
   public static KickConfig defaults() {
     return new KickConfig(
-        "Você foi expulso do servidor.",
+        "You have been kicked from the server.",
         "<red>{reason}",
-        "<green>Você expulsou <gold>{player}</gold>.",
-        "<red><gold>{player}</gold> não pode ser expulso.",
+        "<green>You kicked <gold>{player}</gold>.",
+        "<red><gold>{player}</gold> cannot be kicked.",
         "essentials.kick.exempt");
   }
 

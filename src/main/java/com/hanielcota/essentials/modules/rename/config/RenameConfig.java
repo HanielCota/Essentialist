@@ -12,9 +12,9 @@ public record RenameConfig(
 
   public static RenameConfig defaults() {
     return new RenameConfig(
-        "<red>Você precisa segurar um item.",
-        "<green>Item renomeado para <reset>{name}<green>.",
-        "<green>O nome do item foi removido.");
+        "<red>You need to be holding an item.",
+        "<green>Item renamed to <reset>{name}<green>.",
+        "<green>The item's name has been removed.");
   }
 
   public String formatRenamed(@NonNull String name) {

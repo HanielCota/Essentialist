@@ -17,16 +17,16 @@ public record ModulesInfoConfig(
     return new ModulesInfoConfig(
         4,
         Material.BOOK,
-        "<gold><bold>Painel de Módulos",
+        "<gold><bold>Module Panel",
         List.of(
-            "<gray>Ative ou desative os módulos do servidor.",
+            "<gray>Enable or disable the server modules.",
             "",
-            "<yellow>➜ <gray>Clique num item para <white>alternar<gray>.",
-            "<green>● <gray>Verde = ativado.",
-            "<red>● <gray>Vermelho = desativado.",
-            "<yellow>➜ <gray>Use o <white>filtro</white> para trocar de categoria.",
+            "<yellow>➜ <gray>Click an item to <white>toggle<gray>.",
+            "<green>● <gray>Green = enabled.",
+            "<red>● <gray>Red = disabled.",
+            "<yellow>➜ <gray>Use the <white>filter</white> to switch category.",
             "",
-            "<gold>⚠ <gray>As mudanças aplicam no <white>próximo reinício<gray>.",
-            "<dark_gray>Tudo é salvo em modules.yml."));
+            "<gold>⚠ <gray>Changes apply on the <white>next restart<gray>.",
+            "<dark_gray>Everything is saved in modules.yml."));
   }
 }

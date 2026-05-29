@@ -36,32 +36,32 @@ public record ListConfig(
 
   public static ListConfig defaults() {
     return new ListConfig(
-        "<red>O menu da lista só pode ser aberto por jogadores.",
-        "<dark_gray>Jogadores online",
+        "<red>The list menu can only be opened by players.",
+        "<dark_gray>Players online",
         6,
         List.of(),
         NavigationButtonsConfig.defaults(48, 50),
         49,
         Material.BOOK,
-        "<yellow>Legenda",
+        "<yellow>Legend",
         List.of(
-            "<gray>Jogadores agrupados por grupo de permissão.",
-            "<gray>Maior prioridade aparece primeiro.",
+            "<gray>Players grouped by permission group.",
+            "<gray>Higher priority appears first.",
             "",
             "<gold>Admin <gray>— essentials.list.group.admin",
             "<aqua>VIP <gray>— essentials.list.group.vip",
-            "<gray>Membro <gray>— padrão"),
+            "<gray>Member <gray>— default"),
         "<yellow>{player}",
-        List.of("<gray>Grupo: {group}"),
+        List.of("<gray>Group: {group}"),
         Material.BARRIER,
-        "<red>Nenhum jogador online",
-        List.of("<gray>Não há jogadores visíveis no momento."),
+        "<red>No players online",
+        List.of("<gray>There are no visible players right now."),
         List.of(
             new GroupDefinition(
                 "admin", "<gold>Admin", "essentials.list.group.admin", Material.GOLDEN_HELMET, 100),
             new GroupDefinition(
                 "vip", "<aqua>VIP", "essentials.list.group.vip", Material.DIAMOND_HELMET, 50)),
-        new DefaultGroup("<gray>Membro", Material.PLAYER_HEAD));
+        new DefaultGroup("<gray>Member", Material.PLAYER_HEAD));
   }
 
   public int effectiveRows() {

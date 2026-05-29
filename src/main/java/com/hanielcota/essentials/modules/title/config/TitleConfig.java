@@ -27,14 +27,14 @@ public record TitleConfig(
         10,
         70,
         20,
-        "<green>Título enviado.",
-        "<green>Título enviado para <gold>{player}</gold>.",
-        "<green>Título enviado para <gold>{count}</gold> jogador(es).",
-        "<red>Você não tem permissão para enviar títulos a outros jogadores.",
+        "<green>Title sent.",
+        "<green>Title sent to <gold>{player}</gold>.",
+        "<green>Title sent to <gold>{count}</gold> player(s).",
+        "<red>You don't have permission to send titles to other players.",
         """
-        <yellow>Uso: <gray>/title [jogador] "título" "subtítulo"</gray> — o subtítulo é opcional.\
+        <yellow>Usage: <gray>/title [player] "title" "subtitle"</gray> — the subtitle is optional.\
         """,
-        "<red>O jogador <gold>{player}</gold> não está mais online.");
+        "<red>The player <gold>{player}</gold> is no longer online.");
   }
 
   public MessagePair whenSent() {

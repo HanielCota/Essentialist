@@ -58,31 +58,31 @@ public record TpaBehaviorSettingsMenuConfig(
 
   public static TpaBehaviorSettingsMenuConfig defaults() {
     return new TpaBehaviorSettingsMenuConfig(
-        "Comportamento",
+        "Behavior",
         3,
         10,
         Material.LIME_DYE,
         Material.GRAY_DYE,
-        "Aceitar favoritos automaticamente: {state}",
+        "Auto-accept favorites: {state}",
         List.of(
-            "Pedidos dos seus favoritos são aceitos sem perguntar.",
+            "Requests from your favorites are accepted without asking.",
             "",
-            "Clique para ligar ou desligar."),
+            "Click to turn on or off."),
         12,
         Material.RED_DYE,
         Material.LIME_DYE,
-        "Não perturbe: {state}",
+        "Do not disturb: {state}",
         List.of(
-            "Quando ligado, todos os pedidos de TPA são recusados em silêncio.",
-            "Tempo restante: {remaining}",
+            "When on, every TPA request is silently denied.",
+            "Time left: {remaining}",
             "",
             "{options}",
             "",
-            "Clique para mudar a duração."),
-        "desligado",
-        "30 minutos",
-        "1 hora",
-        "4 horas",
+            "Click to change the duration."),
+        "off",
+        "30 minutes",
+        "1 hour",
+        "4 hours",
         " ◀",
         30,
         60,
@@ -94,9 +94,9 @@ public record TpaBehaviorSettingsMenuConfig(
         "—",
         22,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para as configurações."),
-        "ligado",
-        "desligado");
+        "Back",
+        List.of("Back to the settings."),
+        "on",
+        "off");
   }
 }

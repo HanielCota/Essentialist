@@ -8,14 +8,14 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 @ConfigSerializable
 public record CompactConfig(
     @Comment("Compaction mappings: ingredient → { block, amount }.") Map<Material, Recipe> recipes,
-    @Comment("Shown when /compactar finds nothing to compact.") String nothing,
-    @Comment("Shown after /compactar. Placeholders: {count}.") String success) {
+    @Comment("Shown when /compact finds nothing to compact.") String nothing,
+    @Comment("Shown after /compact. Placeholders: {count}.") String success) {
 
   public static CompactConfig defaults() {
     return new CompactConfig(
         defaultRecipes(),
-        "<red>Você não tem nada para compactar.",
-        "<green>Compactado <gold>{count}</gold> bloco(s).");
+        "<red>You have nothing to compact.",
+        "<green>Compacted <gold>{count}</gold> block(s).");
   }
 
   private static Map<Material, Recipe> defaultRecipes() {

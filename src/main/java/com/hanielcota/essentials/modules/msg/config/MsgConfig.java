@@ -19,12 +19,12 @@ public record MsgConfig(
 
   public static MsgConfig defaults() {
     return new MsgConfig(
-        "<gray>[<gold>Você<gray> -> <gold>{target}<gray>] <white>{message}",
-        "<gray>[<gold>{sender}<gray> -> <gold>Você<gray>] <white>{message}",
-        "<red>Informe a mensagem.",
-        "<red>Você não pode enviar uma mensagem para si mesmo.",
-        "<red>O jogador <gold>{player}</gold> não está online.",
-        "<red>Você ainda não conversou com ninguém.",
-        "<red>O jogador <gold>{player}</gold> não está mais online.");
+        "<gray>[<gold>You<gray> -> <gold>{target}<gray>] <white>{message}",
+        "<gray>[<gold>{sender}<gray> -> <gold>You<gray>] <white>{message}",
+        "<red>Please provide a message.",
+        "<red>You cannot send a message to yourself.",
+        "<red>The player <gold>{player}</gold> is not online.",
+        "<red>You haven't talked to anyone yet.",
+        "<red>The player <gold>{player}</gold> is no longer online.");
   }
 }

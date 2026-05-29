@@ -5,7 +5,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
- * Templates for every entry shown under the "Jogador" tab. The head entry uses the target's player
+ * Templates for every entry shown under the "Player" tab. The head entry uses the target's player
  * skin (its {@code icon} is informational only — actual material is {@code PLAYER_HEAD}).
  */
 @ConfigSerializable
@@ -25,17 +25,16 @@ public record PlayerEntriesSection(
 
   public static PlayerEntriesSection defaults() {
     return new PlayerEntriesSection(
+        InfoEntryConfig.of(Material.PLAYER_HEAD, "<yellow>{player}", "<gray>Player information."),
+        InfoEntryConfig.of(Material.GOLDEN_APPLE, "<yellow>Health", "<gray>{health} <red>❤"),
         InfoEntryConfig.of(
-            Material.PLAYER_HEAD, "<yellow>{player}", "<gray>Informações do jogador."),
-        InfoEntryConfig.of(Material.GOLDEN_APPLE, "<yellow>Vida", "<gray>{health} <red>❤"),
-        InfoEntryConfig.of(
-            Material.COOKED_BEEF, "<yellow>Fome", "<gray>{food} <dark_gray>/ <gray>20"),
-        InfoEntryConfig.of(Material.EXPERIENCE_BOTTLE, "<yellow>Nível", "<gray>{level}"),
-        InfoEntryConfig.of(Material.GRASS_BLOCK, "<yellow>Modo de jogo", "<gray>{mode}"),
-        InfoEntryConfig.of(Material.MAP, "<yellow>Mundo", "<gray>{world}"),
-        InfoEntryConfig.of(Material.COMPASS, "<yellow>Localização", "<gray>{coords}"),
+            Material.COOKED_BEEF, "<yellow>Food", "<gray>{food} <dark_gray>/ <gray>20"),
+        InfoEntryConfig.of(Material.EXPERIENCE_BOTTLE, "<yellow>Level", "<gray>{level}"),
+        InfoEntryConfig.of(Material.GRASS_BLOCK, "<yellow>Game mode", "<gray>{mode}"),
+        InfoEntryConfig.of(Material.MAP, "<yellow>World", "<gray>{world}"),
+        InfoEntryConfig.of(Material.COMPASS, "<yellow>Location", "<gray>{coords}"),
         InfoEntryConfig.of(Material.FEATHER, "<yellow>Ping", "<gray>{ping} ms"),
-        InfoEntryConfig.of(Material.CLOCK, "<yellow>Tempo de sessão", "<gray>{duration}"),
-        "agora mesmo");
+        InfoEntryConfig.of(Material.CLOCK, "<yellow>Session time", "<gray>{duration}"),
+        "just now");
   }
 }

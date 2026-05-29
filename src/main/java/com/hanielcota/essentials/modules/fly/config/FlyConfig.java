@@ -19,8 +19,8 @@ public record FlyConfig(
         "<green>Enabled flight for <gold>{player}</gold>.",
         "<red>Flight disabled.",
         "<red>Disabled flight for <gold>{player}</gold>.",
-        "<red>O modo de jogo atual já permite voar.",
-        "<red>O modo de jogo de <gold>{player}</gold> já permite voar.");
+        "<red>The current game mode already allows flying.",
+        "<red><gold>{player}</gold>'s game mode already allows flying.");
   }
 
   public MessagePair toggle(boolean flightEnabled) {

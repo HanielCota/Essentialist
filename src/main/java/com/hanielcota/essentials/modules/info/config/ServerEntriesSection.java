@@ -5,7 +5,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
- * Templates for every entry shown under the "Servidor" tab. Each entry exposes the runtime
+ * Templates for every entry shown under the "Server" tab. Each entry exposes the runtime
  * placeholder(s) it accepts; the producer fills them in. Edit names/lores freely without touching
  * code.
  */
@@ -23,14 +23,12 @@ public record ServerEntriesSection(
         InfoEntryConfig.of(Material.CLOCK, "<yellow>TPS", "<gray>{tps}"),
         InfoEntryConfig.of(
             Material.PLAYER_HEAD,
-            "<yellow>Jogadores online",
+            "<yellow>Players online",
             "<gray>{online} <dark_gray>/ <gray>{max}"),
-        InfoEntryConfig.of(Material.NAME_TAG, "<yellow>Versão", "<gray>{version}"),
-        InfoEntryConfig.of(Material.COMPARATOR, "<yellow>Tempo ligado", "<gray>{uptime}"),
+        InfoEntryConfig.of(Material.NAME_TAG, "<yellow>Version", "<gray>{version}"),
+        InfoEntryConfig.of(Material.COMPARATOR, "<yellow>Uptime", "<gray>{uptime}"),
         InfoEntryConfig.of(
-            Material.REDSTONE,
-            "<yellow>Memória",
-            "<gray>{usedMb} MB <dark_gray>/ <gray>{maxMb} MB"),
-        InfoEntryConfig.of(Material.GRASS_BLOCK, "<yellow>Mundos", "<gray>{count} carregado(s)"));
+            Material.REDSTONE, "<yellow>Memory", "<gray>{usedMb} MB <dark_gray>/ <gray>{maxMb} MB"),
+        InfoEntryConfig.of(Material.GRASS_BLOCK, "<yellow>Worlds", "<gray>{count} loaded"));
   }
 }

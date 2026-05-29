@@ -18,15 +18,15 @@ public record WarpMenuEntry(
         String displayName,
     @Comment("Extra description lines shown above the location info (MiniMessage).")
         List<String> lore,
-    @Comment("Whether this warp counts as PVP-active for the 'PVP ativo' filter and lore tag.")
+    @Comment("Whether this warp counts as PVP-active for the 'PVP active' filter and lore tag.")
         boolean pvp) {
 
   /** A sample entry written into the default config so admins can see the shape and copy it. */
   public static WarpMenuEntry example() {
     return new WarpMenuEntry(
         Material.NETHER_STAR,
-        "<yellow>Exemplo de Warp",
-        List.of("<gray>Descrição configurável", "<gray>por warp."),
+        "<yellow>Example Warp",
+        List.of("<gray>Configurable description", "<gray>per warp."),
         false);
   }
 }

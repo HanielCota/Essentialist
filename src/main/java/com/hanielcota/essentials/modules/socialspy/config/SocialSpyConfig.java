@@ -19,10 +19,10 @@ public record SocialSpyConfig(
     return new SocialSpyConfig(
         "<gray>[<dark_purple>SPY<gray>] <gold>{sender}<gray> -> <gold>{target}<gray>:"
             + " <white>{message}",
-        "<green>Social spy ativado.",
-        "<red>Social spy desativado.",
-        "<green>Social spy ativado para <gold>{player}</gold>.",
-        "<red>Social spy desativado para <gold>{player}</gold>.");
+        "<green>Social spy enabled.",
+        "<red>Social spy disabled.",
+        "<green>Social spy enabled for <gold>{player}</gold>.",
+        "<red>Social spy disabled for <gold>{player}</gold>.");
   }
 
   public String formatSpy(@NonNull String sender, @NonNull String target, @NonNull String body) {

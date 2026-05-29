@@ -26,23 +26,20 @@ public record TpaBlockedMenuConfig(
 
   public static TpaBlockedMenuConfig defaults() {
     return new TpaBlockedMenuConfig(
-        "Jogadores bloqueados",
+        "Blocked players",
         5,
         List.of(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25),
         Material.PLAYER_HEAD,
         true,
         "",
         "{player}",
-        List.of("Este jogador não pode te enviar pedidos de TPA.", "", "Clique para desbloquear."),
+        List.of("This player cannot send you TPA requests.", "", "Click to unblock."),
         Material.BARRIER,
-        "Ninguém bloqueado",
-        List.of(
-            "Sua lista de bloqueios está vazia.",
-            "",
-            "Use /tpablock <jogador> para bloquear alguém."),
+        "Nobody blocked",
+        List.of("Your block list is empty.", "", "Use /tpablock <player> to block someone."),
         40,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para as configurações."));
+        "Back",
+        List.of("Back to the settings."));
   }
 }

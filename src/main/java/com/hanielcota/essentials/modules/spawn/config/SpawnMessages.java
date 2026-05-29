@@ -18,12 +18,12 @@ public record SpawnMessages(
 
   public static SpawnMessages defaults() {
     return new SpawnMessages(
-        "<green>Spawn definido para a sua localização atual.",
-        "<red>O spawn ainda não foi configurado.",
-        "<red>O mundo do spawn não está carregado.",
-        "<yellow>Teleportando em <gold>{seconds}s</gold>. Não tome dano.",
-        "<green>Você foi teleportado para o spawn.",
-        "<red>Teleporte cancelado.",
-        "<red>O teleporte não pôde ser concluído.");
+        "<green>Spawn set to your current location.",
+        "<red>The spawn has not been configured yet.",
+        "<red>The spawn world is not loaded.",
+        "<yellow>Teleporting in <gold>{seconds}s</gold>. Do not take damage.",
+        "<green>You were teleported to spawn.",
+        "<red>Teleport cancelled.",
+        "<red>The teleport could not be completed.");
   }
 }

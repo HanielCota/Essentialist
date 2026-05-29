@@ -8,6 +8,6 @@ public record WorkstationsConfig(
     @Comment("Shown when a non-player runs a workstation command.") String playerOnly) {
 
   public static WorkstationsConfig defaults() {
-    return new WorkstationsConfig("<red>Este comando so pode ser executado por jogadores.");
+    return new WorkstationsConfig("<red>This command can only be run by players.");
   }
 }

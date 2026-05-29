@@ -15,15 +15,15 @@ public record ClearConfig(
     @Comment("Shown when the player has nothing to clear.") String empty,
     @Comment("Shown to the executor when target has nothing to clear. Placeholders: {player}.")
         String emptyOther,
-    @Comment("When true, /limpar also removes worn armor and the off-hand item.")
+    @Comment("When true, /clear also removes worn armor and the off-hand item.")
         boolean clearArmor) {
 
   public static ClearConfig defaults() {
     return new ClearConfig(
-        "<green>Inventário limpo (<gold>{count}</gold> item(ns) removido(s)).",
-        "<green>Limpo o inventário de <gold>{player}</gold> (<gold>{count}</gold> item(ns)).",
-        "<red>Seu inventário já está vazio.",
-        "<red>O inventário de <gold>{player}</gold> já está vazio.",
+        "<green>Inventory cleared (<gold>{count}</gold> item(s) removed).",
+        "<green>Cleared <gold>{player}</gold>'s inventory (<gold>{count}</gold> item(s)).",
+        "<red>Your inventory is already empty.",
+        "<red><gold>{player}</gold>'s inventory is already empty.",
         false);
   }
 

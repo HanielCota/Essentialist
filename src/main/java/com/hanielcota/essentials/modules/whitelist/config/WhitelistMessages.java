@@ -19,12 +19,12 @@ public record WhitelistMessages(
 
   public static WhitelistMessages defaults() {
     return new WhitelistMessages(
-        "<green><gold>{player}</gold> foi adicionado à whitelist.",
-        "<red><gold>{player}</gold> já está na whitelist.",
-        "<green><gold>{player}</gold> foi removido da whitelist.",
-        "<red><gold>{player}</gold> não está na whitelist.",
-        "<red><gold>{player}</gold> nunca entrou no servidor.",
-        "<red>O menu da whitelist só pode ser aberto por jogadores.");
+        "<green><gold>{player}</gold> was added to the whitelist.",
+        "<red><gold>{player}</gold> is already on the whitelist.",
+        "<green><gold>{player}</gold> was removed from the whitelist.",
+        "<red><gold>{player}</gold> is not on the whitelist.",
+        "<red><gold>{player}</gold> has never joined the server.",
+        "<red>The whitelist menu can only be opened by players.");
   }
 
   public String formatAdded(@NonNull String player) {
