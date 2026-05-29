@@ -94,6 +94,11 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
     throw new IllegalStateException(error);
   }
 
+  /**
+   * Stops accepting new work and drains the queue, waiting up to {@value #DRAIN_TIMEOUT_SECONDS}
+   * seconds. Writes still queued past the timeout are dropped (and logged); an interrupt during the
+   * wait forces an immediate shutdown and re-sets the thread's interrupt flag.
+   */
   @Override
   public void close() {
     this.executor.shutdown();
