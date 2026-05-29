@@ -1,8 +1,8 @@
-package com.hanielcota.essentials.modules.info.listener;
+package com.hanielcota.essentials.menu;
 
 import com.github.hanielcota.menuframework.api.MenuService;
-import com.hanielcota.essentials.modules.info.menu.InfoMenu;
-import com.hanielcota.essentials.modules.info.menu.InfoMenuState;
+import java.util.UUID;
+import java.util.function.Consumer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -13,17 +13,17 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
- * Clears the per-viewer {@link InfoMenuState} when the player closes the menu or quits.
- *
- * <p>Without the close hook, a viewer who ran {@code /informacoes <other>} and then closed the menu
- * would keep their {@code playerTarget} mapping forever, so a later {@code /informacoes} (without
- * args) would still resolve the previous target. The quit hook covers the disconnect-mid-menu path.
+ * Generic per-viewer menu-state cleanup. Runs {@code onClear} when the viewer closes the inventory
+ * belonging to {@code menuId} (verified against the live {@link MenuService} session and view) or
+ * when they quit mid-menu. Shared by every menu that keeps per-viewer state so the close/quit
+ * plumbing is written once.
  */
 @RequiredArgsConstructor
-public final class InfoMenuCleanupListener implements Listener {
+public final class MenuViewCleanupListener implements Listener {
 
-  private final InfoMenuState state;
   private final MenuService menus;
+  private final String menuId;
+  private final Consumer<UUID> onClear;
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onClose(@NonNull InventoryCloseEvent event) {
@@ -39,8 +39,8 @@ public final class InfoMenuCleanupListener implements Listener {
       return;
     }
 
-    var menuId = session.menuId();
-    if (!menuId.equals(InfoMenu.ID)) {
+    var openMenuId = session.menuId();
+    if (!openMenuId.equals(this.menuId)) {
       return;
     }
 
@@ -49,7 +49,7 @@ public final class InfoMenuCleanupListener implements Listener {
       return;
     }
 
-    this.state.clear(viewerId);
+    this.onClear.accept(viewerId);
   }
 
   @EventHandler
@@ -57,6 +57,6 @@ public final class InfoMenuCleanupListener implements Listener {
     var quitter = event.getPlayer();
     var viewerId = quitter.getUniqueId();
 
-    this.state.clear(viewerId);
+    this.onClear.accept(viewerId);
   }
 }

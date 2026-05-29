@@ -1,12 +1,12 @@
 package com.hanielcota.essentials.modules.info;
 
 import com.github.hanielcota.menuframework.api.MenuService;
+import com.hanielcota.essentials.menu.MenuViewCleanupListener;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.environment.ModuleEnvironment;
 import com.hanielcota.essentials.module.registration.ModuleRegistrar;
 import com.hanielcota.essentials.modules.info.command.InfoCommand;
 import com.hanielcota.essentials.modules.info.config.InfoConfig;
-import com.hanielcota.essentials.modules.info.listener.InfoMenuCleanupListener;
 import com.hanielcota.essentials.modules.info.menu.InfoMenu;
 import com.hanielcota.essentials.modules.info.menu.InfoMenuState;
 import com.hanielcota.essentials.modules.info.menu.presentation.InfoMenuRenderer;
@@ -40,7 +40,7 @@ public final class InfoModule extends AbstractModule {
     var menuState = new InfoMenuState(players);
     var menu = new InfoMenu(config, menuState, renderer);
     registrar.menu(menu);
-    var cleanupListener = new InfoMenuCleanupListener(menuState, menus);
+    var cleanupListener = new MenuViewCleanupListener(menus, InfoMenu.ID, menuState::clear);
     registrar.listener(cleanupListener);
 
     var infoCommand = new InfoCommand(menuState, menus);
