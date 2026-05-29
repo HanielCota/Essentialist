@@ -6,6 +6,7 @@ com.hanielcota.essentials.modules.homes.HomesModule
 com.hanielcota.essentials.modules.warps.WarpsModule
 com.hanielcota.essentials.modules.fly.FlyModule
 com.hanielcota.essentials.modules.gamemode.GamemodeModule
+com.hanielcota.essentials.modules.environment.EnvironmentModule
 com.hanielcota.essentials.modules.smelt.SmeltModule
 com.hanielcota.essentials.modules.compact.CompactModule
 com.hanielcota.essentials.modules.clear.ClearModule
@@ -18,6 +19,7 @@ com.hanielcota.essentials.modules.speed.SpeedModule
 com.hanielcota.essentials.modules.hat.HatModule
 com.hanielcota.essentials.modules.repair.RepairModule
 com.hanielcota.essentials.modules.give.GiveModule
+com.hanielcota.essentials.modules.combat.CombatModule
 com.hanielcota.essentials.modules.title.TitleModule
 com.hanielcota.essentials.modules.online.OnlineModule
 com.hanielcota.essentials.modules.near.NearModule
@@ -46,4 +48,5 @@ com.hanielcota.essentials.modules.list.ListModule
 com.hanielcota.essentials.modules.silencer.SilencerModule
 com.hanielcota.essentials.modules.weather.WeatherModule
 com.hanielcota.essentials.modules.crops.CropsModule
+com.hanielcota.essentials.modules.leaves.LeavesModule
 com.hanielcota.essentials.modules.chat.ChatModule
