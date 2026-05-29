@@ -67,7 +67,9 @@ class KitCooldownServiceTest {
         false,
         "",
         false,
-        List.of());
+        List.of(),
+        java.util.Arrays.asList(null, null, null, null),
+        null);
   }
 
   private static final class FakeUsage implements KitUsageRepository {

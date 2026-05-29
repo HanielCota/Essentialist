@@ -61,12 +61,13 @@ public final class KitModule extends AbstractModule {
 
     var giver = new KitGiver();
     var claimService = new KitClaimService(config, cooldowns, giver);
+    var notifier = new KitClaimNotifier(config, cooldowns);
     var admin = new KitAdminService(store, catalog, usage);
 
-    wireMenus(config, catalog, cooldowns, claimService, registrar);
+    wireMenus(config, catalog, cooldowns, claimService, notifier, registrar);
 
     registrar.listener(new FirstJoinKitListener(catalog, claimService));
-    registrar.command(new KitCommand(config, menus, admin));
+    registrar.command(new KitCommand(config, menus, admin, catalog, claimService, notifier));
   }
 
   private CachedKitUsageRepository wireUsageStorage(
@@ -115,10 +116,10 @@ public final class KitModule extends AbstractModule {
       @NonNull KitCatalog catalog,
       @NonNull KitCooldownService cooldowns,
       @NonNull KitClaimService claimService,
+      @NonNull KitClaimNotifier notifier,
       @NonNull ModuleRegistrar registrar) {
     var state = new KitMenuState();
     var entryRenderer = new KitEntryRenderer(config, cooldowns);
-    var notifier = new KitClaimNotifier(config, cooldowns);
 
     var categoryClicks = new KitCategoryClickHandler(state);
     var listClicks = new KitListClickHandler(state);

@@ -89,7 +89,7 @@ public final class KitPreviewMenu implements EssentialsMenu {
       return;
     }
 
-    for (var item : kit.items()) {
+    for (var item : kit.previewItems()) {
       var template = KitItemPreviewRenderer.render(item);
 
       slots.add(SlotDefinition.of(-1, template, click -> {}));

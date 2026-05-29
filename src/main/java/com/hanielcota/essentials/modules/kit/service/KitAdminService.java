@@ -22,23 +22,27 @@ public final class KitAdminService {
   private final KitUsageRepository usage;
 
   /**
-   * Snapshots the admin's main inventory as kit {@code rawId}; returns the saved item count (0 =
-   * empty).
+   * Snapshots the admin's full kit (main inventory + worn armor + off-hand) as kit {@code rawId};
+   * returns the total item count saved (0 means everything was empty).
    */
   public int create(@NonNull Player admin, @NonNull String rawId) {
     var id = rawId.toLowerCase(Locale.ROOT);
-    var items = nonEmptyContents(admin);
-    if (items.isEmpty()) {
+    var inventory = admin.getInventory();
+
+    var storage = KitItemCodec.encode(nonEmpty(inventory.getStorageContents()));
+    var armor = KitItemCodec.encodePositional(inventory.getArmorContents());
+    var offhand = KitItemCodec.encode(List.of(inventory.getItemInOffHand()));
+
+    var total = storage.size() + countPresent(armor) + offhand.size();
+    if (total == 0) {
       return 0;
     }
 
-    var encoded = KitItemCodec.encode(items);
-    var definition = mergeOrCreate(id, rawId, encoded);
-
+    var definition = mergeOrCreate(id, rawId, storage, armor, offhand);
     this.store.putKit(id, definition);
     this.catalog.rebuild();
 
-    return encoded.size();
+    return total;
   }
 
   public boolean delete(@NonNull String rawId) {
@@ -61,20 +65,21 @@ public final class KitAdminService {
   }
 
   private KitDefinitionConfig mergeOrCreate(
-      @NonNull String id, @NonNull String rawId, @NonNull List<String> encoded) {
+      @NonNull String id,
+      @NonNull String rawId,
+      @NonNull List<String> storage,
+      @NonNull List<String> armor,
+      @NonNull List<String> offhand) {
     var existing = this.store.kits().get(id);
     if (existing != null) {
-      return existing.withItems(encoded);
+      return existing.withContents(storage, armor, offhand);
     }
 
     return KitDefinitionConfig.of(
-        rawId, Material.CHEST, DEFAULT_CATEGORY, 0, false, "", false, encoded);
+        rawId, Material.CHEST, DEFAULT_CATEGORY, 0, false, "", false, storage, armor, offhand);
   }
 
-  private static List<ItemStack> nonEmptyContents(@NonNull Player admin) {
-    var inventory = admin.getInventory();
-    var contents = inventory.getStorageContents();
-
+  private static List<ItemStack> nonEmpty(@NonNull ItemStack[] contents) {
     var items = new ArrayList<ItemStack>(contents.length);
     for (var item : contents) {
       if (item == null || item.getType().isAir()) {
@@ -84,5 +89,16 @@ public final class KitAdminService {
     }
 
     return items;
+  }
+
+  private static int countPresent(@NonNull List<String> positional) {
+    var present = 0;
+    for (var entry : positional) {
+      if (!entry.isBlank()) {
+        present++;
+      }
+    }
+
+    return present;
   }
 }

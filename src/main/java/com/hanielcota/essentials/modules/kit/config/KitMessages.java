@@ -23,7 +23,10 @@ public record KitMessages(
     @Comment("Shown after /kit reload. Placeholders: {count}.") String reloaded,
     @Comment("Shown when the console runs /kit (the menu needs a player).") String menuPlayerOnly,
     @Comment("Shown when the inventory has no room and overflow dropping is disabled.")
-        String inventoryNoSpace) {
+        String inventoryNoSpace,
+    @Comment("Shown to the giver after /kit give. Placeholders: {kit}, {player}.") String gave,
+    @Comment("Shown to the giver when /kit give could not deliver. Placeholders: {player}.")
+        String giveFailed) {
 
   public static KitMessages defaults() {
     return new KitMessages(
@@ -39,7 +42,9 @@ public record KitMessages(
         "<yellow>Kit <gold>{kit}</gold> deleted.",
         "<green>Reloaded <gold>{count}</gold> kit(s).",
         "<red>The kit menu can only be opened by players.",
-        "<red>Your inventory is full — free some space and try again.");
+        "<red>Your inventory is full — free some space and try again.",
+        "<green>Gave the kit <gold>{kit}</gold> to <gold>{player}</gold>.",
+        "<red>Could not give the kit to <gold>{player}</gold> — their inventory is full.");
   }
 
   public String formatClaimed(@NonNull String kit) {
@@ -76,5 +81,13 @@ public record KitMessages(
 
   public String formatReloaded(int count) {
     return reloaded.replace("{count}", String.valueOf(count));
+  }
+
+  public String formatGave(@NonNull String kit, @NonNull String player) {
+    return Placeholders.format(gave, "kit", kit, "player", player);
+  }
+
+  public String formatGiveFailed(@NonNull String player) {
+    return giveFailed.replace("{player}", player);
   }
 }

@@ -51,8 +51,14 @@ public final class KitCatalog {
     return this.kits.size();
   }
 
+  private static final int ARMOR_SLOTS = 4;
+
   private static Kit toKit(@NonNull String id, @NonNull KitDefinitionConfig definition) {
-    var items = KitItemCodec.decode(definition.items());
+    var storage = KitItemCodec.decode(definition.items());
+    var armor = KitItemCodec.decodePositional(definition.armor(), ARMOR_SLOTS);
+
+    var offhandItems = KitItemCodec.decode(definition.offhand());
+    var offhand = offhandItems.isEmpty() ? null : offhandItems.getFirst();
 
     return new Kit(
         id,
@@ -63,6 +69,8 @@ public final class KitCatalog {
         definition.oneTime(),
         definition.permission(),
         definition.firstJoin(),
-        items);
+        storage,
+        armor,
+        offhand);
   }
 }

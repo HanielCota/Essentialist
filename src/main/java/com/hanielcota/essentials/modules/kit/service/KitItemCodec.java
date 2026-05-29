@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.kit.service;
 import com.hanielcota.essentials.shared.Log;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -51,6 +52,40 @@ public final class KitItemCodec {
     }
 
     return List.copyOf(items);
+  }
+
+  /**
+   * Encodes a fixed set of slots positionally, using {@code ""} for empties (positions preserved).
+   */
+  public static List<String> encodePositional(@NonNull ItemStack[] slots) {
+    var encoded = new ArrayList<String>(slots.length);
+
+    for (var item : slots) {
+      if (item == null || item.getType().isAir()) {
+        encoded.add("");
+        continue;
+      }
+
+      var bytes = item.serializeAsBytes();
+      encoded.add(ENCODER.encodeToString(bytes));
+    }
+
+    return List.copyOf(encoded);
+  }
+
+  /**
+   * Decodes a positional list to exactly {@code size} entries; empty/blank slots become {@code
+   * null}.
+   */
+  public static List<ItemStack> decodePositional(@NonNull List<String> encoded, int size) {
+    var items = new ArrayList<ItemStack>(size);
+
+    for (var index = 0; index < size; index++) {
+      var entry = index < encoded.size() ? encoded.get(index) : "";
+      items.add(entry.isBlank() ? null : decodeOne(entry));
+    }
+
+    return Collections.unmodifiableList(items);
   }
 
   private static ItemStack decodeOne(@NonNull String entry) {

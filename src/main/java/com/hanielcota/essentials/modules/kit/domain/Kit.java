@@ -1,13 +1,17 @@
 package com.hanielcota.essentials.modules.kit.domain;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jspecify.annotations.Nullable;
 
 /**
- * A claimable kit, fully resolved (items already deserialized). The persisted definition lives in
- * {@code kits.yml}; this is the in-memory shape the catalog hands to the menus and the claim flow.
+ * A claimable kit, fully resolved (items already deserialized). {@code armor} is a positional list
+ * of four slots (boots, leggings, chestplate, helmet) whose entries may be {@code null}; {@code
+ * offhand} is {@code null} when the kit has none.
  */
 public record Kit(
     @NonNull String id,
@@ -18,7 +22,9 @@ public record Kit(
     boolean oneTime,
     @NonNull String permission,
     boolean firstJoin,
-    @NonNull List<ItemStack> items) {
+    @NonNull List<ItemStack> storage,
+    @NonNull List<ItemStack> armor,
+    @Nullable ItemStack offhand) {
 
   public boolean hasPermission() {
     return !this.permission.isBlank();
@@ -26,5 +32,27 @@ public record Kit(
 
   public boolean hasCooldown() {
     return this.cooldownSeconds > 0;
+  }
+
+  public boolean isEmpty() {
+    return this.storage.isEmpty()
+        && this.armor.stream().allMatch(Objects::isNull)
+        && this.offhand == null;
+  }
+
+  /** Every item the kit grants, for the read-only preview (storage, then armor, then off-hand). */
+  public List<ItemStack> previewItems() {
+    var items = new ArrayList<ItemStack>(this.storage);
+
+    for (var piece : this.armor) {
+      if (piece != null) {
+        items.add(piece);
+      }
+    }
+    if (this.offhand != null) {
+      items.add(this.offhand);
+    }
+
+    return items;
   }
 }

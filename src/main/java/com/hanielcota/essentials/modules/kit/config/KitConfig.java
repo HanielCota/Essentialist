@@ -47,7 +47,16 @@ public record KitConfig(
     // A fillable template: run "/kit create starter" holding the items, then flip the flags here.
     var starter =
         KitDefinitionConfig.of(
-            "<green>Starter", Material.CHEST, "general", 0, false, "", false, List.of());
+            "<green>Starter",
+            Material.CHEST,
+            "general",
+            0,
+            false,
+            "",
+            false,
+            List.of(),
+            List.of(),
+            List.of());
     var kits = new LinkedHashMap<String, KitDefinitionConfig>();
     kits.put("starter", starter);
 

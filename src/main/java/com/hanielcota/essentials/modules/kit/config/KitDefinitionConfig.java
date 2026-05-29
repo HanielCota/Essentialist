@@ -6,8 +6,8 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
- * Persisted definition of a single kit (one entry in {@code kits.yml}). The metadata is editable by
- * hand; {@code items} is captured by {@code /kit create} as Base64-encoded ItemStacks.
+ * Persisted definition of a single kit (one entry under {@code kits} in {@code kit.yml}). Metadata
+ * is editable by hand; the item sections are captured by {@code /kit create} as Base64 ItemStacks.
  */
 @ConfigSerializable
 public record KitDefinitionConfig(
@@ -21,8 +21,12 @@ public record KitDefinitionConfig(
         String permission,
     @Comment("When true, the kit is given automatically the first time a player joins.")
         boolean firstJoin,
-    @Comment("Serialized kit items (Base64). Managed by /kit create — edit with care.")
-        List<String> items) {
+    @Comment("Serialized main-inventory items (Base64). Managed by /kit create — edit with care.")
+        List<String> items,
+    @Comment(
+            "Serialized armor, positional: boots, leggings, chestplate, helmet. Equipped on claim.")
+        List<String> armor,
+    @Comment("Serialized off-hand item (0 or 1 entry).") List<String> offhand) {
 
   public static KitDefinitionConfig of(
       String displayName,
@@ -32,16 +36,35 @@ public record KitDefinitionConfig(
       boolean oneTime,
       String permission,
       boolean firstJoin,
-      List<String> items) {
+      List<String> items,
+      List<String> armor,
+      List<String> offhand) {
     return new KitDefinitionConfig(
-        displayName, icon, category, cooldownSeconds, oneTime, permission, firstJoin, items);
+        displayName,
+        icon,
+        category,
+        cooldownSeconds,
+        oneTime,
+        permission,
+        firstJoin,
+        items,
+        armor,
+        offhand);
   }
 
-  /**
-   * Copy of this definition with replaced items (used when /kit create overwrites an existing kit).
-   */
-  public KitDefinitionConfig withItems(List<String> newItems) {
+  /** Copy with replaced item sections (used when /kit create overwrites an existing kit). */
+  public KitDefinitionConfig withContents(
+      List<String> newItems, List<String> newArmor, List<String> newOffhand) {
     return new KitDefinitionConfig(
-        displayName, icon, category, cooldownSeconds, oneTime, permission, firstJoin, newItems);
+        displayName,
+        icon,
+        category,
+        cooldownSeconds,
+        oneTime,
+        permission,
+        firstJoin,
+        newItems,
+        newArmor,
+        newOffhand);
   }
 }
