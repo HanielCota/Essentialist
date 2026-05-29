@@ -19,6 +19,7 @@ com.hanielcota.essentials.modules.speed.SpeedModule
 com.hanielcota.essentials.modules.hat.HatModule
 com.hanielcota.essentials.modules.repair.RepairModule
 com.hanielcota.essentials.modules.give.GiveModule
+com.hanielcota.essentials.modules.combat.CombatModule
 com.hanielcota.essentials.modules.title.TitleModule
 com.hanielcota.essentials.modules.online.OnlineModule
 com.hanielcota.essentials.modules.near.NearModule
