@@ -4,6 +4,8 @@ import com.hanielcota.essentials.core.EssentialsCore;
 import com.hanielcota.essentials.core.ShutdownRegistry;
 import java.util.ArrayList;
 import java.util.Collections;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Tears down already-registered infrastructure when a bootstrap stage fails. The teardown order is
@@ -11,9 +13,8 @@ import java.util.Collections;
  * adding a new ordered service only requires registering a step in that stage, not editing this
  * class.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class BootstrapRollbackHandler {
-
-  private BootstrapRollbackHandler() {}
 
   static void rollback(StageContext context, RuntimeException cause) {
     var services = context.services();

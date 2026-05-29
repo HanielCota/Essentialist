@@ -4,13 +4,14 @@ import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class VanishMenuLayout {
 
   private static final int MIN_ROWS = 1;
-
-  private VanishMenuLayout() {}
 
   public static List<Integer> contentSlots(@NonNull VanishConfig snap) {
     var rows = snap.effectiveRows();

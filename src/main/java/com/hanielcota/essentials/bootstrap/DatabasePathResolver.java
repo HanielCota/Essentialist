@@ -5,6 +5,8 @@ import com.hanielcota.essentials.exception.PluginException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
@@ -12,9 +14,8 @@ import lombok.NonNull;
  * {@link DatabaseBootstrap} so filesystem I/O is separate from service construction and
  * registration.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class DatabasePathResolver {
-
-  private DatabasePathResolver() {}
 
   static Path resolve(@NonNull EssentialsPlugin plugin) {
     var dataFolder = plugin.getDataFolder();

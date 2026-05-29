@@ -5,6 +5,8 @@ import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import java.util.ArrayList;
 import java.util.Locale;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.enchantments.Enchantment;
 
@@ -12,9 +14,8 @@ import org.bukkit.enchantments.Enchantment;
  * Provides tab-completion suggestions for enchantment names. Accepts {@link RegistryAccess} as a
  * parameter so callers can inject alternate registries (e.g. for testing without a running server).
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EnchantmentSuggestions {
-
-  private EnchantmentSuggestions() {}
 
   public static SuggestionProvider<Enchantment> provider(@NonNull RegistryAccess registryAccess) {
     return context -> {

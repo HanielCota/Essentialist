@@ -4,13 +4,14 @@ import com.hanielcota.essentials.modules.vanish.config.VanishConfig;
 import com.hanielcota.essentials.shared.Numbers;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class VanishMessageRenderer {
 
   private static final String PLAYER_PLACEHOLDER = "{player}";
-
-  private VanishMessageRenderer() {}
 
   public static String itemName(@NonNull VanishConfig snap, @NonNull String player) {
     return snap.itemName().replace(PLAYER_PLACEHOLDER, player);

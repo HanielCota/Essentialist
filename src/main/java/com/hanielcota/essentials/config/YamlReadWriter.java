@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Supplier;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
@@ -21,9 +23,8 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
  * key added inside an existing section, leaving the file stale forever. The disk IO is a one-time
  * cost at config load, so paying it unconditionally is cheaper than the bug it prevents.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class YamlReadWriter {
-
-  private YamlReadWriter() {}
 
   public static <T> T readMerging(
       @NonNull Path file, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {

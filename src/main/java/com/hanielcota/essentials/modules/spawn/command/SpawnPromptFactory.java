@@ -3,6 +3,8 @@ package com.hanielcota.essentials.modules.spawn.command;
 import com.hanielcota.essentials.modules.spawn.config.SpawnMessages;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleportPrompt;
 import io.github.hanielcota.commandframework.core.CommandActor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
@@ -10,9 +12,8 @@ import lombok.NonNull;
  * from {@link SpawnMessages} so the command stays thin. Mirrors {@link
  * com.hanielcota.essentials.modules.warps.command.WarpPromptFactory}.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpawnPromptFactory {
-
-  private SpawnPromptFactory() {}
 
   public static DelayedTeleportPrompt create(
       @NonNull CommandActor actor, @NonNull SpawnMessages messages) {
