@@ -62,6 +62,7 @@ public final class ModuleCategoryCatalog {
         "rename",
         "itemlore",
         "more",
+        "kit",
         "workstations");
     put(
         map,

@@ -55,3 +55,4 @@ com.hanielcota.essentials.modules.more.MoreModule
 com.hanielcota.essentials.modules.sudo.SudoModule
 com.hanielcota.essentials.modules.itemlore.ItemLoreModule
 com.hanielcota.essentials.modules.spawnmob.SpawnMobModule
+com.hanielcota.essentials.modules.kit.KitModule
