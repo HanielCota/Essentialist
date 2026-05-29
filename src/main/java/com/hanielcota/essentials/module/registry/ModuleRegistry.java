@@ -19,6 +19,10 @@ public final class ModuleRegistry {
   private final Map<String, Module> registered = new LinkedHashMap<>();
   private final Map<String, ModuleState> states = new LinkedHashMap<>();
 
+  /**
+   * Registers {@code module} in {@code REGISTERED} state. A duplicate id is ignored — the first
+   * registration wins and a warning is logged rather than throwing.
+   */
   public void register(@NonNull Module module) {
     var moduleId = module.id();
 
@@ -40,10 +44,12 @@ public final class ModuleRegistry {
     return this.registered.containsKey(moduleId);
   }
 
+  /** The registered module for {@code moduleId}, or {@code null} if none is registered. */
   public Module get(@NonNull String moduleId) {
     return this.registered.get(moduleId);
   }
 
+  /** Lifecycle state of {@code moduleId}, or {@code null} if the module was never registered. */
   public ModuleState stateOf(@NonNull String moduleId) {
     return this.states.get(moduleId);
   }

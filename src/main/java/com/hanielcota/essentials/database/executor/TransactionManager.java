@@ -17,6 +17,18 @@ public final class TransactionManager {
 
   private final SqlConnectionFactory connectionFactory;
 
+  /**
+   * Runs {@code work} inside a single transaction: auto-commit is disabled for the duration,
+   * committed on success, and rolled back if {@code work} throws. Auto-commit is always restored
+   * and the connection closed before returning.
+   *
+   * <p>If {@code work} throws, the original exception propagates with the rollback (and any
+   * auto-commit-restore) failure attached as a suppressed exception; a runtime exception takes
+   * precedence over a {@link SQLException} when both are in play. Any {@code SQLException} escaping
+   * the connection/transaction machinery itself is wrapped in a {@link PluginException}.
+   *
+   * @throws PluginException if obtaining the connection or driving the transaction fails
+   */
   public void tx(@NonNull TxBlock work) {
     try (var conn = this.connectionFactory.getConnection()) {
       conn.setAutoCommit(false);

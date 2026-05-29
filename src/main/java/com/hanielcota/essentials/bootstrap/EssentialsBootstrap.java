@@ -19,6 +19,12 @@ public class EssentialsBootstrap {
 
   private final EssentialsPlugin plugin;
 
+  /**
+   * Runs every stage in order and returns the assembled {@link EssentialsCore}.
+   *
+   * @throws RuntimeException if any stage fails; before rethrowing, the partially built
+   *     infrastructure is rolled back and failure diagnostics are attached to the exception.
+   */
   public final EssentialsCore start() {
     var services = createServiceRegistry();
     var context = new StageContext(this.plugin, services);
@@ -27,10 +33,15 @@ public class EssentialsBootstrap {
     return runStages(stages, context);
   }
 
+  /** Extension point: the service registry stages share. Override to substitute a test double. */
   protected ServiceRegistry createServiceRegistry() {
     return new DefaultServiceRegistry();
   }
 
+  /**
+   * Extension point: the ordered stage list to run. Override (e.g. from an addon) to add or reorder
+   * stages; the default is {@link StageFactory#defaultStages(EssentialsPlugin)}.
+   */
   protected List<BootstrapStage> stages(EssentialsPlugin plugin) {
     return StageFactory.defaultStages(plugin);
   }
