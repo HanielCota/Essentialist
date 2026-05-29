@@ -51,6 +51,21 @@ public final class YamlReadWriter {
     }
   }
 
+  /** Serializes {@code value} to {@code file}, replacing its contents. */
+  public static <T> void write(@NonNull Path file, @NonNull Class<T> type, @NonNull T value) {
+    ensureParent(file);
+
+    var loader = loaderFor(file);
+    try {
+      var node = loader.load();
+      node.set(type, value);
+
+      loader.save(node);
+    } catch (ConfigurateException e) {
+      throw new ConfigurationException("Failed to write YAML: " + file, e);
+    }
+  }
+
   private static YamlConfigurationLoader loaderFor(@NonNull Path file) {
     var builder = YamlConfigurationLoader.builder();
     builder.path(file);

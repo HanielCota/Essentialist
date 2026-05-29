@@ -8,13 +8,15 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 public record EssentialsConfig(
     @Comment("Placeholders: {count}.") String reloadSuccess,
     @Comment("Placeholders: {succeeded}, {total}, {failed}.") String reloadFailure,
-    @Comment("Shown when /essentials is used without a subcommand.") String usage) {
+    @Comment("Shown when console runs /essentials without a subcommand.") String usage,
+    @Comment("The module-control menu opened by /essentials (in-game).") ModulesMenuConfig menu) {
 
   public static EssentialsConfig defaults() {
     return new EssentialsConfig(
         "<green>Reloaded <gold>{count}</gold> config(s).",
         "<red>Reloaded {succeeded}/{total}. Failed: <gold>{failed}</gold>.",
-        "<yellow>Usage: <gray>/essentials reload</gray>.</yellow>");
+        "<yellow>Usage: <gray>/essentials reload</gray>.</yellow>",
+        ModulesMenuConfig.defaults());
   }
 
   public String formatSuccess(int count) {
