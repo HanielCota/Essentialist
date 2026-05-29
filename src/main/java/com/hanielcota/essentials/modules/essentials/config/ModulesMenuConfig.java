@@ -20,7 +20,8 @@ public record ModulesMenuConfig(
     @Comment("Extra lore line appended when a change is awaiting a restart.") String pendingLine,
     @Comment("Chat feedback when a module is switched on. Placeholder: {module}.") String toggledOn,
     @Comment("Chat feedback when a module is switched off. Placeholder: {module}.")
-        String toggledOff) {
+        String toggledOff,
+    @Comment("Category filter button (cycles the shown category).") ModulesFilterConfig filter) {
 
   private static final int MIN_ROWS = 1;
   private static final int MAX_ROWS = 6;
@@ -38,7 +39,8 @@ public record ModulesMenuConfig(
         List.of("<gray>Estado: <red>Desativado", "<yellow>Clique para ativar."),
         "<gold>⟳ Aplica no próximo restart.",
         "<green>Módulo <gold>{module}</gold> será ativado no próximo restart.",
-        "<red>Módulo <gold>{module}</gold> será desativado no próximo restart.");
+        "<red>Módulo <gold>{module}</gold> será desativado no próximo restart.",
+        ModulesFilterConfig.defaults());
   }
 
   public int effectiveRows() {

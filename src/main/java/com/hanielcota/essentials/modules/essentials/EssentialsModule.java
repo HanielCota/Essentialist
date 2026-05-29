@@ -11,6 +11,7 @@ import com.hanielcota.essentials.modules.essentials.command.EssentialsCommand;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
 import com.hanielcota.essentials.modules.essentials.menu.EssentialsModulesMenu;
 import com.hanielcota.essentials.modules.essentials.menu.EssentialsModulesMenuState;
+import com.hanielcota.essentials.modules.essentials.menu.ModulesFilterRenderer;
 import com.hanielcota.essentials.modules.essentials.menu.ModulesMenuRenderer;
 import lombok.NonNull;
 
@@ -28,7 +29,8 @@ public final class EssentialsModule extends AbstractModule {
     var control = env.service(ModuleControl.class);
 
     var state = new EssentialsModulesMenuState();
-    var renderer = new ModulesMenuRenderer(config, control);
+    var filterRenderer = new ModulesFilterRenderer();
+    var renderer = new ModulesMenuRenderer(config, control, filterRenderer);
     var menu = new EssentialsModulesMenu(config, state, renderer, control);
     registrar.menu(menu);
 

@@ -1,9 +1,11 @@
 package com.hanielcota.essentials.modules.essentials.menu;
 
 import com.github.hanielcota.menuframework.api.ClickContext;
+import com.github.hanielcota.menuframework.api.ClickHandler;
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.module.control.ModuleControl;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
 import com.hanielcota.essentials.modules.essentials.config.ModulesMenuConfig;
@@ -14,8 +16,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Builds the module-control menu slots: the selected category's modules as toggle items in the
- * content area, plus one category tab per {@link ModuleCategory} on the bottom row.
+ * Builds the module-control menu slots: the selected category's modules as toggle items, plus a
+ * single cycling category filter button (same control style as the warps filter).
  */
 @RequiredArgsConstructor
 public final class ModulesMenuRenderer {
@@ -24,20 +26,27 @@ public final class ModulesMenuRenderer {
 
   private final @NonNull ConfigHandle<EssentialsConfig> config;
   private final @NonNull ModuleControl control;
+  private final @NonNull ModulesFilterRenderer filterRenderer;
 
   public List<SlotDefinition> slots(
       @NonNull ModuleCategory selected,
-      @NonNull BiConsumer<ClickContext, ModuleCategory> categorySwitcher,
+      @NonNull ClickHandler onCycle,
       @NonNull BiConsumer<ClickContext, String> toggler) {
     var snap = this.config.value();
     var menu = snap.menu();
     var rows = menu.effectiveRows();
-    var tabRowStart = (rows - 1) * ROW_WIDTH;
+    var filter = menu.filter();
+
+    var slotCount = rows * ROW_WIDTH;
+    var fallbackSlot = (rows - 1) * ROW_WIDTH;
+    var filterSlot = MenuLayouts.sanitizeSlot(filter.slot(), rows, fallbackSlot);
 
     var slots = new ArrayList<SlotDefinition>();
 
-    appendModules(slots, menu, selected, tabRowStart, toggler);
-    appendCategoryTabs(slots, selected, tabRowStart, categorySwitcher);
+    appendModules(slots, menu, selected, slotCount, filterSlot, toggler);
+
+    var filterItem = this.filterRenderer.render(filter, selected);
+    slots.add(SlotDefinition.of(filterSlot, filterItem, onCycle));
 
     return slots;
   }
@@ -46,30 +55,21 @@ public final class ModulesMenuRenderer {
       @NonNull List<SlotDefinition> slots,
       @NonNull ModulesMenuConfig menu,
       @NonNull ModuleCategory selected,
-      int contentLimit,
+      int slotCount,
+      int filterSlot,
       @NonNull BiConsumer<ClickContext, String> toggler) {
     var moduleIds = modulesOf(selected);
 
     var slot = 0;
     for (var moduleId : moduleIds) {
-      if (slot >= contentLimit) {
+      if (slot == filterSlot) {
+        slot++;
+      }
+      if (slot >= slotCount) {
         break;
       }
 
       var def = moduleItem(menu, slot, moduleId, toggler);
-      slots.add(def);
-      slot++;
-    }
-  }
-
-  private void appendCategoryTabs(
-      @NonNull List<SlotDefinition> slots,
-      @NonNull ModuleCategory selected,
-      int tabRowStart,
-      @NonNull BiConsumer<ClickContext, ModuleCategory> categorySwitcher) {
-    var slot = tabRowStart;
-    for (var category : ModuleCategory.values()) {
-      var def = categoryTab(slot, category, selected, categorySwitcher);
       slots.add(def);
       slot++;
     }
@@ -103,23 +103,5 @@ public final class ModulesMenuRenderer {
     var template = builder.build();
 
     return SlotDefinition.of(slot, template, click -> toggler.accept(click, moduleId));
-  }
-
-  private SlotDefinition categoryTab(
-      int slot,
-      @NonNull ModuleCategory category,
-      @NonNull ModuleCategory selected,
-      @NonNull BiConsumer<ClickContext, ModuleCategory> categorySwitcher) {
-    var icon = category.icon();
-    var label = category.label();
-
-    var builder = ItemTemplate.builder(icon);
-    builder.name(label);
-    builder.italic(false);
-    builder.glow(category == selected);
-
-    var template = builder.build();
-
-    return SlotDefinition.of(slot, template, click -> categorySwitcher.accept(click, category));
   }
 }

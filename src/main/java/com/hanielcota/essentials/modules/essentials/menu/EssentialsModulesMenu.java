@@ -68,14 +68,17 @@ public final class EssentialsModulesMenu implements EssentialsMenu {
     var viewerId = player.getUniqueId();
     var category = this.state.category(viewerId);
 
-    return this.renderer.slots(category, this::switchCategory, this::toggleModule);
+    return this.renderer.slots(category, this::cycleCategory, this::toggleModule);
   }
 
-  private void switchCategory(@NonNull ClickContext click, @NonNull ModuleCategory category) {
+  private void cycleCategory(@NonNull ClickContext click) {
     var viewer = click.player();
     var viewerId = viewer.getUniqueId();
 
-    this.state.switchCategory(viewerId, category);
+    var current = this.state.category(viewerId);
+    var next = current.next();
+
+    this.state.switchCategory(viewerId, next);
     click.refresh();
   }
 
