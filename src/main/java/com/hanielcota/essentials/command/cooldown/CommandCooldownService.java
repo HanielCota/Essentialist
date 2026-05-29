@@ -11,7 +11,11 @@ import lombok.NonNull;
  */
 public final class CommandCooldownService {
 
+  private static final long EVICTION_INTERVAL_MS = 60_000L;
+  private static final long MAX_COOLDOWN_WINDOW_MS = 600_000L;
+
   private final ConcurrentHashMap<String, Long> lastUsed = new ConcurrentHashMap<>();
+  private volatile long lastEvictionMs = System.currentTimeMillis();
 
   private static String key(@NonNull String actorId, @NonNull String command) {
     return actorId + ':' + command;
@@ -38,5 +42,26 @@ public final class CommandCooldownService {
   public void record(@NonNull String actorId, @NonNull String command, long now) {
     var mapKey = key(actorId, command);
     this.lastUsed.put(mapKey, now);
+
+    evictStale(now);
+  }
+
+  private void evictStale(long now) {
+    var elapsed = now - this.lastEvictionMs;
+    if (elapsed < EVICTION_INTERVAL_MS) {
+      return;
+    }
+
+    this.lastEvictionMs = now;
+
+    var cutoff = now - MAX_COOLDOWN_WINDOW_MS;
+    var iterator = this.lastUsed.entrySet().iterator();
+
+    while (iterator.hasNext()) {
+      var entry = iterator.next();
+      if (entry.getValue() < cutoff) {
+        iterator.remove();
+      }
+    }
   }
 }

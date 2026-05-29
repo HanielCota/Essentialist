@@ -35,9 +35,14 @@ public final class SpeedService {
       return false;
     }
 
+    var maxSpeed = snap.maxSpeed();
+    if (maxSpeed == 0) {
+      return false;
+    }
+
     // Scale by the configured max so the top value maps to Bukkit's 1.0 ceiling regardless of
     // range.
-    var scaled = value / (float) snap.maxSpeed();
+    var scaled = value / (float) maxSpeed;
     var clamped = clampToBukkitRange(scaled);
     player.setWalkSpeed(clamped);
     this.modified.add(player.getUniqueId());
@@ -50,7 +55,12 @@ public final class SpeedService {
       return false;
     }
 
-    var scaled = value / (float) snap.maxSpeed();
+    var maxSpeed = snap.maxSpeed();
+    if (maxSpeed == 0) {
+      return false;
+    }
+
+    var scaled = value / (float) maxSpeed;
     var clamped = clampToBukkitRange(scaled);
     player.setFlySpeed(clamped);
     this.modified.add(player.getUniqueId());

@@ -45,6 +45,13 @@ public final class TeleportDispatcher {
 
     var hasArg3 = !arg3.isEmpty();
     if (hasArg3) {
+      if (arg2.isEmpty()) {
+        var snap = this.config.value();
+        var msg = snap.invalidPosition();
+        sender.sendError(msg);
+        return;
+      }
+
       dispatchToPosition(sender, arg1, arg2.get(), arg3.get());
       return;
     }

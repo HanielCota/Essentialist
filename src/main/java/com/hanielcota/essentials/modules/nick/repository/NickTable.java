@@ -41,13 +41,14 @@ public final class NickTable extends SqlTable {
 
   private static String buildCreateTable(@NonNull SqlDialect dialect) {
     var caseInsensitive = dialect.caseInsensitiveTextSuffix();
-    return "CREATE TABLE IF NOT EXISTS nicks (\n"
-        + "  player_id TEXT PRIMARY KEY,\n"
-        + "  nickname TEXT NOT NULL"
-        + caseInsensitive
-        + " UNIQUE,\n"
-        + "  real_name TEXT NOT NULL,\n"
-        + "  created_at INTEGER NOT NULL\n"
-        + ")";
+    return """
+    CREATE TABLE IF NOT EXISTS nicks (
+      player_id TEXT PRIMARY KEY,
+      nickname TEXT NOT NULL%s UNIQUE,
+      real_name TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    )\
+    """
+        .formatted(caseInsensitive);
   }
 }

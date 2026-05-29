@@ -26,29 +26,33 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class YamlReadWriter {
 
+  private static final Object LOCK = new Object();
+
   public static <T> T readMerging(
       @NonNull Path file, @NonNull Class<T> type, @NonNull Supplier<T> defaults) {
     ensureParent(file);
 
-    var loader = loaderFor(file);
-    try {
-      var node = loader.load();
-      var options = node.options();
-      var defaultsNode = CommentedConfigurationNode.root(options);
+    synchronized (LOCK) {
+      var loader = loaderFor(file);
+      try {
+        var node = loader.load();
+        var options = node.options();
+        var defaultsNode = CommentedConfigurationNode.root(options);
 
-      var defaultInstance = defaults.get();
-      defaultsNode.set(type, defaultInstance);
-      node.mergeFrom(defaultsNode);
+        var defaultInstance = defaults.get();
+        defaultsNode.set(type, defaultInstance);
+        node.mergeFrom(defaultsNode);
 
-      var value = node.get(type);
-      if (value == null) {
-        value = defaultInstance;
+        var value = node.get(type);
+        if (value == null) {
+          value = defaultInstance;
+        }
+
+        loader.save(node);
+        return value;
+      } catch (ConfigurateException e) {
+        throw new ConfigurationException("Failed to load YAML: " + file, e);
       }
-
-      loader.save(node);
-      return value;
-    } catch (ConfigurateException e) {
-      throw new ConfigurationException("Failed to load YAML: " + file, e);
     }
   }
 
@@ -56,14 +60,16 @@ public final class YamlReadWriter {
   public static <T> void write(@NonNull Path file, @NonNull Class<T> type, @NonNull T value) {
     ensureParent(file);
 
-    var loader = loaderFor(file);
-    try {
-      var node = loader.load();
-      node.set(type, value);
+    synchronized (LOCK) {
+      var loader = loaderFor(file);
+      try {
+        var node = loader.load();
+        node.set(type, value);
 
-      loader.save(node);
-    } catch (ConfigurateException e) {
-      throw new ConfigurationException("Failed to write YAML: " + file, e);
+        loader.save(node);
+      } catch (ConfigurateException e) {
+        throw new ConfigurationException("Failed to write YAML: " + file, e);
+      }
     }
   }
 

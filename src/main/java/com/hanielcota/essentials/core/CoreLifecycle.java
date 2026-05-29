@@ -8,6 +8,7 @@ import com.hanielcota.essentials.service.ServiceRegistry;
 import com.hanielcota.essentials.shared.Log;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +28,15 @@ final class CoreLifecycle {
 
   private final @NonNull EssentialsPlugin plugin;
   private final @NonNull ServiceRegistry services;
-  private volatile LifecyclePhase phase = LifecyclePhase.BOOTING;
+  private final AtomicReference<LifecyclePhase> phase =
+      new AtomicReference<>(LifecyclePhase.BOOTING);
 
   LifecyclePhase phase() {
-    return this.phase;
+    return this.phase.get();
   }
 
   void advance(@NonNull LifecyclePhase next) {
-    this.phase = next;
+    this.phase.set(next);
 
     if (next == LifecyclePhase.ENABLED) {
       enableModules();
@@ -49,13 +51,13 @@ final class CoreLifecycle {
   }
 
   void shutdown() {
-    this.phase = LifecyclePhase.DISABLING;
+    this.phase.set(LifecyclePhase.DISABLING);
 
     try {
       disableModules();
     } finally {
       runShutdownSteps();
-      this.phase = LifecyclePhase.DISABLED;
+      this.phase.set(LifecyclePhase.DISABLED);
     }
   }
 

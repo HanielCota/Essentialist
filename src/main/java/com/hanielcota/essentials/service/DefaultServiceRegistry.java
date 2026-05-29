@@ -15,7 +15,7 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
   private final List<BiConsumer<Class<?>, Object>> listeners = new CopyOnWriteArrayList<>();
 
   @Override
-  public <T> void register(@NonNull Class<T> type, @NonNull T instance) {
+  public synchronized <T> void register(@NonNull Class<T> type, @NonNull T instance) {
     var previous = this.services.putIfAbsent(type, instance);
 
     if (previous != null) {
@@ -66,14 +66,14 @@ public final class DefaultServiceRegistry implements ServiceRegistry {
   /**
    * Subscribes {@code listener} to future registrations and immediately replays every
    * already-registered service to it, so a late subscriber never misses services registered before
-   * it. Replay runs before the listener is wired to avoid double-delivering a concurrent
-   * registration.
+   * it. The listener is added first, then replayed, so a concurrent registration between add and
+   * replay is delivered twice at worst (harmless) rather than missed entirely.
    */
   @Override
-  public void addRegistrationListener(@NonNull BiConsumer<Class<?>, Object> listener) {
-    replayExistingTo(listener);
-
+  public synchronized void addRegistrationListener(@NonNull BiConsumer<Class<?>, Object> listener) {
     this.listeners.add(listener);
+
+    replayExistingTo(listener);
   }
 
   private void replayExistingTo(@NonNull BiConsumer<Class<?>, Object> listener) {

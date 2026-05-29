@@ -2,7 +2,9 @@ package com.hanielcota.essentials.modules.vanish.service;
 
 import com.hanielcota.essentials.EssentialsPlugin;
 import com.hanielcota.essentials.paper.PlayerProvider;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -24,6 +26,8 @@ public final class VanishVisibilityApplier {
 
   private final EssentialsPlugin plugin;
   private final PlayerProvider players;
+  private final Map<UUID, Boolean> previousInvulnerable = new ConcurrentHashMap<>();
+  private final Map<UUID, Boolean> previousPickup = new ConcurrentHashMap<>();
 
   /** Hides {@code target} from every viewer without {@link #SEE_PERMISSION} and enables guards. */
   public void apply(@NonNull Player target) {
@@ -39,11 +43,17 @@ public final class VanishVisibilityApplier {
       viewer.hidePlayer(this.plugin, target);
     }
 
+    var id = target.getUniqueId();
+    this.previousInvulnerable.put(id, target.isInvulnerable());
+    this.previousPickup.put(id, target.getCanPickupItems());
+
     target.setInvulnerable(true);
     target.setCanPickupItems(false);
   }
 
-  /** Reveals {@code target} to every viewer and clears the protection flags. */
+  /**
+   * Reveals {@code target} to every viewer and restores the protection flags to pre-vanish state.
+   */
   public void unapply(@NonNull Player target) {
     var viewers = this.players.all();
 
@@ -54,8 +64,12 @@ public final class VanishVisibilityApplier {
       viewer.showPlayer(this.plugin, target);
     }
 
-    target.setInvulnerable(false);
-    target.setCanPickupItems(true);
+    var id = target.getUniqueId();
+    var wasInvulnerable = this.previousInvulnerable.remove(id);
+    var couldPickup = this.previousPickup.remove(id);
+
+    target.setInvulnerable(wasInvulnerable != null && wasInvulnerable);
+    target.setCanPickupItems(couldPickup == null || couldPickup);
   }
 
   /**

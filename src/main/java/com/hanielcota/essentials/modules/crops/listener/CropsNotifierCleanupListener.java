@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.crops.listener;
 
-import com.hanielcota.essentials.modules.crops.CropsNotifier;
+import com.hanielcota.essentials.modules.crops.command.CropsNotifier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;

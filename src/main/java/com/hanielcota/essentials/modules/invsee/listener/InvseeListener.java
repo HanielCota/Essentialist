@@ -18,17 +18,11 @@ public final class InvseeListener implements Listener {
 
   private final InvseeSynchronizer synchronizer;
 
-  // Run at MONITOR with ignoreCancelled=true so we only sync the view back to the target after the
-  // event has run its full course AND survived every other plugin's cancel decision — otherwise an
-  // anti-cheat / protection plugin cancelling the click would still trigger a writeback that
-  // overwrites the live inventory with the stale view (item-loss / dupe vector).
-  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onClick(@NonNull InventoryClickEvent event) {
-    var view = event.getView();
-    var top = view.getTopInventory();
-    var topHolder = top.getHolder();
+  @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+  public void onClickGuard(@NonNull InventoryClickEvent event) {
+    var topHolder = event.getView().getTopInventory().getHolder();
 
-    if (!(topHolder instanceof InvseeHolder holder)) {
+    if (!(topHolder instanceof InvseeHolder)) {
       return;
     }
 
@@ -40,22 +34,18 @@ public final class InvseeListener implements Listener {
 
     var clickedInventory = event.getClickedInventory();
     var clickedSlot = event.getSlot();
+    var top = event.getView().getTopInventory();
 
     if (clickedInventory == top && clickedSlot >= InvseeLayout.FIRST_LOCKED_SLOT) {
       event.setCancelled(true);
-      return;
     }
-
-    this.synchronizer.scheduleSync(holder, top);
   }
 
-  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onDrag(@NonNull InventoryDragEvent event) {
-    var view = event.getView();
-    var top = view.getTopInventory();
-    var topHolder = top.getHolder();
+  @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+  public void onDragGuard(@NonNull InventoryDragEvent event) {
+    var topHolder = event.getView().getTopInventory().getHolder();
 
-    if (!(topHolder instanceof InvseeHolder holder)) {
+    if (!(topHolder instanceof InvseeHolder)) {
       return;
     }
 
@@ -65,6 +55,7 @@ public final class InvseeListener implements Listener {
       return;
     }
 
+    var top = event.getView().getTopInventory();
     var topSize = top.getSize();
     var rawSlots = event.getRawSlots();
 
@@ -74,7 +65,33 @@ public final class InvseeListener implements Listener {
         return;
       }
     }
+  }
 
+  // Run at MONITOR with ignoreCancelled=true so we only sync the view back to the target after the
+  // event has run its full course AND survived every other plugin's cancel decision — otherwise an
+  // anti-cheat / protection plugin cancelling the click would still trigger a writeback that
+  // overwrites the live inventory with the stale view (item-loss / dupe vector).
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onClickSync(@NonNull InventoryClickEvent event) {
+    var topHolder = event.getView().getTopInventory().getHolder();
+
+    if (!(topHolder instanceof InvseeHolder holder)) {
+      return;
+    }
+
+    var top = event.getView().getTopInventory();
+    this.synchronizer.scheduleSync(holder, top);
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onDragSync(@NonNull InventoryDragEvent event) {
+    var topHolder = event.getView().getTopInventory().getHolder();
+
+    if (!(topHolder instanceof InvseeHolder holder)) {
+      return;
+    }
+
+    var top = event.getView().getTopInventory();
     this.synchronizer.scheduleSync(holder, top);
   }
 }

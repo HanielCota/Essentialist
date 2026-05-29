@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.crops;
 import com.hanielcota.essentials.module.AbstractModule;
 import com.hanielcota.essentials.module.environment.ModuleEnvironment;
 import com.hanielcota.essentials.module.registration.ModuleRegistrar;
+import com.hanielcota.essentials.modules.crops.command.CropsNotifier;
 import com.hanielcota.essentials.modules.crops.config.CropsConfig;
 import com.hanielcota.essentials.modules.crops.listener.AutoReplantListener;
 import com.hanielcota.essentials.modules.crops.listener.CropBreakListener;

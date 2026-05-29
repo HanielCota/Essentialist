@@ -34,6 +34,9 @@ final class DatabaseBootstrap implements BootstrapStage {
     database.connect();
 
     var services = context.services();
+    var shutdownRegistry = services.resolve(ShutdownRegistry.class);
+    shutdownRegistry.register(ShutdownStep.of("DatabaseProvider", database::close));
+
     services.register(DatabaseProvider.class, database);
     services.register(SqlConnectionFactory.class, database);
 
@@ -44,8 +47,5 @@ final class DatabaseBootstrap implements BootstrapStage {
     services.register(SqlDialect.class, new SqliteDialect());
 
     services.register(AsyncDatabaseWriter.Factory.class, new DefaultAsyncDatabaseWriterFactory());
-
-    var shutdownRegistry = services.resolve(ShutdownRegistry.class);
-    shutdownRegistry.register(ShutdownStep.of("DatabaseProvider", database::close));
   }
 }

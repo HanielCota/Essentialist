@@ -1,14 +1,15 @@
 package com.hanielcota.essentials.modules.homes.service;
 
+import java.util.Optional;
 import lombok.NonNull;
 
 public record HomeNameResolver(@NonNull HomeNameValidator validator) {
 
-  public String resolve(@NonNull String rawName) {
+  public Optional<String> resolve(@NonNull String rawName) {
     if (!this.validator.isValid(rawName)) {
-      return null;
+      return Optional.empty();
     }
 
-    return rawName;
+    return Optional.of(rawName);
   }
 }

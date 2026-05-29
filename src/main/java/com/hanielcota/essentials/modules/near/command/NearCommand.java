@@ -10,6 +10,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 
 @Command("near")
 @EssentialsCommand
+@PlayerOnly
 @Permission("essentials.near")
 @Description("Lista os jogadores próximos.")
 @Syntax("/near [raio]")

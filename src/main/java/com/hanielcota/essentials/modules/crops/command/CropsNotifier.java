@@ -1,4 +1,4 @@
-package com.hanielcota.essentials.modules.crops;
+package com.hanielcota.essentials.modules.crops.command;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.crops.config.CropsConfig;
@@ -10,11 +10,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
-/**
- * Sends the "action blocked" feedback for crop protections, throttled per player so a player who
- * keeps mining unripe crops is not spammed. Shared by the break and trample listeners so the
- * cooldown is unified per player across both.
- */
 @RequiredArgsConstructor
 public final class CropsNotifier {
 
@@ -51,7 +46,6 @@ public final class CropsNotifier {
     player.sendMessage(component);
   }
 
-  /** Drops a player's throttle timestamp so the map does not grow unbounded over server uptime. */
   public void forget(@NonNull UUID playerId) {
     this.lastSent.remove(playerId);
   }

@@ -12,6 +12,7 @@ import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
 import io.github.hanielcota.commandframework.annotation.Min;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Subcommand;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -23,6 +24,7 @@ import org.bukkit.entity.Player;
 
 @Command("itemlore")
 @EssentialsCommand
+@PlayerOnly
 @Permission("essentials.itemlore")
 @Description("Edita a lore do item na mão.")
 @Syntax("/itemlore add <texto> | set <linha> <texto> | remove <linha> | clear")

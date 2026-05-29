@@ -11,6 +11,7 @@ import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.Min;
 import io.github.hanielcota.commandframework.annotation.Permission;
+import io.github.hanielcota.commandframework.annotation.PlayerOnly;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
@@ -21,6 +22,7 @@ import org.bukkit.entity.Player;
 
 @Command("spawnmob")
 @EssentialsCommand
+@PlayerOnly
 @Permission("essentials.spawnmob")
 @Description("Invoca mobs na sua localização.")
 @Syntax("/spawnmob <mob> [quantidade]")

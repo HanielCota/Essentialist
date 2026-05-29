@@ -76,12 +76,14 @@ public final class SqliteDatabase implements DatabaseProvider {
 
   @Override
   public Connection getConnection() throws SQLException {
-    var current = this.sourceRef.get();
+    synchronized (this.sourceRef) {
+      var current = this.sourceRef.get();
 
-    if (current == null || current.isClosed()) {
-      throw new SQLException("Database is not connected");
+      if (current == null || current.isClosed()) {
+        throw new SQLException("Database is not connected");
+      }
+
+      return current.getConnection();
     }
-
-    return current.getConnection();
   }
 }

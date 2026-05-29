@@ -71,23 +71,26 @@ public final class DefaultAsyncDatabaseWriter implements AsyncDatabaseWriter {
   }
 
   private void runSafely(@NonNull String operation, @NonNull Runnable work) {
-    try {
-      work.run();
-    } catch (RuntimeException e) {
-      LOG.warn(e, "{} async {} failed", this.threadName, operation);
-      throw e;
-    }
+    work.run();
   }
 
   private Void handleSubmitFailure(@NonNull String operation, @NonNull Throwable error) {
     if (error instanceof RejectedExecutionException) {
+      var queue = this.executor.getQueue();
+      var queued = queue.size();
+      var remaining = queue.remainingCapacity();
+
       LOG.warn(
-          "{} rejected {} (queue full or shutting down, capacity {})",
+          "{} rejected {} (queue full or shutting down, queued={}, remaining={})",
           this.threadName,
           operation,
-          this.executor.getQueue().remainingCapacity() + this.executor.getQueue().size());
+          queued,
+          remaining);
       return null;
     }
+
+    LOG.warn(error, "{} async {} failed", this.threadName, operation);
+
     if (error instanceof RuntimeException runtime) {
       throw runtime;
     }
