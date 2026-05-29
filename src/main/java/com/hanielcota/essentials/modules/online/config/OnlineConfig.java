@@ -13,9 +13,9 @@ public record OnlineConfig(
 
   public static OnlineConfig defaults() {
     return new OnlineConfig(
-        "<gray>Não há ninguém online no momento.",
-        "<yellow>Há <gold>{count}</gold>/<gold>{max}</gold> jogador online.",
-        "<yellow>Há <gold>{count}</gold>/<gold>{max}</gold> jogadores online.");
+        "<gray>There is nobody online right now.",
+        "<yellow>There is <gold>{count}</gold>/<gold>{max}</gold> player online.",
+        "<yellow>There are <gold>{count}</gold>/<gold>{max}</gold> players online.");
   }
 
   public String format(int count, int max) {

@@ -24,16 +24,16 @@ public record RepairConfig(
 
   public static RepairConfig defaults() {
     return new RepairConfig(
-        "<green>Item reparado.",
-        "<green>Reparou o item de <gold>{player}</gold>.",
-        "<green>Reparado <gold>{count}</gold> item(ns).",
-        "<green>Reparado <gold>{count}</gold> item(ns) de <gold>{player}</gold>.",
-        "<red>O item na sua mão não precisa de reparo.",
-        "<red>O item na mão de <gold>{player}</gold> não precisa de reparo.",
-        "<red>Nenhum item no seu inventário precisa de reparo.",
-        "<red>Nenhum item no inventário de <gold>{player}</gold> precisa de reparo.",
-        "<red>Sua mão está vazia.",
-        "<red>A mão de <gold>{player}</gold> está vazia.",
+        "<green>Item repaired.",
+        "<green>Repaired the item of <gold>{player}</gold>.",
+        "<green>Repaired <gold>{count}</gold> item(s).",
+        "<green>Repaired <gold>{count}</gold> item(s) of <gold>{player}</gold>.",
+        "<red>The item in your hand does not need repair.",
+        "<red>The item in <gold>{player}</gold>'s hand does not need repair.",
+        "<red>No item in your inventory needs repair.",
+        "<red>No item in <gold>{player}</gold>'s inventory needs repair.",
+        "<red>Your hand is empty.",
+        "<red><gold>{player}</gold>'s hand is empty.",
         List.of(),
         41);
   }

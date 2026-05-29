@@ -44,34 +44,34 @@ public record TpaPendingActionMenuConfig(
 
   public static TpaPendingActionMenuConfig defaults() {
     return new TpaPendingActionMenuConfig(
-        "Pedido pendente",
+        "Pending request",
         5,
         13,
         Material.PLAYER_HEAD,
         true,
         "",
         "{player}",
-        List.of("{type}.", "Expira em {seconds}s.", "", "Escolha uma ação abaixo."),
+        List.of("{type}.", "Expires in {seconds}s.", "", "Choose an action below."),
         30,
         Material.LIME_DYE,
-        "Aceitar",
-        List.of("Aceita o pedido de {player} e teleporta na hora.", "", "Clique para aceitar."),
+        "Accept",
+        List.of("Accepts {player}'s request and teleports right away.", "", "Click to accept."),
         31,
         Material.RED_DYE,
-        "Recusar",
-        List.of("Recusa o pedido de {player} sem teleportar.", "", "Clique para recusar."),
+        "Deny",
+        List.of("Denies {player}'s request without teleporting.", "", "Click to deny."),
         32,
         Material.BARRIER,
-        "Bloquear jogador",
+        "Block player",
         List.of(
-            "Recusa o pedido e impede que {player} te envie novos pedidos.",
+            "Denies the request and stops {player} from sending you new ones.",
             "",
-            "Clique para bloquear."),
+            "Click to block."),
         40,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para a lista de pedidos."),
-        "Quer ir até você",
-        "Quer que você vá até ele");
+        "Back",
+        List.of("Back to the requests list."),
+        "Wants to come to you",
+        "Wants you to go to them");
   }
 }

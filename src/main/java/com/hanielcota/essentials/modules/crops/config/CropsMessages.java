@@ -18,7 +18,7 @@ public record CropsMessages(
     return new CropsMessages(
         true,
         3000L,
-        "<red>Você não pode quebrar plantações que ainda não cresceram.",
-        "<red>Você não pode pisar na plantação.");
+        "<red>You cannot break crops that have not fully grown yet.",
+        "<red>You cannot trample the farmland.");
   }
 }

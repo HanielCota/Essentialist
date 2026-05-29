@@ -14,7 +14,7 @@ public record PingConfig(
 
   public static PingConfig defaults() {
     return new PingConfig(
-        "<gray>Seu ping: {ping}.", "<gray>Ping de <gold>{player}</gold>: {ping}.", 100, 250);
+        "<gray>Your ping: {ping}.", "<gray><gold>{player}</gold>'s ping: {ping}.", 100, 250);
   }
 
   public MessagePair message() {

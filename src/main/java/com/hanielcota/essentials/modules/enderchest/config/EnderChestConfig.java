@@ -14,9 +14,9 @@ public record EnderChestConfig(
 
   public static EnderChestConfig defaults() {
     return new EnderChestConfig(
-        "<green>Abrindo o seu Ender Chest.",
-        "<green>Abrindo o Ender Chest de <gold>{player}</gold>.",
-        "<red>Você não pode abrir o Ender Chest de outros jogadores.");
+        "<green>Opening your Ender Chest.",
+        "<green>Opening <gold>{player}</gold>'s Ender Chest.",
+        "<red>You cannot open other players' Ender Chests.");
   }
 
   public MessagePair whenOpened() {

@@ -23,10 +23,10 @@ public record HatConfig(
 
   public static HatConfig defaults() {
     return new HatConfig(
-        "<green>Chapéu equipado.",
-        "<red>Você precisa estar segurando um item para usar como chapéu.",
-        "<red>Esse item não pode ser usado como chapéu.",
-        "<red>Sem espaço no inventário para o chapéu anterior.",
+        "<green>Hat equipped.",
+        "<red>You need to be holding an item to use as a hat.",
+        "<red>That item cannot be used as a hat.",
+        "<red>No inventory space for the previous hat.",
         List.of(
             Material.LEATHER_HELMET,
             Material.CHAINMAIL_HELMET,

@@ -13,10 +13,10 @@ public record ActionBarConfig(
 
   public static ActionBarConfig defaults() {
     return new ActionBarConfig(
-        "<red>Informe a mensagem da action bar.",
-        "<red>Use /actionbar broadcast para enviar pelo console.",
-        "<green>Action bar enviada.",
-        "<green>Action bar enviada para <gold>{count}</gold> jogador(es).");
+        "<red>Provide the action bar message.",
+        "<red>Use /actionbar broadcast to send it from the console.",
+        "<green>Action bar sent.",
+        "<green>Action bar sent to <gold>{count}</gold> player(s).");
   }
 
   public String formatBroadcasted(int count) {

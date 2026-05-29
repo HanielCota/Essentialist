@@ -40,37 +40,28 @@ public record TpaPrivacySettingsMenuConfig(
 
   public static TpaPrivacySettingsMenuConfig defaults() {
     return new TpaPrivacySettingsMenuConfig(
-        "Privacidade",
+        "Privacy",
         3,
         10,
         12,
         14,
         Material.LIME_DYE,
         Material.GRAY_DYE,
-        "Receber pedidos /tpa: {state}",
-        List.of(
-            "Outros jogadores podem pedir para vir até você.",
-            "",
-            "Clique para ligar ou desligar."),
-        "Receber pedidos /tpahere: {state}",
-        List.of(
-            "Outros jogadores podem pedir para você ir até eles.",
-            "",
-            "Clique para ligar ou desligar."),
-        "Aceitar pedidos entre mundos: {state}",
-        List.of(
-            "Aceita pedidos de jogadores que estão em outros mundos.",
-            "",
-            "Clique para ligar ou desligar."),
+        "Receive /tpa requests: {state}",
+        List.of("Other players can ask to come to you.", "", "Click to turn on or off."),
+        "Receive /tpahere requests: {state}",
+        List.of("Other players can ask you to go to them.", "", "Click to turn on or off."),
+        "Accept cross-world requests: {state}",
+        List.of("Accepts requests from players in other worlds.", "", "Click to turn on or off."),
         20,
         Material.IRON_BARS,
-        "Jogadores bloqueados",
-        List.of("Lista de quem não pode te enviar pedidos.", "", "Clique para abrir."),
+        "Blocked players",
+        List.of("List of who cannot send you requests.", "", "Click to open."),
         22,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para as configurações."),
-        "ligado",
-        "desligado");
+        "Back",
+        List.of("Back to the settings."),
+        "on",
+        "off");
   }
 }

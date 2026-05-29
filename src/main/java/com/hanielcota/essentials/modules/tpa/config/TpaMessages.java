@@ -59,13 +59,13 @@ public record TpaMessages(
                 + "Placeholders: {player}.")
         String requestReplaced,
     @Comment("/tpahistory when the player has no history yet.") String noHistory,
-    @Comment("/tpahistory <jogador> when the target has no history. Placeholders: {player}.")
+    @Comment("/tpahistory <player> when the target has no history. Placeholders: {player}.")
         String noHistoryOther,
-    @Comment("/tpahistory <jogador> without the .others permission.") String noPermissionOther,
-    @Comment("/tpahistory <jogador> when the target is unknown. Placeholders: {player}.")
+    @Comment("/tpahistory <player> without the .others permission.") String noPermissionOther,
+    @Comment("/tpahistory <player> when the target is unknown. Placeholders: {player}.")
         String playerNotFound,
     @Comment(
-            "/tpahistory <jogador> confirmation sent before opening the menu. "
+            "/tpahistory <player> confirmation sent before opening the menu. "
                 + "Placeholders: {player}.")
         String viewingOther,
     @Comment("/tpa blocked because target disabled incoming /tpa. Placeholders: {player}.")
@@ -125,67 +125,67 @@ public record TpaMessages(
 
   public static TpaMessages defaults() {
     return new TpaMessages(
-        "<green>Pedido enviado para ir até <gold>{player}</gold>.",
-        "<green>Pedido enviado para chamar <gold>{player}</gold> até você.",
-        "<red>Você não pode enviar um pedido de teleporte para si mesmo.",
-        "<red>Você não tem nenhum pedido pendente para cancelar.",
-        "<yellow>Pedido de teleporte para <gold>{player}</gold> cancelado.",
-        "<red>Seu pedido de teleporte para <gold>{player}</gold> expirou.",
-        "<green><gold>{player}</gold> aceitou seu pedido de teleporte.",
-        "<red><gold>{player}</gold> recusou seu pedido de teleporte.",
-        "<red><gold>{player}</gold> está offline — o pedido foi cancelado.",
-        "<red><gold>{player}</gold> não está mais online — o pedido foi cancelado.",
-        "<red>O teleporte não pôde ser concluído.",
-        "<gold>{player}</gold> <yellow>quer se teleportar até você. <gray>(expira em {seconds}s)",
-        "<gold>{player}</gold> <yellow>quer que você se teleporte até ele. "
-            + "<gray>(expira em {seconds}s)",
-        "<light_purple>★</light_purple> <gold>{player}</gold> <yellow>(seu favorito) "
-            + "<yellow>quer se teleportar até você. <gray>(expira em {seconds}s)",
-        "<light_purple>★</light_purple> <gold>{player}</gold> <yellow>(seu favorito) "
-            + "<yellow>quer que você se teleporte até ele. <gray>(expira em {seconds}s)",
-        "<green><bold>[ACEITAR]</bold>",
-        "<red><bold>[RECUSAR]</bold>",
-        "<green>Clique para aceitar o pedido de <gold>{player}</gold>.",
-        "<red>Clique para recusar o pedido de <gold>{player}</gold>.",
-        "<red>Você não tem nenhum pedido de teleporte pendente.",
-        "<red>Você tem vários pedidos. Use <gold>/tpaccept <jogador></gold> para aceitar "
-            + "ou <gold>/tpdeny <jogador></gold> para recusar.",
-        "<green>Você aceitou o pedido de <gold>{player}</gold>.",
-        "<yellow>Você recusou o pedido de <gold>{player}</gold>.",
-        "<red>O pedido de teleporte foi cancelado — <gold>{player}</gold> saiu do servidor.",
-        "<red>O pedido de teleporte foi cancelado — <gold>{player}</gold> enviou um novo pedido.",
-        "<red>Você ainda não enviou nenhum pedido de teleporte.",
-        "<red><gold>{player}</gold> ainda não enviou nenhum pedido de teleporte.",
-        "<red>Você não tem permissão para ver o histórico de outros jogadores.",
-        "<red>O jogador <gold>{player}</gold> nunca entrou neste servidor.",
-        "<gray>Mostrando o histórico de teleportes de <gold>{player}</gold>.",
-        "<red><gold>{player}</gold> não permite que outros jogadores teleportem até ele.",
-        "<red><gold>{player}</gold> não permite ser chamado até outros jogadores.",
-        "<red><gold>{player}</gold> não está recebendo pedidos seus.",
-        "<green>Você bloqueou pedidos de TPA de <gold>{player}</gold>.",
-        "<green>Você desbloqueou pedidos de TPA de <gold>{player}</gold>.",
-        "<red>Você não pode bloquear pedidos de TPA de si mesmo.",
-        "<yellow>Digite no chat o nick do jogador que deseja adicionar aos favoritos. "
-            + "<gray>(<white>{seconds}s</white>, digite <white>cancelar</white> para abortar)",
-        "<green>Você adicionou <gold>{player}</gold> aos favoritos.",
-        "<yellow>Você removeu <gold>{player}</gold> dos favoritos.",
-        "<red><gold>{player}</gold> já está nos seus favoritos.",
-        "<red>Nick inválido. Use apenas letras, números e _.",
-        "<red>Você não digitou nada a tempo — adição de favorito cancelada.",
-        "<yellow>Adição de favorito cancelada.",
-        "<red>Você não pode adicionar a si mesmo como favorito.",
-        "<red>O jogador <gold>{player}</gold> nunca entrou neste servidor.",
-        "<red><gold>{player}</gold> não está online no momento.",
-        "<red><gold>{player}</gold> está no modo Não-Perturbe e não está recebendo pedidos.",
-        "<gold>{player}</gold> te adicionou aos favoritos.",
-        "<red><gold>{player}</gold> não está aceitando pedidos vindos de outros mundos.",
-        "<green>Você aceitou <white>{count}</white> pedido(s).",
-        "<yellow>Você recusou <white>{count}</white> pedido(s).",
-        "<yellow>Pedidos /tpa ignorados — um pedido /tpahere tem prioridade. "
-            + "(<white>{count}</white> ignorado(s))",
-        "<gray>Alguns pedidos já foram processados e não puderam ser negados. "
-            + "(<white>{count}</white> pedido(s))",
-        "<yellow>Seu pedido para <gold>{oldTarget}</gold> foi substituído por um novo para "
+        "<green>Request sent to teleport to <gold>{player}</gold>.",
+        "<green>Request sent for <gold>{player}</gold> to teleport to you.",
+        "<red>You cannot send a teleport request to yourself.",
+        "<red>You have no pending request to cancel.",
+        "<yellow>Teleport request to <gold>{player}</gold> cancelled.",
+        "<red>Your teleport request to <gold>{player}</gold> has expired.",
+        "<green><gold>{player}</gold> accepted your teleport request.",
+        "<red><gold>{player}</gold> denied your teleport request.",
+        "<red><gold>{player}</gold> is offline — the request was cancelled.",
+        "<red><gold>{player}</gold> is no longer online — the request was cancelled.",
+        "<red>The teleport could not be completed.",
+        "<gold>{player}</gold> <yellow>wants to teleport to you. <gray>(expires in {seconds}s)",
+        "<gold>{player}</gold> <yellow>wants you to teleport to them. "
+            + "<gray>(expires in {seconds}s)",
+        "<light_purple>★</light_purple> <gold>{player}</gold> <yellow>(your favorite) "
+            + "<yellow>wants to teleport to you. <gray>(expires in {seconds}s)",
+        "<light_purple>★</light_purple> <gold>{player}</gold> <yellow>(your favorite) "
+            + "<yellow>wants you to teleport to them. <gray>(expires in {seconds}s)",
+        "<green><bold>[ACCEPT]</bold>",
+        "<red><bold>[DENY]</bold>",
+        "<green>Click to accept the request from <gold>{player}</gold>.",
+        "<red>Click to deny the request from <gold>{player}</gold>.",
+        "<red>You have no pending teleport request.",
+        "<red>You have several requests. Use <gold>/tpaccept <player></gold> to accept "
+            + "or <gold>/tpdeny <player></gold> to deny.",
+        "<green>You accepted the request from <gold>{player}</gold>.",
+        "<yellow>You denied the request from <gold>{player}</gold>.",
+        "<red>The teleport request was cancelled — <gold>{player}</gold> left the server.",
+        "<red>The teleport request was cancelled — <gold>{player}</gold> sent a new request.",
+        "<red>You have not sent any teleport request yet.",
+        "<red><gold>{player}</gold> has not sent any teleport request yet.",
+        "<red>You do not have permission to view other players' history.",
+        "<red>The player <gold>{player}</gold> has never joined this server.",
+        "<gray>Showing the teleport history of <gold>{player}</gold>.",
+        "<red><gold>{player}</gold> does not allow other players to teleport to them.",
+        "<red><gold>{player}</gold> does not allow being summoned to other players.",
+        "<red><gold>{player}</gold> is not receiving requests from you.",
+        "<green>You blocked TPA requests from <gold>{player}</gold>.",
+        "<green>You unblocked TPA requests from <gold>{player}</gold>.",
+        "<red>You cannot block TPA requests from yourself.",
+        "<yellow>Type in chat the nick of the player you want to add to your favorites. "
+            + "<gray>(<white>{seconds}s</white>, type <white>cancel</white> to abort)",
+        "<green>You added <gold>{player}</gold> to your favorites.",
+        "<yellow>You removed <gold>{player}</gold> from your favorites.",
+        "<red><gold>{player}</gold> is already in your favorites.",
+        "<red>Invalid nick. Use only letters, numbers and _.",
+        "<red>You did not type anything in time — adding favorite cancelled.",
+        "<yellow>Adding favorite cancelled.",
+        "<red>You cannot add yourself as a favorite.",
+        "<red>The player <gold>{player}</gold> has never joined this server.",
+        "<red><gold>{player}</gold> is not online right now.",
+        "<red><gold>{player}</gold> is in Do-Not-Disturb mode and is not receiving requests.",
+        "<gold>{player}</gold> added you to their favorites.",
+        "<red><gold>{player}</gold> is not accepting requests from other worlds.",
+        "<green>You accepted <white>{count}</white> request(s).",
+        "<yellow>You denied <white>{count}</white> request(s).",
+        "<yellow>/tpa requests skipped — a /tpahere request has priority. "
+            + "(<white>{count}</white> skipped)",
+        "<gray>Some requests were already processed and could not be denied. "
+            + "(<white>{count}</white> request(s))",
+        "<yellow>Your request to <gold>{oldTarget}</gold> was replaced by a new one to "
             + "<gold>{newTarget}</gold>.</yellow>");
   }
 

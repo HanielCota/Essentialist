@@ -13,7 +13,7 @@ public record GameModeLabels(
     @Comment("Label shown for GameMode SPECTATOR on the player info card.") String spectator) {
 
   public static GameModeLabels defaults() {
-    return new GameModeLabels("Sobrevivência", "Criativo", "Aventura", "Espectador");
+    return new GameModeLabels("Survival", "Creative", "Adventure", "Spectator");
   }
 
   public String label(@NonNull GameMode mode) {

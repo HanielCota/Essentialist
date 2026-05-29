@@ -14,10 +14,10 @@ public record InvseeConfig(
 
   public static InvseeConfig defaults() {
     return new InvseeConfig(
-        "<dark_gray>Inventário de {player}",
-        "<green>Abrindo o inventário de <gold>{player}</gold>.",
-        "<red>Você não pode ver o próprio inventário.",
-        "<red>O inventário desse jogador já está sendo visto por outro staff.");
+        "<dark_gray>{player}'s inventory",
+        "<green>Opening <gold>{player}</gold>'s inventory.",
+        "<red>You cannot view your own inventory.",
+        "<red>That player's inventory is already being viewed by another staff member.");
   }
 
   public String formatTitle(@NonNull String player) {

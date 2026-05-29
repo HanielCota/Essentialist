@@ -10,7 +10,7 @@ public record ClearChatConfig(
     @Comment("Broadcast after the chat is cleared. Placeholder: {player}.") String announcement) {
 
   public static ClearChatConfig defaults() {
-    return new ClearChatConfig(100, "<yellow>O chat foi limpo por <gold>{player}</gold>.");
+    return new ClearChatConfig(100, "<yellow>The chat was cleared by <gold>{player}</gold>.");
   }
 
   /** Configured line count clamped to a safe range. */

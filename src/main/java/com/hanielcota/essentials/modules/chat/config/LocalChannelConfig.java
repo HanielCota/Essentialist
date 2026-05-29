@@ -23,7 +23,7 @@ public record LocalChannelConfig(
   public static LocalChannelConfig defaults() {
     return new LocalChannelConfig(
         100.0,
-        "<gray>Ninguém te escutou aqui perto.",
+        "<gray>No one nearby heard you.",
         0,
         "<gray><player></gray> <dark_gray>»</dark_gray> <white><message></white>");
   }

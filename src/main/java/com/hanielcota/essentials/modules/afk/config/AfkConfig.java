@@ -28,9 +28,9 @@ public record AfkConfig(
         300,
         5,
         250,
-        "<gray><gold>{player}</gold> está agora <yellow>AFK</yellow>.",
-        "<gray><gold>{player}</gold> está agora <yellow>AFK</yellow><gray>: <white>{reason}",
-        "<gray><gold>{player}</gold> não está mais <yellow>AFK</yellow><gray>.");
+        "<gray><gold>{player}</gold> is now <yellow>AFK</yellow>.",
+        "<gray><gold>{player}</gold> is now <yellow>AFK</yellow><gray>: <white>{reason}",
+        "<gray><gold>{player}</gold> is no longer <yellow>AFK</yellow><gray>.");
   }
 
   public String formatEnter(@NonNull String player) {

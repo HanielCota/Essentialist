@@ -15,9 +15,10 @@ public record PluginEntriesSection(
 
   public static PluginEntriesSection defaults() {
     return new PluginEntriesSection(
-        InfoEntryConfig.of(Material.NETHER_STAR, "<yellow>{name}", "<gray>Versão <white>{version}"),
-        InfoEntryConfig.of(Material.WRITABLE_BOOK, "<yellow>Autor", "<gray>{authors}"),
+        InfoEntryConfig.of(
+            Material.NETHER_STAR, "<yellow>{name}", "<gray>Version <white>{version}"),
+        InfoEntryConfig.of(Material.WRITABLE_BOOK, "<yellow>Author", "<gray>{authors}"),
         InfoEntryConfig.of(Material.GRASS_BLOCK, "<yellow>Minecraft", "<gray>{minecraft}"),
-        "Desconhecido");
+        "Unknown");
   }
 }

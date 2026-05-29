@@ -35,21 +35,21 @@ public record WarpsMessages(
 
   public static WarpsMessages defaults() {
     return new WarpsMessages(
-        "<green>Warp <gold>{name}</gold> criada.",
-        "<green>Warp <gold>{name}</gold> atualizada.",
-        "<red>A warp <gold>{name}</gold> não existe.",
-        "<yellow>Warp <gold>{name}</gold> removida.",
-        "<red>Você não tem permissão para usar a warp <gold>{name}</gold>.",
-        "<red>O mundo desta warp não está carregado.",
-        "<red>Você não tem acesso a nenhuma warp.",
-        "<gray>Warps disponíveis (<gold>{count}</gold><gray>):",
+        "<green>Warp <gold>{name}</gold> created.",
+        "<green>Warp <gold>{name}</gold> updated.",
+        "<red>The warp <gold>{name}</gold> does not exist.",
+        "<yellow>Warp <gold>{name}</gold> removed.",
+        "<red>You do not have permission to use the warp <gold>{name}</gold>.",
+        "<red>This warp's world is not loaded.",
+        "<red>You do not have access to any warp.",
+        "<gray>Available warps (<gold>{count}</gold><gray>):",
         "<gold>{name}</gold> <gray>— <white>{world} {x}, {y}, {z}",
-        "<gray>Clique para ir até <gold>{name}</gold>.",
-        "<yellow>Teleportando para <gold>{name}</gold> em <gold>{seconds}s</gold>. "
-            + "Não tome dano.",
-        "<green>Você foi teleportado para <gold>{name}</gold>.",
-        "<red>Teleporte cancelado.",
-        "<red>O teleporte não pôde ser concluído.",
-        "<red>Nome de warp inválido. Use até {max} caracteres: letras, números, '_' ou '-'.");
+        "<gray>Click to go to <gold>{name}</gold>.",
+        "<yellow>Teleporting to <gold>{name}</gold> in <gold>{seconds}s</gold>. "
+            + "Do not take damage.",
+        "<green>You were teleported to <gold>{name}</gold>.",
+        "<red>Teleport cancelled.",
+        "<red>The teleport could not be completed.",
+        "<red>Invalid warp name. Use up to {max} characters: letters, numbers, '_' or '-'.");
   }
 }

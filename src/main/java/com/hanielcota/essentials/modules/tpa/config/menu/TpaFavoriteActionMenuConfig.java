@@ -43,29 +43,29 @@ public record TpaFavoriteActionMenuConfig(
 
   public static TpaFavoriteActionMenuConfig defaults() {
     return new TpaFavoriteActionMenuConfig(
-        "Favorito",
+        "Favorite",
         5,
         13,
         Material.PLAYER_HEAD,
         true,
         "",
         "{player}",
-        List.of("Escolha uma ação abaixo."),
+        List.of("Choose an action below."),
         30,
         Material.ENDER_PEARL,
-        "Ir até {player}",
-        List.of("Pede teleporte para visitar {player}.", "", "Clique para enviar o pedido."),
+        "Go to {player}",
+        List.of("Request a teleport to visit {player}.", "", "Click to send the request."),
         31,
         Material.COMPASS,
-        "Chamar {player}",
-        List.of("Pede para {player} vir até você.", "", "Clique para enviar o pedido."),
+        "Summon {player}",
+        List.of("Ask {player} to come to you.", "", "Click to send the request."),
         32,
         Material.RED_DYE,
-        "Remover dos favoritos",
-        List.of("Tira {player} da sua lista de favoritos.", "", "Clique para remover."),
+        "Remove from favorites",
+        List.of("Removes {player} from your favorites list.", "", "Click to remove."),
         40,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para a lista de favoritos."));
+        "Back",
+        List.of("Back to the favorites list."));
   }
 }

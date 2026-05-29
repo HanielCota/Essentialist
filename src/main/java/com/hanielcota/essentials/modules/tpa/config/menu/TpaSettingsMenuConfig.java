@@ -37,27 +37,27 @@ public record TpaSettingsMenuConfig(
 
   public static TpaSettingsMenuConfig defaults() {
     return new TpaSettingsMenuConfig(
-        "Configurações de TPA",
+        "TPA Settings",
         3,
         10,
         Material.IRON_DOOR,
-        "Privacidade",
-        List.of("Controla quem pode te enviar pedidos de TPA.", "", "Clique para abrir."),
+        "Privacy",
+        List.of("Controls who can send you TPA requests.", "", "Click to open."),
         12,
         Material.BELL,
-        "Notificações",
-        List.of("Sons e avisos no chat.", "", "Clique para abrir."),
+        "Notifications",
+        List.of("Sounds and chat alerts.", "", "Click to open."),
         14,
         Material.REDSTONE_TORCH,
-        "Comportamento",
-        List.of("Aceitar favoritos automaticamente e modo Não Perturbe.", "", "Clique para abrir."),
+        "Behavior",
+        List.of("Auto-accept favorites and Do Not Disturb mode.", "", "Click to open."),
         20,
         Material.CLOCK,
         "Cooldown",
-        List.of("Tempo de espera entre comandos: 5 segundos.", "", "(configurado pelo servidor)"),
+        List.of("Wait time between commands: 5 seconds.", "", "(configured by the server)"),
         22,
         Material.ARROW,
-        "Voltar",
-        List.of("Volta para o menu de TPA."));
+        "Back",
+        List.of("Back to the TPA menu."));
   }
 }

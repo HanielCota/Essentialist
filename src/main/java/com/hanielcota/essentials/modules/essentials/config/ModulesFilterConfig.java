@@ -29,22 +29,17 @@ public record ModulesFilterConfig(
     return new ModulesFilterConfig(
         45,
         Material.HOPPER,
-        "<yellow>Filtro: <white>{state}",
-        List.of(
-            "<gray>Categoria de módulos exibida.",
-            "",
-            "{options}",
-            "",
-            "<green>Clique para alternar."),
+        "<yellow>Filter: <white>{state}",
+        List.of("<gray>Displayed module category.", "", "{options}", "", "<green>Click to cycle."),
         " <green>◀",
-        "Todos",
-        "Proteção",
-        "Teleporte",
+        "All",
+        "Protection",
+        "Teleport",
         "Chat",
-        "Itens",
-        "Jogador",
+        "Items",
+        "Player",
         "Admin",
-        "Outros");
+        "Other");
   }
 
   public String labelOf(@NonNull ModuleCategory category) {

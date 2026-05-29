@@ -25,18 +25,18 @@ public record GiveConfig(
 
   public static GiveConfig defaults() {
     return new GiveConfig(
-        "<green>Você recebeu <gold>{amount}x {item}</gold>.",
-        "<green>Você deu <gold>{amount}x {item}</gold> para <gold>{player}</gold>.",
-        "<yellow>Você recebeu <gold>{amount}x {item}</gold>; <gold>{leftover}</gold> não couberam.",
-        "<yellow>Você deu <gold>{amount}x {item}</gold> para <gold>{player}</gold>;"
-            + " <gold>{leftover}</gold> não couberam.",
-        "<red>O inventário está cheio.",
-        "<red>O inventário de <gold>{player}</gold> está cheio.",
-        "<red>Esse material não pode ser dado como item.",
-        "<red>A quantidade precisa ser um número positivo.",
-        "<red>A quantidade máxima por comando é <gold>{max}</gold>.",
+        "<green>You received <gold>{amount}x {item}</gold>.",
+        "<green>You gave <gold>{amount}x {item}</gold> to <gold>{player}</gold>.",
+        "<yellow>You received <gold>{amount}x {item}</gold>; <gold>{leftover}</gold> did not fit.",
+        "<yellow>You gave <gold>{amount}x {item}</gold> to <gold>{player}</gold>;"
+            + " <gold>{leftover}</gold> did not fit.",
+        "<red>The inventory is full.",
+        "<red><gold>{player}</gold>'s inventory is full.",
+        "<red>That material cannot be given as an item.",
+        "<red>The amount must be a positive number.",
+        "<red>The maximum amount per command is <gold>{max}</gold>.",
         2304,
-        "<green>Você deu <gold>{amount}x {item}</gold> para <gold>{count}</gold> jogador(es).");
+        "<green>You gave <gold>{amount}x {item}</gold> to <gold>{count}</gold> player(s).");
   }
 
   public MessagePair whenGiven() {

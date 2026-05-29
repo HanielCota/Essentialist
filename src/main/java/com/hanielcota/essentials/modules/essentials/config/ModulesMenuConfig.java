@@ -42,7 +42,7 @@ public record ModulesMenuConfig(
 
   public static ModulesMenuConfig defaults() {
     return new ModulesMenuConfig(
-        "Módulos",
+        "Modules",
         DEFAULT_ROWS,
         DEFAULT_CONTENT_SLOTS,
         Material.LIME_DYE,
@@ -50,16 +50,16 @@ public record ModulesMenuConfig(
         "<green>{module}",
         "<red>{module}",
         List.of(
-            "<dark_gray>▪ <gray>Status: <green>● Ativado",
+            "<dark_gray>▪ <gray>Status: <green>● Enabled",
             "",
-            "<yellow>➜ <gray>Clique para <red>desativar<gray>."),
+            "<yellow>➜ <gray>Click to <red>disable<gray>."),
         List.of(
-            "<dark_gray>▪ <gray>Status: <red>● Desativado",
+            "<dark_gray>▪ <gray>Status: <red>● Disabled",
             "",
-            "<yellow>➜ <gray>Clique para <green>ativar<gray>."),
-        "<gold>⚠ <gray>Aplica no próximo reinício.",
-        "<green>Módulo <gold>{module}</gold> será ativado no próximo reinício.",
-        "<red>Módulo <gold>{module}</gold> será desativado no próximo reinício.",
+            "<yellow>➜ <gray>Click to <green>enable<gray>."),
+        "<gold>⚠ <gray>Applies on the next restart.",
+        "<green>Module <gold>{module}</gold> will be enabled on the next restart.",
+        "<red>Module <gold>{module}</gold> will be disabled on the next restart.",
         ModulesInfoConfig.defaults(),
         ModulesFilterConfig.defaults(),
         NavigationButtonsConfig.defaults(48, 50));

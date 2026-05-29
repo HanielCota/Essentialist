@@ -31,18 +31,18 @@ public record MuteConfig(
 
   public static MuteConfig defaults() {
     return new MuteConfig(
-        "<green>Você silenciou <gold>{player}</gold> permanentemente.",
-        "<green>Você silenciou <gold>{player}</gold> por <gold>{time}</gold>.",
-        "<red>Você foi silenciado permanentemente.",
-        "<red>Você foi silenciado por <gold>{time}</gold>.",
-        "<green>Você removeu o silêncio de <gold>{player}</gold>.",
-        "<green>O seu silêncio foi removido.",
-        "<red>Você está silenciado permanentemente.",
-        "<red>Você está silenciado. Tempo restante: <gold>{time}</gold>.",
-        "<red>Você não pode silenciar a si mesmo.",
-        "<red><gold>{player}</gold> não está silenciado.",
-        "<red><gold>{player}</gold> não pode ser silenciado.",
-        "<red>Duração inválida: <gold>{duration}</gold>.",
+        "<green>You muted <gold>{player}</gold> permanently.",
+        "<green>You muted <gold>{player}</gold> for <gold>{time}</gold>.",
+        "<red>You have been muted permanently.",
+        "<red>You have been muted for <gold>{time}</gold>.",
+        "<green>You unmuted <gold>{player}</gold>.",
+        "<green>You have been unmuted.",
+        "<red>You are muted permanently.",
+        "<red>You are muted. Time remaining: <gold>{time}</gold>.",
+        "<red>You cannot mute yourself.",
+        "<red><gold>{player}</gold> is not muted.",
+        "<red><gold>{player}</gold> cannot be muted.",
+        "<red>Invalid duration: <gold>{duration}</gold>.",
         MuteBlockedCommands.defaults());
   }
 

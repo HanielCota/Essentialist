@@ -33,16 +33,15 @@ public record SpeedConfig(
         10,
         0.2f,
         0.1f,
-        "<green>Velocidade de caminhada definida para <gold>{valor}</gold>.",
-        "<green>Velocidade de caminhada de <gold>{player}</gold> definida para"
-            + " <gold>{valor}</gold>.",
-        "<green>Velocidade de voo definida para <gold>{valor}</gold>.",
-        "<green>Velocidade de voo de <gold>{player}</gold> definida para <gold>{valor}</gold>.",
-        "<green>Velocidades de caminhada e voo restauradas para o padrão.",
-        "<green>Velocidades de <gold>{player}</gold> restauradas para o padrão.",
-        "<red>A velocidade precisa estar entre {min} e {max}.",
-        "<yellow>Use <gray>/speed walk</gray> ou <gray>/speed fly</gray> com um valor de {min} a"
-            + " {max}, ou <gray>/speed reset</gray> para restaurar o padrão.</yellow>");
+        "<green>Walk speed set to <gold>{valor}</gold>.",
+        "<green>Walk speed of <gold>{player}</gold> set to" + " <gold>{valor}</gold>.",
+        "<green>Fly speed set to <gold>{valor}</gold>.",
+        "<green>Fly speed of <gold>{player}</gold> set to <gold>{valor}</gold>.",
+        "<green>Walk and fly speeds restored to the defaults.",
+        "<green>Speeds of <gold>{player}</gold> restored to the defaults.",
+        "<red>The speed must be between {min} and {max}.",
+        "<yellow>Use <gray>/speed walk</gray> or <gray>/speed fly</gray> with a value from {min} to"
+            + " {max}, or <gray>/speed reset</gray> to restore the default.</yellow>");
   }
 
   private static MessagePair resolve(@NonNull String self, @NonNull String other, int valor) {

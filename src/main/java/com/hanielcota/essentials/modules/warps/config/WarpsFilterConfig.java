@@ -25,15 +25,15 @@ public record WarpsFilterConfig(
     return new WarpsFilterConfig(
         45,
         Material.HOPPER,
-        "<yellow>Filtro: <white>{state}",
+        "<yellow>Filter: <white>{state}",
         List.of(
-            "<gray>Ordena e filtra as warps.", "", "{options}", "", "<green>Clique para alternar."),
+            "<gray>Sorts and filters the warps.", "", "{options}", "", "<green>Click to cycle."),
         " <green>◀",
-        "Padrão (A-Z)",
-        "Mais jogadores",
-        "Menos jogadores",
-        "Mais curtidas",
-        "Favoritas",
-        "PVP ativo");
+        "Default (A-Z)",
+        "Most players",
+        "Fewest players",
+        "Most liked",
+        "Favorites",
+        "PVP active");
   }
 }

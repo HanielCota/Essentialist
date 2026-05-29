@@ -22,8 +22,8 @@ public record StaffChannelConfig(
         "<dark_red>[S]</dark_red> <gold><player></gold> <dark_gray>»</dark_gray>"
             + " <yellow><message></yellow>",
         0,
-        "<green>Staff chat persistente ATIVADO.",
-        "<green>Staff chat persistente DESATIVADO.",
-        "<yellow>Use <gray>/staffchat <mensagem></gray> ou <gray>/staffchat toggle</gray>.");
+        "<green>Persistent staff chat ENABLED.",
+        "<green>Persistent staff chat DISABLED.",
+        "<yellow>Use <gray>/staffchat <message></gray> or <gray>/staffchat toggle</gray>.");
   }
 }

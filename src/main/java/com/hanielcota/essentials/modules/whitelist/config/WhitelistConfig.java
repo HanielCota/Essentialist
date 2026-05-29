@@ -41,28 +41,28 @@ public record WhitelistConfig(
         NavigationButtonsConfig.defaults(48, 50),
         10,
         Material.BOOK,
-        "<yellow>Whitelist do servidor",
+        "<yellow>Server whitelist",
         List.of(
-            "<gray>Só jogadores adicionados podem entrar.",
+            "<gray>Only added players can join.",
             "",
-            "<yellow>/whitelist add [jogador] <gray>adiciona",
-            "<yellow>/whitelist remove [jogador] <gray>remove",
-            "<yellow>/whitelist <gray>abre este menu",
+            "<yellow>/whitelist add [player] <gray>adds",
+            "<yellow>/whitelist remove [player] <gray>removes",
+            "<yellow>/whitelist <gray>opens this menu",
             "",
-            "<gray>Aqui no menu:",
-            "<yellow>Clique <gray>remove o jogador"),
+            "<gray>Here in the menu:",
+            "<yellow>Click <gray>removes the player"),
         "<yellow>{player}",
-        List.of("<gray>Clique para <red>remover</red> da whitelist."),
+        List.of("<gray>Click to <red>remove</red> from the whitelist."),
         Material.BARRIER,
-        "<red>A whitelist está vazia",
+        "<red>The whitelist is empty",
         List.of(
-            "<gray>Nenhum jogador foi adicionado ainda.",
+            "<gray>No player has been added yet.",
             "",
-            "<yellow>/whitelist add [jogador]",
-            "<dark_gray>» <gray>adiciona um jogador à whitelist",
+            "<yellow>/whitelist add [player]",
+            "<dark_gray>» <gray>adds a player to the whitelist",
             "",
-            "<yellow>/whitelist remove [jogador]",
-            "<dark_gray>» <gray>remove um jogador da whitelist"));
+            "<yellow>/whitelist remove [player]",
+            "<dark_gray>» <gray>removes a player from the whitelist"));
   }
 
   public int effectiveRows() {

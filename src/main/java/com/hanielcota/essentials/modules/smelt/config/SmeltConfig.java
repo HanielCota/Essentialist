@@ -15,8 +15,8 @@ public record SmeltConfig(
   public static SmeltConfig defaults() {
     return new SmeltConfig(
         defaultMappings(),
-        "<red>Você não tem nada para derreter.",
-        "<green>Derretido <gold>{count}</gold> item(ns).");
+        "<red>You have nothing to smelt.",
+        "<green>Smelted <gold>{count}</gold> item(s).");
   }
 
   private static Map<Material, Material> defaultMappings() {
