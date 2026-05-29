@@ -41,7 +41,14 @@ public record HomesOptionsMenuConfig(
     @Comment("Material of the unpin button (shown when the home is pinned).")
         Material unpinMaterial,
     @Comment("Name of the unpin button. Placeholders: {name}.") String unpinName,
-    @Comment("Lore of the unpin button. Placeholders: {name}.") List<String> unpinLore) {
+    @Comment("Lore of the unpin button. Placeholders: {name}.") List<String> unpinLore,
+    @Comment("Name shown in the info slot when the targeted home no longer exists.")
+        String unavailableName) {
+
+  // The action buttons span the first three rows, so anything below 3 would collapse them onto the
+  // same slot; clamp to a usable height.
+  private static final int MIN_ROWS = 3;
+  private static final int MAX_ROWS = 6;
 
   public static HomesOptionsMenuConfig defaults() {
     return new HomesOptionsMenuConfig(
@@ -77,6 +84,11 @@ public record HomesOptionsMenuConfig(
         List.of("<gray>Moves <gold>{name}</gold> to the top of the list."),
         Material.NETHER_STAR,
         "<gold>★ Unpin",
-        List.of("<gray>Removes the highlight from <gold>{name}</gold>."));
+        List.of("<gray>Removes the highlight from <gold>{name}</gold>."),
+        "<red>Home unavailable");
+  }
+
+  public int effectiveRows() {
+    return Math.clamp(rows, MIN_ROWS, MAX_ROWS);
   }
 }

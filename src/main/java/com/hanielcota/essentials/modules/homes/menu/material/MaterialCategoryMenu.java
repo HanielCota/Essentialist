@@ -10,6 +10,7 @@ import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategory;
 import com.hanielcota.essentials.modules.homes.menu.presentation.MaterialCategorySection;
@@ -31,6 +32,8 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.homes.categories";
 
+  private static final int MIN_ROWS = 1;
+
   private final ConfigHandle<HomesConfig> config;
   private final MaterialCategoryClickHandler clickHandler;
 
@@ -50,6 +53,10 @@ public final class MaterialCategoryMenu implements EssentialsMenu {
     var contentSlots = MaterialCategorySection.contentSlots(categoryMenu);
 
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
+    if (rows > MIN_ROWS) {
+      var navigation = categoryMenu.navigation();
+      PageNavigation.apply(menusRef, paginationBuilder, ID, rows, navigation);
+    }
     var pagination = paginationBuilder.build();
 
     var builder = MenuFramework.builder(ID, menusRef);

@@ -48,7 +48,7 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   public void register(@NonNull MenuService menus) {
     var snap = this.config.value();
     var options = snap.menu().options();
-    var rows = MenuLayouts.clampRows(options.rows());
+    var rows = options.effectiveRows();
 
     var titleTemplate = options.title();
     var titleRaw = stripNamePlaceholder(titleTemplate);
@@ -76,7 +76,7 @@ public final class HomeOptionsMenu implements EssentialsMenu {
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {
     var options = this.config.value().menu().options();
-    var rows = MenuLayouts.clampRows(options.rows());
+    var rows = options.effectiveRows();
 
     var uuid = player.getUniqueId();
     var homeName = this.target.peek(uuid);
@@ -192,7 +192,9 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   }
 
   private static ItemTemplate missingTemplate(@NonNull HomesOptionsMenuConfig options) {
-    return MenuTemplates.simple(options.backMaterial(), "<red>Home indisponível", List.of());
+    var name = options.unavailableName();
+
+    return MenuTemplates.simple(options.backMaterial(), name, List.of());
   }
 
   // The inventory title is fixed at menu registration, so the {name} placeholder cannot be

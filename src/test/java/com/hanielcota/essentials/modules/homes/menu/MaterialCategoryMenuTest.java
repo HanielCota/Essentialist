@@ -104,7 +104,8 @@ class MaterialCategoryMenuTest {
             originalCategory.backSlot(),
             originalCategory.backMaterial(),
             originalCategory.backName(),
-            originalCategory.backLore());
+            originalCategory.backLore(),
+            originalCategory.navigation());
 
     return new HomesMenuConfig(
         original.main(),
