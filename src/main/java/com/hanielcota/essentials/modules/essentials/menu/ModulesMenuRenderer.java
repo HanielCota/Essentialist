@@ -6,6 +6,7 @@ import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.module.control.ModuleControl;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
 import com.hanielcota.essentials.modules.essentials.config.ModulesMenuConfig;
@@ -16,8 +17,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Builds the module-control menu slots: the selected category's modules as toggle items, plus a
- * single cycling category filter button (same control style as the warps filter).
+ * Builds the module-control menu slots: a static guide item, the selected category's modules as
+ * toggle items placed in the configured content slots, and a single cycling category filter button
+ * (same control style as the warps filter).
  */
 @RequiredArgsConstructor
 public final class ModulesMenuRenderer {
@@ -35,18 +37,12 @@ public final class ModulesMenuRenderer {
     var snap = this.config.value();
     var menu = snap.menu();
     var rows = menu.effectiveRows();
-    var filter = menu.filter();
-
-    var slotCount = rows * ROW_WIDTH;
-    var fallbackSlot = (rows - 1) * ROW_WIDTH;
-    var filterSlot = MenuLayouts.sanitizeSlot(filter.slot(), rows, fallbackSlot);
 
     var slots = new ArrayList<SlotDefinition>();
 
-    appendModules(slots, menu, selected, slotCount, filterSlot, toggler);
-
-    var filterItem = this.filterRenderer.render(filter, selected);
-    slots.add(SlotDefinition.of(filterSlot, filterItem, onCycle));
+    appendModules(slots, menu, selected, toggler);
+    appendInfo(slots, menu, rows);
+    appendFilter(slots, menu, selected, rows, onCycle);
 
     return slots;
   }
@@ -55,24 +51,43 @@ public final class ModulesMenuRenderer {
       @NonNull List<SlotDefinition> slots,
       @NonNull ModulesMenuConfig menu,
       @NonNull ModuleCategory selected,
-      int slotCount,
-      int filterSlot,
       @NonNull BiConsumer<ClickContext, String> toggler) {
+    var contentSlots = menu.effectiveContentSlots();
     var moduleIds = modulesOf(selected);
+    var count = Math.min(moduleIds.size(), contentSlots.size());
 
-    var slot = 0;
-    for (var moduleId : moduleIds) {
-      if (slot == filterSlot) {
-        slot++;
-      }
-      if (slot >= slotCount) {
-        break;
-      }
-
+    for (var i = 0; i < count; i++) {
+      var slot = contentSlots.get(i);
+      var moduleId = moduleIds.get(i);
       var def = moduleItem(menu, slot, moduleId, toggler);
+
       slots.add(def);
-      slot++;
     }
+  }
+
+  private void appendInfo(
+      @NonNull List<SlotDefinition> slots, @NonNull ModulesMenuConfig menu, int rows) {
+    var info = menu.info();
+    var infoSlot = MenuLayouts.sanitizeSlot(info.slot(), rows, 4);
+
+    var template = MenuTemplates.simple(info.material(), info.name(), info.lore());
+
+    slots.add(SlotDefinition.of(infoSlot, template, click -> {}));
+  }
+
+  private void appendFilter(
+      @NonNull List<SlotDefinition> slots,
+      @NonNull ModulesMenuConfig menu,
+      @NonNull ModuleCategory selected,
+      int rows,
+      @NonNull ClickHandler onCycle) {
+    var filter = menu.filter();
+    var fallbackSlot = (rows - 1) * ROW_WIDTH;
+    var filterSlot = MenuLayouts.sanitizeSlot(filter.slot(), rows, fallbackSlot);
+
+    var filterItem = this.filterRenderer.render(filter, selected);
+
+    slots.add(SlotDefinition.of(filterSlot, filterItem, onCycle));
   }
 
   private List<String> modulesOf(@NonNull ModuleCategory category) {

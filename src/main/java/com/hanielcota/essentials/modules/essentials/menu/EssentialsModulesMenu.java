@@ -12,22 +12,19 @@ import com.hanielcota.essentials.module.control.ModuleControl;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
 /**
- * Single admin menu listing every module grouped by category tab. Clicking a module flips its
- * persisted switch in {@code modules.yml} (applied on the next restart); clicking a tab switches
- * category. Both re-render this same inventory via {@link ClickContext#refresh()}.
+ * Single admin menu listing the modules of the selected category. Clicking a module flips its
+ * persisted switch in {@code modules.yml} (applied on the next restart); clicking the filter button
+ * cycles the category. Both re-render this same inventory via {@link ClickContext#refresh()}.
  */
 @RequiredArgsConstructor
 public final class EssentialsModulesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.modules";
-
-  private static final int ROW_WIDTH = 9;
 
   private final @NonNull ConfigHandle<EssentialsConfig> config;
   private final @NonNull EssentialsModulesMenuState state;
@@ -49,10 +46,9 @@ public final class EssentialsModulesMenu implements EssentialsMenu {
     var menuTitle = ComponentUtils.mini(rawTitle);
 
     // The framework requires content slots whenever dynamicContent is used. Every item is placed at
-    // an explicit slot (modules in the content area, tabs on the bottom row), so the whole grid is
-    // declared as content and pagination never has to project a -1 item.
-    var slotCount = rows * ROW_WIDTH;
-    var contentSlots = IntStream.range(0, slotCount).boxed().toList();
+    // an explicit slot (modules in the content slots, guide + filter at their own slots), so
+    // pagination never has to project a -1 item.
+    var contentSlots = menu.effectiveContentSlots();
     var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
 
     var builder = MenuFramework.builder(ID, menus);
