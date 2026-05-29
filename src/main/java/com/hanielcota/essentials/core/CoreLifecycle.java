@@ -71,9 +71,7 @@ final class CoreLifecycle {
     }
 
     var steps = new ArrayList<>(registryHandle.get().steps());
-    java.util.Collections.reverse(steps);
-
-    runSteps(steps);
+    runSteps(steps.reversed());
   }
 
   private static void runSteps(@NonNull List<ShutdownStep> steps) {

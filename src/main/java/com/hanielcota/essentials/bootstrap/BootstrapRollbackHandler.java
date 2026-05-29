@@ -3,7 +3,6 @@ package com.hanielcota.essentials.bootstrap;
 import com.hanielcota.essentials.core.EssentialsCore;
 import com.hanielcota.essentials.core.ShutdownRegistry;
 import java.util.ArrayList;
-import java.util.Collections;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -31,8 +30,7 @@ final class BootstrapRollbackHandler {
     }
 
     var steps = new ArrayList<>(registryHandle.get().steps());
-    Collections.reverse(steps);
-    for (var step : steps) {
+    for (var step : steps.reversed()) {
       suppressAndRun(cause, step::run);
     }
   }
