@@ -12,7 +12,8 @@ public final class SkullNotifier {
 
   private final ConfigHandle<SkullConfig> config;
 
-  public void sendReceived(@NonNull CommandActor actor, @NonNull OfflinePlayer owner, boolean self) {
+  public void sendReceived(
+      @NonNull CommandActor actor, @NonNull OfflinePlayer owner, boolean self) {
     var snap = config.value();
     var messages = snap.whenReceived();
     var ownerName = owner.getName();
