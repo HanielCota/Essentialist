@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.kit.config;
 
 import com.hanielcota.essentials.menu.NavigationButtonsConfig;
+import com.hanielcota.essentials.modules.kit.domain.KitSort;
 import java.util.List;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -27,7 +28,23 @@ public record KitListMenuConfig(
     @Comment("Slot of the back button (returns to the category menu).") int backSlot,
     @Comment("Material of the back button.") Material backMaterial,
     @Comment("Name of the back button.") String backName,
-    @Comment("Lore of the back button.") List<String> backLore) {
+    @Comment("Lore of the back button.") List<String> backLore,
+    @Comment("Slot of the sort-cycle button.") int sortSlot,
+    @Comment("Material of the sort button.") Material sortMaterial,
+    @Comment("Name of the sort button. Placeholder: {state}.") String sortName,
+    @Comment(
+            "Lore of the sort button. Use {state} and {options} (the list with the active marked).")
+        List<String> sortLore,
+    @Comment("Label shown for the alphabetical sort.") String sortLabelName,
+    @Comment("Label shown for the available-first sort.") String sortLabelAvailable,
+    @Comment("Suffix appended to the active option in {options}.") String sortActiveMarker) {
+
+  public String sortLabel(KitSort sort) {
+    return switch (sort) {
+      case NAME -> this.sortLabelName;
+      case AVAILABLE -> this.sortLabelAvailable;
+    };
+  }
 
   public static KitListMenuConfig defaults() {
     return new KitListMenuConfig(
@@ -47,6 +64,13 @@ public record KitListMenuConfig(
         45,
         Material.ARROW,
         "<yellow>Back",
-        List.of("<gray>Returns to the categories."));
+        List.of("<gray>Returns to the categories."),
+        53,
+        Material.HOPPER,
+        "<gold>Sort: <yellow>{state}",
+        List.of("<gray>Order of the kits.", "", "{options}", "", "<yellow>Click to cycle."),
+        "Alphabetical",
+        "Available first",
+        " <green>◀");
   }
 }

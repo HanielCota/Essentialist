@@ -14,7 +14,12 @@ public record KitCategoryMenuConfig(
         List<Integer> contentSlots,
     @Comment("Previous/next page buttons.") NavigationButtonsConfig navigation,
     @Comment("Category item name. Placeholders: {category}, {kits}.") String itemName,
-    @Comment("Category item lore. Placeholders: {category}, {kits}.") List<String> itemLore) {
+    @Comment("Category item lore. Placeholders: {category}, {kits}.") List<String> itemLore,
+    @Comment("Show a 'claim all available' button on the category menu.") boolean claimAllEnabled,
+    @Comment("Slot of the claim-all button.") int claimAllSlot,
+    @Comment("Material of the claim-all button.") org.bukkit.Material claimAllMaterial,
+    @Comment("Name of the claim-all button.") String claimAllName,
+    @Comment("Lore of the claim-all button.") List<String> claimAllLore) {
 
   public static KitCategoryMenuConfig defaults() {
     return new KitCategoryMenuConfig(
@@ -23,6 +28,11 @@ public record KitCategoryMenuConfig(
         List.of(11, 12, 13, 14, 15, 20, 21, 22, 23, 24, 29, 30, 31, 32, 33),
         NavigationButtonsConfig.defaults(39, 41),
         "<gold>{category}",
-        List.of("<gray>Kits: <white>{kits}", "", "<yellow>Click to browse."));
+        List.of("<gray>Kits: <white>{kits}", "", "<yellow>Click to browse."),
+        true,
+        40,
+        org.bukkit.Material.HOPPER,
+        "<green>Claim all available",
+        List.of("<gray>Claims every kit you can take now."));
   }
 }

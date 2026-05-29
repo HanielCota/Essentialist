@@ -32,6 +32,7 @@ import com.hanielcota.essentials.modules.kit.service.KitClaimService;
 import com.hanielcota.essentials.modules.kit.service.KitConfigStore;
 import com.hanielcota.essentials.modules.kit.service.KitCooldownService;
 import com.hanielcota.essentials.modules.kit.service.KitGiver;
+import com.hanielcota.essentials.modules.kit.service.KitSortPreferences;
 import java.time.ZoneId;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -125,16 +126,19 @@ public final class KitModule extends AbstractModule {
       @NonNull KitClaimNotifier notifier,
       @NonNull ModuleRegistrar registrar) {
     var state = new KitMenuState();
+    var sortPreferences = new KitSortPreferences();
     var entryRenderer = new KitEntryRenderer(config, cooldowns);
 
-    var categoryClicks = new KitCategoryClickHandler(state);
-    var listClicks = new KitListClickHandler(state);
+    var categoryClicks = new KitCategoryClickHandler(config, state, catalog, claimService);
+    var listClicks = new KitListClickHandler(state, sortPreferences);
     var previewClicks = new KitPreviewClickHandler(state, catalog, claimService, notifier);
 
     registrar.menu(new KitCategoryMenu(config, catalog, categoryClicks));
-    registrar.menu(new KitListMenu(config, catalog, entryRenderer, state, listClicks));
+    registrar.menu(
+        new KitListMenu(
+            config, catalog, entryRenderer, cooldowns, state, sortPreferences, listClicks));
     registrar.menu(new KitPreviewMenu(config, catalog, state, previewClicks));
-    registrar.listener(new KitMenuCleanupListener(state));
+    registrar.listener(new KitMenuCleanupListener(state, sortPreferences));
   }
 
   private static ExecutorService newIoExecutor() {

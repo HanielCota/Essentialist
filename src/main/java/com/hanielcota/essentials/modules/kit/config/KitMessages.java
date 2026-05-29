@@ -27,7 +27,9 @@ public record KitMessages(
     @Comment("Shown to the giver after /kit give. Placeholders: {kit}, {player}.") String gave,
     @Comment("Shown to the giver when /kit give could not deliver. Placeholders: {player}.")
         String giveFailed,
-    @Comment("Shown after a /kit set* edit. Placeholders: {kit}.") String edited) {
+    @Comment("Shown after a /kit set* edit. Placeholders: {kit}.") String edited,
+    @Comment("Shown after claim-all. Placeholders: {count}.") String claimedAll,
+    @Comment("Shown when claim-all found no claimable kit.") String claimedNone) {
 
   public static KitMessages defaults() {
     return new KitMessages(
@@ -46,7 +48,9 @@ public record KitMessages(
         "<red>Your inventory is full — free some space and try again.",
         "<green>Gave the kit <gold>{kit}</gold> to <gold>{player}</gold>.",
         "<red>Could not give the kit to <gold>{player}</gold> — their inventory is full.",
-        "<green>Kit <gold>{kit}</gold> updated.");
+        "<green>Kit <gold>{kit}</gold> updated.",
+        "<green>Claimed <gold>{count}</gold> kit(s).",
+        "<yellow>There are no kits available to claim right now.");
   }
 
   public String formatClaimed(@NonNull String kit) {
@@ -95,5 +99,9 @@ public record KitMessages(
 
   public String formatEdited(@NonNull String kit) {
     return edited.replace("{kit}", kit);
+  }
+
+  public String formatClaimedAll(int count) {
+    return claimedAll.replace("{count}", String.valueOf(count));
   }
 }

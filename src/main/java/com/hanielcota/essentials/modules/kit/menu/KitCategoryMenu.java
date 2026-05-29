@@ -19,7 +19,6 @@ import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -59,6 +58,13 @@ public final class KitCategoryMenu implements EssentialsMenu {
     builder.title(title);
     builder.pagination(pagination);
     builder.dynamicContent(this::buildSlots);
+
+    if (cfg.claimAllEnabled()) {
+      var slot = claimAllSlot(cfg, rows);
+      var template =
+          MenuTemplates.simple(cfg.claimAllMaterial(), cfg.claimAllName(), cfg.claimAllLore());
+      builder.slot(slot, template, this.clicks::claimAll);
+    }
 
     builder.buildAndRegister();
   }
@@ -120,9 +126,20 @@ public final class KitCategoryMenu implements EssentialsMenu {
       @NonNull com.hanielcota.essentials.modules.kit.config.KitCategoryMenuConfig cfg,
       int rows) {
     var navigation = cfg.navigation();
-    var reserved =
-        Set.of(navigation.effectivePreviousSlot(rows), navigation.effectiveNextSlot(rows));
+    var reserved = new HashSet<Integer>();
+    reserved.add(navigation.effectivePreviousSlot(rows));
+    reserved.add(navigation.effectiveNextSlot(rows));
+    if (cfg.claimAllEnabled()) {
+      reserved.add(claimAllSlot(cfg, rows));
+    }
 
     return sanitized.stream().filter(slot -> !reserved.contains(slot)).toList();
+  }
+
+  private static int claimAllSlot(
+      @NonNull com.hanielcota.essentials.modules.kit.config.KitCategoryMenuConfig cfg, int rows) {
+    var fallback = (rows - 1) * 9 + 4;
+
+    return MenuLayouts.sanitizeSlot(cfg.claimAllSlot(), rows, fallback);
   }
 }
