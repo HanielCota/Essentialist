@@ -60,6 +60,8 @@ public final class ModuleCategoryCatalog {
         "enderchest",
         "invsee",
         "rename",
+        "itemlore",
+        "more",
         "workstations");
     put(
         map,
@@ -69,6 +71,7 @@ public final class ModuleCategoryCatalog {
         "speed",
         "feed",
         "heal",
+        "god",
         "vanish",
         "nick",
         "afk",
@@ -78,7 +81,16 @@ public final class ModuleCategoryCatalog {
         "ping",
         "list",
         "light");
-    put(map, ModuleCategory.ADMIN, "essentials", "whitelist", "kick", "kill", "info");
+    put(
+        map,
+        ModuleCategory.ADMIN,
+        "essentials",
+        "whitelist",
+        "kick",
+        "kill",
+        "info",
+        "sudo",
+        "spawnmob");
 
     return Map.copyOf(map);
   }

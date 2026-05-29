@@ -50,3 +50,8 @@ com.hanielcota.essentials.modules.weather.WeatherModule
 com.hanielcota.essentials.modules.crops.CropsModule
 com.hanielcota.essentials.modules.leaves.LeavesModule
 com.hanielcota.essentials.modules.chat.ChatModule
+com.hanielcota.essentials.modules.god.GodModule
+com.hanielcota.essentials.modules.more.MoreModule
+com.hanielcota.essentials.modules.sudo.SudoModule
+com.hanielcota.essentials.modules.itemlore.ItemLoreModule
+com.hanielcota.essentials.modules.spawnmob.SpawnMobModule
