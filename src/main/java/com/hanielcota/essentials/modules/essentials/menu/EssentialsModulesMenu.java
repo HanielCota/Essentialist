@@ -27,12 +27,15 @@ public final class EssentialsModulesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.modules";
 
-  private static final int MIN_ROWS = 1;
-
   private final @NonNull ConfigHandle<EssentialsConfig> config;
   private final @NonNull EssentialsModulesMenuState state;
   private final @NonNull ModulesMenuRenderer renderer;
   private final @NonNull ModuleControl control;
+
+  // Resolved once at register() so the renderer lays the control items out against the geometry the
+  // inventory was actually built with — a later /essentials reload changing rows/slots cannot
+  // misplace them (geometry only takes effect on restart, like the module switches themselves).
+  private ModulesMenuLayout layout;
 
   @Override
   public @NonNull String id() {
@@ -45,17 +48,18 @@ public final class EssentialsModulesMenu implements EssentialsMenu {
     var menu = snap.menu();
     var rows = menu.effectiveRows();
 
+    this.layout = ModulesMenuLayout.resolve(menu, rows);
+
     var rawTitle = menu.title();
     var menuTitle = ComponentUtils.mini(rawTitle);
 
     // Modules are paginated (-1) through the content slots; the guide and filter sit at their own
-    // slots. Navigation buttons are required so the -1 items project, and let "All" page through
-    // every module beyond the first page.
-    var contentSlots = menu.effectiveContentSlots();
+    // slots, which the layout carves out of the content slots so an item can never land on top of
+    // a control. Navigation is always wired because -1 items only project when navigation slots
+    // exist (spare buttons hide on a single page via hideDisabledNavigation).
+    var contentSlots = this.layout.contentSlots();
     var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
-    if (rows > MIN_ROWS) {
-      PageNavigation.apply(menus, paginationBuilder, ID, rows, menu.navigation());
-    }
+    PageNavigation.apply(menus, paginationBuilder, ID, rows, menu.navigation());
     var pagination = paginationBuilder.build();
 
     var builder = MenuFramework.builder(ID, menus);
@@ -71,7 +75,7 @@ public final class EssentialsModulesMenu implements EssentialsMenu {
     var viewerId = player.getUniqueId();
     var category = this.state.category(viewerId);
 
-    return this.renderer.slots(category, this::cycleCategory, this::toggleModule);
+    return this.renderer.slots(category, this.layout, this::cycleCategory, this::toggleModule);
   }
 
   private void cycleCategory(@NonNull ClickContext click) {
