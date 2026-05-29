@@ -52,14 +52,10 @@ public final class ModulesMenuRenderer {
       @NonNull ModulesMenuConfig menu,
       @NonNull ModuleCategory selected,
       @NonNull BiConsumer<ClickContext, String> toggler) {
-    var contentSlots = menu.effectiveContentSlots();
     var moduleIds = modulesOf(selected);
-    var count = Math.min(moduleIds.size(), contentSlots.size());
 
-    for (var i = 0; i < count; i++) {
-      var slot = contentSlots.get(i);
-      var moduleId = moduleIds.get(i);
-      var def = moduleItem(menu, slot, moduleId, toggler);
+    for (var moduleId : moduleIds) {
+      var def = moduleItem(menu, moduleId, toggler);
 
       slots.add(def);
     }
@@ -91,6 +87,10 @@ public final class ModulesMenuRenderer {
   }
 
   private List<String> modulesOf(@NonNull ModuleCategory category) {
+    if (category == ModuleCategory.ALL) {
+      return this.control.moduleIds();
+    }
+
     return this.control.moduleIds().stream()
         .filter(id -> ModuleCategoryCatalog.categoryOf(id) == category)
         .toList();
@@ -98,7 +98,6 @@ public final class ModulesMenuRenderer {
 
   private SlotDefinition moduleItem(
       @NonNull ModulesMenuConfig menu,
-      int slot,
       @NonNull String moduleId,
       @NonNull BiConsumer<ClickContext, String> toggler) {
     var enabled = this.control.persistedEnabled(moduleId);
@@ -117,6 +116,7 @@ public final class ModulesMenuRenderer {
 
     var template = builder.build();
 
-    return SlotDefinition.of(slot, template, click -> toggler.accept(click, moduleId));
+    // Slot -1: pagination flows module items through the configured content slots, across pages.
+    return SlotDefinition.of(-1, template, click -> toggler.accept(click, moduleId));
   }
 }

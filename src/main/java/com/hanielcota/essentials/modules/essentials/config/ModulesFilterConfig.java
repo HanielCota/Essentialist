@@ -16,6 +16,7 @@ public record ModulesFilterConfig(
     @Comment("Filter button lore. {options} expands to the list with the active one marked.")
         List<String> lore,
     @Comment("Marker appended to the active option in {options}.") String activeMarker,
+    @Comment("Label for the All filter (shows every module).") String labelAll,
     @Comment("Label for the Protection category.") String labelProtection,
     @Comment("Label for the Teleport category.") String labelTeleport,
     @Comment("Label for the Chat category.") String labelChat,
@@ -36,6 +37,7 @@ public record ModulesFilterConfig(
             "",
             "<green>Clique para alternar."),
         " <green>◀",
+        "Todos",
         "Proteção",
         "Teleporte",
         "Chat",
@@ -47,6 +49,7 @@ public record ModulesFilterConfig(
 
   public String labelOf(@NonNull ModuleCategory category) {
     return switch (category) {
+      case ALL -> this.labelAll;
       case PROTECTION -> this.labelProtection;
       case TELEPORT -> this.labelTeleport;
       case CHAT -> this.labelChat;
