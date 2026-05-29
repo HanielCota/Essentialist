@@ -31,10 +31,14 @@ public final class KitCategoryClickHandler {
 
     var claimed = 0;
     for (var kit : this.catalog.all()) {
-      var outcome = this.claimService.claim(player, kit);
+      var outcome = this.claimService.claim(player, kit, false);
       if (outcome.result() == KitClaimResult.CLAIMED) {
         claimed++;
       }
+    }
+
+    if (claimed > 0) {
+      this.claimService.playClaimSound(player);
     }
 
     var messages = this.config.value().messages();

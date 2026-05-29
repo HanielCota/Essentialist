@@ -21,6 +21,7 @@ import com.hanielcota.essentials.modules.kit.service.KitSortPreferences;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import lombok.NonNull;
@@ -115,8 +116,14 @@ public final class KitListMenu implements EssentialsMenu {
       return;
     }
 
-    Comparator<Kit> byAvailability =
-        Comparator.comparingInt(kit -> isClaimable(player, kit) ? 0 : 1);
+    // Compute claimability once per kit; comparingInt's extractor would otherwise re-run it on
+    // every comparison (and re-read the cooldown cache each time).
+    var rankById = new HashMap<String, Integer>(kits.size());
+    for (var kit : kits) {
+      rankById.put(kit.id(), isClaimable(player, kit) ? 0 : 1);
+    }
+
+    Comparator<Kit> byAvailability = Comparator.comparingInt(kit -> rankById.get(kit.id()));
     kits.sort(byAvailability.thenComparing(byName));
   }
 

@@ -23,6 +23,14 @@ public final class KitClaimService {
 
   /** A player claiming a kit themselves: enforces permission, one-time and cooldown. */
   public ClaimOutcome claim(@NonNull Player player, @NonNull Kit kit) {
+    return claim(player, kit, true);
+  }
+
+  /**
+   * As {@link #claim(Player, Kit)} but lets the caller suppress the claim sound — bulk flows (claim
+   * all, first join) pass {@code false} and play a single sound themselves.
+   */
+  public ClaimOutcome claim(@NonNull Player player, @NonNull Kit kit, boolean playSound) {
     var uuid = player.getUniqueId();
     var bypass = player.hasPermission(BYPASS_PERMISSION);
 
@@ -39,7 +47,7 @@ public final class KitClaimService {
       return ClaimOutcome.of(KitClaimResult.ON_COOLDOWN);
     }
 
-    var outcome = deliverItems(player, kit);
+    var outcome = deliverItems(player, kit, playSound);
     if (outcome.result() == KitClaimResult.CLAIMED) {
       this.cooldowns.markClaimed(uuid, kit);
     }
@@ -56,17 +64,24 @@ public final class KitClaimService {
       return ClaimOutcome.of(KitClaimResult.EMPTY);
     }
 
-    return deliverItems(target, kit);
+    return deliverItems(target, kit, true);
   }
 
-  private ClaimOutcome deliverItems(@NonNull Player player, @NonNull Kit kit) {
+  /** Plays the configured claim sound once (used by bulk flows after the loop). */
+  public void playClaimSound(@NonNull Player player) {
+    playClaimSound(player, this.config.value());
+  }
+
+  private ClaimOutcome deliverItems(@NonNull Player player, @NonNull Kit kit, boolean playSound) {
     var snap = this.config.value();
     var giveResult = this.giver.give(player, kit, snap.dropWhenInventoryFull());
     if (giveResult == KitGiver.GiveResult.REJECTED_FULL) {
       return ClaimOutcome.of(KitClaimResult.INVENTORY_FULL);
     }
 
-    playClaimSound(player, snap);
+    if (playSound) {
+      playClaimSound(player, snap);
+    }
 
     var overflowDropped = giveResult == KitGiver.GiveResult.OVERFLOW_DROPPED;
     return new ClaimOutcome(KitClaimResult.CLAIMED, overflowDropped);
