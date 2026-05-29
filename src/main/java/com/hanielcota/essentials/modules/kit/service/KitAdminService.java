@@ -17,7 +17,7 @@ public final class KitAdminService {
 
   private static final String DEFAULT_CATEGORY = "general";
 
-  private final KitDefinitionStore store;
+  private final KitConfigStore store;
   private final KitCatalog catalog;
   private final KitUsageRepository usage;
 
@@ -35,7 +35,7 @@ public final class KitAdminService {
     var encoded = KitItemCodec.encode(items);
     var definition = mergeOrCreate(id, rawId, encoded);
 
-    this.store.put(id, definition);
+    this.store.putKit(id, definition);
     this.catalog.rebuild();
 
     return encoded.size();
@@ -43,7 +43,7 @@ public final class KitAdminService {
 
   public boolean delete(@NonNull String rawId) {
     var id = rawId.toLowerCase(Locale.ROOT);
-    var removed = this.store.remove(id);
+    var removed = this.store.removeKit(id);
 
     if (removed) {
       this.catalog.rebuild();
@@ -62,7 +62,7 @@ public final class KitAdminService {
 
   private KitDefinitionConfig mergeOrCreate(
       @NonNull String id, @NonNull String rawId, @NonNull List<String> encoded) {
-    var existing = this.store.all().get(id);
+    var existing = this.store.kits().get(id);
     if (existing != null) {
       return existing.withItems(encoded);
     }

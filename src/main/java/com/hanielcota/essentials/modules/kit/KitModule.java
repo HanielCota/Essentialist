@@ -29,8 +29,8 @@ import com.hanielcota.essentials.modules.kit.repository.SqlKitUsageRepository;
 import com.hanielcota.essentials.modules.kit.service.KitAdminService;
 import com.hanielcota.essentials.modules.kit.service.KitCatalog;
 import com.hanielcota.essentials.modules.kit.service.KitClaimService;
+import com.hanielcota.essentials.modules.kit.service.KitConfigStore;
 import com.hanielcota.essentials.modules.kit.service.KitCooldownService;
-import com.hanielcota.essentials.modules.kit.service.KitDefinitionStore;
 import com.hanielcota.essentials.modules.kit.service.KitGiver;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,18 +47,21 @@ public final class KitModule extends AbstractModule {
 
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
-    var config = env.config("kit", KitConfig.class, KitConfig::defaults);
     var menus = env.service(MenuService.class);
 
     var usage = wireUsageStorage(env, registrar);
     var cooldowns = new KitCooldownService(usage, System::currentTimeMillis);
 
     var definitions = wireDefinitions(env, registrar);
+    var store = definitions.store();
     var catalog = definitions.catalog();
+
+    // The store owns kit.yml and is itself the config handle (it both reads and rewrites the file).
+    ConfigHandle<KitConfig> config = store;
 
     var giver = new KitGiver();
     var claimService = new KitClaimService(config, cooldowns, giver);
-    var admin = new KitAdminService(definitions.store(), catalog, usage);
+    var admin = new KitAdminService(store, catalog, usage);
 
     wireMenus(config, catalog, cooldowns, claimService, registrar);
 
@@ -88,15 +91,15 @@ public final class KitModule extends AbstractModule {
 
   private Definitions wireDefinitions(
       @NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
-    // Sits next to kit.yml under the config dir (CoreServicesBootstrap roots module configs at
-    // <dataFolder>/modules), not at the plugin root, so all kit files live together.
+    // Single kit.yml under the config dir (CoreServicesBootstrap roots module configs at
+    // <dataFolder>/modules). The module owns the file directly because it rewrites it on create.
     var configDir = env.plugin().getDataFolder().toPath().resolve("modules");
-    var file = configDir.resolve("kits.yml");
+    var file = configDir.resolve("kit.yml");
 
     var ioExecutor = newIoExecutor();
     registrar.closeable(ioExecutor::shutdown);
 
-    var store = new KitDefinitionStore(file, ioExecutor);
+    var store = new KitConfigStore(file, ioExecutor);
     store.load();
 
     var catalog = new KitCatalog(store);
@@ -105,7 +108,7 @@ public final class KitModule extends AbstractModule {
     return new Definitions(store, catalog);
   }
 
-  private record Definitions(KitDefinitionStore store, KitCatalog catalog) {}
+  private record Definitions(KitConfigStore store, KitCatalog catalog) {}
 
   private void wireMenus(
       @NonNull ConfigHandle<KitConfig> config,

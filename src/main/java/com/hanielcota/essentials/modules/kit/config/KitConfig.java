@@ -27,10 +27,13 @@ public record KitConfig(
     @Comment("The /kit category menu.") KitCategoryMenuConfig categoryMenu,
     @Comment("The paginated kit list menu.") KitListMenuConfig listMenu,
     @Comment("The read-only kit preview menu.") KitPreviewMenuConfig previewMenu,
-    @Comment("Chat messages.") KitMessages messages) {
+    @Comment("Chat messages.") KitMessages messages,
+    @Comment("Kit definitions keyed by id. Managed by /kit create; edit the metadata by hand.")
+        Map<String, KitDefinitionConfig> kits) {
 
   public KitConfig {
     categories = categories == null ? new LinkedHashMap<>() : new LinkedHashMap<>(categories);
+    kits = kits == null ? new LinkedHashMap<>() : new LinkedHashMap<>(kits);
   }
 
   public static KitConfig defaults() {
@@ -41,6 +44,13 @@ public record KitConfig(
     categories.put("general", general);
     categories.put("vip", vip);
 
+    // A fillable template: run "/kit create starter" holding the items, then flip the flags here.
+    var starter =
+        KitDefinitionConfig.of(
+            "<green>Starter", Material.CHEST, "general", 0, false, "", false, List.of());
+    var kits = new LinkedHashMap<String, KitDefinitionConfig>();
+    kits.put("starter", starter);
+
     return new KitConfig(
         true,
         "entity.experience_orb.pickup",
@@ -50,7 +60,22 @@ public record KitConfig(
         KitCategoryMenuConfig.defaults(),
         KitListMenuConfig.defaults(),
         KitPreviewMenuConfig.defaults(),
-        KitMessages.defaults());
+        KitMessages.defaults(),
+        kits);
+  }
+
+  public KitConfig withKits(@NonNull Map<String, KitDefinitionConfig> newKits) {
+    return new KitConfig(
+        dropWhenInventoryFull,
+        claimSound,
+        claimVolume,
+        claimPitch,
+        categories,
+        categoryMenu,
+        listMenu,
+        previewMenu,
+        messages,
+        newKits);
   }
 
   public boolean playsClaimSound() {

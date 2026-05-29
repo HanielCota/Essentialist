@@ -1,5 +1,7 @@
 package com.hanielcota.essentials.modules.kit.service;
 
+import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.modules.kit.config.KitConfig;
 import com.hanielcota.essentials.modules.kit.config.KitDefinitionConfig;
 import com.hanielcota.essentials.modules.kit.domain.Kit;
 import java.util.LinkedHashMap;
@@ -9,16 +11,16 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-/** In-memory view of the resolved kits (items already deserialized), rebuilt from the store. */
+/** In-memory view of the resolved kits (items already deserialized), rebuilt from the config. */
 @RequiredArgsConstructor
 public final class KitCatalog {
 
-  private final KitDefinitionStore store;
+  private final ConfigHandle<KitConfig> config;
 
   private volatile Map<String, Kit> kits = Map.of();
 
   public void rebuild() {
-    var definitions = this.store.all();
+    var definitions = this.config.value().kits();
 
     var resolved = new LinkedHashMap<String, Kit>(definitions.size());
     for (var entry : definitions.entrySet()) {
