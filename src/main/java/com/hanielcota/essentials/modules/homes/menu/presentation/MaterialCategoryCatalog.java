@@ -2,9 +2,12 @@ package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import java.util.List;
 import java.util.Map;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.Material;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class MaterialCategoryCatalog {
 
   private static final Map<MaterialCategory, List<Material>> MATERIALS =
@@ -638,8 +641,6 @@ final class MaterialCategoryCatalog {
                   Material.PINK_PETALS,
                   Material.WILDFLOWERS)),
           Map.entry(MaterialCategory.MISC, List.of()));
-
-  private MaterialCategoryCatalog() {}
 
   static @NonNull MaterialCategory categoryOf(@NonNull Material material) {
     for (var entry : MATERIALS.entrySet()) {

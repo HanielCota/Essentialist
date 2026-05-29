@@ -1,14 +1,15 @@
 package com.hanielcota.essentials.shared;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
  * Performs {@code {}} token replacement for log message patterns. Separated from {@link Log} so the
  * formatter can be tested and evolved independently of the logging backend.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class MessageFormatter {
-
-  private MessageFormatter() {}
 
   static String format(@NonNull String pattern, @NonNull Object[] args) {
     if (args.length == 0) {

@@ -1,5 +1,9 @@
 package com.hanielcota.essentials.modules.invsee.domain;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class InvseeLayout {
 
   public static final int SIZE = 45;
@@ -10,6 +14,4 @@ public final class InvseeLayout {
   public static final int BOOTS_SLOT = 39;
   public static final int OFFHAND_SLOT = 40;
   public static final int FIRST_LOCKED_SLOT = 41;
-
-  private InvseeLayout() {}
 }
