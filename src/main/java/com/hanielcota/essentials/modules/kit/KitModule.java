@@ -88,8 +88,10 @@ public final class KitModule extends AbstractModule {
 
   private Definitions wireDefinitions(
       @NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
-    var dataFolder = env.plugin().getDataFolder().toPath();
-    var file = dataFolder.resolve("kits.yml");
+    // Sits next to kit.yml under the config dir (CoreServicesBootstrap roots module configs at
+    // <dataFolder>/modules), not at the plugin root, so all kit files live together.
+    var configDir = env.plugin().getDataFolder().toPath().resolve("modules");
+    var file = configDir.resolve("kits.yml");
 
     var ioExecutor = newIoExecutor();
     registrar.closeable(ioExecutor::shutdown);
