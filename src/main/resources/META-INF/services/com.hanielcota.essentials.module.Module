@@ -33,6 +33,7 @@ com.hanielcota.essentials.modules.info.InfoModule
 com.hanielcota.essentials.modules.rename.RenameModule
 com.hanielcota.essentials.modules.enderchest.EnderChestModule
 com.hanielcota.essentials.modules.actionbar.ActionBarModule
+com.hanielcota.essentials.modules.entity.EntityModule
 com.hanielcota.essentials.modules.essentials.EssentialsModule
 com.hanielcota.essentials.modules.workstations.WorkstationsModule
 com.hanielcota.essentials.modules.vanish.VanishModule
