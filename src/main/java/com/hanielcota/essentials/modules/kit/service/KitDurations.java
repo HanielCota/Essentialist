@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.kit.service;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.OptionalLong;
-import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -15,9 +14,6 @@ public final class KitDurations {
   private static final long SECONDS_PER_MINUTE = 60L;
   private static final long SECONDS_PER_HOUR = 3600L;
   private static final long SECONDS_PER_DAY = 86_400L;
-
-  private static final Pattern RAW_SECONDS = Pattern.compile("\\d+");
-  private static final Pattern UNIT = Pattern.compile("(\\d+)([dhms])");
 
   public static String format(long totalSeconds) {
     if (totalSeconds <= 0) {
@@ -46,6 +42,8 @@ public final class KitDurations {
    * Parses a duration into seconds. Accepts raw seconds ({@code 90}) or unit groups in any
    * combination ({@code 1d2h30m10s}); commas and spaces between groups are ignored. Returns an
    * empty result when the input is malformed.
+   *
+   * <p>Hand-scanned rather than regex-based so it stays linear-time on any input (no backtracking).
    */
   public static OptionalLong parseSeconds(@NonNull String input) {
     var normalized = input.trim().toLowerCase(Locale.ROOT).replace(",", "").replace(" ", "");
@@ -53,39 +51,37 @@ public final class KitDurations {
       return OptionalLong.empty();
     }
 
-    if (RAW_SECONDS.matcher(normalized).matches()) {
-      return parseLong(normalized);
-    }
-
-    return parseUnits(normalized);
-  }
-
-  private static OptionalLong parseUnits(@NonNull String normalized) {
-    var matcher = UNIT.matcher(normalized);
-
     var total = 0L;
-    var covered = 0;
-    var matched = false;
-    while (matcher.find()) {
-      if (matcher.start() != covered) {
+    var current = 0L;
+    var hasDigit = false;
+    var sawUnit = false;
+
+    for (var index = 0; index < normalized.length(); index++) {
+      var ch = normalized.charAt(index);
+
+      if (ch >= '0' && ch <= '9') {
+        current = current * 10 + (ch - '0');
+        hasDigit = true;
+        continue;
+      }
+
+      var unit = unitSeconds(ch);
+      if (unit < 0 || !hasDigit) {
         return OptionalLong.empty();
       }
 
-      var amount = parseLong(matcher.group(1));
-      if (amount.isEmpty()) {
-        return OptionalLong.empty();
-      }
-
-      matched = true;
-      total += amount.getAsLong() * unitSeconds(matcher.group(2).charAt(0));
-      covered = matcher.end();
+      total += current * unit;
+      current = 0;
+      hasDigit = false;
+      sawUnit = true;
     }
 
-    if (!matched || covered != normalized.length()) {
-      return OptionalLong.empty();
+    if (!sawUnit) {
+      return hasDigit ? OptionalLong.of(current) : OptionalLong.empty();
     }
 
-    return OptionalLong.of(total);
+    // A trailing number with no unit (e.g. "1d2") is malformed.
+    return hasDigit ? OptionalLong.empty() : OptionalLong.of(total);
   }
 
   private static long unitSeconds(char unit) {
@@ -93,15 +89,8 @@ public final class KitDurations {
       case 'd' -> SECONDS_PER_DAY;
       case 'h' -> SECONDS_PER_HOUR;
       case 'm' -> SECONDS_PER_MINUTE;
-      default -> 1L;
+      case 's' -> 1L;
+      default -> -1L;
     };
-  }
-
-  private static OptionalLong parseLong(@NonNull String digits) {
-    try {
-      return OptionalLong.of(Long.parseLong(digits));
-    } catch (NumberFormatException e) {
-      return OptionalLong.empty();
-    }
   }
 }
