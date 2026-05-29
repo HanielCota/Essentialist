@@ -6,6 +6,7 @@ com.hanielcota.essentials.modules.homes.HomesModule
 com.hanielcota.essentials.modules.warps.WarpsModule
 com.hanielcota.essentials.modules.fly.FlyModule
 com.hanielcota.essentials.modules.gamemode.GamemodeModule
+com.hanielcota.essentials.modules.environment.EnvironmentModule
 com.hanielcota.essentials.modules.smelt.SmeltModule
 com.hanielcota.essentials.modules.compact.CompactModule
 com.hanielcota.essentials.modules.clear.ClearModule
