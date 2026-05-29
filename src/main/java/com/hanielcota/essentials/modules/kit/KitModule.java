@@ -33,9 +33,8 @@ import com.hanielcota.essentials.modules.kit.service.KitConfigStore;
 import com.hanielcota.essentials.modules.kit.service.KitCooldownService;
 import com.hanielcota.essentials.modules.kit.service.KitGiver;
 import com.hanielcota.essentials.modules.kit.service.KitSortPreferences;
+import com.hanielcota.essentials.scheduler.Scheduler;
 import java.time.ZoneId;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.IntSupplier;
 import lombok.NonNull;
 
@@ -51,6 +50,7 @@ public final class KitModule extends AbstractModule {
   @Override
   protected void onEnable(@NonNull ModuleEnvironment env, @NonNull ModuleRegistrar registrar) {
     var menus = env.service(MenuService.class);
+    var scheduler = env.service(Scheduler.class);
 
     var usage = wireUsageStorage(env, registrar);
 
@@ -74,7 +74,8 @@ public final class KitModule extends AbstractModule {
     wireMenus(config, catalog, cooldowns, claimService, notifier, registrar);
 
     registrar.listener(new FirstJoinKitListener(catalog, claimService));
-    registrar.command(new KitCommand(config, menus, admin, catalog, claimService, notifier));
+    registrar.command(
+        new KitCommand(config, menus, scheduler, admin, catalog, claimService, notifier));
   }
 
   private CachedKitUsageRepository wireUsageStorage(
@@ -104,10 +105,7 @@ public final class KitModule extends AbstractModule {
     var configDir = env.plugin().getDataFolder().toPath().resolve("modules");
     var file = configDir.resolve("kit.yml");
 
-    var ioExecutor = newIoExecutor();
-    registrar.closeable(ioExecutor::shutdown);
-
-    var store = new KitConfigStore(file, ioExecutor);
+    var store = new KitConfigStore(file);
     store.load();
 
     var catalog = new KitCatalog(store);
@@ -139,16 +137,5 @@ public final class KitModule extends AbstractModule {
             config, catalog, entryRenderer, cooldowns, state, sortPreferences, listClicks));
     registrar.menu(new KitPreviewMenu(config, catalog, state, previewClicks));
     registrar.listener(new KitMenuCleanupListener(state, sortPreferences));
-  }
-
-  private static ExecutorService newIoExecutor() {
-    return Executors.newSingleThreadExecutor(KitModule::ioThread);
-  }
-
-  private static Thread ioThread(@NonNull Runnable runnable) {
-    var thread = new Thread(runnable, "essentials-kit-io");
-    thread.setDaemon(true);
-
-    return thread;
   }
 }

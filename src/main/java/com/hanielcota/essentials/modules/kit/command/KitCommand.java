@@ -5,12 +5,14 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.MenuOpenings;
 import com.hanielcota.essentials.modules.kit.config.KitConfig;
 import com.hanielcota.essentials.modules.kit.config.KitDefinitionConfig;
+import com.hanielcota.essentials.modules.kit.domain.Kit;
 import com.hanielcota.essentials.modules.kit.domain.KitClaimResult;
 import com.hanielcota.essentials.modules.kit.menu.KitCategoryMenu;
 import com.hanielcota.essentials.modules.kit.service.KitAdminService;
 import com.hanielcota.essentials.modules.kit.service.KitCatalog;
 import com.hanielcota.essentials.modules.kit.service.KitClaimService;
 import com.hanielcota.essentials.modules.kit.service.KitDurations;
+import com.hanielcota.essentials.scheduler.Scheduler;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
@@ -37,6 +39,7 @@ import org.bukkit.entity.Player;
 public record KitCommand(
     ConfigHandle<KitConfig> config,
     MenuService menus,
+    Scheduler scheduler,
     KitAdminService admin,
     KitCatalog catalog,
     KitClaimService claimService,
@@ -68,25 +71,36 @@ public record KitCommand(
     var messages = this.config.value().messages();
     var id = kitName.toLowerCase(Locale.ROOT);
 
-    var kit = this.catalog.find(id);
-    if (kit.isEmpty()) {
+    var found = this.catalog.find(id);
+    if (found.isEmpty()) {
       return CommandResult.invalidUsage(messages.formatUnknownKit(kitName));
     }
 
-    var outcome = this.claimService.deliver(target, kit.get());
-    var targetName = target.getName();
-
-    if (outcome.result() != KitClaimResult.CLAIMED) {
-      var failMsg = messages.formatGiveFailed(targetName);
-      return CommandResult.invalidUsage(failMsg);
+    var kit = found.get();
+    if (kit.isEmpty()) {
+      return CommandResult.invalidUsage(messages.formatEmpty(kitName));
     }
 
-    this.notifier.notify(target, kit.get(), outcome);
-
-    var gaveMsg = messages.formatGave(kit.get().displayName(), targetName);
-    actor.sendSuccess(gaveMsg);
+    // The delivery mutates the target's inventory, so it must run on the target's own region.
+    Runnable delivery = () -> deliverTo(actor, target, kit);
+    this.scheduler.runOnEntity(target, delivery);
 
     return CommandResult.success();
+  }
+
+  private void deliverTo(@NonNull CommandActor actor, @NonNull Player target, @NonNull Kit kit) {
+    var messages = this.config.value().messages();
+    var targetName = target.getName();
+
+    var outcome = this.claimService.deliver(target, kit);
+    this.notifier.notify(target, kit, outcome);
+
+    if (outcome.result() == KitClaimResult.CLAIMED) {
+      actor.sendSuccess(messages.formatGave(kit.displayName(), targetName));
+      return;
+    }
+
+    actor.sendError(messages.formatGiveFailed(targetName));
   }
 
   @Subcommand("create")

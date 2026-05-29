@@ -7,24 +7,24 @@ import com.hanielcota.essentials.modules.kit.config.KitDefinitionConfig;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Owns the single {@code kit.yml}: it is both the read handle for the static config (categories,
  * menus, messages, behaviour) and the writer for the kit definitions section, which {@code /kit
- * create} and {@code /kit delete} rewrite.
+ * create}, {@code /kit delete} and {@code /kit set*} rewrite.
  *
  * <p>Because the module writes this file, it cannot also be loaded through the shared config
- * service (two owners would diverge), so the store implements {@link ConfigHandle} itself. The
- * in-memory snapshot updates synchronously; the disk write goes to an executor off the main thread.
+ * service (two owners would diverge), so the store implements {@link ConfigHandle} itself. Writes
+ * are synchronous: the file is small and only touched by (rare) admin commands, and a synchronous
+ * write keeps {@link #load()} from racing a not-yet-flushed write on an immediate {@code /kit
+ * reload}.
  */
 @RequiredArgsConstructor
 public final class KitConfigStore implements ConfigHandle<KitConfig> {
 
   private final Path file;
-  private final Executor ioExecutor;
 
   private volatile KitConfig current = KitConfig.defaults();
 
@@ -69,7 +69,6 @@ public final class KitConfigStore implements ConfigHandle<KitConfig> {
     var snapshot = this.current.withKits(kits);
     this.current = snapshot;
 
-    var target = this.file;
-    this.ioExecutor.execute(() -> YamlReadWriter.write(target, KitConfig.class, snapshot));
+    YamlReadWriter.write(this.file, KitConfig.class, snapshot);
   }
 }
