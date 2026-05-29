@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.essentials.config;
 
 import com.hanielcota.essentials.menu.MenuLayouts;
+import com.hanielcota.essentials.menu.NavigationButtonsConfig;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -25,7 +26,9 @@ public record ModulesMenuConfig(
     @Comment("Chat feedback when a module is switched off. Placeholder: {module}.")
         String toggledOff,
     @Comment("The 'how it works' guide item.") ModulesInfoConfig info,
-    @Comment("Category filter button (cycles the shown category).") ModulesFilterConfig filter) {
+    @Comment("Category filter button (cycles the shown category).") ModulesFilterConfig filter,
+    @Comment("Previous/next page buttons (used when a category overflows the content slots).")
+        NavigationButtonsConfig navigation) {
 
   private static final int MIN_ROWS = 1;
   private static final int MAX_ROWS = 6;
@@ -58,7 +61,8 @@ public record ModulesMenuConfig(
         "<green>Módulo <gold>{module}</gold> será ativado no próximo reinício.",
         "<red>Módulo <gold>{module}</gold> será desativado no próximo reinício.",
         ModulesInfoConfig.defaults(),
-        ModulesFilterConfig.defaults());
+        ModulesFilterConfig.defaults(),
+        NavigationButtonsConfig.defaults(48, 50));
   }
 
   public int effectiveRows() {

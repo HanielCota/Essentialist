@@ -11,7 +11,7 @@ public final class EssentialsModulesMenuState {
   private final Map<UUID, ModuleCategory> openCategory = new ConcurrentHashMap<>();
 
   public ModuleCategory category(@NonNull UUID viewer) {
-    return this.openCategory.getOrDefault(viewer, ModuleCategory.PROTECTION);
+    return this.openCategory.getOrDefault(viewer, ModuleCategory.ALL);
   }
 
   public void switchCategory(@NonNull UUID viewer, @NonNull ModuleCategory category) {

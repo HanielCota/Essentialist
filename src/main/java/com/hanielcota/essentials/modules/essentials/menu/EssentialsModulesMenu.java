@@ -8,6 +8,7 @@ import com.github.hanielcota.menuframework.definition.PaginationConfig;
 import com.github.hanielcota.menuframework.definition.SlotDefinition;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.menu.EssentialsMenu;
+import com.hanielcota.essentials.menu.PageNavigation;
 import com.hanielcota.essentials.module.control.ModuleControl;
 import com.hanielcota.essentials.modules.essentials.config.EssentialsConfig;
 import com.hanielcota.essentials.shared.ComponentUtils;
@@ -25,6 +26,8 @@ import org.bukkit.entity.Player;
 public final class EssentialsModulesMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.modules";
+
+  private static final int MIN_ROWS = 1;
 
   private final @NonNull ConfigHandle<EssentialsConfig> config;
   private final @NonNull EssentialsModulesMenuState state;
@@ -45,11 +48,15 @@ public final class EssentialsModulesMenu implements EssentialsMenu {
     var rawTitle = menu.title();
     var menuTitle = ComponentUtils.mini(rawTitle);
 
-    // The framework requires content slots whenever dynamicContent is used. Every item is placed at
-    // an explicit slot (modules in the content slots, guide + filter at their own slots), so
-    // pagination never has to project a -1 item.
+    // Modules are paginated (-1) through the content slots; the guide and filter sit at their own
+    // slots. Navigation buttons are required so the -1 items project, and let "All" page through
+    // every module beyond the first page.
     var contentSlots = menu.effectiveContentSlots();
-    var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
+    var paginationBuilder = PaginationConfig.builder().contentSlots(contentSlots);
+    if (rows > MIN_ROWS) {
+      PageNavigation.apply(menus, paginationBuilder, ID, rows, menu.navigation());
+    }
+    var pagination = paginationBuilder.build();
 
     var builder = MenuFramework.builder(ID, menus);
     builder.rows(rows);

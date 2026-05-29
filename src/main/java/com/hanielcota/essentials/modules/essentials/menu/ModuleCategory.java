@@ -7,6 +7,7 @@ import lombok.NonNull;
  * {@code ModulesFilterConfig} so they stay admin-configurable.
  */
 public enum ModuleCategory {
+  ALL,
   PROTECTION,
   TELEPORT,
   CHAT,
