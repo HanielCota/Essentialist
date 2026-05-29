@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.essentials.config;
 
+import com.hanielcota.essentials.menu.MenuLayouts;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.NonNull;
@@ -10,7 +11,9 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 @ConfigSerializable
 public record ModulesMenuConfig(
     @Comment("Inventory title of the module-control menu.") String title,
-    @Comment("Menu height in rows (1-6). The bottom row holds the category tabs.") int rows,
+    @Comment("Menu height in rows (1-6).") int rows,
+    @Comment("Slots (0-based) the module items are placed in, in order.")
+        List<Integer> contentSlots,
     @Comment("Icon for an enabled module.") Material enabledMaterial,
     @Comment("Icon for a disabled module.") Material disabledMaterial,
     @Comment("Item name of an enabled module. Placeholder: {module}.") String enabledName,
@@ -21,25 +24,40 @@ public record ModulesMenuConfig(
     @Comment("Chat feedback when a module is switched on. Placeholder: {module}.") String toggledOn,
     @Comment("Chat feedback when a module is switched off. Placeholder: {module}.")
         String toggledOff,
+    @Comment("The 'how it works' guide item.") ModulesInfoConfig info,
     @Comment("Category filter button (cycles the shown category).") ModulesFilterConfig filter) {
 
   private static final int MIN_ROWS = 1;
   private static final int MAX_ROWS = 6;
   private static final int DEFAULT_ROWS = 6;
 
+  // Inner grid of a 6-row chest (cols 2-8 of rows 2-5), so the border frames the content.
+  private static final List<Integer> DEFAULT_CONTENT_SLOTS =
+      List.of(
+          10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34, 37,
+          38, 39, 40, 41, 42, 43);
+
   public static ModulesMenuConfig defaults() {
     return new ModulesMenuConfig(
         "Módulos",
         DEFAULT_ROWS,
+        DEFAULT_CONTENT_SLOTS,
         Material.LIME_DYE,
         Material.GRAY_DYE,
         "<green>{module}",
         "<red>{module}",
-        List.of("<gray>Estado: <green>Ativado", "<yellow>Clique para desativar."),
-        List.of("<gray>Estado: <red>Desativado", "<yellow>Clique para ativar."),
-        "<gold>⟳ Aplica no próximo restart.",
-        "<green>Módulo <gold>{module}</gold> será ativado no próximo restart.",
-        "<red>Módulo <gold>{module}</gold> será desativado no próximo restart.",
+        List.of(
+            "<dark_gray>▪ <gray>Status: <green>● Ativado",
+            "",
+            "<yellow>➜ <gray>Clique para <red>desativar<gray>."),
+        List.of(
+            "<dark_gray>▪ <gray>Status: <red>● Desativado",
+            "",
+            "<yellow>➜ <gray>Clique para <green>ativar<gray>."),
+        "<gold>⚠ <gray>Aplica no próximo reinício.",
+        "<green>Módulo <gold>{module}</gold> será ativado no próximo reinício.",
+        "<red>Módulo <gold>{module}</gold> será desativado no próximo reinício.",
+        ModulesInfoConfig.defaults(),
         ModulesFilterConfig.defaults());
   }
 
@@ -52,6 +70,12 @@ public record ModulesMenuConfig(
     }
 
     return this.rows;
+  }
+
+  public List<Integer> effectiveContentSlots() {
+    var rows = effectiveRows();
+
+    return MenuLayouts.sanitizeSlots(this.contentSlots, rows);
   }
 
   public Material material(boolean enabled) {
