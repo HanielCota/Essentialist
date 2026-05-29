@@ -24,9 +24,10 @@ public final class KitAdminService {
 
   /**
    * Snapshots the admin's full kit (main inventory + worn armor + off-hand) as kit {@code rawId};
-   * returns the total item count saved (0 means everything was empty).
+   * returns the total item count saved (0 means everything was empty). A {@code cooldownSeconds} of
+   * {@code -1} keeps the existing cooldown (or 0 for a new kit); {@code >= 0} sets it.
    */
-  public int create(@NonNull Player admin, @NonNull String rawId) {
+  public int create(@NonNull Player admin, @NonNull String rawId, long cooldownSeconds) {
     var id = rawId.toLowerCase(Locale.ROOT);
     var inventory = admin.getInventory();
 
@@ -39,7 +40,7 @@ public final class KitAdminService {
       return 0;
     }
 
-    var definition = mergeOrCreate(id, rawId, storage, armor, offhand);
+    var definition = mergeOrCreate(id, rawId, storage, armor, offhand, cooldownSeconds);
     this.store.putKit(id, definition);
     this.catalog.rebuild();
 
@@ -87,14 +88,29 @@ public final class KitAdminService {
       @NonNull String rawId,
       @NonNull List<String> storage,
       @NonNull List<String> armor,
-      @NonNull List<String> offhand) {
+      @NonNull List<String> offhand,
+      long cooldownSeconds) {
     var existing = this.store.kits().get(id);
-    if (existing != null) {
-      return existing.withContents(storage, armor, offhand);
+    var base =
+        existing != null
+            ? existing.withContents(storage, armor, offhand)
+            : KitDefinitionConfig.of(
+                rawId,
+                Material.CHEST,
+                DEFAULT_CATEGORY,
+                0,
+                false,
+                "",
+                false,
+                storage,
+                armor,
+                offhand);
+
+    if (cooldownSeconds < 0) {
+      return base;
     }
 
-    return KitDefinitionConfig.of(
-        rawId, Material.CHEST, DEFAULT_CATEGORY, 0, false, "", false, storage, armor, offhand);
+    return base.withCooldownSeconds(cooldownSeconds);
   }
 
   private static List<ItemStack> nonEmpty(@NonNull ItemStack[] contents) {

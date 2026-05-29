@@ -10,12 +10,13 @@ import com.hanielcota.essentials.modules.kit.menu.KitCategoryMenu;
 import com.hanielcota.essentials.modules.kit.service.KitAdminService;
 import com.hanielcota.essentials.modules.kit.service.KitCatalog;
 import com.hanielcota.essentials.modules.kit.service.KitClaimService;
+import com.hanielcota.essentials.modules.kit.service.KitDurations;
 import io.github.hanielcota.commandframework.annotation.Arg;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
+import io.github.hanielcota.commandframework.annotation.DefaultValue;
 import io.github.hanielcota.commandframework.annotation.Description;
 import io.github.hanielcota.commandframework.annotation.GreedyString;
-import io.github.hanielcota.commandframework.annotation.Min;
 import io.github.hanielcota.commandframework.annotation.OnlinePlayer;
 import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.PlayerOnly;
@@ -91,13 +92,27 @@ public record KitCommand(
   @Subcommand("create")
   @Permission("essentials.kit.admin")
   @PlayerOnly
-  @Description("Cria ou atualiza um kit com o conteúdo do seu inventário.")
-  @Syntax("/kit create <nome>")
-  public CommandResult create(@NonNull CommandActor actor, @Arg("nome") String name) {
+  @Description("Cria ou atualiza um kit com o conteúdo do seu inventário (cooldown opcional).")
+  @Syntax("/kit create <nome> [cooldown]")
+  public CommandResult create(
+      @NonNull CommandActor actor,
+      @Arg("nome") String name,
+      @DefaultValue("") @Arg("cooldown") String cooldown) {
     var player = actor.unwrap(Player.class);
     var messages = this.config.value().messages();
 
-    var count = this.admin.create(player, name);
+    long cooldownSeconds;
+    if (cooldown.isBlank()) {
+      cooldownSeconds = -1;
+    } else {
+      var parsed = KitDurations.parseSeconds(cooldown);
+      if (parsed.isEmpty()) {
+        return CommandResult.invalidUsage(messages.formatInvalidDuration(cooldown));
+      }
+      cooldownSeconds = parsed.getAsLong();
+    }
+
+    var count = this.admin.create(player, name, cooldownSeconds);
     if (count == 0) {
       return CommandResult.invalidUsage(messages.createEmpty());
     }
@@ -143,10 +158,18 @@ public record KitCommand(
 
   @Subcommand("setcooldown")
   @Permission("essentials.kit.admin")
-  @Description("Define o cooldown do kit em segundos (0 desativa).")
-  @Syntax("/kit setcooldown <kit> <segundos>")
+  @Description("Define o cooldown do kit (segundos ou ex.: 1d2h30m; 0 desativa).")
+  @Syntax("/kit setcooldown <kit> <duracao>")
   public CommandResult setCooldown(
-      @NonNull CommandActor actor, @Arg("kit") String kit, @Min(0) @Arg("segundos") long seconds) {
+      @NonNull CommandActor actor, @Arg("kit") String kit, @Arg("duracao") String duration) {
+    var messages = this.config.value().messages();
+
+    var parsed = KitDurations.parseSeconds(duration);
+    if (parsed.isEmpty()) {
+      return CommandResult.invalidUsage(messages.formatInvalidDuration(duration));
+    }
+
+    var seconds = parsed.getAsLong();
     UnaryOperator<KitDefinitionConfig> mutation =
         definition -> definition.withCooldownSeconds(seconds);
 

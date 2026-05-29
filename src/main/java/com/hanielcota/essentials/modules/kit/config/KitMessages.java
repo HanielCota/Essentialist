@@ -29,7 +29,9 @@ public record KitMessages(
         String giveFailed,
     @Comment("Shown after a /kit set* edit. Placeholders: {kit}.") String edited,
     @Comment("Shown after claim-all. Placeholders: {count}.") String claimedAll,
-    @Comment("Shown when claim-all found no claimable kit.") String claimedNone) {
+    @Comment("Shown when claim-all found no claimable kit.") String claimedNone,
+    @Comment("Shown when a cooldown duration is malformed. Placeholders: {value}.")
+        String invalidDuration) {
 
   public static KitMessages defaults() {
     return new KitMessages(
@@ -50,7 +52,8 @@ public record KitMessages(
         "<red>Could not give the kit to <gold>{player}</gold> — their inventory is full.",
         "<green>Kit <gold>{kit}</gold> updated.",
         "<green>Claimed <gold>{count}</gold> kit(s).",
-        "<yellow>There are no kits available to claim right now.");
+        "<yellow>There are no kits available to claim right now.",
+        "<red>Invalid duration <gold>{value}</gold>. Use seconds or e.g. 1d2h30m.");
   }
 
   public String formatClaimed(@NonNull String kit) {
@@ -103,5 +106,9 @@ public record KitMessages(
 
   public String formatClaimedAll(int count) {
     return claimedAll.replace("{count}", String.valueOf(count));
+  }
+
+  public String formatInvalidDuration(@NonNull String value) {
+    return invalidDuration.replace("{value}", value);
   }
 }
