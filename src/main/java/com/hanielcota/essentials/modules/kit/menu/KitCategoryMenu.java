@@ -17,14 +17,14 @@ import com.hanielcota.essentials.modules.kit.service.KitCatalog;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import com.hanielcota.essentials.shared.Placeholders;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
 
-/** The /kit landing menu: the categories that currently hold at least one kit, paginated. */
+/** The /kit landing menu: every configured category (plus any used by a kit), paginated. */
 @RequiredArgsConstructor
 public final class KitCategoryMenu implements EssentialsMenu {
 
@@ -69,12 +69,9 @@ public final class KitCategoryMenu implements EssentialsMenu {
 
     var slots = new ArrayList<SlotDefinition>();
     for (var category : shownCategories(snap)) {
-      var kits = this.catalog.byCategory(category.id());
-      if (kits.isEmpty()) {
-        continue;
-      }
+      var kitCount = this.catalog.byCategory(category.id()).size();
 
-      var template = categoryItem(cfg.itemName(), cfg.itemLore(), category, kits.size());
+      var template = categoryItem(cfg.itemName(), cfg.itemLore(), category, kitCount);
       var categoryId = category.id();
 
       slots.add(SlotDefinition.of(-1, template, click -> this.clicks.open(click, categoryId)));
@@ -83,24 +80,19 @@ public final class KitCategoryMenu implements EssentialsMenu {
     return slots;
   }
 
-  // Configured categories (sorted) that are in use, then any category referenced by a kit but not
-  // configured (synthesised), so no kit is ever unreachable.
+  // Every configured category (sorted), plus any category referenced by a kit but not configured
+  // (synthesised). Configured-but-empty categories still show, and no kit is ever unreachable.
   private List<KitCategory> shownCategories(@NonNull KitConfig snap) {
-    var used = new LinkedHashSet<String>();
-    for (var kit : this.catalog.all()) {
-      used.add(kit.category());
-    }
-
     var shown = new ArrayList<KitCategory>();
-    var seen = new java.util.HashSet<String>();
+    var seen = new HashSet<String>();
+
     for (var category : snap.sortedCategories()) {
-      if (used.contains(category.id())) {
-        shown.add(category);
-        seen.add(category.id());
-      }
+      shown.add(category);
+      seen.add(category.id());
     }
-    for (var id : used) {
-      if (!seen.contains(id)) {
+    for (var kit : this.catalog.all()) {
+      var id = kit.category();
+      if (seen.add(id)) {
         shown.add(snap.category(id));
       }
     }
