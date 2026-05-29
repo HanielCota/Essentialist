@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
 
@@ -130,7 +131,7 @@ class CachedHomeRepositoryTest {
     private final Queue<Runnable> tasks = new ArrayDeque<>();
 
     @Override
-    public CompletableFuture<Void> submit(String operation, Runnable work) {
+    public CompletableFuture<Void> submit(@NonNull String operation, @NonNull Runnable work) {
       tasks.add(work);
       return CompletableFuture.completedFuture(null);
     }
@@ -164,52 +165,53 @@ class CachedHomeRepositoryTest {
     }
 
     @Override
-    public Optional<Home> find(UUID owner, String name) {
+    public Optional<Home> find(@NonNull UUID owner, @NonNull String name) {
       findCalls++;
       return Optional.empty();
     }
 
     @Override
-    public List<Home> list(UUID owner) {
+    public List<Home> list(@NonNull UUID owner) {
       listCalls++;
       return List.copyOf(this.homes);
     }
 
     @Override
-    public int count(UUID owner) {
+    public int count(@NonNull UUID owner) {
       countCalls++;
       return 0;
     }
 
     @Override
-    public void save(Home home) {
+    public void save(@NonNull Home home) {
       saveCalls++;
     }
 
     @Override
-    public boolean delete(UUID owner, String name) {
+    public boolean delete(@NonNull UUID owner, @NonNull String name) {
       deleteCalls++;
       return true;
     }
 
     @Override
-    public boolean rename(UUID owner, String oldName, String newName) {
+    public boolean rename(@NonNull UUID owner, @NonNull String oldName, @NonNull String newName) {
       renameCalls++;
       return true;
     }
 
     @Override
-    public boolean updateMaterial(UUID owner, String name, Material material) {
+    public boolean updateMaterial(
+        @NonNull UUID owner, @NonNull String name, @NonNull Material material) {
       return true;
     }
 
     @Override
-    public boolean updatePinned(UUID owner, String name, boolean pinned) {
+    public boolean updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
       return true;
     }
 
     @Override
-    public boolean bumpUsage(UUID owner, String name, long timestampMs) {
+    public boolean bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {
       return true;
     }
   }
