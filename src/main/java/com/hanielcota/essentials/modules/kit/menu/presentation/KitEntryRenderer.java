@@ -35,7 +35,7 @@ public final class KitEntryRenderer {
       return locked(cfg, name, cfg.claimedLore());
     }
 
-    var remaining = kit.hasCooldown() ? this.cooldowns.remainingSeconds(uuid, kit) : 0;
+    var remaining = kit.hasCooldownGate() ? this.cooldowns.remainingSeconds(uuid, kit) : 0;
     if (remaining > 0) {
       var time = KitDurations.format(remaining);
       var lore = Placeholders.replaceInAll(cfg.cooldownLore(), "{time}", time);

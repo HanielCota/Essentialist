@@ -35,7 +35,7 @@ public final class KitClaimService {
     if (kit.oneTime() && !bypass && this.cooldowns.hasClaimed(uuid, kit)) {
       return ClaimOutcome.of(KitClaimResult.ALREADY_CLAIMED);
     }
-    if (kit.hasCooldown() && !bypass && this.cooldowns.remainingSeconds(uuid, kit) > 0) {
+    if (kit.hasCooldownGate() && !bypass && this.cooldowns.remainingSeconds(uuid, kit) > 0) {
       return ClaimOutcome.of(KitClaimResult.ON_COOLDOWN);
     }
 

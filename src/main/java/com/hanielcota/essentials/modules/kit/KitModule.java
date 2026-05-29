@@ -32,8 +32,10 @@ import com.hanielcota.essentials.modules.kit.service.KitClaimService;
 import com.hanielcota.essentials.modules.kit.service.KitConfigStore;
 import com.hanielcota.essentials.modules.kit.service.KitCooldownService;
 import com.hanielcota.essentials.modules.kit.service.KitGiver;
+import java.time.ZoneId;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.IntSupplier;
 import lombok.NonNull;
 
 /**
@@ -50,7 +52,6 @@ public final class KitModule extends AbstractModule {
     var menus = env.service(MenuService.class);
 
     var usage = wireUsageStorage(env, registrar);
-    var cooldowns = new KitCooldownService(usage, System::currentTimeMillis);
 
     var definitions = wireDefinitions(env, registrar);
     var store = definitions.store();
@@ -58,6 +59,11 @@ public final class KitModule extends AbstractModule {
 
     // The store owns kit.yml and is itself the config handle (it both reads and rewrites the file).
     ConfigHandle<KitConfig> config = store;
+
+    IntSupplier dailyResetHour = () -> config.value().dailyResetHour();
+    var cooldowns =
+        new KitCooldownService(
+            usage, System::currentTimeMillis, dailyResetHour, ZoneId.systemDefault());
 
     var giver = new KitGiver();
     var claimService = new KitClaimService(config, cooldowns, giver);

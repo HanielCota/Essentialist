@@ -26,7 +26,8 @@ public record KitMessages(
         String inventoryNoSpace,
     @Comment("Shown to the giver after /kit give. Placeholders: {kit}, {player}.") String gave,
     @Comment("Shown to the giver when /kit give could not deliver. Placeholders: {player}.")
-        String giveFailed) {
+        String giveFailed,
+    @Comment("Shown after a /kit set* edit. Placeholders: {kit}.") String edited) {
 
   public static KitMessages defaults() {
     return new KitMessages(
@@ -44,7 +45,8 @@ public record KitMessages(
         "<red>The kit menu can only be opened by players.",
         "<red>Your inventory is full — free some space and try again.",
         "<green>Gave the kit <gold>{kit}</gold> to <gold>{player}</gold>.",
-        "<red>Could not give the kit to <gold>{player}</gold> — their inventory is full.");
+        "<red>Could not give the kit to <gold>{player}</gold> — their inventory is full.",
+        "<green>Kit <gold>{kit}</gold> updated.");
   }
 
   public String formatClaimed(@NonNull String kit) {
@@ -89,5 +91,9 @@ public record KitMessages(
 
   public String formatGiveFailed(@NonNull String player) {
     return giveFailed.replace("{player}", player);
+  }
+
+  public String formatEdited(@NonNull String kit) {
+    return edited.replace("{kit}", kit);
   }
 }

@@ -7,7 +7,8 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 /**
  * Persisted definition of a single kit (one entry under {@code kits} in {@code kit.yml}). Metadata
- * is editable by hand; the item sections are captured by {@code /kit create} as Base64 ItemStacks.
+ * is editable by hand or via {@code /kit set*}; the item sections are captured by {@code /kit
+ * create} as Base64 ItemStacks.
  */
 @ConfigSerializable
 public record KitDefinitionConfig(
@@ -26,7 +27,10 @@ public record KitDefinitionConfig(
     @Comment(
             "Serialized armor, positional: boots, leggings, chestplate, helmet. Equipped on claim.")
         List<String> armor,
-    @Comment("Serialized off-hand item (0 or 1 entry).") List<String> offhand) {
+    @Comment("Serialized off-hand item (0 or 1 entry).") List<String> offhand,
+    @Comment(
+            "When true, the cooldown resets daily at the configured hour instead of being rolling.")
+        boolean dailyReset) {
 
   public static KitDefinitionConfig of(
       String displayName,
@@ -49,7 +53,8 @@ public record KitDefinitionConfig(
         firstJoin,
         items,
         armor,
-        offhand);
+        offhand,
+        false);
   }
 
   /** Copy with replaced item sections (used when /kit create overwrites an existing kit). */
@@ -65,6 +70,112 @@ public record KitDefinitionConfig(
         firstJoin,
         newItems,
         newArmor,
-        newOffhand);
+        newOffhand,
+        dailyReset);
+  }
+
+  public KitDefinitionConfig withDisplayName(String value) {
+    return new KitDefinitionConfig(
+        value,
+        icon,
+        category,
+        cooldownSeconds,
+        oneTime,
+        permission,
+        firstJoin,
+        items,
+        armor,
+        offhand,
+        dailyReset);
+  }
+
+  public KitDefinitionConfig withIcon(Material value) {
+    return new KitDefinitionConfig(
+        displayName,
+        value,
+        category,
+        cooldownSeconds,
+        oneTime,
+        permission,
+        firstJoin,
+        items,
+        armor,
+        offhand,
+        dailyReset);
+  }
+
+  public KitDefinitionConfig withCategory(String value) {
+    return new KitDefinitionConfig(
+        displayName,
+        icon,
+        value,
+        cooldownSeconds,
+        oneTime,
+        permission,
+        firstJoin,
+        items,
+        armor,
+        offhand,
+        dailyReset);
+  }
+
+  public KitDefinitionConfig withCooldownSeconds(long value) {
+    return new KitDefinitionConfig(
+        displayName,
+        icon,
+        category,
+        value,
+        oneTime,
+        permission,
+        firstJoin,
+        items,
+        armor,
+        offhand,
+        dailyReset);
+  }
+
+  public KitDefinitionConfig withOneTime(boolean value) {
+    return new KitDefinitionConfig(
+        displayName,
+        icon,
+        category,
+        cooldownSeconds,
+        value,
+        permission,
+        firstJoin,
+        items,
+        armor,
+        offhand,
+        dailyReset);
+  }
+
+  public KitDefinitionConfig withPermission(String value) {
+    return new KitDefinitionConfig(
+        displayName,
+        icon,
+        category,
+        cooldownSeconds,
+        oneTime,
+        value,
+        firstJoin,
+        items,
+        armor,
+        offhand,
+        dailyReset);
+  }
+
+  public KitDefinitionConfig withDailyReset(boolean value) {
+    return new KitDefinitionConfig(
+        displayName,
+        icon,
+        category,
+        cooldownSeconds,
+        oneTime,
+        permission,
+        firstJoin,
+        items,
+        armor,
+        offhand,
+        value);
   }
 }

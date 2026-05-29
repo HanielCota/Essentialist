@@ -71,6 +71,7 @@ public final class KitCatalog {
         definition.firstJoin(),
         storage,
         armor,
-        offhand);
+        offhand,
+        definition.dailyReset());
   }
 }

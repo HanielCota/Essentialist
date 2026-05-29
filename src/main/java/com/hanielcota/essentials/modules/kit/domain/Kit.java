@@ -24,14 +24,16 @@ public record Kit(
     boolean firstJoin,
     @NonNull List<ItemStack> storage,
     @NonNull List<ItemStack> armor,
-    @Nullable ItemStack offhand) {
+    @Nullable ItemStack offhand,
+    boolean dailyReset) {
 
   public boolean hasPermission() {
     return !this.permission.isBlank();
   }
 
-  public boolean hasCooldown() {
-    return this.cooldownSeconds > 0;
+  /** Whether the kit gates re-claims at all (a rolling cooldown or a daily reset). */
+  public boolean hasCooldownGate() {
+    return this.dailyReset || this.cooldownSeconds > 0;
   }
 
   public boolean isEmpty() {

@@ -22,6 +22,8 @@ public record KitConfig(
         String claimSound,
     @Comment("Volume of the claim sound.") float claimVolume,
     @Comment("Pitch of the claim sound.") float claimPitch,
+    @Comment("Hour of day (0-23, server time) when daily-reset kits become claimable again.")
+        int dailyResetHour,
     @Comment("Kit categories keyed by id. Each kit references one of these ids.")
         Map<String, KitCategoryConfig> categories,
     @Comment("The /kit category menu.") KitCategoryMenuConfig categoryMenu,
@@ -65,6 +67,7 @@ public record KitConfig(
         "entity.experience_orb.pickup",
         1.0f,
         1.0f,
+        0,
         categories,
         KitCategoryMenuConfig.defaults(),
         KitListMenuConfig.defaults(),
@@ -79,6 +82,7 @@ public record KitConfig(
         claimSound,
         claimVolume,
         claimPitch,
+        dailyResetHour,
         categories,
         categoryMenu,
         listMenu,

@@ -5,6 +5,7 @@ import com.hanielcota.essentials.modules.kit.repository.KitUsageRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.UnaryOperator;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
@@ -43,6 +44,23 @@ public final class KitAdminService {
     this.catalog.rebuild();
 
     return total;
+  }
+
+  /**
+   * Applies a metadata change to an existing kit; returns {@code false} when the kit is unknown.
+   */
+  public boolean edit(@NonNull String rawId, @NonNull UnaryOperator<KitDefinitionConfig> mutation) {
+    var id = rawId.toLowerCase(Locale.ROOT);
+    var existing = this.store.kits().get(id);
+    if (existing == null) {
+      return false;
+    }
+
+    var updated = mutation.apply(existing);
+    this.store.putKit(id, updated);
+    this.catalog.rebuild();
+
+    return true;
   }
 
   public boolean delete(@NonNull String rawId) {
