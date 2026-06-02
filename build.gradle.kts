@@ -11,7 +11,7 @@ description = "Modular essentials plugin for Paper"
 base.archivesName = rootProject.name
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(26)
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
 }
 
 val paperApi = providers.gradleProperty("paperApiVersion")
