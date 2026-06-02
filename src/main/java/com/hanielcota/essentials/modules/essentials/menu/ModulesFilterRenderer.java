@@ -16,6 +16,19 @@ public final class ModulesFilterRenderer {
   private static final String OPTIONS_TOKEN = "{options}";
   private static final String STATE_TOKEN = "{state}";
 
+  private static List<String> options(
+      @NonNull ModulesFilterConfig filter, @NonNull ModuleCategory current) {
+    var lines = new ArrayList<String>(ModuleCategory.values().length);
+    for (var category : ModuleCategory.values()) {
+      var label = "<gray>" + filter.labelOf(category);
+      if (category == current) {
+        label += filter.activeMarker();
+      }
+      lines.add(label);
+    }
+    return lines;
+  }
+
   public @NonNull ItemTemplate render(
       @NonNull ModulesFilterConfig filter, @NonNull ModuleCategory current) {
     var stateLabel = filter.labelOf(current);
@@ -31,18 +44,5 @@ public final class ModulesFilterRenderer {
     }
 
     return MenuTemplates.simple(filter.material(), name, lore);
-  }
-
-  private static List<String> options(
-      @NonNull ModulesFilterConfig filter, @NonNull ModuleCategory current) {
-    var lines = new ArrayList<String>(ModuleCategory.values().length);
-    for (var category : ModuleCategory.values()) {
-      var label = "<gray>" + filter.labelOf(category);
-      if (category == current) {
-        label += filter.activeMarker();
-      }
-      lines.add(label);
-    }
-    return lines;
   }
 }

@@ -16,6 +16,14 @@ public final class IceSnowListener implements Listener {
 
   private final ConfigHandle<EnvironmentConfig> config;
 
+  private static boolean isIce(@NonNull Material material) {
+    return material == Material.ICE || material == Material.FROSTED_ICE;
+  }
+
+  private static boolean isSnow(@NonNull Material material) {
+    return material == Material.SNOW || material == Material.SNOW_BLOCK;
+  }
+
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onFade(@NonNull BlockFadeEvent event) {
     var snap = this.config.value();
@@ -54,13 +62,5 @@ public final class IceSnowListener implements Listener {
     }
 
     event.setCancelled(true);
-  }
-
-  private static boolean isIce(@NonNull Material material) {
-    return material == Material.ICE || material == Material.FROSTED_ICE;
-  }
-
-  private static boolean isSnow(@NonNull Material material) {
-    return material == Material.SNOW || material == Material.SNOW_BLOCK;
   }
 }

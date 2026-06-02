@@ -16,11 +16,6 @@ public final class KitUsageTable extends SqlTable {
       """
       DELETE FROM kit_uses WHERE kit_id = ?\
       """;
-
-  public KitUsageTable(@NonNull SqlDialect dialect) {
-    super(dialect, "kit_uses", CREATE_TABLE, "player_id", "kit_id", "used_at");
-  }
-
   private static final String CREATE_TABLE =
       """
       CREATE TABLE IF NOT EXISTS kit_uses (
@@ -30,4 +25,8 @@ public final class KitUsageTable extends SqlTable {
         PRIMARY KEY (player_id, kit_id)
       )\
       """;
+
+  public KitUsageTable(@NonNull SqlDialect dialect) {
+    super(dialect, "kit_uses", CREATE_TABLE, "player_id", "kit_id", "used_at");
+  }
 }

@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.speed.command;
 
-import com.hanielcota.essentials.command.Senders;
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.config.MessagePair;
 import com.hanielcota.essentials.paper.ActorFactory;
 import io.github.hanielcota.commandframework.core.CommandActor;
@@ -19,13 +19,6 @@ public final class SpeedNotifier {
 
   public void announce(
       @NonNull CommandActor sender, @NonNull Player subject, @NonNull MessagePair messages) {
-    var name = subject.getName();
-    var isSelf = Senders.isSelf(sender, subject);
-    var target = this.actors.actorOf(subject);
-
-    var senderMsg = messages.forSender(isSelf, name);
-    var targetMsg = messages.forTarget(name);
-
-    sender.sendDualMessage(target, senderMsg, targetMsg);
+    DualReply.send(sender, subject, this.actors, messages);
   }
 }

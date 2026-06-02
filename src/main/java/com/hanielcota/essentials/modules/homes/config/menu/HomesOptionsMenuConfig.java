@@ -42,6 +42,15 @@ public record HomesOptionsMenuConfig(
         Material unpinMaterial,
     @Comment("Name of the unpin button. Placeholders: {name}.") String unpinName,
     @Comment("Lore of the unpin button. Placeholders: {name}.") List<String> unpinLore,
+    @Comment("Slot of the make-public / make-private button.") int shareSlot,
+    @Comment("Material of the make-public button (shown when the home is private).")
+        Material shareMaterial,
+    @Comment("Name of the make-public button. Placeholders: {name}.") String shareName,
+    @Comment("Lore of the make-public button. Placeholders: {name}.") List<String> shareLore,
+    @Comment("Material of the make-private button (shown when the home is public).")
+        Material unshareMaterial,
+    @Comment("Name of the make-private button. Placeholders: {name}.") String unshareName,
+    @Comment("Lore of the make-private button. Placeholders: {name}.") List<String> unshareLore,
     @Comment("Name shown in the info slot when the targeted home no longer exists.")
         String unavailableName) {
 
@@ -85,6 +94,13 @@ public record HomesOptionsMenuConfig(
         Material.NETHER_STAR,
         "<gold>★ Unpin",
         List.of("<gray>Removes the highlight from <gold>{name}</gold>."),
+        16,
+        Material.ENDER_EYE,
+        "<green>Make public",
+        List.of("<gray>Lets anyone visit <gold>{name}</gold>", "<gray>from the public homes list."),
+        Material.ENDER_PEARL,
+        "<gray>Make private",
+        List.of("<gray>Hides <gold>{name}</gold> from the public list."),
         "<red>Home unavailable");
   }
 

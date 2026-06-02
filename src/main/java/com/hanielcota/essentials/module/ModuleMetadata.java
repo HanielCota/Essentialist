@@ -16,7 +16,6 @@ import lombok.NonNull;
  * @param dependencies ids of modules that must be enabled before this one
  * @param version human-readable version string
  * @param description short human-readable description
- * @throws IllegalArgumentException if {@code id} is {@code null} or blank
  */
 public record ModuleMetadata(
     String id, Set<String> dependencies, String version, String description) {

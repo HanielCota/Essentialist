@@ -13,6 +13,7 @@ import com.hanielcota.essentials.modules.homes.command.HomeCommand;
 import com.hanielcota.essentials.modules.homes.command.HomeLimitReachedMessageResolver;
 import com.hanielcota.essentials.modules.homes.command.HomesCommand;
 import com.hanielcota.essentials.modules.homes.command.MissingHomeMessageResolver;
+import com.hanielcota.essentials.modules.homes.command.PublicHomesCommand;
 import com.hanielcota.essentials.modules.homes.config.HomesConfig;
 import com.hanielcota.essentials.modules.homes.config.menu.MaterialNamesConfig;
 import com.hanielcota.essentials.modules.homes.create.HomeCreateNotifier;
@@ -27,6 +28,8 @@ import com.hanielcota.essentials.modules.homes.menu.HomeClickHandler;
 import com.hanielcota.essentials.modules.homes.menu.HomesActionTarget;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenu;
 import com.hanielcota.essentials.modules.homes.menu.HomesMenuState;
+import com.hanielcota.essentials.modules.homes.menu.PublicHomesClickHandler;
+import com.hanielcota.essentials.modules.homes.menu.PublicHomesMenu;
 import com.hanielcota.essentials.modules.homes.menu.delete.DeleteHomeClickHandler;
 import com.hanielcota.essentials.modules.homes.menu.delete.DeleteHomeDialog;
 import com.hanielcota.essentials.modules.homes.menu.material.MaterialCategoryClickHandler;
@@ -52,6 +55,7 @@ import com.hanielcota.essentials.modules.homes.service.HomeNameValidator;
 import com.hanielcota.essentials.modules.homes.service.HomeOrderingPreferences;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
 import com.hanielcota.essentials.modules.homes.service.HomeTeleporter;
+import com.hanielcota.essentials.modules.homes.service.HomeWorldPolicy;
 import com.hanielcota.essentials.modules.teleport.service.DelayedTeleport;
 import com.hanielcota.essentials.paper.ActorFactory;
 import com.hanielcota.essentials.scheduler.Scheduler;
@@ -104,7 +108,8 @@ public final class HomesModule extends AbstractModule {
     var repository = new CachedHomeRepository(sqlRepository, asyncWriter, cache);
     IntSupplier defaultLimit = () -> config.value().defaultLimit();
     var limits = new HomeLimitResolver(defaultLimit);
-    var homeService = new HomeService(repository, limits);
+    var worldPolicy = new HomeWorldPolicy(() -> config.value().blockedWorlds());
+    var homeService = new HomeService(repository, limits, worldPolicy);
 
     registrar.closeable(repository);
     registrar.listener(new HomesCacheListener(repository));
@@ -226,6 +231,10 @@ public final class HomesModule extends AbstractModule {
         new MaterialPickerMenu(
             config, interaction.actionTarget(), iconRegistry, pickerClickHandler));
     registrar.menu(new DeleteHomeDialog(config, deleteClickHandler));
+
+    var publicClickHandler = new PublicHomesClickHandler(interaction.teleporter(), actors);
+    registrar.menu(new PublicHomesMenu(config, homeService, renderer, publicClickHandler));
+
     registrar.listener(new HomesMenuCleanupListener(menuState));
   }
 
@@ -247,6 +256,7 @@ public final class HomesModule extends AbstractModule {
             menus,
             menuState));
     registrar.command(new HomesCommand(homeService, menus, menuState));
+    registrar.command(new PublicHomesCommand(menus));
   }
 
   private record HomesInteraction(

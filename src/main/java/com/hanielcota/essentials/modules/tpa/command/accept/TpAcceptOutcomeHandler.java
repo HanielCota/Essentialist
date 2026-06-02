@@ -36,14 +36,6 @@ public final class TpAcceptOutcomeHandler {
     return Map.copyOf(map);
   }
 
-  @FunctionalInterface
-  private interface ResultRoute {
-    void handle(
-        @NonNull TeleportRequest request,
-        @NonNull TpaMessages messages,
-        @NonNull CommandActor actor);
-  }
-
   public void handleClaim(
       @NonNull AcceptOutcome result,
       @NonNull TeleportRequest request,
@@ -108,5 +100,13 @@ public final class TpAcceptOutcomeHandler {
     var template = messages.crossWorldRefused();
     var msg = template.replace("{player}", requesterName);
     actor.sendError(msg);
+  }
+
+  @FunctionalInterface
+  private interface ResultRoute {
+    void handle(
+        @NonNull TeleportRequest request,
+        @NonNull TpaMessages messages,
+        @NonNull CommandActor actor);
   }
 }

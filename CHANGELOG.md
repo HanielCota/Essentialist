@@ -13,10 +13,14 @@ All notable changes to Essentialist are tracked here. Entries follow the structu
   - only `core.api` may implement the public `*Api` facades.
 - Test coverage for the previously-untested core: `ModuleLifecycle`, `ModuleDependencyResolver`, `DefaultAsyncDatabaseWriter` (saturation + rejection + exception propagation), `SqliteDialect`, `MainThreadCallbacks`, and six `*ApiAdapter`s.
 - `docs/FOLIA_SMOKE_TEST.md` — checklist for validating Folia compatibility on a live server.
+- Homes can be marked **public** (per-home `shared` flag, persisted via a new `homes.shared` column with an online migration). A make-public/make-private toggle sits in the `/homes` options menu, and `/publichomes` (permission `essentials.home.visit`) opens a paginated directory of every shared home, most-visited first; clicking warm-up-teleports the visitor without touching the owner's usage stats.
+- Homes can be blocked per world: `HomesConfig.blockedWorlds` rejects `/sethome`-style creation in the listed worlds unless the player holds `essentials.home.world.bypass`.
+- `/back` history now records why each location was captured (`DEATH` vs `TELEPORT`). The menu shows the cause in the item lore via the `{cause}` placeholder and adds a filter button (cycles all → death → teleport), with a configurable empty-state placeholder when the active filter matches no entries. New `teleport_history.cause` column with an online migration defaulting existing rows to `TELEPORT`.
 
 ### Changed
 
 - `NearService.findNearby` pre-sizes the result list to `candidates.size()` to avoid the default ArrayList grow-by-50% on dense worlds.
+- `/back` menu defaults to 5 rows with entries laid out from slot 10; previous/next navigation moved to slots 39/41 and the cause filter sits at slot 40.
 
 ## Releases shipped via merged PRs
 

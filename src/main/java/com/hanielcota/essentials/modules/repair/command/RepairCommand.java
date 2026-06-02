@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.repair.command;
 
 import com.hanielcota.essentials.command.DualReply;
+import com.hanielcota.essentials.command.Replacers;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.repair.config.RepairConfig;
@@ -16,7 +17,6 @@ import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.annotation.TargetOrSelf;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
-import java.util.function.UnaryOperator;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 
@@ -70,7 +70,7 @@ public record RepairCommand(
 
     var messages = snap.whenAllRepaired();
     var count = Integer.toString(repaired);
-    var replacer = (UnaryOperator<String>) line -> line.replace("{count}", count);
+    var replacer = Replacers.count(count);
     DualReply.send(sender, subject, this.actors, messages, replacer);
     return CommandResult.success();
   }

@@ -36,6 +36,12 @@ public record ItemLoreCommand(ConfigHandle<ItemLoreConfig> config, ItemLoreServi
     return base.decoration(TextDecoration.ITALIC, false);
   }
 
+  private static CommandResult success(@NonNull CommandActor actor, @NonNull String message) {
+    actor.sendSuccess(message);
+
+    return CommandResult.success();
+  }
+
   @DefaultSubcommand
   public CommandResult usage(@NonNull CommandActor actor) {
     var snap = this.config.value();
@@ -93,11 +99,5 @@ public record ItemLoreCommand(ConfigHandle<ItemLoreConfig> config, ItemLoreServi
       case INVALID_LINE -> CommandResult.invalidUsage(snap.invalidLine());
       case EMPTY_LORE -> CommandResult.invalidUsage(snap.emptyLore());
     };
-  }
-
-  private static CommandResult success(@NonNull CommandActor actor, @NonNull String message) {
-    actor.sendSuccess(message);
-
-    return CommandResult.success();
   }
 }

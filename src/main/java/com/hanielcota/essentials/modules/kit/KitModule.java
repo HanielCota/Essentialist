@@ -114,8 +114,6 @@ public final class KitModule extends AbstractModule {
     return new Definitions(store, catalog);
   }
 
-  private record Definitions(KitConfigStore store, KitCatalog catalog) {}
-
   private void wireMenus(
       @NonNull ConfigHandle<KitConfig> config,
       @NonNull KitCatalog catalog,
@@ -138,4 +136,6 @@ public final class KitModule extends AbstractModule {
     registrar.menu(new KitPreviewMenu(config, catalog, state, previewClicks));
     registrar.listener(new KitMenuCleanupListener(state, sortPreferences));
   }
+
+  private record Definitions(KitConfigStore store, KitCatalog catalog) {}
 }

@@ -50,11 +50,6 @@ public record EnvironmentConfig(
     @Comment("Stop lightning transformations (pig→piglin, villager→witch, charged creeper).")
         boolean preventLightningTransform) {
 
-  public enum WorldMode {
-    WHITELIST,
-    BLACKLIST
-  }
-
   public static EnvironmentConfig defaults() {
     return new EnvironmentConfig(
         true,
@@ -82,7 +77,7 @@ public record EnvironmentConfig(
 
   public boolean appliesTo(String worldName) {
     var listed = worlds.contains(worldName);
-    return worldMode == WorldMode.WHITELIST ? listed : !listed;
+    return (worldMode == WorldMode.WHITELIST) == listed;
   }
 
   public boolean hasBypassPermission() {
@@ -99,5 +94,10 @@ public record EnvironmentConfig(
 
   public boolean isGriefEntityBlocked(String entityTypeName) {
     return blockedGriefEntities.isEmpty() || blockedGriefEntities.contains(entityTypeName);
+  }
+
+  public enum WorldMode {
+    WHITELIST,
+    BLACKLIST
   }
 }

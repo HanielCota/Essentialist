@@ -27,6 +27,15 @@ public final class ModulesMenuRenderer {
   private final @NonNull ModuleControl control;
   private final @NonNull ModulesFilterRenderer filterRenderer;
 
+  private static boolean matchesCategory(
+      @NonNull String moduleId, @NonNull ModuleCategory category) {
+    if (category == ModuleCategory.ALL) {
+      return true;
+    }
+
+    return ModuleCategoryCatalog.categoryOf(moduleId) == category;
+  }
+
   public List<SlotDefinition> slots(
       @NonNull ModuleCategory selected,
       @NonNull ModulesMenuLayout layout,
@@ -87,15 +96,6 @@ public final class ModulesMenuRenderer {
         .filter(id -> !this.control.isProtected(id))
         .filter(id -> matchesCategory(id, category))
         .toList();
-  }
-
-  private static boolean matchesCategory(
-      @NonNull String moduleId, @NonNull ModuleCategory category) {
-    if (category == ModuleCategory.ALL) {
-      return true;
-    }
-
-    return ModuleCategoryCatalog.categoryOf(moduleId) == category;
   }
 
   private SlotDefinition moduleItem(

@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.enchant.config;
 
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.List;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -29,6 +30,8 @@ public record EnchantConfig(
                 + " {enchantment}.")
         String incompatible) {
 
+  private static final String ENCHANTMENT_PLACEHOLDER = "{enchantment}";
+
   public static EnchantConfig defaults() {
     return new EnchantConfig(
         10,
@@ -57,16 +60,15 @@ public record EnchantConfig(
 
   public String formatApplied(@NonNull String enchantment, int level) {
     var levelText = Integer.toString(level);
-    var withEnchant = applied.replace("{enchantment}", enchantment);
-    return withEnchant.replace("{level}", levelText);
+    return Placeholders.format(applied, "enchantment", enchantment, "level", levelText);
   }
 
   public String formatRemoved(@NonNull String enchantment) {
-    return removed.replace("{enchantment}", enchantment);
+    return removed.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 
   public String formatNotEnchanted(@NonNull String enchantment) {
-    return notEnchanted.replace("{enchantment}", enchantment);
+    return notEnchanted.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 
   public String formatCleared(int count) {
@@ -80,10 +82,10 @@ public record EnchantConfig(
   }
 
   public String formatBlocked(@NonNull String enchantment) {
-    return blocked.replace("{enchantment}", enchantment);
+    return blocked.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 
   public String formatIncompatible(@NonNull String enchantment) {
-    return incompatible.replace("{enchantment}", enchantment);
+    return incompatible.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 }

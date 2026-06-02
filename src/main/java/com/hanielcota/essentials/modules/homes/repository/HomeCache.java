@@ -4,6 +4,7 @@ import com.hanielcota.essentials.modules.homes.domain.Home;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -62,6 +63,17 @@ public final class HomeCache {
     return bucket.count();
   }
 
+  Set<UUID> loadedOwners() {
+    return Set.copyOf(this.homes.keySet());
+  }
+
+  List<Home> listShared() {
+    return this.homes.values().stream()
+        .flatMap(bucket -> bucket.list().stream())
+        .filter(Home::shared)
+        .toList();
+  }
+
   void save(@NonNull Home home) {
     var ownerId = home.owner();
     var bucket = bucket(ownerId);
@@ -108,6 +120,16 @@ public final class HomeCache {
     }
 
     return bucket.updatePinned(name, pinned);
+  }
+
+  Optional<Home> updateShared(@NonNull UUID owner, @NonNull String name, boolean shared) {
+    var bucket = this.homes.get(owner);
+
+    if (bucket == null) {
+      return Optional.empty();
+    }
+
+    return bucket.updateShared(name, shared);
   }
 
   Optional<Home> bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {

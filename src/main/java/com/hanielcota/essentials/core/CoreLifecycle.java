@@ -31,6 +31,20 @@ final class CoreLifecycle {
   private final AtomicReference<LifecyclePhase> phase =
       new AtomicReference<>(LifecyclePhase.BOOTING);
 
+  private static void runSteps(@NonNull List<ShutdownStep> steps) {
+    for (var step : steps) {
+      safelyShutdown(step);
+    }
+  }
+
+  private static void safelyShutdown(@NonNull ShutdownStep step) {
+    try {
+      step.run();
+    } catch (RuntimeException e) {
+      LOG.error(e, "{} shutdown failed", step.label());
+    }
+  }
+
   LifecyclePhase phase() {
     return this.phase.get();
   }
@@ -74,19 +88,5 @@ final class CoreLifecycle {
 
     var steps = new ArrayList<>(registryHandle.get().steps());
     runSteps(steps.reversed());
-  }
-
-  private static void runSteps(@NonNull List<ShutdownStep> steps) {
-    for (var step : steps) {
-      safelyShutdown(step);
-    }
-  }
-
-  private static void safelyShutdown(@NonNull ShutdownStep step) {
-    try {
-      step.run();
-    } catch (RuntimeException e) {
-      LOG.error(e, "{} shutdown failed", step.label());
-    }
   }
 }

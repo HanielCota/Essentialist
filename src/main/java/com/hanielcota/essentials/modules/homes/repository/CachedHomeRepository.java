@@ -3,6 +3,8 @@ package com.hanielcota.essentials.modules.homes.repository;
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
 import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.shared.Log;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +28,8 @@ import org.bukkit.Material;
 public final class CachedHomeRepository implements HomeRepository, AutoCloseable {
 
   private static final Log LOG = Log.of(CachedHomeRepository.class);
+  private static final Comparator<Home> SHARED_ORDER =
+      Comparator.comparingLong(Home::teleportCount).reversed().thenComparing(Home::name);
 
   private final HomeRepository delegate;
   private final AsyncDatabaseWriter writer;
@@ -137,6 +141,40 @@ public final class CachedHomeRepository implements HomeRepository, AutoCloseable
     this.writer.submit("update home pinned", persist);
 
     return true;
+  }
+
+  @Override
+  public boolean updateShared(@NonNull UUID owner, @NonNull String name, boolean shared) {
+    var updated = this.cache.updateShared(owner, name, shared);
+
+    if (updated.isEmpty()) {
+      return false;
+    }
+
+    Runnable persist = () -> this.delegate.updateShared(owner, name, shared);
+    this.writer.submit("update home shared", persist);
+
+    return true;
+  }
+
+  // Shared homes span every player, including offline owners not in the cache, so this reads
+  // from SQL and overlays loaded buckets. Loaded owners may have pending async writes, so their
+  // in-memory state is authoritative until eviction.
+  @Override
+  public List<Home> listShared() {
+    var loadedOwners = this.cache.loadedOwners();
+    var homes = new ArrayList<Home>();
+
+    for (var home : this.delegate.listShared()) {
+      if (!loadedOwners.contains(home.owner())) {
+        homes.add(home);
+      }
+    }
+
+    homes.addAll(this.cache.listShared());
+    homes.sort(SHARED_ORDER);
+
+    return List.copyOf(homes);
   }
 
   @Override

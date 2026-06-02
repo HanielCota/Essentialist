@@ -33,7 +33,7 @@ public final class InvseeSynchronizer {
           if (live == null || !live.isOnline() || live.isDead()) {
             return;
           }
-          this.service.sync(live, view);
+          this.service.sync(live, holder, view);
         };
 
     this.scheduler.runOnEntity(target, writeBack);

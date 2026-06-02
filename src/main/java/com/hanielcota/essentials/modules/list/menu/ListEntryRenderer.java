@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.list.menu;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.list.config.ListConfig;
 import com.hanielcota.essentials.modules.list.domain.PlayerEntry;
 import com.hanielcota.essentials.shared.PlayerHeadTextures;
@@ -40,14 +41,7 @@ public record ListEntryRenderer(ConfigHandle<ListConfig> config) {
     var material = snap.emptyMaterial();
     var name = snap.emptyName();
     var lore = snap.emptyLore();
-    var loreArray = lore.toArray(String[]::new);
 
-    var builder = ItemTemplate.builder(material);
-    builder = builder.name(name);
-    builder = builder.lore(loreArray);
-    builder = builder.flags(ItemFlag.HIDE_ATTRIBUTES);
-    builder = builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.info(material, name, lore);
   }
 }

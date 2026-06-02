@@ -28,6 +28,17 @@ public final class KitCooldownService {
   private final IntSupplier dailyResetHour;
   private final ZoneId zone;
 
+  private static long rollingRemaining(long lastUsed, long now, long cooldownSeconds) {
+    var windowMs = cooldownSeconds * MILLIS_PER_SECOND;
+    var remainingMs = windowMs - (now - lastUsed);
+
+    return remainingMs <= 0 ? 0 : ceilToSeconds(remainingMs);
+  }
+
+  private static long ceilToSeconds(long millis) {
+    return (millis + MILLIS_PER_SECOND - 1) / MILLIS_PER_SECOND;
+  }
+
   /** Whether {@code player} has ever claimed {@code kit} (the gate for one-time kits). */
   public boolean hasClaimed(@NonNull UUID player, @NonNull Kit kit) {
     var history = this.usage.findAll(player);
@@ -63,13 +74,6 @@ public final class KitCooldownService {
     this.usage.upsert(player, kitId, now);
   }
 
-  private static long rollingRemaining(long lastUsed, long now, long cooldownSeconds) {
-    var windowMs = cooldownSeconds * MILLIS_PER_SECOND;
-    var remainingMs = windowMs - (now - lastUsed);
-
-    return remainingMs <= 0 ? 0 : ceilToSeconds(remainingMs);
-  }
-
   private long dailyRemaining(long lastUsed, long now) {
     var boundary = lastResetBoundaryMs(now);
     if (lastUsed < boundary) {
@@ -88,9 +92,5 @@ public final class KitCooldownService {
     var todayReset = today.atTime(hour, 0).atZone(this.zone).toInstant().toEpochMilli();
 
     return todayReset <= now ? todayReset : todayReset - MILLIS_PER_DAY;
-  }
-
-  private static long ceilToSeconds(long millis) {
-    return (millis + MILLIS_PER_SECOND - 1) / MILLIS_PER_SECOND;
   }
 }

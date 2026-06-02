@@ -18,6 +18,10 @@ import org.junit.jupiter.api.Test;
 
 class HomeServiceTest {
 
+  private static HomeWorldPolicy allowAllWorlds() {
+    return new HomeWorldPolicy(List::of);
+  }
+
   private static Player player(UUID owner) {
     return (Player)
         Proxy.newProxyInstance(
@@ -55,7 +59,7 @@ class HomeServiceTest {
   @Test
   void renameReportsNotFoundWhenSourceIsMissing() {
     var repository = new RefusingRenameRepository(false);
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 1));
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 1), allowAllWorlds());
 
     var result = service.rename(UUID.randomUUID(), "base", "main");
 
@@ -65,10 +69,11 @@ class HomeServiceTest {
   @Test
   void renameReportsNameTakenWhenSourceExistsButRepositoryRefuses() {
     var owner = UUID.randomUUID();
-    var home = new Home(owner, "base", "world", 0, 64, 0, 0, 0, Material.RED_BED, 1, false, 0L, 0L);
+    var home =
+        new Home(owner, "base", "world", 0, 64, 0, 0, 0, Material.RED_BED, 1, false, 0L, 0L, false);
     var repository = new RefusingRenameRepository(true);
     repository.home = home;
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 1));
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 1), allowAllWorlds());
 
     var result = service.rename(owner, "base", "main");
 
@@ -79,7 +84,7 @@ class HomeServiceTest {
   void createNewNormalizesNullMaterialToDefaultIcon() {
     var owner = UUID.randomUUID();
     var repository = new RecordingRepository();
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 3));
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 3), allowAllWorlds());
 
     service.createNew(player(owner), "base", location(), null);
 
@@ -89,7 +94,7 @@ class HomeServiceTest {
   @Test
   void setMaterialRejectsNonRenderableIconBeforeRepositoryMutation() {
     var repository = new RecordingRepository();
-    var service = new HomeService(repository, new HomeLimitResolver(() -> 3));
+    var service = new HomeService(repository, new HomeLimitResolver(() -> 3), allowAllWorlds());
 
     assertFalse(service.setMaterial(UUID.randomUUID(), "base", Material.AIR));
     assertEquals(0, repository.updateMaterialCalls);
@@ -149,6 +154,16 @@ class HomeServiceTest {
     }
 
     @Override
+    public boolean updateShared(UUID owner, String name, boolean shared) {
+      return false;
+    }
+
+    @Override
+    public List<Home> listShared() {
+      return List.of();
+    }
+
+    @Override
     public boolean bumpUsage(UUID owner, String name, long timestampMs) {
       return false;
     }
@@ -198,6 +213,16 @@ class HomeServiceTest {
     @Override
     public boolean updatePinned(UUID owner, String name, boolean pinned) {
       return true;
+    }
+
+    @Override
+    public boolean updateShared(UUID owner, String name, boolean shared) {
+      return true;
+    }
+
+    @Override
+    public List<Home> listShared() {
+      return List.of();
     }
 
     @Override

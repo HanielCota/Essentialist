@@ -37,6 +37,14 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
         MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0));
   }
 
+  private static List<String> applyState(@NonNull List<String> lore, @NonNull String state) {
+    var replaced = new ArrayList<String>(lore.size());
+    for (var line : lore) {
+      replaced.add(line.replace("{state}", state));
+    }
+    return replaced;
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -120,13 +128,5 @@ public final class TpaBehaviorSettingsMenu implements EssentialsMenu {
 
     this.profiles.setDndUntil(viewerId, nextUntil);
     click.session().refresh();
-  }
-
-  private static List<String> applyState(@NonNull List<String> lore, @NonNull String state) {
-    var replaced = new ArrayList<String>(lore.size());
-    for (var line : lore) {
-      replaced.add(line.replace("{state}", state));
-    }
-    return replaced;
   }
 }

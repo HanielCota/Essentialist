@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.crops.listener;
 
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.crops.config.CropsConfig;
+import com.hanielcota.essentials.shared.ItemStacks;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -64,8 +65,8 @@ public final class AutoReplantListener implements Listener {
       return;
     }
 
-    if (snap.replantConsumesSeed()) {
-      consumeSeed(event, material);
+    if (snap.replantConsumesSeed() && !consumeSeed(event, material)) {
+      return;
     }
 
     replant(event, material);
@@ -83,14 +84,22 @@ public final class AutoReplantListener implements Listener {
     }
   }
 
-  private void consumeSeed(@NonNull BlockDropItemEvent event, @NonNull Material crop) {
+  private boolean consumeSeed(@NonNull BlockDropItemEvent event, @NonNull Material crop) {
     var seedOpt = seedOf(crop);
 
     if (seedOpt.isEmpty()) {
-      return;
+      return true;
     }
 
     var seed = seedOpt.get();
+    if (consumeSeedFromDrops(event, seed)) {
+      return true;
+    }
+
+    return consumeSeedFromPlayer(event, seed);
+  }
+
+  private boolean consumeSeedFromDrops(@NonNull BlockDropItemEvent event, @NonNull Material seed) {
     var drops = event.getItems();
     var iterator = drops.iterator();
 
@@ -106,12 +115,51 @@ public final class AutoReplantListener implements Listener {
 
       if (remaining <= 0) {
         iterator.remove();
-        return;
+        return true;
       }
 
       stack.setAmount(remaining);
       dropped.setItemStack(stack);
-      return;
+      return true;
     }
+
+    return false;
+  }
+
+  private boolean consumeSeedFromPlayer(@NonNull BlockDropItemEvent event, @NonNull Material seed) {
+    var inventory = event.getPlayer().getInventory();
+    var storage = inventory.getStorageContents();
+
+    for (var slot = 0; slot < storage.length; slot++) {
+      var item = storage[slot];
+      if (item == null || item.getType() != seed || !ItemStacks.isPlain(item)) {
+        continue;
+      }
+
+      var remaining = item.getAmount() - 1;
+      if (remaining <= 0) {
+        inventory.setItem(slot, null);
+        return true;
+      }
+
+      item.setAmount(remaining);
+      inventory.setItem(slot, item);
+      return true;
+    }
+
+    var offhand = inventory.getItemInOffHand();
+    if (offhand.getType() != seed || !ItemStacks.isPlain(offhand)) {
+      return false;
+    }
+
+    var remaining = offhand.getAmount() - 1;
+    if (remaining <= 0) {
+      inventory.setItemInOffHand(null);
+      return true;
+    }
+
+    offhand.setAmount(remaining);
+    inventory.setItemInOffHand(offhand);
+    return true;
   }
 }

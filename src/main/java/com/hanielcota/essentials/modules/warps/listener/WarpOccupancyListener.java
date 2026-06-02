@@ -29,6 +29,16 @@ public final class WarpOccupancyListener implements Listener {
   private final WarpFilterPreferences filters;
   private final ConfigHandle<WarpsConfig> config;
 
+  private static boolean blockChanged(@NonNull Location from, Location to) {
+    if (to == null) {
+      return false;
+    }
+
+    return from.getBlockX() != to.getBlockX()
+        || from.getBlockY() != to.getBlockY()
+        || from.getBlockZ() != to.getBlockZ();
+  }
+
   @EventHandler
   public void onQuit(@NonNull PlayerQuitEvent event) {
     var playerId = event.getPlayer().getUniqueId();
@@ -80,15 +90,5 @@ public final class WarpOccupancyListener implements Listener {
     if (outside) {
       this.occupancy.leave(playerId);
     }
-  }
-
-  private static boolean blockChanged(@NonNull Location from, Location to) {
-    if (to == null) {
-      return false;
-    }
-
-    return from.getBlockX() != to.getBlockX()
-        || from.getBlockY() != to.getBlockY()
-        || from.getBlockZ() != to.getBlockZ();
   }
 }

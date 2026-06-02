@@ -53,6 +53,27 @@ public final class TpaHistoryMenu implements EssentialsMenu {
     return MenuLayouts.sanitizeSlots(configured, rows, fallback);
   }
 
+  private static int backSlot(@NonNull TpaMenuConfig settings, int rows) {
+    return MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
+  }
+
+  private static ItemTemplate backTemplate(@NonNull TpaMenuConfig settings) {
+    var builder = ItemTemplate.builder(settings.backIcon());
+    builder.name(settings.backName());
+    builder.lore(settings.backLore().toArray(String[]::new));
+    builder.italic(false);
+    return builder.build();
+  }
+
+  private static ItemTemplate filterTemplate(
+      @NonNull TpaMenuConfig settings, @NonNull String name, @NonNull List<String> lore) {
+    var builder = ItemTemplate.builder(settings.filterIcon());
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+    return builder.build();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -84,27 +105,6 @@ public final class TpaHistoryMenu implements EssentialsMenu {
         backSlot(settings, rows), backTemplate(settings), click -> click.switchTo(TpaHelpMenu.ID));
 
     builder.buildAndRegister();
-  }
-
-  private static int backSlot(@NonNull TpaMenuConfig settings, int rows) {
-    return MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
-  }
-
-  private static ItemTemplate backTemplate(@NonNull TpaMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.backIcon());
-    builder.name(settings.backName());
-    builder.lore(settings.backLore().toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
-  }
-
-  private static ItemTemplate filterTemplate(
-      @NonNull TpaMenuConfig settings, @NonNull String name, @NonNull List<String> lore) {
-    var builder = ItemTemplate.builder(settings.filterIcon());
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-    return builder.build();
   }
 
   private List<SlotDefinition> buildSlots(@NonNull Player player, @NonNull MenuSession session) {

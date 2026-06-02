@@ -16,23 +16,6 @@ public final class WarpFilterRenderer {
   private static final String OPTIONS_TOKEN = "{options}";
   private static final String STATE_TOKEN = "{state}";
 
-  public @NonNull ItemTemplate render(
-      @NonNull WarpsFilterConfig filter, @NonNull WarpFilter current) {
-    var stateLabel = labelOf(filter, current);
-    var name = filter.name().replace(STATE_TOKEN, stateLabel);
-
-    var lore = new ArrayList<String>(filter.lore().size() + WarpFilter.values().length);
-    for (var line : filter.lore()) {
-      if (line.equals(OPTIONS_TOKEN)) {
-        lore.addAll(options(filter, current));
-        continue;
-      }
-      lore.add(line.replace(STATE_TOKEN, stateLabel));
-    }
-
-    return MenuTemplates.simple(filter.material(), name, lore);
-  }
-
   private static List<String> options(
       @NonNull WarpsFilterConfig filter, @NonNull WarpFilter current) {
     var lines = new ArrayList<String>(WarpFilter.values().length);
@@ -55,5 +38,22 @@ public final class WarpFilterRenderer {
       case FAVORITES -> filter.labelFavorites();
       case PVP -> filter.labelPvp();
     };
+  }
+
+  public @NonNull ItemTemplate render(
+      @NonNull WarpsFilterConfig filter, @NonNull WarpFilter current) {
+    var stateLabel = labelOf(filter, current);
+    var name = filter.name().replace(STATE_TOKEN, stateLabel);
+
+    var lore = new ArrayList<String>(filter.lore().size() + WarpFilter.values().length);
+    for (var line : filter.lore()) {
+      if (line.equals(OPTIONS_TOKEN)) {
+        lore.addAll(options(filter, current));
+        continue;
+      }
+      lore.add(line.replace(STATE_TOKEN, stateLabel));
+    }
+
+    return MenuTemplates.simple(filter.material(), name, lore);
   }
 }

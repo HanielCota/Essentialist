@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.invsee.service;
 
 import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
 import com.hanielcota.essentials.modules.invsee.domain.InvseeLayout;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeSnapshot;
 import com.hanielcota.essentials.shared.ComponentUtils;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -31,26 +32,21 @@ public final class InvseeViewBuilder {
     var view = Bukkit.createInventory(holder, InvseeLayout.SIZE, titleComponent);
     holder.inventory(view);
 
-    var source = target.getInventory();
-    var storage = source.getStorageContents();
+    var snapshot = InvseeSnapshot.fromPlayer(target);
+    holder.snapshot(snapshot);
+
     for (var slot = 0; slot < InvseeLayout.STORAGE_SLOTS; slot++) {
-      view.setItem(slot, storage[slot]);
+      view.setItem(slot, snapshot.itemAt(slot));
     }
 
-    var helmet = source.getHelmet();
-    var chestplate = source.getChestplate();
-    var leggings = source.getLeggings();
-    var boots = source.getBoots();
-    var offhand = source.getItemInOffHand();
-
-    view.setItem(InvseeLayout.HELMET_SLOT, helmet);
-    view.setItem(InvseeLayout.CHESTPLATE_SLOT, chestplate);
-    view.setItem(InvseeLayout.LEGGINGS_SLOT, leggings);
-    view.setItem(InvseeLayout.BOOTS_SLOT, boots);
-    view.setItem(InvseeLayout.OFFHAND_SLOT, offhand);
+    view.setItem(InvseeLayout.HELMET_SLOT, snapshot.itemAt(InvseeLayout.HELMET_SLOT));
+    view.setItem(InvseeLayout.CHESTPLATE_SLOT, snapshot.itemAt(InvseeLayout.CHESTPLATE_SLOT));
+    view.setItem(InvseeLayout.LEGGINGS_SLOT, snapshot.itemAt(InvseeLayout.LEGGINGS_SLOT));
+    view.setItem(InvseeLayout.BOOTS_SLOT, snapshot.itemAt(InvseeLayout.BOOTS_SLOT));
+    view.setItem(InvseeLayout.OFFHAND_SLOT, snapshot.itemAt(InvseeLayout.OFFHAND_SLOT));
 
     for (var slot = InvseeLayout.FIRST_LOCKED_SLOT; slot < InvseeLayout.SIZE; slot++) {
-      view.setItem(slot, FILLER);
+      view.setItem(slot, FILLER.clone());
     }
 
     return view;

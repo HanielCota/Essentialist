@@ -20,6 +20,34 @@ public final class HangingProtectionListener implements Listener {
 
   private final ConfigHandle<EntityConfig> config;
 
+  private static boolean isHangingProtected(@NonNull EntityConfig snap, @NonNull Entity hanging) {
+    if (hanging instanceof ItemFrame) {
+      return snap.protectItemFrames();
+    }
+    if (hanging instanceof Painting) {
+      return snap.protectPaintings();
+    }
+
+    return false;
+  }
+
+  private static boolean isBypassingRemover(
+      @NonNull EntityConfig snap, @NonNull HangingBreakEvent event) {
+    if (!(event instanceof HangingBreakByEntityEvent byEntity)) {
+      return false;
+    }
+
+    return isBypassingPlayer(snap, byEntity.getRemover());
+  }
+
+  private static boolean isBypassingPlayer(@NonNull EntityConfig snap, Entity entity) {
+    if (!(entity instanceof Player player)) {
+      return false;
+    }
+
+    return snap.hasBypassPermission() && player.hasPermission(snap.bypassPermission());
+  }
+
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onHangingBreak(@NonNull HangingBreakEvent event) {
     var hanging = event.getEntity();
@@ -53,33 +81,5 @@ public final class HangingProtectionListener implements Listener {
     }
 
     event.setCancelled(true);
-  }
-
-  private static boolean isHangingProtected(@NonNull EntityConfig snap, @NonNull Entity hanging) {
-    if (hanging instanceof ItemFrame) {
-      return snap.protectItemFrames();
-    }
-    if (hanging instanceof Painting) {
-      return snap.protectPaintings();
-    }
-
-    return false;
-  }
-
-  private static boolean isBypassingRemover(
-      @NonNull EntityConfig snap, @NonNull HangingBreakEvent event) {
-    if (!(event instanceof HangingBreakByEntityEvent byEntity)) {
-      return false;
-    }
-
-    return isBypassingPlayer(snap, byEntity.getRemover());
-  }
-
-  private static boolean isBypassingPlayer(@NonNull EntityConfig snap, Entity entity) {
-    if (!(entity instanceof Player player)) {
-      return false;
-    }
-
-    return snap.hasBypassPermission() && player.hasPermission(snap.bypassPermission());
   }
 }

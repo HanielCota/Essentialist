@@ -16,8 +16,6 @@ import lombok.NonNull;
  */
 public final class WarpOccupancy {
 
-  private record Anchor(String warp, String world, double x, double y, double z) {}
-
   private final Map<String, Set<UUID>> playersByWarp = new HashMap<>();
   private final Map<UUID, Anchor> anchorByPlayer = new HashMap<>();
 
@@ -87,4 +85,6 @@ public final class WarpOccupancy {
 
     return distanceSq > radiusSq;
   }
+
+  private record Anchor(String warp, String world, double x, double y, double z) {}
 }

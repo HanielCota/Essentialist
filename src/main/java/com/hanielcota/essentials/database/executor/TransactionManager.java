@@ -17,6 +17,31 @@ public final class TransactionManager {
 
   private final SqlConnectionFactory connectionFactory;
 
+  private static void restoreAutoCommit(@NonNull Connection conn, @NonNull TxState state) {
+    try {
+      conn.setAutoCommit(true);
+    } catch (SQLException restoreError) {
+      state.attachSuppressedOrAdopt(restoreError);
+    }
+  }
+
+  private static void rethrowPrimary(@NonNull TxState state) throws SQLException {
+    if (state.runtimePrimary != null) {
+      throw state.runtimePrimary;
+    }
+    if (state.sqlPrimary != null) {
+      throw state.sqlPrimary;
+    }
+  }
+
+  private static void rollbackQuietly(@NonNull Connection conn, @NonNull Throwable primary) {
+    try {
+      conn.rollback();
+    } catch (SQLException rollbackError) {
+      primary.addSuppressed(rollbackError);
+    }
+  }
+
   /**
    * Runs {@code work} inside a single transaction: auto-commit is disabled for the duration,
    * committed on success, and rolled back if {@code work} throws. Auto-commit is always restored
@@ -50,31 +75,6 @@ public final class TransactionManager {
       rethrowPrimary(state);
     } catch (SQLException e) {
       throw new PluginException("SQL transaction failed", e);
-    }
-  }
-
-  private static void restoreAutoCommit(@NonNull Connection conn, @NonNull TxState state) {
-    try {
-      conn.setAutoCommit(true);
-    } catch (SQLException restoreError) {
-      state.attachSuppressedOrAdopt(restoreError);
-    }
-  }
-
-  private static void rethrowPrimary(@NonNull TxState state) throws SQLException {
-    if (state.runtimePrimary != null) {
-      throw state.runtimePrimary;
-    }
-    if (state.sqlPrimary != null) {
-      throw state.sqlPrimary;
-    }
-  }
-
-  private static void rollbackQuietly(@NonNull Connection conn, @NonNull Throwable primary) {
-    try {
-      conn.rollback();
-    } catch (SQLException rollbackError) {
-      primary.addSuppressed(rollbackError);
     }
   }
 

@@ -3,7 +3,6 @@ package com.hanielcota.essentials.modules.kit.menu;
 import com.github.hanielcota.menuframework.api.ClickContext;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kit.config.KitConfig;
-import com.hanielcota.essentials.modules.kit.domain.KitClaimResult;
 import com.hanielcota.essentials.modules.kit.service.KitCatalog;
 import com.hanielcota.essentials.modules.kit.service.KitClaimService;
 import com.hanielcota.essentials.shared.ComponentUtils;
@@ -28,18 +27,9 @@ public final class KitCategoryClickHandler {
 
   public void claimAll(@NonNull ClickContext click) {
     var player = click.player();
+    var kits = this.catalog.all();
 
-    var claimed = 0;
-    for (var kit : this.catalog.all()) {
-      var outcome = this.claimService.claim(player, kit, false);
-      if (outcome.result() == KitClaimResult.CLAIMED) {
-        claimed++;
-      }
-    }
-
-    if (claimed > 0) {
-      this.claimService.playClaimSound(player);
-    }
+    var claimed = this.claimService.claimAll(player, kits);
 
     var messages = this.config.value().messages();
     var text = claimed == 0 ? messages.claimedNone() : messages.formatClaimedAll(claimed);

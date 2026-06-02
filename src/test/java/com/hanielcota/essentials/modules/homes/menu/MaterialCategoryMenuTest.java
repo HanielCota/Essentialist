@@ -85,6 +85,7 @@ class MaterialCategoryMenuTest {
         original.homeNameMinLength(),
         original.homeNameMaxLength(),
         original.allowedNamePattern(),
+        original.blockedWorlds(),
         menu,
         original.messages());
   }
@@ -112,7 +113,8 @@ class MaterialCategoryMenuTest {
         newCategory,
         original.picker(),
         original.deleteDialog(),
-        original.options());
+        original.options(),
+        original.publicMenu());
   }
 
   private static ConfigHandle<HomesConfig> config(HomesConfig value) {

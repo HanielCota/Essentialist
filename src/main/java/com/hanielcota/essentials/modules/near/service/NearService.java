@@ -75,7 +75,5 @@ public final class NearService {
    * record stays valid past the originating tick — Bukkit's {@code Player} reference goes stale on
    * disconnect.
    */
-  public record Nearby(UUID id, String name, int distance) {
-    public Nearby {}
-  }
+  public record Nearby(UUID id, String name, int distance) {}
 }

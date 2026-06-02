@@ -11,10 +11,6 @@ import lombok.NonNull;
  */
 public interface ShutdownStep {
 
-  String label();
-
-  void run();
-
   static ShutdownStep of(@NonNull String label, @NonNull Runnable action) {
     return new ShutdownStep() {
       @Override
@@ -28,4 +24,8 @@ public interface ShutdownStep {
       }
     };
   }
+
+  String label();
+
+  void run();
 }

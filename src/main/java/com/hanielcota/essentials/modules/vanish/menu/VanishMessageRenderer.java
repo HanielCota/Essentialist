@@ -63,11 +63,8 @@ public final class VanishMessageRenderer {
       @NonNull String x,
       @NonNull String y,
       @NonNull String z) {
-    var withPlayer = template.replace(PLAYER_PLACEHOLDER, player);
-    var withWorld = withPlayer.replace("{world}", world);
-    var withX = withWorld.replace("{x}", x);
-    var withY = withX.replace("{y}", y);
+    var values = java.util.Map.of("player", player, "world", world, "x", x, "y", y, "z", z);
 
-    return withY.replace("{z}", z);
+    return com.hanielcota.essentials.shared.Placeholders.format(template, values);
   }
 }

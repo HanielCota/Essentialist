@@ -87,6 +87,26 @@ public final class HomeOptionsClickHandler {
     click.refresh();
   }
 
+  void toggleShare(@NonNull ClickContext click) {
+    var player = click.player();
+    var uuid = player.getUniqueId();
+    var homeName = this.target.peek(uuid);
+
+    if (homeName == null) {
+      click.close();
+      return;
+    }
+
+    var home = this.service.findHome(uuid, homeName);
+    if (home.isEmpty()) {
+      click.close();
+      return;
+    }
+
+    this.service.setShared(uuid, homeName, !home.get().shared());
+    click.refresh();
+  }
+
   void delete(@NonNull ClickContext click) {
     click.switchTo(DeleteHomeDialog.ID);
   }

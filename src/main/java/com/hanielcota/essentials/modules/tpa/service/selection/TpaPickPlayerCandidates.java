@@ -24,6 +24,17 @@ public final class TpaPickPlayerCandidates {
   private final TpaFavoriteService favorites;
   private final TpaContactService contacts;
 
+  private static List<Player> keepSameWorld(@NonNull Player viewer, @NonNull List<Player> online) {
+    var worldId = viewer.getWorld().getUID();
+    var result = new ArrayList<Player>(online.size());
+    for (var candidate : online) {
+      if (candidate.getWorld().getUID().equals(worldId)) {
+        result.add(candidate);
+      }
+    }
+    return result;
+  }
+
   public List<Player> resolve(@NonNull Player viewer, @NonNull TpaPickPlayerFilter filter) {
     var viewerId = viewer.getUniqueId();
     var online = onlineOthers(viewerId);
@@ -60,17 +71,6 @@ public final class TpaPickPlayerCandidates {
     var result = new ArrayList<Player>(online.size());
     for (var candidate : online) {
       if (favoriteIds.contains(candidate.getUniqueId())) {
-        result.add(candidate);
-      }
-    }
-    return result;
-  }
-
-  private static List<Player> keepSameWorld(@NonNull Player viewer, @NonNull List<Player> online) {
-    var worldId = viewer.getWorld().getUID();
-    var result = new ArrayList<Player>(online.size());
-    for (var candidate : online) {
-      if (candidate.getWorld().getUID().equals(worldId)) {
         result.add(candidate);
       }
     }

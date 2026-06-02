@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
+import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -53,8 +54,12 @@ public final class InvseeService {
     this.locks.releaseTarget(targetId);
   }
 
-  /** Writes the editable slots of {@code view} back into {@code target}'s inventory. */
-  public void sync(@NonNull Player target, @NonNull Inventory view) {
-    InvseeWriteback.apply(target, view);
+  /**
+   * Writes the editable slots of {@code view} back into {@code target}'s inventory only when the
+   * target still matches the view's baseline snapshot.
+   */
+  public boolean sync(
+      @NonNull Player target, @NonNull InvseeHolder holder, @NonNull Inventory view) {
+    return InvseeWriteback.apply(target, holder, view);
   }
 }

@@ -24,6 +24,7 @@ public final class HomeService implements HomesApi {
 
   private final HomeRepository repository;
   private final HomeLimitResolver limits;
+  private final HomeWorldPolicy worldPolicy;
 
   public Optional<Home> findHome(@NonNull UUID owner, @NonNull String name) {
     return this.repository.find(owner, name);
@@ -47,6 +48,13 @@ public final class HomeService implements HomesApi {
       @NonNull Location location,
       @Nullable Material material) {
     var ownerId = owner.getUniqueId();
+
+    var locationWorld = location.getWorld();
+    var worldName = locationWorld.getName();
+    if (this.worldPolicy.isCreationBlocked(owner, worldName)) {
+      return CreateResult.WORLD_BLOCKED;
+    }
+
     var existing = this.repository.find(ownerId, name);
 
     if (existing.isPresent()) {
@@ -99,6 +107,14 @@ public final class HomeService implements HomesApi {
 
   public boolean setPinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
     return this.repository.updatePinned(owner, name, pinned);
+  }
+
+  public boolean setShared(@NonNull UUID owner, @NonNull String name, boolean shared) {
+    return this.repository.updateShared(owner, name, shared);
+  }
+
+  public List<Home> publicHomes() {
+    return this.repository.listShared();
   }
 
   public boolean recordUsage(@NonNull UUID owner, @NonNull String name, long timestampMs) {

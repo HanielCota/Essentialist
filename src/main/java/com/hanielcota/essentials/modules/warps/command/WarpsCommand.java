@@ -25,8 +25,12 @@ public record WarpsCommand(@NonNull MenuService menus) {
 
   @DefaultSubcommand
   public CommandResult execute(@NonNull CommandActor actor) {
+    return openWarpsMenu(this.menus, actor);
+  }
+
+  static CommandResult openWarpsMenu(@NonNull MenuService menus, @NonNull CommandActor actor) {
     var player = actor.unwrap(Player.class);
-    MenuOpenings.open(this.menus, player, WarpsMenu.ID, actor);
+    MenuOpenings.open(menus, player, WarpsMenu.ID, actor);
     return CommandResult.success();
   }
 }

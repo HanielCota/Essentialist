@@ -42,6 +42,31 @@ public final class KitPreviewMenu implements EssentialsMenu {
   // later /essentials reload changes the configured row count (same fix as the homes menus).
   private int registeredRows;
 
+  private static int claimSlot(@NonNull KitPreviewMenuConfig cfg, int rows) {
+    var fallback = rows * SLOTS_PER_ROW - 5;
+
+    return MenuLayouts.sanitizeSlot(cfg.claimSlot(), rows, fallback);
+  }
+
+  private static int backSlot(@NonNull KitPreviewMenuConfig cfg, int rows) {
+    var fallback = (rows - 1) * SLOTS_PER_ROW;
+
+    return MenuLayouts.sanitizeSlot(cfg.backSlot(), rows, fallback);
+  }
+
+  private static List<Integer> contentSlots(@NonNull KitPreviewMenuConfig cfg, int rows) {
+    var sanitized = MenuLayouts.sanitizeSlots(cfg.contentSlots(), rows);
+    var navigation = cfg.navigation();
+    var reserved =
+        Set.of(
+            claimSlot(cfg, rows),
+            backSlot(cfg, rows),
+            navigation.effectivePreviousSlot(rows),
+            navigation.effectiveNextSlot(rows));
+
+    return sanitized.stream().filter(slot -> !reserved.contains(slot)).toList();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -104,7 +129,8 @@ public final class KitPreviewMenu implements EssentialsMenu {
     var kit = currentKit(player);
     var kitName = kit != null ? kit.displayName() : "?";
 
-    var name = cfg.claimName().replace("{kit}", kitName);
+    var claimName = cfg.claimName();
+    var name = claimName.replace("{kit}", kitName);
     var lore = Placeholders.replaceInAll(cfg.claimLore(), "{kit}", kitName);
     var template = MenuTemplates.simple(cfg.claimMaterial(), name, lore);
 
@@ -127,30 +153,5 @@ public final class KitPreviewMenu implements EssentialsMenu {
     }
 
     return this.catalog.find(kitId).orElse(null);
-  }
-
-  private static int claimSlot(@NonNull KitPreviewMenuConfig cfg, int rows) {
-    var fallback = rows * SLOTS_PER_ROW - 5;
-
-    return MenuLayouts.sanitizeSlot(cfg.claimSlot(), rows, fallback);
-  }
-
-  private static int backSlot(@NonNull KitPreviewMenuConfig cfg, int rows) {
-    var fallback = (rows - 1) * SLOTS_PER_ROW;
-
-    return MenuLayouts.sanitizeSlot(cfg.backSlot(), rows, fallback);
-  }
-
-  private static List<Integer> contentSlots(@NonNull KitPreviewMenuConfig cfg, int rows) {
-    var sanitized = MenuLayouts.sanitizeSlots(cfg.contentSlots(), rows);
-    var navigation = cfg.navigation();
-    var reserved =
-        Set.of(
-            claimSlot(cfg, rows),
-            backSlot(cfg, rows),
-            navigation.effectivePreviousSlot(rows),
-            navigation.effectiveNextSlot(rows));
-
-    return sanitized.stream().filter(slot -> !reserved.contains(slot)).toList();
   }
 }

@@ -21,6 +21,12 @@ final class CommandSystemBootstrap implements BootstrapStage {
 
   private final EssentialsPlugin plugin;
 
+  @SuppressWarnings("unchecked")
+  private static <T> void mirror(
+      @NonNull PaperCommandFramework framework, @NonNull Class<?> type, @NonNull Object instance) {
+    framework.registerDependency((Class<T>) type, (T) instance);
+  }
+
   @Override
   public String name() {
     return "command-framework";
@@ -50,11 +56,5 @@ final class CommandSystemBootstrap implements BootstrapStage {
           }
           mirror(framework, type, instance);
         });
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <T> void mirror(
-      @NonNull PaperCommandFramework framework, @NonNull Class<?> type, @NonNull Object instance) {
-    framework.registerDependency((Class<T>) type, (T) instance);
   }
 }

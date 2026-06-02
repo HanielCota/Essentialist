@@ -17,6 +17,18 @@ public final class PvpListener implements Listener {
 
   private final ConfigHandle<CombatConfig> config;
 
+  private static Player resolveAttacker(@NonNull Entity damager) {
+    if (damager instanceof Player player) {
+      return player;
+    }
+    if (!(damager instanceof Projectile projectile)) {
+      return null;
+    }
+
+    var shooter = projectile.getShooter();
+    return shooter instanceof Player shooterPlayer ? shooterPlayer : null;
+  }
+
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onPlayerDamage(@NonNull EntityDamageByEntityEvent event) {
     if (!(event.getEntity() instanceof Player victim)) {
@@ -39,17 +51,5 @@ public final class PvpListener implements Listener {
     }
 
     event.setCancelled(true);
-  }
-
-  private static Player resolveAttacker(@NonNull Entity damager) {
-    if (damager instanceof Player player) {
-      return player;
-    }
-    if (!(damager instanceof Projectile projectile)) {
-      return null;
-    }
-
-    var shooter = projectile.getShooter();
-    return shooter instanceof Player shooterPlayer ? shooterPlayer : null;
   }
 }

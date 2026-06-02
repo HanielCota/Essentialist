@@ -21,38 +21,6 @@ public final class KitGiver {
 
   private static final int ARMOR_SLOTS = 4;
 
-  public GiveResult give(@NonNull Player player, @NonNull Kit kit, boolean dropOverflow) {
-    var inventory = player.getInventory();
-
-    var toInventory = new ArrayList<ItemStack>();
-    for (var item : kit.storage()) {
-      toInventory.add(item.clone());
-    }
-
-    var equipArmor = resolveArmor(inventory, kit.armor(), toInventory);
-    var equipOffhand = resolveOffhand(inventory, kit.offhand(), toInventory);
-
-    if (!dropOverflow && !fits(player, toInventory)) {
-      return GiveResult.REJECTED_FULL;
-    }
-
-    applyArmor(inventory, equipArmor);
-    if (equipOffhand != null) {
-      inventory.setItemInOffHand(equipOffhand);
-    }
-
-    var leftover = inventory.addItem(toInventory.toArray(ItemStack[]::new));
-    if (leftover.isEmpty()) {
-      return GiveResult.GIVEN;
-    }
-    if (!dropOverflow) {
-      return GiveResult.GIVEN;
-    }
-
-    dropAll(player, leftover.values());
-    return GiveResult.OVERFLOW_DROPPED;
-  }
-
   // Armor pieces to equip into currently-empty slots; pieces for occupied slots join toInventory.
   private static ItemStack[] resolveArmor(
       @NonNull PlayerInventory inventory,
@@ -144,6 +112,38 @@ public final class KitGiver {
     }
 
     return copy;
+  }
+
+  public GiveResult give(@NonNull Player player, @NonNull Kit kit, boolean dropOverflow) {
+    var inventory = player.getInventory();
+
+    var toInventory = new ArrayList<ItemStack>();
+    for (var item : kit.storage()) {
+      toInventory.add(item.clone());
+    }
+
+    var equipArmor = resolveArmor(inventory, kit.armor(), toInventory);
+    var equipOffhand = resolveOffhand(inventory, kit.offhand(), toInventory);
+
+    if (!dropOverflow && !fits(player, toInventory)) {
+      return GiveResult.REJECTED_FULL;
+    }
+
+    applyArmor(inventory, equipArmor);
+    if (equipOffhand != null) {
+      inventory.setItemInOffHand(equipOffhand);
+    }
+
+    var leftover = inventory.addItem(toInventory.toArray(ItemStack[]::new));
+    if (leftover.isEmpty()) {
+      return GiveResult.GIVEN;
+    }
+    if (!dropOverflow) {
+      return GiveResult.GIVEN;
+    }
+
+    dropAll(player, leftover.values());
+    return GiveResult.OVERFLOW_DROPPED;
   }
 
   public enum GiveResult {

@@ -1,6 +1,6 @@
 package com.hanielcota.essentials.modules.light.command;
 
-import com.hanielcota.essentials.command.Senders;
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.light.config.LightConfig;
 import com.hanielcota.essentials.paper.ActorFactory;
@@ -22,13 +22,7 @@ public final class LightNotifier {
   public void announce(@NonNull CommandActor sender, @NonNull Player subject, boolean enabled) {
     var snap = this.config.value();
     var messages = snap.toggle(enabled);
-    var name = subject.getName();
-    var self = Senders.isSelf(sender, subject);
 
-    var target = this.actors.actorOf(subject);
-    var selfMessage = messages.forSender(self, name);
-    var targetMessage = messages.forTarget(name);
-
-    sender.sendDualMessage(target, selfMessage, targetMessage);
+    DualReply.send(sender, subject, this.actors, messages);
   }
 }

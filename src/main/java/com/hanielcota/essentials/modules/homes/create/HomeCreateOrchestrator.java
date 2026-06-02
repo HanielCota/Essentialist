@@ -71,6 +71,7 @@ public final class HomeCreateOrchestrator {
     switch (outcome) {
       case CREATED -> this.notifier.sendCreated(player, input);
       case ALREADY_EXISTS -> this.notifier.sendAlreadyExists(player, input);
+      case WORLD_BLOCKED -> this.notifier.sendWorldBlocked(player);
       case LIMIT_REACHED -> {
         var msg = this.limitReachedResolver.resolve(input, player);
         this.notifier.sendLimitReached(player, msg);

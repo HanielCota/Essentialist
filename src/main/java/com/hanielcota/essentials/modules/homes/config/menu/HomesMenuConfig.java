@@ -9,7 +9,8 @@ public record HomesMenuConfig(
     @Comment("Material category submenu settings.") HomesCategoryMenuConfig category,
     @Comment("Material picker submenu settings.") HomesPickerMenuConfig picker,
     @Comment("Delete-confirmation dialog settings.") HomesDeleteDialogConfig deleteDialog,
-    @Comment("Right-click options submenu settings.") HomesOptionsMenuConfig options) {
+    @Comment("Right-click options submenu settings.") HomesOptionsMenuConfig options,
+    @Comment("Public homes browse menu settings.") HomesPublicMenuConfig publicMenu) {
 
   public static HomesMenuConfig defaults() {
     return new HomesMenuConfig(
@@ -17,6 +18,7 @@ public record HomesMenuConfig(
         HomesCategoryMenuConfig.defaults(),
         HomesPickerMenuConfig.defaults(),
         HomesDeleteDialogConfig.defaults(),
-        HomesOptionsMenuConfig.defaults());
+        HomesOptionsMenuConfig.defaults(),
+        HomesPublicMenuConfig.defaults());
   }
 }

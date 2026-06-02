@@ -11,6 +11,35 @@ import org.jspecify.annotations.Nullable;
 /** Edits the lore of the item in the player's main hand. */
 public final class ItemLoreService {
 
+  private static @Nullable ItemStack heldItem(@NonNull Player player) {
+    var inventory = player.getInventory();
+    var item = inventory.getItemInMainHand();
+
+    if (item.getType().isAir()) {
+      return null;
+    }
+
+    return item;
+  }
+
+  private static List<Component> currentLore(@NonNull ItemStack item) {
+    var meta = item.getItemMeta();
+    var lore = meta.lore();
+
+    if (lore == null) {
+      return new ArrayList<>();
+    }
+
+    return new ArrayList<>(lore);
+  }
+
+  private static void applyLore(@NonNull ItemStack item, @Nullable List<Component> lore) {
+    var meta = item.getItemMeta();
+    meta.lore(lore);
+
+    item.setItemMeta(meta);
+  }
+
   public Result add(@NonNull Player player, @NonNull Component line) {
     var item = heldItem(player);
     if (item == null) {
@@ -73,35 +102,6 @@ public final class ItemLoreService {
 
     applyLore(item, null);
     return Result.CLEARED;
-  }
-
-  private static @Nullable ItemStack heldItem(@NonNull Player player) {
-    var inventory = player.getInventory();
-    var item = inventory.getItemInMainHand();
-
-    if (item.getType().isAir()) {
-      return null;
-    }
-
-    return item;
-  }
-
-  private static List<Component> currentLore(@NonNull ItemStack item) {
-    var meta = item.getItemMeta();
-    var lore = meta.lore();
-
-    if (lore == null) {
-      return new ArrayList<>();
-    }
-
-    return new ArrayList<>(lore);
-  }
-
-  private static void applyLore(@NonNull ItemStack item, @Nullable List<Component> lore) {
-    var meta = item.getItemMeta();
-    meta.lore(lore);
-
-    item.setItemMeta(meta);
   }
 
   public enum Result {

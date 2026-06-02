@@ -8,6 +8,7 @@ import com.hanielcota.essentials.modules.tpa.service.favorites.TpaFavoriteServic
 import com.hanielcota.essentials.paper.PlayerProvider;
 import com.hanielcota.essentials.shared.ClickableMessage;
 import com.hanielcota.essentials.shared.ComponentUtils;
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.UUID;
 import lombok.NonNull;
 import org.bukkit.SoundCategory;
@@ -153,8 +154,9 @@ public record TpaNotifier(
 
     var oldTargetName = request.target().name();
     var replacedTemplate = messages.outgoingReplaced();
-    var replacedMsg = replacedTemplate.replace("{oldTarget}", oldTargetName);
-    replacedMsg = replacedMsg.replace("{newTarget}", newTargetName);
+    var replacedMsg =
+        Placeholders.format(
+            replacedTemplate, "oldTarget", oldTargetName, "newTarget", newTargetName);
     var replacedComponent = ComponentUtils.mini(replacedMsg);
 
     online.sendMessage(replacedComponent);

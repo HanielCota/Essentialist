@@ -1,8 +1,6 @@
 package com.hanielcota.essentials.modules.workstations.command;
 
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
-import com.hanielcota.essentials.config.ConfigHandle;
-import com.hanielcota.essentials.modules.workstations.config.WorkstationsConfig;
 import io.github.hanielcota.commandframework.annotation.Command;
 import io.github.hanielcota.commandframework.annotation.DefaultSubcommand;
 import io.github.hanielcota.commandframework.annotation.Description;
@@ -20,7 +18,7 @@ import org.bukkit.inventory.MenuType;
 @PlayerOnly
 @Description("Opens a virtual grindstone.")
 @Syntax("/rebolo")
-public record GrindstoneCommand(ConfigHandle<WorkstationsConfig> config) {
+public record GrindstoneCommand() {
 
   @DefaultSubcommand
   public CommandResult execute(@NonNull CommandActor actor) {

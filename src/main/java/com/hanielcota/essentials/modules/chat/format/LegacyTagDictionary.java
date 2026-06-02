@@ -43,13 +43,7 @@ public final class LegacyTagDictionary {
         return colorTag;
       }
     }
-    if (allowDecorations) {
-      var decorationTag = DECORATION_TAGS[lower];
-      if (decorationTag != null) {
-        return decorationTag;
-      }
-    }
-    return null;
+    return allowDecorations ? DECORATION_TAGS[lower] : null;
   }
 
   /**

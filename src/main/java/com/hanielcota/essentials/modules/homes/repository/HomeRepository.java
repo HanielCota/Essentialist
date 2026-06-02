@@ -31,5 +31,10 @@ public interface HomeRepository {
 
   boolean updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned);
 
+  boolean updateShared(@NonNull UUID owner, @NonNull String name, boolean shared);
+
+  /** Every shared home across all players, most-visited first. Reads straight from storage. */
+  List<Home> listShared();
+
   boolean bumpUsage(@NonNull UUID owner, @NonNull String name, long timestampMs);
 }

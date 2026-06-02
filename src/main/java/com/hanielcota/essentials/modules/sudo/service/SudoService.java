@@ -11,17 +11,17 @@ public final class SudoService {
 
   private final Scheduler scheduler;
 
-  public void run(@NonNull Player target, @NonNull String command) {
-    var normalized = stripLeadingSlash(command);
-
-    this.scheduler.runOnEntity(target, () -> target.performCommand(normalized));
-  }
-
   private static String stripLeadingSlash(@NonNull String command) {
     if (command.startsWith("/")) {
       return command.substring(1);
     }
 
     return command;
+  }
+
+  public void run(@NonNull Player target, @NonNull String command) {
+    var normalized = stripLeadingSlash(command);
+
+    this.scheduler.runOnEntity(target, () -> target.performCommand(normalized));
   }
 }

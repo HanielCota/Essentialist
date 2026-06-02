@@ -9,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Single source of truth the {@link com.hanielcota.essentials.modules.back.menu.BackMenu} consults
- * to render an entry list: consumes the prefetch left by {@code /back}, falling back to a direct
- * {@link TeleportHistory#list(UUID)} when the prefetch has already been drained (e.g. page-flip
- * re-renders after the initial open). Centralizing the lookup hides the cache vs SQL choice from
- * the menu.
+ * to render an entry list: reuses the prefetch left by {@code /back}, falling back to a direct
+ * {@link TeleportHistory#list(UUID)} only when no snapshot exists. Reusing (rather than draining)
+ * the snapshot keeps filter re-renders off the SQL thread. Centralizing the lookup hides the cache
+ * vs SQL choice from the menu.
  */
 @RequiredArgsConstructor
 public final class BackEntryProvider {
@@ -21,7 +21,7 @@ public final class BackEntryProvider {
   private final @NonNull TeleportHistory history;
 
   public List<HistoryEntry> entriesFor(@NonNull UUID viewer) {
-    var cached = this.prefetch.consume(viewer);
+    var cached = this.prefetch.peek(viewer);
     if (cached != null) {
       return cached;
     }

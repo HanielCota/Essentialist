@@ -6,11 +6,13 @@ import com.hanielcota.essentials.modules.tpa.config.TpaConfig;
 import com.hanielcota.essentials.modules.tpa.domain.Destination;
 import com.hanielcota.essentials.modules.tpa.history.TpaHistoryEntry;
 import com.hanielcota.essentials.shared.Numbers;
+import com.hanielcota.essentials.shared.Placeholders;
 import com.hanielcota.essentials.shared.PlayerHeadTextures;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.jspecify.annotations.Nullable;
@@ -30,15 +32,18 @@ public record TpaHistoryEntryRenderer(ConfigHandle<TpaConfig> config) {
       @NonNull String y,
       @NonNull String z,
       @NonNull String time) {
-    var withTarget = line.replace("{target}", targetName);
-    var withType = withTarget.replace("{type}", type);
-    var withStatus = withType.replace("{status}", status);
-    var withWorld = withStatus.replace("{world}", world);
-    var withX = withWorld.replace("{x}", x);
-    var withY = withX.replace("{y}", y);
-    var withZ = withY.replace("{z}", z);
+    var tokens =
+        Map.of(
+            "target", targetName,
+            "type", type,
+            "status", status,
+            "world", world,
+            "x", x,
+            "y", y,
+            "z", z,
+            "time", time);
 
-    return withZ.replace("{time}", time);
+    return Placeholders.format(line, tokens);
   }
 
   private static Coordinates resolveCoordinates(@Nullable Destination destination) {

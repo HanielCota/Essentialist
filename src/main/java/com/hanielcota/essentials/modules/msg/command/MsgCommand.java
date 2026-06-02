@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 @Syntax("/msg <jogador> <mensagem>")
 public record MsgCommand(
     ConfigHandle<MsgConfig> config,
-    MsgExchangeOrchestrator dispatcher,
+    MsgExchangeOrchestrator orchestrator,
     BiPredicate<Player, Player> visibilityFilter) {
 
   @DefaultSubcommand
@@ -55,7 +55,7 @@ public record MsgCommand(
       return CommandResult.invalidUsage(notFoundMsg);
     }
 
-    this.dispatcher.send(from, target, body);
+    this.orchestrator.send(from, target, body);
     return CommandResult.success();
   }
 }

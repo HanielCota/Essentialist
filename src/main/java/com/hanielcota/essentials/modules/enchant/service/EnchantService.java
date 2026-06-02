@@ -105,8 +105,6 @@ public final class EnchantService {
     ClearResult NOTHING_TO_CLEAR = NothingToClear.INSTANCE;
     ClearResult EMPTY_HAND = EmptyHand.INSTANCE;
 
-    record Cleared(int removed) implements ClearResult {}
-
     enum NothingToClear implements ClearResult {
       INSTANCE
     }
@@ -114,5 +112,7 @@ public final class EnchantService {
     enum EmptyHand implements ClearResult {
       INSTANCE
     }
+
+    record Cleared(int removed) implements ClearResult {}
   }
 }

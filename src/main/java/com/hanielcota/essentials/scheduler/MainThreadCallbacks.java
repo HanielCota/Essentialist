@@ -43,6 +43,7 @@ public final class MainThreadCallbacks {
       @NonNull Consumer<T> onValue,
       @NonNull Duration timeout,
       @NonNull String operation) {
+
     var timeoutMillis = timeout.toMillis();
     var unit = TimeUnit.MILLISECONDS;
     var executor = this.scheduler.mainExecutor();

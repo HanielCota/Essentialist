@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.enderchest.command;
 
+import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.command.annotation.EssentialsCommand;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.enderchest.config.EnderChestConfig;
@@ -29,7 +30,7 @@ public record EnderChestCommand(ConfigHandle<EnderChestConfig> config) {
   public CommandResult execute(@NonNull CommandActor sender, @TargetOrSelf @NonNull Player target) {
     var viewer = sender.unwrap(Player.class);
     var snap = this.config.value();
-    var self = target.equals(viewer);
+    var self = Senders.isSelf(sender, target);
     var targetName = target.getName();
 
     viewer.openInventory(target.getEnderChest());

@@ -28,6 +28,14 @@ import org.bukkit.entity.Player;
 @Syntax("/spawnmob <mob> [quantidade]")
 public record SpawnMobCommand(ConfigHandle<SpawnMobConfig> config, SpawnMobService service) {
 
+  private static boolean isSpawnableMob(@NonNull EntityType type) {
+    return type.isSpawnable() && type.isAlive();
+  }
+
+  private static String name(@NonNull EntityType type) {
+    return type.name().toLowerCase(Locale.ROOT);
+  }
+
   @DefaultSubcommand
   public CommandResult execute(
       @NonNull CommandActor sender,
@@ -50,13 +58,5 @@ public record SpawnMobCommand(ConfigHandle<SpawnMobConfig> config, SpawnMobServi
     var spawnedMsg = snap.formatSpawned(capped, mobName);
     sender.sendSuccess(spawnedMsg);
     return CommandResult.success();
-  }
-
-  private static boolean isSpawnableMob(@NonNull EntityType type) {
-    return type.isSpawnable() && type.isAlive();
-  }
-
-  private static String name(@NonNull EntityType type) {
-    return type.name().toLowerCase(Locale.ROOT);
   }
 }

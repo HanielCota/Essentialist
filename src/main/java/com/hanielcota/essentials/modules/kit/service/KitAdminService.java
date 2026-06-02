@@ -22,6 +22,29 @@ public final class KitAdminService {
   private final KitCatalog catalog;
   private final KitUsageRepository usage;
 
+  private static List<ItemStack> nonEmpty(@NonNull ItemStack[] contents) {
+    var items = new ArrayList<ItemStack>(contents.length);
+    for (var item : contents) {
+      if (item == null || item.getType().isAir()) {
+        continue;
+      }
+      items.add(item);
+    }
+
+    return items;
+  }
+
+  private static int countPresent(@NonNull List<String> positional) {
+    var present = 0;
+    for (var entry : positional) {
+      if (!entry.isBlank()) {
+        present++;
+      }
+    }
+
+    return present;
+  }
+
   /**
    * Snapshots the admin's full kit (main inventory + worn armor + off-hand) as kit {@code rawId};
    * returns the total item count saved (0 means everything was empty). A {@code cooldownSeconds} of
@@ -111,28 +134,5 @@ public final class KitAdminService {
     }
 
     return base.withCooldownSeconds(cooldownSeconds);
-  }
-
-  private static List<ItemStack> nonEmpty(@NonNull ItemStack[] contents) {
-    var items = new ArrayList<ItemStack>(contents.length);
-    for (var item : contents) {
-      if (item == null || item.getType().isAir()) {
-        continue;
-      }
-      items.add(item);
-    }
-
-    return items;
-  }
-
-  private static int countPresent(@NonNull List<String> positional) {
-    var present = 0;
-    for (var entry : positional) {
-      if (!entry.isBlank()) {
-        present++;
-      }
-    }
-
-    return present;
   }
 }
