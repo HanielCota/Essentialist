@@ -48,7 +48,7 @@ class TitleLinesTest {
 
   @Test
   void parseIgnoresExtraTextOutsideQuotes() {
-    var lines = TitleLines.parse("\"Title\" \"Subtitle\"");
+    var lines = TitleLines.parse("\"Title\" middle \"Subtitle\" suffix");
 
     assertEquals("Title", lines.title());
     assertEquals("Subtitle", lines.subtitle());

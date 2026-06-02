@@ -20,6 +20,10 @@ public final class TpaFavoriteMenuRenderer {
 
   private final @NonNull PlayerProvider players;
 
+  private static final String PLAYER_PLACEHOLDER = "{player}";
+  private static final String STATUS_PLACEHOLDER = "{status}";
+  private static final String COUNT_PLACEHOLDER = "{count}";
+
   private static String orderingStateLabel(
       @NonNull TpaFavoritesMenuConfig settings, @NonNull FavoriteOrdering ordering) {
     return switch (ordering) {
@@ -94,8 +98,8 @@ public final class TpaFavoriteMenuRenderer {
       @NonNull List<String> lines, @NonNull String player, @NonNull String status) {
     var replaced = new ArrayList<String>(lines.size());
     for (var line : lines) {
-      var withPlayer = line.replace("{player}", player);
-      var withStatus = withPlayer.replace("{status}", status);
+      var withPlayer = line.replace(PLAYER_PLACEHOLDER, player);
+      var withStatus = withPlayer.replace(STATUS_PLACEHOLDER, status);
       replaced.add(withStatus);
     }
     return replaced;
@@ -108,9 +112,9 @@ public final class TpaFavoriteMenuRenderer {
       @NonNull String count) {
     var replaced = new ArrayList<String>(lines.size());
     for (var line : lines) {
-      var withPlayer = line.replace("{player}", player);
-      var withStatus = withPlayer.replace("{status}", status);
-      var withCount = withStatus.replace("{count}", count);
+      var withPlayer = line.replace(PLAYER_PLACEHOLDER, player);
+      var withStatus = withPlayer.replace(STATUS_PLACEHOLDER, status);
+      var withCount = withStatus.replace(COUNT_PLACEHOLDER, count);
       replaced.add(withCount);
     }
     return replaced;
@@ -159,8 +163,8 @@ public final class TpaFavoriteMenuRenderer {
     var name =
         settings
             .favoriteName()
-            .replace("{player}", entry.favoriteName())
-            .replace("{status}", statusLabel);
+            .replace(PLAYER_PLACEHOLDER, entry.favoriteName())
+            .replace(STATUS_PLACEHOLDER, statusLabel);
     var lore =
         applyFavoritePlaceholders(settings.favoriteLore(), entry.favoriteName(), statusLabel);
 
@@ -180,9 +184,9 @@ public final class TpaFavoriteMenuRenderer {
     var name =
         settings
             .suggestionName()
-            .replace("{player}", contact.targetName())
-            .replace("{status}", statusLabel)
-            .replace("{count}", count);
+            .replace(PLAYER_PLACEHOLDER, contact.targetName())
+            .replace(STATUS_PLACEHOLDER, statusLabel)
+            .replace(COUNT_PLACEHOLDER, count);
     var lore =
         applySuggestionPlaceholders(
             settings.suggestionLore(), contact.targetName(), statusLabel, count);

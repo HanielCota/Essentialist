@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.junit.jupiter.api.Test;
@@ -77,7 +76,7 @@ class HomesApiAdapterTest {
 
     @Override
     public List<Home> list(@NonNull UUID owner) {
-      return this.rows.stream().filter(h -> h.owner().equals(owner)).collect(Collectors.toList());
+      return this.rows.stream().filter(h -> h.owner().equals(owner)).toList();
     }
 
     @Override
@@ -118,7 +117,7 @@ class HomesApiAdapterTest {
 
     @Override
     public List<Home> listShared() {
-      return this.rows.stream().filter(Home::shared).collect(Collectors.toList());
+      return this.rows.stream().filter(Home::shared).toList();
     }
 
     @Override

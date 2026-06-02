@@ -26,6 +26,8 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
 
   public static final String ID = "essentials.tpa.settings.privacy";
 
+  private static final String STATE_PLACEHOLDER = "{state}";
+
   private final ConfigHandle<TpaConfig> config;
   private final TpaProfileService profiles;
 
@@ -41,7 +43,7 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
   private static List<String> applyState(@NonNull List<String> lore, @NonNull String state) {
     var replaced = new ArrayList<String>(lore.size());
     for (var line : lore) {
-      replaced.add(line.replace("{state}", state));
+      replaced.add(line.replace(STATE_PLACEHOLDER, state));
     }
     return replaced;
   }
@@ -86,7 +88,7 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
         type == TeleportRequestType.TPA ? settings.receiveTpaName() : settings.receiveTpaHereName();
     var loreTemplate =
         type == TeleportRequestType.TPA ? settings.receiveTpaLore() : settings.receiveTpaHereLore();
-    var name = nameTemplate.replace("{state}", state);
+    var name = nameTemplate.replace(STATE_PLACEHOLDER, state);
     var lore = applyState(loreTemplate, state);
     var template = MenuTemplates.simple(material, name, lore);
 
@@ -103,7 +105,7 @@ public final class TpaPrivacySettingsMenu implements EssentialsMenu {
     var state = enabled ? settings.enabledLabel() : settings.disabledLabel();
     var material = enabled ? settings.enabledIcon() : settings.disabledIcon();
 
-    var name = settings.allowCrossWorldName().replace("{state}", state);
+    var name = settings.allowCrossWorldName().replace(STATE_PLACEHOLDER, state);
     var lore = applyState(settings.allowCrossWorldLore(), state);
     var template = MenuTemplates.simple(material, name, lore);
     var safeSlot = MenuLayouts.sanitizeSlot(settings.allowCrossWorldSlot(), rows, 0);

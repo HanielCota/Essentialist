@@ -34,18 +34,27 @@ class MsgExchangeOrchestratorTest {
         new ActorFactory() {
           @Override
           public CommandActor actorOf(org.bukkit.entity.Player player) {
+            var delivered = new java.util.ArrayList<Object>();
             return new CommandActor() {
               @Override
-              public void sendMessage(String message) {}
+              public void sendMessage(String message) {
+                delivered.add(message);
+              }
 
               @Override
-              public void sendMessage(Component message) {}
+              public void sendMessage(Component message) {
+                delivered.add(message);
+              }
 
               @Override
-              public void sendSuccess(String message) {}
+              public void sendSuccess(String message) {
+                delivered.add(message);
+              }
 
               @Override
-              public void sendError(String message) {}
+              public void sendError(String message) {
+                delivered.add(message);
+              }
 
               @Override
               public String uniqueId() {

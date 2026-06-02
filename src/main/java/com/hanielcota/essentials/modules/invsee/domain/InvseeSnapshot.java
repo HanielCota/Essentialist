@@ -65,6 +65,22 @@ public record InvseeSnapshot(ItemStack[] contents) {
     return cloneItem(this.contents[slot]);
   }
 
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof InvseeSnapshot snapshot
+        && sameContents(this.contents, snapshot.contents);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(this.contents);
+  }
+
+  @Override
+  public String toString() {
+    return "InvseeSnapshot[contents=" + Arrays.toString(this.contents) + ']';
+  }
+
   private static ItemStack[] cloneContents(@NonNull ItemStack[] source) {
     var copy = new ItemStack[source.length];
     for (var i = 0; i < source.length; i++) {

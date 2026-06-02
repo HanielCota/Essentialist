@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 @RequiredArgsConstructor
 public final class PublicHomesMenu implements EssentialsMenu {
 
-  public static final String ID = "essentials.homes.public";
+  public static final String MENU_ID = "essentials.homes.public";
 
   private static final int MIN_ROWS = 1;
 
@@ -47,7 +47,7 @@ public final class PublicHomesMenu implements EssentialsMenu {
 
   @Override
   public @NonNull String id() {
-    return ID;
+    return MENU_ID;
   }
 
   @Override
@@ -58,7 +58,7 @@ public final class PublicHomesMenu implements EssentialsMenu {
     var rawTitle = snap.title();
     var menuTitle = ComponentUtils.mini(rawTitle);
 
-    var builder = MenuFramework.builder(ID, menus);
+    var builder = MenuFramework.builder(MENU_ID, menus);
     builder.rows(menuRows(snap));
     builder.title(menuTitle);
     builder.pagination(pagination);
@@ -84,7 +84,7 @@ public final class PublicHomesMenu implements EssentialsMenu {
 
     if (rows > MIN_ROWS) {
       var navigation = snap.navigation();
-      PageNavigation.apply(menus, paginationBuilder, ID, rows, navigation);
+      PageNavigation.apply(menus, paginationBuilder, MENU_ID, rows, navigation);
     }
 
     return paginationBuilder.build();

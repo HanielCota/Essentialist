@@ -30,6 +30,8 @@ public record EnchantConfig(
                 + " {enchantment}.")
         String incompatible) {
 
+  private static final String ENCHANTMENT_PLACEHOLDER = "{enchantment}";
+
   public static EnchantConfig defaults() {
     return new EnchantConfig(
         10,
@@ -62,11 +64,11 @@ public record EnchantConfig(
   }
 
   public String formatRemoved(@NonNull String enchantment) {
-    return removed.replace("{enchantment}", enchantment);
+    return removed.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 
   public String formatNotEnchanted(@NonNull String enchantment) {
-    return notEnchanted.replace("{enchantment}", enchantment);
+    return notEnchanted.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 
   public String formatCleared(int count) {
@@ -80,10 +82,10 @@ public record EnchantConfig(
   }
 
   public String formatBlocked(@NonNull String enchantment) {
-    return blocked.replace("{enchantment}", enchantment);
+    return blocked.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 
   public String formatIncompatible(@NonNull String enchantment) {
-    return incompatible.replace("{enchantment}", enchantment);
+    return incompatible.replace(ENCHANTMENT_PLACEHOLDER, enchantment);
   }
 }

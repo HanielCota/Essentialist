@@ -27,7 +27,7 @@ public record PublicHomesCommand(MenuService menus) {
   public CommandResult execute(@NonNull CommandActor actor) {
     var sender = actor.unwrap(Player.class);
 
-    MenuOpenings.open(this.menus, sender, PublicHomesMenu.ID, actor);
+    MenuOpenings.open(this.menus, sender, PublicHomesMenu.MENU_ID, actor);
     return CommandResult.success();
   }
 }

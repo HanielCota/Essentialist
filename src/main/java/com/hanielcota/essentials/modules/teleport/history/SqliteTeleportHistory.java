@@ -65,7 +65,7 @@ public final class SqliteTeleportHistory implements TeleportHistory {
     }
     try {
       return Cause.valueOf(raw);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException _) {
       return Cause.TELEPORT;
     }
   }

@@ -14,7 +14,9 @@ class SudoServiceTest {
           }
 
           @Override
-          public void runSync(Runnable task) {}
+          public void runSync(Runnable task) {
+            task.run();
+          }
 
           @Override
           public java.util.concurrent.Executor mainExecutor() {
