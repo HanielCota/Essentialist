@@ -31,6 +31,9 @@ public final class BackWarmupCanceller implements Listener {
   public void onMove(@NonNull PlayerMoveEvent event) {
     var from = event.getFrom();
     var to = event.getTo();
+    if (to == null) {
+      return;
+    }
 
     var sameWorld = Objects.equals(from.getWorld(), to.getWorld());
     var sameBlock =

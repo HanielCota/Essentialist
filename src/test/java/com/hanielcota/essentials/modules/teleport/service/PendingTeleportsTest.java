@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.teleport.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.hanielcota.essentials.scheduler.Task;
 import java.util.UUID;
@@ -52,7 +53,7 @@ class PendingTeleportsTest {
     pending.cancelSilently(id);
 
     assertNull(pending.remove(id));
-    assert cancelled[0];
+    assertTrue(cancelled[0]);
   }
 
   @Test

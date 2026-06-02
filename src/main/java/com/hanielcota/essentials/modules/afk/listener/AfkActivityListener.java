@@ -39,6 +39,9 @@ public final class AfkActivityListener implements Listener {
   public void onMove(@NonNull PlayerMoveEvent event) {
     var from = event.getFrom();
     var to = event.getTo();
+    if (to == null) {
+      return;
+    }
     if (from.getX() == to.getX() && from.getY() == to.getY() && from.getZ() == to.getZ()) {
       return;
     }
