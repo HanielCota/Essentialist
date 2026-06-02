@@ -1,7 +1,6 @@
 package com.hanielcota.essentials.modules.tpa.service;
 
 import com.hanielcota.essentials.database.async.AsyncDatabaseWriter;
-import com.hanielcota.essentials.modules.tpa.domain.FavoriteOrdering;
 import com.hanielcota.essentials.modules.tpa.domain.TeleportRequestType;
 import com.hanielcota.essentials.modules.tpa.domain.TpaProfile;
 import com.hanielcota.essentials.modules.tpa.repository.profile.TpaProfileRepository;
@@ -81,11 +80,6 @@ public final class TpaProfileService {
           var nextOrdering = current.favoriteOrdering().next();
           return current.withFavoriteOrdering(nextOrdering);
         });
-  }
-
-  public TpaProfile setFavoriteOrdering(
-      @NonNull UUID playerId, @NonNull FavoriteOrdering ordering) {
-    return mutate(playerId, current -> current.withFavoriteOrdering(ordering));
   }
 
   public boolean accepts(@NonNull UUID playerId, @NonNull TeleportRequestType type) {

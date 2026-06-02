@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.whitelist.menu;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
 import com.hanielcota.essentials.config.ConfigHandle;
+import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.whitelist.config.WhitelistConfig;
 import com.hanielcota.essentials.modules.whitelist.service.WhitelistService;
 import com.hanielcota.essentials.shared.PlayerHeadTextures;
@@ -37,13 +38,7 @@ public record WhitelistEntryRenderer(ConfigHandle<WhitelistConfig> config) {
     var material = snap.emptyMaterial();
     var name = snap.emptyName();
     var lore = snap.emptyLore();
-    var loreArray = lore.toArray(String[]::new);
 
-    var builder = ItemTemplate.builder(material);
-    builder = builder.name(name);
-    builder = builder.lore(loreArray);
-    builder = builder.italic(false);
-
-    return builder.build();
+    return MenuTemplates.simple(material, name, lore);
   }
 }

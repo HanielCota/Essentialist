@@ -29,6 +29,7 @@ final class SqlHomeMapper {
     var pinned = rs.getInt("pinned") != 0;
     var teleportCount = rs.getLong("teleport_count");
     var lastUsedAt = rs.getLong("last_used_at");
+    var shared = rs.getInt("shared") != 0;
 
     return new Home(
         ownerId,
@@ -43,6 +44,7 @@ final class SqlHomeMapper {
         createdAt,
         pinned,
         teleportCount,
-        lastUsedAt);
+        lastUsedAt,
+        shared);
   }
 }

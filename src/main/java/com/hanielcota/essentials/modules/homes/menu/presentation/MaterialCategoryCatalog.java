@@ -642,22 +642,6 @@ final class MaterialCategoryCatalog {
                   Material.WILDFLOWERS)),
           Map.entry(MaterialCategory.MISC, List.of()));
 
-  static @NonNull MaterialCategory categoryOf(@NonNull Material material) {
-    for (var entry : MATERIALS.entrySet()) {
-      var category = entry.getKey();
-      if (category == MaterialCategory.MISC) {
-        continue;
-      }
-
-      var materials = entry.getValue();
-      if (materials.contains(material)) {
-        return category;
-      }
-    }
-
-    return MaterialCategory.MISC;
-  }
-
   static @NonNull List<Material> materials(@NonNull MaterialCategory category) {
     var materials = MATERIALS.getOrDefault(category, List.of());
 

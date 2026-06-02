@@ -51,6 +51,62 @@ public final class KitListMenu implements EssentialsMenu {
   // Frozen at register() so the sort button stays aligned with the built inventory after a reload.
   private int registeredRows;
 
+  private static List<String> expandSortLore(
+      @NonNull KitListMenuConfig cfg, @NonNull KitSort sort, @NonNull String stateLabel) {
+    var lore = new ArrayList<String>(cfg.sortLore().size() + KitSort.values().length);
+
+    for (var line : cfg.sortLore()) {
+      if (line.equals("{options}")) {
+        appendOptions(lore, cfg, sort);
+        continue;
+      }
+
+      var loreLine = line.replace("{state}", stateLabel);
+
+      lore.add(loreLine);
+    }
+
+    return lore;
+  }
+
+  private static void appendOptions(
+      @NonNull List<String> lore, @NonNull KitListMenuConfig cfg, @NonNull KitSort active) {
+    for (var sort : KitSort.values()) {
+      var label = "<gray>" + cfg.sortLabel(sort);
+      if (sort == active) {
+        label += cfg.sortActiveMarker();
+      }
+
+      lore.add(label);
+    }
+  }
+
+  private static int backSlot(@NonNull KitListMenuConfig cfg, int rows) {
+    var fallback = (rows - 1) * SLOTS_PER_ROW;
+
+    return MenuLayouts.sanitizeSlot(cfg.backSlot(), rows, fallback);
+  }
+
+  private static int sortSlot(@NonNull KitListMenuConfig cfg, int rows) {
+    var fallback = rows * SLOTS_PER_ROW - 1;
+
+    return MenuLayouts.sanitizeSlot(cfg.sortSlot(), rows, fallback);
+  }
+
+  private static List<Integer> contentSlots(
+      @NonNull KitListMenuConfig cfg, int rows, int backSlot, int sortSlot) {
+    var sanitized = MenuLayouts.sanitizeSlots(cfg.contentSlots(), rows);
+    var navigation = cfg.navigation();
+    var reserved =
+        Set.of(
+            backSlot,
+            sortSlot,
+            navigation.effectivePreviousSlot(rows),
+            navigation.effectiveNextSlot(rows));
+
+    return sanitized.stream().filter(slot -> !reserved.contains(slot)).toList();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -145,66 +201,13 @@ public final class KitListMenu implements EssentialsMenu {
 
   private SlotDefinition sortButton(@NonNull KitListMenuConfig cfg, @NonNull KitSort sort) {
     var stateLabel = cfg.sortLabel(sort);
-    var name = cfg.sortName().replace("{state}", stateLabel);
+    var sortName = cfg.sortName();
+    var name = sortName.replace("{state}", stateLabel);
     var lore = expandSortLore(cfg, sort, stateLabel);
 
     var template = MenuTemplates.simple(cfg.sortMaterial(), name, lore);
     var slot = sortSlot(cfg, this.registeredRows);
 
     return SlotDefinition.of(slot, template, this.clicks::cycleSort);
-  }
-
-  private static List<String> expandSortLore(
-      @NonNull KitListMenuConfig cfg, @NonNull KitSort sort, @NonNull String stateLabel) {
-    var lore = new ArrayList<String>(cfg.sortLore().size() + KitSort.values().length);
-
-    for (var line : cfg.sortLore()) {
-      if (line.equals("{options}")) {
-        appendOptions(lore, cfg, sort);
-        continue;
-      }
-
-      lore.add(line.replace("{state}", stateLabel));
-    }
-
-    return lore;
-  }
-
-  private static void appendOptions(
-      @NonNull List<String> lore, @NonNull KitListMenuConfig cfg, @NonNull KitSort active) {
-    for (var sort : KitSort.values()) {
-      var label = "<gray>" + cfg.sortLabel(sort);
-      if (sort == active) {
-        label += cfg.sortActiveMarker();
-      }
-
-      lore.add(label);
-    }
-  }
-
-  private static int backSlot(@NonNull KitListMenuConfig cfg, int rows) {
-    var fallback = (rows - 1) * SLOTS_PER_ROW;
-
-    return MenuLayouts.sanitizeSlot(cfg.backSlot(), rows, fallback);
-  }
-
-  private static int sortSlot(@NonNull KitListMenuConfig cfg, int rows) {
-    var fallback = rows * SLOTS_PER_ROW - 1;
-
-    return MenuLayouts.sanitizeSlot(cfg.sortSlot(), rows, fallback);
-  }
-
-  private static List<Integer> contentSlots(
-      @NonNull KitListMenuConfig cfg, int rows, int backSlot, int sortSlot) {
-    var sanitized = MenuLayouts.sanitizeSlots(cfg.contentSlots(), rows);
-    var navigation = cfg.navigation();
-    var reserved =
-        Set.of(
-            backSlot,
-            sortSlot,
-            navigation.effectivePreviousSlot(rows),
-            navigation.effectiveNextSlot(rows));
-
-    return sanitized.stream().filter(slot -> !reserved.contains(slot)).toList();
   }
 }

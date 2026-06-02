@@ -27,6 +27,11 @@ public final class SqlHomeTable extends SqlTable {
       UPDATE homes SET pinned = ? WHERE player_id = ? AND name = ?\
       """;
 
+  static final String UPDATE_SHARED =
+      """
+      UPDATE homes SET shared = ? WHERE player_id = ? AND name = ?\
+      """;
+
   static final String BUMP_USAGE =
       """
       UPDATE homes SET teleport_count = teleport_count + 1, last_used_at = ? \
@@ -36,15 +41,22 @@ public final class SqlHomeTable extends SqlTable {
   static final String SELECT_ONE =
       """
       SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at, pinned, \
-      teleport_count, last_used_at \
+      teleport_count, last_used_at, shared \
       FROM homes WHERE player_id = ? AND name = ?\
       """;
 
   static final String SELECT_ALL =
       """
       SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at, pinned, \
-      teleport_count, last_used_at \
+      teleport_count, last_used_at, shared \
       FROM homes WHERE player_id = ? ORDER BY name\
+      """;
+
+  static final String SELECT_SHARED =
+      """
+      SELECT player_id, name, world, x, y, z, yaw, pitch, material, created_at, pinned, \
+      teleport_count, last_used_at, shared \
+      FROM homes WHERE shared = 1 ORDER BY teleport_count DESC, name\
       """;
 
   static final String COUNT =
@@ -72,6 +84,11 @@ public final class SqlHomeTable extends SqlTable {
       ALTER TABLE homes ADD COLUMN last_used_at INTEGER NOT NULL DEFAULT 0\
       """;
 
+  private static final String ADD_SHARED_COLUMN =
+      """
+      ALTER TABLE homes ADD COLUMN shared INTEGER NOT NULL DEFAULT 0\
+      """;
+
   private final String columnExistsQuery;
 
   public SqlHomeTable(@NonNull SqlDialect dialect) {
@@ -91,7 +108,8 @@ public final class SqlHomeTable extends SqlTable {
         "created_at",
         "pinned",
         "teleport_count",
-        "last_used_at");
+        "last_used_at",
+        "shared");
     this.columnExistsQuery = dialect.columnExistsQuery();
   }
 
@@ -113,6 +131,7 @@ public final class SqlHomeTable extends SqlTable {
         + "  pinned INTEGER NOT NULL DEFAULT 0,\n"
         + "  teleport_count INTEGER NOT NULL DEFAULT 0,\n"
         + "  last_used_at INTEGER NOT NULL DEFAULT 0,\n"
+        + "  shared INTEGER NOT NULL DEFAULT 0,\n"
         + "  PRIMARY KEY (player_id, name)\n"
         + ")";
   }
@@ -124,6 +143,7 @@ public final class SqlHomeTable extends SqlTable {
     migrateColumn(sqlExecutor, "pinned", ADD_PINNED_COLUMN);
     migrateColumn(sqlExecutor, "teleport_count", ADD_TELEPORT_COUNT_COLUMN);
     migrateColumn(sqlExecutor, "last_used_at", ADD_LAST_USED_AT_COLUMN);
+    migrateColumn(sqlExecutor, "shared", ADD_SHARED_COLUMN);
   }
 
   private void migrateColumn(

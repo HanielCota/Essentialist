@@ -3,6 +3,7 @@ package com.hanielcota.essentials.modules.msg.command;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.msg.config.MsgConfig;
 import com.hanielcota.essentials.paper.ActorFactory;
+import com.hanielcota.essentials.shared.Placeholders;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -17,6 +18,14 @@ public final class MsgNotifier {
   private final @NonNull ConfigHandle<MsgConfig> config;
   private final @NonNull ActorFactory actors;
 
+  private static String fill(
+      @NonNull String template,
+      @NonNull String sender,
+      @NonNull String target,
+      @NonNull String body) {
+    return Placeholders.format(template, "sender", sender, "target", target, "message", body);
+  }
+
   public void notifyExchange(@NonNull Player sender, @NonNull Player target, @NonNull String body) {
     var snap = this.config.value();
     var senderName = sender.getName();
@@ -30,15 +39,5 @@ public final class MsgNotifier {
 
     senderActor.sendMessage(outgoingMsg);
     targetActor.sendMessage(incomingMsg);
-  }
-
-  private static String fill(
-      @NonNull String template,
-      @NonNull String sender,
-      @NonNull String target,
-      @NonNull String body) {
-    var withSender = template.replace("{sender}", sender);
-    var withTarget = withSender.replace("{target}", target);
-    return withTarget.replace("{message}", body);
   }
 }

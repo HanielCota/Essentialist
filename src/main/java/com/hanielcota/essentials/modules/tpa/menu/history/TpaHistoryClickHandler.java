@@ -15,6 +15,15 @@ public final class TpaHistoryClickHandler {
   private final @NonNull ConfigHandle<TpaConfig> config;
   private final @NonNull TpaHistoryMenuState state;
 
+  private static String formatDestinationCopy(
+      @NonNull String template, @NonNull Destination destination) {
+    return template
+        .replace("{world}", destination.world())
+        .replace("{x}", Long.toString(Math.round(destination.x())))
+        .replace("{y}", Long.toString(Math.round(destination.y())))
+        .replace("{z}", Long.toString(Math.round(destination.z())));
+  }
+
   void onEntryClicked(@NonNull ClickContext click, @NonNull TpaHistoryEntry entry) {
     if (entry.status() != TeleportRequestStatus.ACCEPTED) {
       return;
@@ -33,14 +42,5 @@ public final class TpaHistoryClickHandler {
     var viewerId = click.player().getUniqueId();
     this.state.cycleFilter(viewerId);
     click.refresh();
-  }
-
-  private static String formatDestinationCopy(
-      @NonNull String template, @NonNull Destination destination) {
-    return template
-        .replace("{world}", destination.world())
-        .replace("{x}", Long.toString(Math.round(destination.x())))
-        .replace("{y}", Long.toString(Math.round(destination.y())))
-        .replace("{z}", Long.toString(Math.round(destination.z())));
   }
 }

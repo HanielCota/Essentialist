@@ -27,33 +27,6 @@ final class ModuleDiscoveryStage implements BootstrapStage {
 
   private final EssentialsPlugin plugin;
 
-  @Override
-  public String name() {
-    return "module-discovery";
-  }
-
-  @Override
-  public void start(@NonNull StageContext context) {
-    var dataFolder = this.plugin.getDataFolder().toPath();
-    var modules = ModuleManager.createDefault();
-    var classLoader = getClass().getClassLoader();
-    var loader = ServiceLoader.load(Module.class, classLoader);
-    var discovered = new ArrayList<Module>();
-
-    loader.forEach(discovered::add);
-
-    var settingsLoader = new ModuleSettingsLoader(dataFolder);
-    var settings = settingsLoader.load(discovered);
-    var enabledModules = ModuleFilter.enabled(discovered, settings);
-
-    enabledModules.forEach(modules::register);
-
-    var control = buildControl(dataFolder, discovered, enabledModules, settings, context);
-
-    context.services().register(ModuleManager.class, modules);
-    context.services().register(ModuleControl.class, control);
-  }
-
   private static ModuleControl buildControl(
       @NonNull Path dataFolder,
       @NonNull List<Module> discovered,
@@ -83,5 +56,32 @@ final class ModuleDiscoveryStage implements BootstrapStage {
     thread.setDaemon(true);
 
     return thread;
+  }
+
+  @Override
+  public String name() {
+    return "module-discovery";
+  }
+
+  @Override
+  public void start(@NonNull StageContext context) {
+    var dataFolder = this.plugin.getDataFolder().toPath();
+    var modules = ModuleManager.createDefault();
+    var classLoader = getClass().getClassLoader();
+    var loader = ServiceLoader.load(Module.class, classLoader);
+    var discovered = new ArrayList<Module>();
+
+    loader.forEach(discovered::add);
+
+    var settingsLoader = new ModuleSettingsLoader(dataFolder);
+    var settings = settingsLoader.load(discovered);
+    var enabledModules = ModuleFilter.enabled(discovered, settings);
+
+    enabledModules.forEach(modules::register);
+
+    var control = buildControl(dataFolder, discovered, enabledModules, settings, context);
+
+    context.services().register(ModuleManager.class, modules);
+    context.services().register(ModuleControl.class, control);
   }
 }

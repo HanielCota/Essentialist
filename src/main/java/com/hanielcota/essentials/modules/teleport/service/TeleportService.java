@@ -37,6 +37,20 @@ public final class TeleportService implements TeleportsApi {
     return aId.equals(bId);
   }
 
+  private static Optional<TeleportOutcome> validatePosition(
+      @NonNull Location destination, @NonNull World world) {
+    var minHeight = world.getMinHeight();
+    var maxHeight = world.getMaxHeight();
+    var worldBorder = world.getWorldBorder();
+    var insideBorder = worldBorder.isInside(destination);
+
+    if (destination.getY() < minHeight || destination.getY() >= maxHeight || !insideBorder) {
+      return Optional.of(TeleportOutcome.INVALID_POSITION);
+    }
+
+    return Optional.empty();
+  }
+
   public CompletableFuture<TeleportOutcome> toPlayer(
       @NonNull Player sender, @NonNull Player target) {
     if (sameId(sender, target)) {
@@ -83,19 +97,5 @@ public final class TeleportService implements TeleportsApi {
     var destination = viewer.getLocation();
 
     return dispatch(target, destination);
-  }
-
-  private static Optional<TeleportOutcome> validatePosition(
-      @NonNull Location destination, @NonNull World world) {
-    var minHeight = world.getMinHeight();
-    var maxHeight = world.getMaxHeight();
-    var worldBorder = world.getWorldBorder();
-    var insideBorder = worldBorder.isInside(destination);
-
-    if (destination.getY() < minHeight || destination.getY() >= maxHeight || !insideBorder) {
-      return Optional.of(TeleportOutcome.INVALID_POSITION);
-    }
-
-    return Optional.empty();
   }
 }

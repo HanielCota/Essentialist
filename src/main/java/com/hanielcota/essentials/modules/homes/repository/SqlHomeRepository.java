@@ -73,6 +73,7 @@ public final class SqlHomeRepository implements HomeRepository {
     var pinned = home.pinned() ? 1 : 0;
     var teleportCount = home.teleportCount();
     var lastUsedAt = home.lastUsedAt();
+    var shared = home.shared() ? 1 : 0;
 
     this.sqlExecutor.update(
         this.table.upsert(),
@@ -88,7 +89,8 @@ public final class SqlHomeRepository implements HomeRepository {
         createdAt,
         pinned,
         teleportCount,
-        lastUsedAt);
+        lastUsedAt,
+        shared);
   }
 
   @Override
@@ -145,6 +147,22 @@ public final class SqlHomeRepository implements HomeRepository {
         this.sqlExecutor.updateCount(SqlHomeTable.UPDATE_PINNED, pinnedFlag, ownerStr, name);
 
     return rowsAffected > 0;
+  }
+
+  @Override
+  public boolean updateShared(@NonNull UUID owner, @NonNull String name, boolean shared) {
+    var ownerStr = owner.toString();
+    var sharedFlag = shared ? 1 : 0;
+
+    var rowsAffected =
+        this.sqlExecutor.updateCount(SqlHomeTable.UPDATE_SHARED, sharedFlag, ownerStr, name);
+
+    return rowsAffected > 0;
+  }
+
+  @Override
+  public List<Home> listShared() {
+    return this.sqlExecutor.query(SqlHomeTable.SELECT_SHARED, SqlHomeMapper::read);
   }
 
   @Override

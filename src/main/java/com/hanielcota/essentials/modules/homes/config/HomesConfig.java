@@ -2,6 +2,7 @@ package com.hanielcota.essentials.modules.homes.config;
 
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMenuConfig;
 import java.time.Duration;
+import java.util.List;
 import org.bukkit.Material;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
@@ -28,6 +29,11 @@ public record HomesConfig(
     @Comment("Maximum length of a home name.") int homeNameMaxLength,
     @Comment("Regex a home name must fully match. Default allows letters, digits, '_' and '-'.")
         String allowedNamePattern,
+    @Comment(
+            "Worlds (exact folder names) where players cannot create homes. The"
+                + " essentials.home.world.bypass permission overrides this. Empty allows every"
+                + " world.")
+        List<String> blockedWorlds,
     HomesMenuConfig menu,
     HomesMessages messages) {
 
@@ -35,7 +41,8 @@ public record HomesConfig(
     var menu = HomesMenuConfig.defaults();
     var messages = HomesMessages.defaults();
 
-    return new HomesConfig(3, 1, Material.RED_BED, 30, 1, 32, "[A-Za-z0-9_-]+", menu, messages);
+    return new HomesConfig(
+        3, 1, Material.RED_BED, 30, 1, 32, "[A-Za-z0-9_-]+", List.of(), menu, messages);
   }
 
   public Duration teleportDelay() {

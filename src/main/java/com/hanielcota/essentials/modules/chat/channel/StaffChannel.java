@@ -18,6 +18,14 @@ public final class StaffChannel implements ChatChannel {
 
   public static final String ID = "staff";
 
+  private static boolean shouldRemove(@NonNull Audience audience, @NonNull UUID senderId) {
+    if (!(audience instanceof Player viewer)) {
+      return false;
+    }
+
+    return !StaffAudience.canHear(viewer, senderId);
+  }
+
   @Override
   public String id() {
     return ID;
@@ -42,13 +50,5 @@ public final class StaffChannel implements ChatChannel {
   public void filterViewers(@NonNull AsyncChatEvent event, @NonNull Player sender) {
     var senderId = sender.getUniqueId();
     event.viewers().removeIf(audience -> shouldRemove(audience, senderId));
-  }
-
-  private static boolean shouldRemove(@NonNull Audience audience, @NonNull UUID senderId) {
-    if (!(audience instanceof Player viewer)) {
-      return false;
-    }
-
-    return !StaffAudience.canHear(viewer, senderId);
   }
 }

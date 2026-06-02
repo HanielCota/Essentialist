@@ -26,7 +26,7 @@ public final class EssentialsPlugin extends JavaPlugin {
     }
   }
 
-  protected EssentialsBootstrap createBootstrap() {
+  private EssentialsBootstrap createBootstrap() {
     return new EssentialsBootstrap(this);
   }
 

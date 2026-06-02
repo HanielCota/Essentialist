@@ -5,7 +5,6 @@ import com.hanielcota.essentials.modules.warps.domain.Warp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +19,9 @@ import org.bukkit.Material;
 @RequiredArgsConstructor
 public final class SqlWarpRepository implements WarpRepository {
 
+  private static final Material DEFAULT_ICON = Material.ENDER_PEARL;
   private final SqlExecutor sqlExecutor;
   private final WarpTable table;
-
-  private static final Material DEFAULT_ICON = Material.ENDER_PEARL;
 
   private static Warp readRow(@NonNull ResultSet rs) throws SQLException {
     var name = rs.getString("name");
@@ -50,17 +48,6 @@ public final class SqlWarpRepository implements WarpRepository {
 
     var material = Material.matchMaterial(iconName);
     return material != null ? material : DEFAULT_ICON;
-  }
-
-  public Optional<Warp> find(@NonNull String name) {
-    var rows = this.sqlExecutor.query(WarpTable.SELECT_ONE, SqlWarpRepository::readRow, name);
-
-    if (rows.isEmpty()) {
-      return Optional.empty();
-    }
-
-    var first = rows.getFirst();
-    return Optional.of(first);
   }
 
   public List<Warp> list() {

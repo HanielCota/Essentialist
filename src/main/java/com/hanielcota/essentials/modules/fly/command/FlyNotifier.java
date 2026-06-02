@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.fly.command;
 
+import com.hanielcota.essentials.command.DualReply;
 import com.hanielcota.essentials.command.Senders;
 import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.fly.config.FlyConfig;
@@ -23,10 +24,10 @@ public final class FlyNotifier {
   public void announce(
       @NonNull CommandActor sender, @NonNull Player subject, @NonNull FlyService.Result result) {
     var snap = this.config.value();
-    var name = subject.getName();
-    var self = Senders.isSelf(sender, subject);
 
     if (result == FlyService.Result.UNSUPPORTED) {
+      var name = subject.getName();
+      var self = Senders.isSelf(sender, subject);
       var unsupported = snap.unsupportedGamemode();
       var unsupportedMsg = unsupported.forSender(self, name);
       sender.sendError(unsupportedMsg);
@@ -35,11 +36,7 @@ public final class FlyNotifier {
 
     var enabled = result == FlyService.Result.ENABLED;
     var messages = snap.toggle(enabled);
-    var target = this.actors.actorOf(subject);
 
-    var senderMsg = messages.forSender(self, name);
-    var targetMsg = messages.forTarget(name);
-
-    sender.sendDualMessage(target, senderMsg, targetMsg);
+    DualReply.send(sender, subject, this.actors, messages);
   }
 }

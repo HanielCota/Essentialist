@@ -12,6 +12,7 @@ public final class InvseeHolder implements InventoryHolder {
 
   private final UUID targetId;
   private Inventory inventory;
+  private InvseeSnapshot snapshot;
 
   public UUID targetId() {
     return this.targetId;
@@ -20,6 +21,14 @@ public final class InvseeHolder implements InventoryHolder {
   /** Set once, right after the inventory is created. */
   public void inventory(@NonNull Inventory inventory) {
     this.inventory = inventory;
+  }
+
+  public InvseeSnapshot snapshot() {
+    return this.snapshot;
+  }
+
+  public void snapshot(@NonNull InvseeSnapshot snapshot) {
+    this.snapshot = snapshot;
   }
 
   @Override

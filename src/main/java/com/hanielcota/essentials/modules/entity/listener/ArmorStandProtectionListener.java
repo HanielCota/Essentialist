@@ -51,12 +51,8 @@ public final class ArmorStandProtectionListener implements Listener {
     if (!snap.protectArmorStands() || !snap.appliesTo(worldName)) {
       return false;
     }
-    if (actor instanceof Player player
-        && snap.hasBypassPermission()
-        && player.hasPermission(snap.bypassPermission())) {
-      return false;
-    }
-
-    return true;
+    return !(actor instanceof Player player)
+        || !snap.hasBypassPermission()
+        || !player.hasPermission(snap.bypassPermission());
   }
 }

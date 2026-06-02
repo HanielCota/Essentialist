@@ -8,6 +8,7 @@ import com.hanielcota.essentials.modules.homes.domain.Home;
 import com.hanielcota.essentials.modules.homes.repository.HomeRepository;
 import com.hanielcota.essentials.modules.homes.service.HomeLimitResolver;
 import com.hanielcota.essentials.modules.homes.service.HomeService;
+import com.hanielcota.essentials.modules.homes.service.HomeWorldPolicy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,11 +51,13 @@ class HomesApiAdapterTest {
 
   private static HomesApi apiWith(@NonNull Home... homes) {
     var repository = new InMemoryHomeRepository(List.of(homes));
-    return new HomeService(repository, new HomeLimitResolver(() -> 0));
+    return new HomeService(
+        repository, new HomeLimitResolver(() -> 0), new HomeWorldPolicy(List::of));
   }
 
   private static Home home(@NonNull UUID owner, @NonNull String name) {
-    return new Home(owner, name, "world", 0, 64, 0, 0, 0, Material.RED_BED, 0L, false, 0L, 0L);
+    return new Home(
+        owner, name, "world", 0, 64, 0, 0, 0, Material.RED_BED, 0L, false, 0L, 0L, false);
   }
 
   private static final class InMemoryHomeRepository implements HomeRepository {
@@ -106,6 +109,16 @@ class HomesApiAdapterTest {
     @Override
     public boolean updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
       return false;
+    }
+
+    @Override
+    public boolean updateShared(@NonNull UUID owner, @NonNull String name, boolean shared) {
+      return false;
+    }
+
+    @Override
+    public List<Home> listShared() {
+      return this.rows.stream().filter(Home::shared).collect(Collectors.toList());
     }
 
     @Override

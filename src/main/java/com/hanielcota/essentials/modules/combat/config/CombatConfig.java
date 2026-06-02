@@ -28,11 +28,6 @@ public record CombatConfig(
     @Comment("Keep the player's inventory on death (drops nothing).") boolean keepInventory,
     @Comment("Keep the player's experience on death (drops no XP).") boolean keepExperience) {
 
-  public enum WorldMode {
-    WHITELIST,
-    BLACKLIST
-  }
-
   public static CombatConfig defaults() {
     return new CombatConfig(
         true,
@@ -48,7 +43,7 @@ public record CombatConfig(
 
   public boolean appliesTo(String worldName) {
     var listed = worlds.contains(worldName);
-    return worldMode == WorldMode.WHITELIST ? listed : !listed;
+    return (worldMode == WorldMode.WHITELIST) == listed;
   }
 
   public boolean hasBypassPermission() {
@@ -57,5 +52,10 @@ public record CombatConfig(
 
   public boolean isDamageCauseImmune(String causeName) {
     return immuneDamageCauses.contains(causeName);
+  }
+
+  public enum WorldMode {
+    WHITELIST,
+    BLACKLIST
   }
 }

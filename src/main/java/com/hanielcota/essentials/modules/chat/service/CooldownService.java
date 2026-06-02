@@ -46,7 +46,7 @@ public final class CooldownService {
       return 0L;
     }
 
-    var cooldownMillis = (long) cooldownSeconds * 1_000L;
+    var cooldownMillis = cooldownSeconds * 1_000L;
     var now = System.currentTimeMillis();
     var elapsed = now - lastSend;
     var remaining = cooldownMillis - elapsed;

@@ -39,13 +39,6 @@ public record KitListMenuConfig(
     @Comment("Label shown for the available-first sort.") String sortLabelAvailable,
     @Comment("Suffix appended to the active option in {options}.") String sortActiveMarker) {
 
-  public String sortLabel(KitSort sort) {
-    return switch (sort) {
-      case NAME -> this.sortLabelName;
-      case AVAILABLE -> this.sortLabelAvailable;
-    };
-  }
-
   public static KitListMenuConfig defaults() {
     return new KitListMenuConfig(
         "<dark_gray>Kits",
@@ -72,5 +65,12 @@ public record KitListMenuConfig(
         "Alphabetical",
         "Available first",
         " <green>◀");
+  }
+
+  public String sortLabel(KitSort sort) {
+    return switch (sort) {
+      case NAME -> this.sortLabelName;
+      case AVAILABLE -> this.sortLabelAvailable;
+    };
   }
 }

@@ -11,6 +11,7 @@ import com.hanielcota.essentials.menu.EssentialsMenu;
 import com.hanielcota.essentials.menu.MenuLayouts;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.menu.PageNavigation;
+import com.hanielcota.essentials.modules.kit.config.KitCategoryMenuConfig;
 import com.hanielcota.essentials.modules.kit.config.KitConfig;
 import com.hanielcota.essentials.modules.kit.domain.KitCategory;
 import com.hanielcota.essentials.modules.kit.service.KitCatalog;
@@ -34,6 +35,43 @@ public final class KitCategoryMenu implements EssentialsMenu {
   private final ConfigHandle<KitConfig> config;
   private final KitCatalog catalog;
   private final KitCategoryClickHandler clicks;
+
+  private static ItemTemplate categoryItem(
+      @NonNull String nameTemplate,
+      @NonNull List<String> loreTemplate,
+      @NonNull KitCategory category,
+      int kitCount) {
+    var categoryName = category.displayName();
+    var name = nameTemplate.replace("{category}", categoryName);
+
+    var lore = new ArrayList<String>(loreTemplate.size());
+    for (var line : loreTemplate) {
+      var loreLine = Placeholders.format(line, "category", categoryName, "kits", kitCount);
+
+      lore.add(loreLine);
+    }
+
+    return MenuTemplates.simple(category.icon(), name, lore);
+  }
+
+  private static List<Integer> contentSlots(
+      @NonNull List<Integer> sanitized, @NonNull KitCategoryMenuConfig cfg, int rows) {
+    var navigation = cfg.navigation();
+    var reserved = new HashSet<Integer>();
+    reserved.add(navigation.effectivePreviousSlot(rows));
+    reserved.add(navigation.effectiveNextSlot(rows));
+    if (cfg.claimAllEnabled()) {
+      reserved.add(claimAllSlot(cfg, rows));
+    }
+
+    return sanitized.stream().filter(slot -> !reserved.contains(slot)).toList();
+  }
+
+  private static int claimAllSlot(@NonNull KitCategoryMenuConfig cfg, int rows) {
+    var fallback = (rows - 1) * 9 + 4;
+
+    return MenuLayouts.sanitizeSlot(cfg.claimAllSlot(), rows, fallback);
+  }
 
   @Override
   public @NonNull String id() {
@@ -104,42 +142,5 @@ public final class KitCategoryMenu implements EssentialsMenu {
     }
 
     return shown;
-  }
-
-  private static ItemTemplate categoryItem(
-      @NonNull String nameTemplate,
-      @NonNull List<String> loreTemplate,
-      @NonNull KitCategory category,
-      int kitCount) {
-    var name = nameTemplate.replace("{category}", category.displayName());
-
-    var lore = new ArrayList<String>(loreTemplate.size());
-    for (var line : loreTemplate) {
-      lore.add(Placeholders.format(line, "category", category.displayName(), "kits", kitCount));
-    }
-
-    return MenuTemplates.simple(category.icon(), name, lore);
-  }
-
-  private static List<Integer> contentSlots(
-      @NonNull List<Integer> sanitized,
-      @NonNull com.hanielcota.essentials.modules.kit.config.KitCategoryMenuConfig cfg,
-      int rows) {
-    var navigation = cfg.navigation();
-    var reserved = new HashSet<Integer>();
-    reserved.add(navigation.effectivePreviousSlot(rows));
-    reserved.add(navigation.effectiveNextSlot(rows));
-    if (cfg.claimAllEnabled()) {
-      reserved.add(claimAllSlot(cfg, rows));
-    }
-
-    return sanitized.stream().filter(slot -> !reserved.contains(slot)).toList();
-  }
-
-  private static int claimAllSlot(
-      @NonNull com.hanielcota.essentials.modules.kit.config.KitCategoryMenuConfig cfg, int rows) {
-    var fallback = (rows - 1) * 9 + 4;
-
-    return MenuLayouts.sanitizeSlot(cfg.claimAllSlot(), rows, fallback);
   }
 }

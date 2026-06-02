@@ -19,6 +19,22 @@ public class EssentialsBootstrap {
 
   private final EssentialsPlugin plugin;
 
+  private static EssentialsCore runStages(List<BootstrapStage> stages, StageContext context) {
+    var completed = new ArrayList<BootstrapStage>(stages.size());
+
+    try {
+      for (var stage : stages) {
+        stage.start(context);
+        completed.add(stage);
+      }
+      return context.services().resolve(EssentialsCore.class);
+    } catch (RuntimeException e) {
+      StageFailureDiagnostics.attach(e, completed, stages);
+      BootstrapRollbackHandler.rollback(context, e);
+      throw e;
+    }
+  }
+
   /**
    * Runs every stage in order and returns the assembled {@link EssentialsCore}.
    *
@@ -44,21 +60,5 @@ public class EssentialsBootstrap {
    */
   protected List<BootstrapStage> stages(EssentialsPlugin plugin) {
     return StageFactory.defaultStages(plugin);
-  }
-
-  private static EssentialsCore runStages(List<BootstrapStage> stages, StageContext context) {
-    var completed = new ArrayList<BootstrapStage>(stages.size());
-
-    try {
-      for (var stage : stages) {
-        stage.start(context);
-        completed.add(stage);
-      }
-      return context.services().resolve(EssentialsCore.class);
-    } catch (RuntimeException e) {
-      StageFailureDiagnostics.attach(e, completed, stages);
-      BootstrapRollbackHandler.rollback(context, e);
-      throw e;
-    }
   }
 }

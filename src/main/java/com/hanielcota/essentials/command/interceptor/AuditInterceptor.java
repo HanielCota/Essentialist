@@ -19,6 +19,16 @@ public final class AuditInterceptor implements RichCommandInterceptor {
 
   private final @NonNull Logger logger;
 
+  private static String displayPathOf(@NonNull CommandRoute route) {
+    var root = route.root();
+    var pathTokens = route.path();
+    if (pathTokens.isEmpty()) {
+      return root;
+    }
+    var subPath = String.join(" ", pathTokens);
+    return root + " " + subPath;
+  }
+
   @Override
   public @NonNull CommandResult before(
       @NonNull CommandContext context, @NonNull List<ParsedParameter<?>> parameters) {
@@ -43,16 +53,6 @@ public final class AuditInterceptor implements RichCommandInterceptor {
     this.logger.info(messageWithArgs);
 
     return CommandResult.success();
-  }
-
-  private static String displayPathOf(@NonNull CommandRoute route) {
-    var root = route.root();
-    var pathTokens = route.path();
-    if (pathTokens.isEmpty()) {
-      return root;
-    }
-    var subPath = String.join(" ", pathTokens);
-    return root + " " + subPath;
   }
 
   // Skip the auto-injected CommandActor parameter — it's redundant with the actor name already on

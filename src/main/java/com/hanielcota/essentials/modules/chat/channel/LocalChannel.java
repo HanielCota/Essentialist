@@ -34,6 +34,47 @@ public final class LocalChannel implements ChatChannel {
   private final @NonNull ConfigHandle<ChatConfig> config;
   private final @NonNull LocalChannelNotifier notifier;
 
+  private static boolean shouldRemove(
+      @NonNull Audience audience,
+      @NonNull UUID senderId,
+      @NonNull World senderWorld,
+      @NonNull Location senderLocation,
+      double radiusSquared) {
+    if (!(audience instanceof Player viewer)) {
+      return false;
+    }
+
+    var viewerId = viewer.getUniqueId();
+    if (viewerId.equals(senderId)) {
+      return false;
+    }
+
+    var viewerWorld = viewer.getWorld();
+    if (viewerWorld != senderWorld) {
+      return true;
+    }
+
+    var viewerLocation = viewer.getLocation();
+    var distSq = viewerLocation.distanceSquared(senderLocation);
+
+    return distSq > radiusSquared;
+  }
+
+  private static boolean hasAtLeastOneOtherPlayer(
+      @NonNull AsyncChatEvent event, @NonNull Player sender) {
+    var senderId = sender.getUniqueId();
+    for (var audience : event.viewers()) {
+      if (!(audience instanceof Player viewer)) {
+        continue;
+      }
+      var viewerId = viewer.getUniqueId();
+      if (!viewerId.equals(senderId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public String id() {
     return ID;
@@ -82,46 +123,5 @@ public final class LocalChannel implements ChatChannel {
 
     this.notifier.warnNoListeners(sender);
     return true;
-  }
-
-  private static boolean shouldRemove(
-      @NonNull Audience audience,
-      @NonNull UUID senderId,
-      @NonNull World senderWorld,
-      @NonNull Location senderLocation,
-      double radiusSquared) {
-    if (!(audience instanceof Player viewer)) {
-      return false;
-    }
-
-    var viewerId = viewer.getUniqueId();
-    if (viewerId.equals(senderId)) {
-      return false;
-    }
-
-    var viewerWorld = viewer.getWorld();
-    if (viewerWorld != senderWorld) {
-      return true;
-    }
-
-    var viewerLocation = viewer.getLocation();
-    var distSq = viewerLocation.distanceSquared(senderLocation);
-
-    return distSq > radiusSquared;
-  }
-
-  private static boolean hasAtLeastOneOtherPlayer(
-      @NonNull AsyncChatEvent event, @NonNull Player sender) {
-    var senderId = sender.getUniqueId();
-    for (var audience : event.viewers()) {
-      if (!(audience instanceof Player viewer)) {
-        continue;
-      }
-      var viewerId = viewer.getUniqueId();
-      if (!viewerId.equals(senderId)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

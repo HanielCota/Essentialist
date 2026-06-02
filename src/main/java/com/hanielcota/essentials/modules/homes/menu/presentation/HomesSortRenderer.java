@@ -1,6 +1,7 @@
 package com.hanielcota.essentials.modules.homes.menu.presentation;
 
 import com.github.hanielcota.menuframework.definition.ItemTemplate;
+import com.hanielcota.essentials.menu.ListMarkers;
 import com.hanielcota.essentials.menu.MenuTemplates;
 import com.hanielcota.essentials.modules.homes.config.menu.HomesMainMenuConfig;
 import com.hanielcota.essentials.modules.homes.domain.HomeOrdering;
@@ -13,15 +14,6 @@ import lombok.NonNull;
  * list with an active marker, mirroring the favorite-ordering renderer in the TPA module.
  */
 public final class HomesSortRenderer {
-
-  public ItemTemplate sortTemplate(
-      @NonNull HomesMainMenuConfig settings, @NonNull HomeOrdering ordering) {
-    var stateLabel = orderingLabel(settings, ordering);
-    var name = settings.sortName().replace("{state}", stateLabel);
-    var lore = renderLore(settings, stateLabel, ordering);
-
-    return MenuTemplates.simple(settings.sortMaterial(), name, lore);
-  }
 
   private static String orderingLabel(
       @NonNull HomesMainMenuConfig settings, @NonNull HomeOrdering ordering) {
@@ -51,12 +43,18 @@ public final class HomesSortRenderer {
       @NonNull HomesMainMenuConfig settings, @NonNull HomeOrdering current) {
     var marker = settings.sortActiveMarker();
     return List.of(
-        markActive(settings.sortLabelName(), marker, current == HomeOrdering.NAME),
-        markActive(settings.sortLabelMostUsed(), marker, current == HomeOrdering.MOST_USED),
-        markActive(settings.sortLabelRecent(), marker, current == HomeOrdering.RECENT));
+        ListMarkers.markActive(settings.sortLabelName(), marker, current == HomeOrdering.NAME),
+        ListMarkers.markActive(
+            settings.sortLabelMostUsed(), marker, current == HomeOrdering.MOST_USED),
+        ListMarkers.markActive(settings.sortLabelRecent(), marker, current == HomeOrdering.RECENT));
   }
 
-  private static String markActive(@NonNull String label, @NonNull String marker, boolean active) {
-    return active ? label + marker : label;
+  public ItemTemplate sortTemplate(
+      @NonNull HomesMainMenuConfig settings, @NonNull HomeOrdering ordering) {
+    var stateLabel = orderingLabel(settings, ordering);
+    var name = settings.sortName().replace("{state}", stateLabel);
+    var lore = renderLore(settings, stateLabel, ordering);
+
+    return MenuTemplates.simple(settings.sortMaterial(), name, lore);
   }
 }

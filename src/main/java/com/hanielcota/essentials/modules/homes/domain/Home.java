@@ -26,7 +26,8 @@ public record Home(
     long createdAt,
     boolean pinned,
     long teleportCount,
-    long lastUsedAt) {
+    long lastUsedAt,
+    boolean shared) {
 
   public static Home of(
       @NonNull UUID owner,
@@ -45,7 +46,7 @@ public record Home(
     var createdAt = System.currentTimeMillis();
 
     return new Home(
-        owner, name, worldName, x, y, z, yaw, pitch, material, createdAt, false, 0L, 0L);
+        owner, name, worldName, x, y, z, yaw, pitch, material, createdAt, false, 0L, 0L, false);
   }
 
   public Home withName(@NonNull String newName) {
@@ -62,7 +63,8 @@ public record Home(
         this.createdAt,
         this.pinned,
         this.teleportCount,
-        this.lastUsedAt);
+        this.lastUsedAt,
+        this.shared);
   }
 
   public Home withMaterial(@NonNull Material newMaterial) {
@@ -79,7 +81,8 @@ public record Home(
         this.createdAt,
         this.pinned,
         this.teleportCount,
-        this.lastUsedAt);
+        this.lastUsedAt,
+        this.shared);
   }
 
   public Home withPinned(boolean newPinned) {
@@ -96,7 +99,26 @@ public record Home(
         this.createdAt,
         newPinned,
         this.teleportCount,
-        this.lastUsedAt);
+        this.lastUsedAt,
+        this.shared);
+  }
+
+  public Home withShared(boolean newShared) {
+    return new Home(
+        this.owner,
+        this.name,
+        this.world,
+        this.x,
+        this.y,
+        this.z,
+        this.yaw,
+        this.pitch,
+        this.material,
+        this.createdAt,
+        this.pinned,
+        this.teleportCount,
+        this.lastUsedAt,
+        newShared);
   }
 
   public Home withUsageBump(long timestampMs) {
@@ -113,7 +135,8 @@ public record Home(
         this.createdAt,
         this.pinned,
         this.teleportCount + 1,
-        timestampMs);
+        timestampMs,
+        this.shared);
   }
 
   public Optional<Location> resolve() {

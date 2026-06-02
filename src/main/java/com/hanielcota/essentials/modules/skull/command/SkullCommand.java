@@ -36,10 +36,10 @@ public record SkullCommand(
     }
 
     var name = targetName.get();
-    var resolved = players.offlineByName(name);
+    var resolved = this.players.offlineByName(name);
 
     if (resolved.isEmpty()) {
-      notifier.sendPlayerNotFound(actor);
+      this.notifier.sendPlayerNotFound(actor);
       return CommandResult.invalidUsage();
     }
 
@@ -48,15 +48,15 @@ public record SkullCommand(
   }
 
   private CommandResult giveSkull(CommandActor actor, Player recipient, OfflinePlayer owner) {
-    var delivery = skullService.deliver(recipient, owner);
+    var delivery = this.skullService.deliver(recipient, owner);
 
     if (!delivery.isSuccess()) {
-      notifier.sendInventoryFull(actor);
+      this.notifier.sendInventoryFull(actor);
       return CommandResult.invalidUsage();
     }
 
     var self = Senders.isSelf(actor, owner);
-    notifier.sendReceived(actor, owner, self);
+    this.notifier.sendReceived(actor, owner, self);
     return CommandResult.success();
   }
 }

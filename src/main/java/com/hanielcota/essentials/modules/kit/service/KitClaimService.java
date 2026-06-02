@@ -4,6 +4,7 @@ import com.hanielcota.essentials.config.ConfigHandle;
 import com.hanielcota.essentials.modules.kit.config.KitConfig;
 import com.hanielcota.essentials.modules.kit.domain.Kit;
 import com.hanielcota.essentials.modules.kit.domain.KitClaimResult;
+import java.util.Collection;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Player;
@@ -20,6 +21,15 @@ public final class KitClaimService {
   private final ConfigHandle<KitConfig> config;
   private final KitCooldownService cooldowns;
   private final KitGiver giver;
+
+  private static void playClaimSound(@NonNull Player player, @NonNull KitConfig snap) {
+    if (!snap.playsClaimSound()) {
+      return;
+    }
+
+    var location = player.getLocation();
+    player.playSound(location, snap.claimSound(), snap.claimVolume(), snap.claimPitch());
+  }
 
   /** A player claiming a kit themselves: enforces permission, one-time and cooldown. */
   public ClaimOutcome claim(@NonNull Player player, @NonNull Kit kit) {
@@ -72,6 +82,26 @@ public final class KitClaimService {
     playClaimSound(player, this.config.value());
   }
 
+  /**
+   * Claims every kit in {@code kits} (silently, one sound at the end), returning how many were
+   * actually delivered. Used by bulk flows (claim all, first join).
+   */
+  public int claimAll(@NonNull Player player, @NonNull Collection<Kit> kits) {
+    var claimed = 0;
+    for (var kit : kits) {
+      var outcome = claim(player, kit, false);
+      if (outcome.result() == KitClaimResult.CLAIMED) {
+        claimed++;
+      }
+    }
+
+    if (claimed > 0) {
+      playClaimSound(player);
+    }
+
+    return claimed;
+  }
+
   private ClaimOutcome deliverItems(@NonNull Player player, @NonNull Kit kit, boolean playSound) {
     var snap = this.config.value();
     var giveResult = this.giver.give(player, kit, snap.dropWhenInventoryFull());
@@ -85,14 +115,5 @@ public final class KitClaimService {
 
     var overflowDropped = giveResult == KitGiver.GiveResult.OVERFLOW_DROPPED;
     return new ClaimOutcome(KitClaimResult.CLAIMED, overflowDropped);
-  }
-
-  private static void playClaimSound(@NonNull Player player, @NonNull KitConfig snap) {
-    if (!snap.playsClaimSound()) {
-      return;
-    }
-
-    var location = player.getLocation();
-    player.playSound(location, snap.claimSound(), snap.claimVolume(), snap.claimPitch());
   }
 }

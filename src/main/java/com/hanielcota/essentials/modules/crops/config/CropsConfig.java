@@ -43,14 +43,10 @@ public record CropsConfig(
     @Comment("Automatically replant fully grown crops after harvest.") boolean autoReplant,
     @Comment(
             "When auto-replanting, remove one seed from the harvest drops so the replant is not"
-                + " free. No effect if the harvest dropped no matching seed.")
+                + " free. If the harvest drops no matching seed, one is consumed from the player;"
+                + " if none is available, the crop is not replanted.")
         boolean replantConsumesSeed,
     @Comment("Player feedback messages.") CropsMessages messages) {
-
-  public enum WorldMode {
-    WHITELIST,
-    BLACKLIST
-  }
 
   public static CropsConfig defaults() {
     return new CropsConfig(
@@ -74,7 +70,7 @@ public record CropsConfig(
 
   public boolean appliesTo(String worldName) {
     var listed = worlds.contains(worldName);
-    return worldMode == WorldMode.WHITELIST ? listed : !listed;
+    return (worldMode == WorldMode.WHITELIST) == listed;
   }
 
   public boolean isCropAllowed(Material material) {
@@ -87,5 +83,10 @@ public record CropsConfig(
 
   public boolean hasBypassPermission() {
     return !bypassPermission.isBlank();
+  }
+
+  public enum WorldMode {
+    WHITELIST,
+    BLACKLIST
   }
 }

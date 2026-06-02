@@ -23,6 +23,24 @@ public final class KitEntryRenderer {
   private final ConfigHandle<KitConfig> config;
   private final KitCooldownService cooldowns;
 
+  private static ItemTemplate locked(
+      @NonNull KitListMenuConfig cfg, @NonNull String name, @NonNull List<String> lore) {
+    return entry(cfg.lockedMaterial(), name, lore, false);
+  }
+
+  private static ItemTemplate entry(
+      @NonNull Material material, @NonNull String name, @NonNull List<String> lore, boolean glow) {
+    var loreArray = lore.toArray(String[]::new);
+
+    var builder = ItemTemplate.builder(material);
+    builder.name(name);
+    builder.lore(loreArray);
+    builder.italic(false);
+    builder.glow(glow);
+
+    return builder.build();
+  }
+
   public ItemTemplate render(@NonNull Player player, @NonNull Kit kit) {
     var cfg = this.config.value().listMenu();
     var uuid = player.getUniqueId();
@@ -44,23 +62,5 @@ public final class KitEntryRenderer {
     }
 
     return entry(kit.icon(), name, cfg.availableLore(), cfg.glowWhenAvailable());
-  }
-
-  private static ItemTemplate locked(
-      @NonNull KitListMenuConfig cfg, @NonNull String name, @NonNull List<String> lore) {
-    return entry(cfg.lockedMaterial(), name, lore, false);
-  }
-
-  private static ItemTemplate entry(
-      @NonNull Material material, @NonNull String name, @NonNull List<String> lore, boolean glow) {
-    var loreArray = lore.toArray(String[]::new);
-
-    var builder = ItemTemplate.builder(material);
-    builder.name(name);
-    builder.lore(loreArray);
-    builder.italic(false);
-    builder.glow(glow);
-
-    return builder.build();
   }
 }

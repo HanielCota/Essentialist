@@ -16,45 +16,6 @@ import org.jspecify.annotations.Nullable;
 
 public final class TpaPendingMenuRenderer {
 
-  public ItemTemplate backTemplate(@NonNull TpaPendingMenuConfig settings) {
-    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
-  }
-
-  public ItemTemplate emptyTemplate(@NonNull TpaPendingMenuConfig settings) {
-    return MenuTemplates.simple(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
-  }
-
-  public ItemTemplate bulkTemplate(
-      @NonNull Material icon,
-      @NonNull String nameTemplate,
-      @NonNull List<String> loreTemplate,
-      int pending) {
-    var pendingText = Integer.toString(pending);
-    var name = nameTemplate.replace("{pending}", pendingText);
-    var lore = replacePending(loreTemplate, pendingText);
-
-    return MenuTemplates.simple(icon, name, lore);
-  }
-
-  public ItemTemplate requestTemplate(
-      @NonNull TpaPendingMenuConfig settings,
-      @NonNull TeleportRequest request,
-      @Nullable Player requester,
-      @NonNull Player viewer) {
-    var name =
-        applyRequestPlaceholders(settings.requestName(), settings, request, requester, viewer);
-    var lore =
-        applyRequestPlaceholders(settings.requestLore(), settings, request, requester, viewer);
-
-    var builder = ItemTemplate.builder(settings.requestIcon());
-    applyHead(builder, settings, request);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
   private static void applyHead(
       @NonNull ItemTemplate.Builder builder,
       @NonNull TpaPendingMenuConfig settings,
@@ -147,5 +108,44 @@ public final class TpaPendingMenuRenderer {
       lore.add(line.replace("{pending}", pendingText));
     }
     return lore;
+  }
+
+  public ItemTemplate backTemplate(@NonNull TpaPendingMenuConfig settings) {
+    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
+  }
+
+  public ItemTemplate emptyTemplate(@NonNull TpaPendingMenuConfig settings) {
+    return MenuTemplates.simple(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
+  }
+
+  public ItemTemplate bulkTemplate(
+      @NonNull Material icon,
+      @NonNull String nameTemplate,
+      @NonNull List<String> loreTemplate,
+      int pending) {
+    var pendingText = Integer.toString(pending);
+    var name = nameTemplate.replace("{pending}", pendingText);
+    var lore = replacePending(loreTemplate, pendingText);
+
+    return MenuTemplates.simple(icon, name, lore);
+  }
+
+  public ItemTemplate requestTemplate(
+      @NonNull TpaPendingMenuConfig settings,
+      @NonNull TeleportRequest request,
+      @Nullable Player requester,
+      @NonNull Player viewer) {
+    var name =
+        applyRequestPlaceholders(settings.requestName(), settings, request, requester, viewer);
+    var lore =
+        applyRequestPlaceholders(settings.requestLore(), settings, request, requester, viewer);
+
+    var builder = ItemTemplate.builder(settings.requestIcon());
+    applyHead(builder, settings, request);
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
   }
 }

@@ -29,11 +29,6 @@ public enum MaterialCategory {
     this.icon = icon;
   }
 
-  /** Returns the category that owns this material, or {@link #MISC} if none does. */
-  public static @NonNull MaterialCategory of(@NonNull Material material) {
-    return MaterialCategoryCatalog.categoryOf(material);
-  }
-
   public static @NonNull List<MaterialCategory> browsable() {
     return List.of(values());
   }

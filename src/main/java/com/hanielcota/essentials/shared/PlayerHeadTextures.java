@@ -59,7 +59,7 @@ public final class PlayerHeadTextures {
       }
 
       var value = property.getValue();
-      if (value == null || value.isEmpty()) {
+      if (value.isEmpty()) {
         return null;
       }
 

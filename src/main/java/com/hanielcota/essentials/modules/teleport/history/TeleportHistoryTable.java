@@ -9,8 +9,8 @@ public final class TeleportHistoryTable extends SqlTable {
 
   static final String INSERT =
       """
-      INSERT INTO teleport_history (player_id, world, x, y, z, yaw, pitch, created_at) \
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)\
+      INSERT INTO teleport_history (player_id, world, x, y, z, yaw, pitch, created_at, cause) \
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\
       """;
 
   static final String TRIM =
@@ -27,7 +27,7 @@ public final class TeleportHistoryTable extends SqlTable {
 
   static final String LIST =
       """
-      SELECT id, world, x, y, z, yaw, pitch, created_at FROM teleport_history \
+      SELECT id, world, x, y, z, yaw, pitch, created_at, cause FROM teleport_history \
       WHERE player_id = ? ORDER BY created_at DESC LIMIT ?\
       """;
 
@@ -42,6 +42,15 @@ public final class TeleportHistoryTable extends SqlTable {
       ON teleport_history(player_id, created_at)\
       """;
 
+  /**
+   * Backfills the {@code cause} column on databases created before history tracked why a location
+   * was captured. Existing rows default to {@code TELEPORT}, the original sole behaviour.
+   */
+  private static final String ADD_CAUSE_COLUMN =
+      "ALTER TABLE teleport_history ADD COLUMN cause TEXT NOT NULL DEFAULT 'TELEPORT'";
+
+  private final String columnExistsQuery;
+
   public TeleportHistoryTable(@NonNull SqlDialect dialect) {
     super(
         dialect,
@@ -54,7 +63,9 @@ public final class TeleportHistoryTable extends SqlTable {
         "z",
         "yaw",
         "pitch",
-        "created_at");
+        "created_at",
+        "cause");
+    this.columnExistsQuery = dialect.columnExistsQuery();
   }
 
   private static String buildCreateTable(@NonNull SqlDialect dialect) {
@@ -70,13 +81,23 @@ public final class TeleportHistoryTable extends SqlTable {
         + "  z REAL NOT NULL,\n"
         + "  yaw REAL NOT NULL,\n"
         + "  pitch REAL NOT NULL,\n"
-        + "  created_at INTEGER NOT NULL\n"
+        + "  created_at INTEGER NOT NULL,\n"
+        + "  cause TEXT NOT NULL DEFAULT 'TELEPORT'\n"
         + ")";
   }
 
   @Override
   public void install(@NonNull SqlExecutor executor) {
     super.install(executor);
+    migrateCauseColumn(executor);
     executor.ddl(CREATE_INDEX);
+  }
+
+  private void migrateCauseColumn(@NonNull SqlExecutor executor) {
+    var present =
+        executor.query(this.columnExistsQuery, rs -> rs.getInt(1), "teleport_history", "cause");
+    if (present.isEmpty()) {
+      executor.ddl(ADD_CAUSE_COLUMN);
+    }
   }
 }

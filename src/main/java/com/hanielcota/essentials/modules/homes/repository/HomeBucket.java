@@ -14,10 +14,9 @@ import org.bukkit.Material;
 
 final class HomeBucket {
 
-  private final Map<String, Home> homes = new ConcurrentHashMap<>();
-
   private static final Comparator<Home> BY_PINNED_THEN_NAME =
       Comparator.comparing(Home::pinned).reversed().thenComparing(Home::name);
+  private final Map<String, Home> homes = new ConcurrentHashMap<>();
 
   private static List<Home> sorted(@NonNull Collection<Home> homes) {
     var list = new ArrayList<>(homes);
@@ -101,6 +100,13 @@ final class HomeBucket {
     var homeKey = key(name);
 
     var updated = this.homes.computeIfPresent(homeKey, (k, current) -> current.withPinned(pinned));
+    return Optional.ofNullable(updated);
+  }
+
+  Optional<Home> updateShared(@NonNull String name, boolean shared) {
+    var homeKey = key(name);
+
+    var updated = this.homes.computeIfPresent(homeKey, (k, current) -> current.withShared(shared));
     return Optional.ofNullable(updated);
   }
 

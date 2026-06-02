@@ -37,29 +37,6 @@ public final class PlaceholderApiResolver implements PlaceholderResolver {
     this.setPlaceholders = resolveMethod();
   }
 
-  @Override
-  public boolean isAvailable() {
-    return this.setPlaceholders != null;
-  }
-
-  @Override
-  public String apply(@NonNull Player sender, @NonNull String input) {
-    if (this.setPlaceholders == null) {
-      return input;
-    }
-    if (input.indexOf('%') < 0) {
-      return input;
-    }
-
-    try {
-      var result = this.setPlaceholders.invoke(null, sender, input);
-      return (String) result;
-    } catch (ReflectiveOperationException e) {
-      LOG.warn(e, "PlaceholderAPI dispatch failed; falling back to unprocessed template");
-      return input;
-    }
-  }
-
   private static @Nullable Method resolveMethod() {
     var pluginManager = Bukkit.getServer().getPluginManager();
     var plugin = pluginManager.getPlugin(PLUGIN_NAME);
@@ -80,6 +57,29 @@ public final class PlaceholderApiResolver implements PlaceholderResolver {
               + " disabled",
           CLASS_NAME);
       return null;
+    }
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return this.setPlaceholders != null;
+  }
+
+  @Override
+  public String apply(@NonNull Player sender, @NonNull String input) {
+    if (this.setPlaceholders == null) {
+      return input;
+    }
+    if (input.indexOf('%') < 0) {
+      return input;
+    }
+
+    try {
+      var result = this.setPlaceholders.invoke(null, sender, input);
+      return (String) result;
+    } catch (ReflectiveOperationException e) {
+      LOG.warn(e, "PlaceholderAPI dispatch failed; falling back to unprocessed template");
+      return input;
     }
   }
 }

@@ -70,6 +70,11 @@ public final class SqlTpaProfileRepository implements TpaProfileRepository {
     }
   }
 
+  private static int mapReceive(
+      @NonNull Map<TeleportRequestType, Boolean> map, @NonNull TeleportRequestType type) {
+    return map.getOrDefault(type, false) ? 1 : 0;
+  }
+
   public List<TpaProfileService.Entry> listAll() {
     return this.sqlExecutor.query(TpaProfileTable.SELECT_ALL, SqlTpaProfileRepository::readRow);
   }
@@ -109,10 +114,5 @@ public final class SqlTpaProfileRepository implements TpaProfileRepository {
         dndUntilMs,
         favoriteOrdering,
         updatedAt);
-  }
-
-  private static int mapReceive(
-      @NonNull Map<TeleportRequestType, Boolean> map, @NonNull TeleportRequestType type) {
-    return map.getOrDefault(type, false) ? 1 : 0;
   }
 }

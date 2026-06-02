@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 public record ReplyCommand(
     ConfigHandle<MsgConfig> config,
     MsgService partners,
-    MsgExchangeOrchestrator dispatcher,
+    MsgExchangeOrchestrator orchestrator,
     PlayerProvider players,
     BiPredicate<Player, Player> visibilityFilter) {
 
@@ -58,7 +58,7 @@ public record ReplyCommand(
       return CommandResult.invalidUsage(offlineMsg);
     }
 
-    this.dispatcher.send(from, target, body);
+    this.orchestrator.send(from, target, body);
     return CommandResult.success();
   }
 }

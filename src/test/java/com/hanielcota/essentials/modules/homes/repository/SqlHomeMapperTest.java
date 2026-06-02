@@ -26,7 +26,8 @@ class SqlHomeMapperTest {
             Map.entry("created_at", 6L),
             Map.entry("pinned", 0),
             Map.entry("teleport_count", 0L),
-            Map.entry("last_used_at", 0L));
+            Map.entry("last_used_at", 0L),
+            Map.entry("shared", 0));
 
     return (ResultSet)
         Proxy.newProxyInstance(

@@ -16,54 +16,6 @@ import org.bukkit.Material;
 
 public final class TpaPendingActionRenderer {
 
-  public ItemTemplate targetTemplate(
-      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
-    var requesterName = request.requester().name();
-    var typeLabel = typeLabel(settings, request.type());
-    var seconds = Long.toString(secondsLeft(request));
-    var name = targetName(settings, requesterName, typeLabel, seconds);
-    var lore = applyTargetPlaceholders(settings.targetLore(), requesterName, typeLabel, seconds);
-
-    var builder = ItemTemplate.builder(settings.targetIcon());
-    applyTargetHead(builder, settings, request);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  public ItemTemplate acceptTemplate(
-      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
-    var requesterName = request.requester().name();
-    var name = settings.acceptName().replace("{player}", requesterName);
-    var lore = replacePlayer(settings.acceptLore(), requesterName);
-
-    return MenuTemplates.simple(settings.acceptIcon(), name, lore);
-  }
-
-  public ItemTemplate denyTemplate(
-      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
-    var requesterName = request.requester().name();
-    var name = settings.denyName().replace("{player}", requesterName);
-    var lore = replacePlayer(settings.denyLore(), requesterName);
-
-    return MenuTemplates.simple(settings.denyIcon(), name, lore);
-  }
-
-  public ItemTemplate blockTemplate(
-      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
-    var requesterName = request.requester().name();
-    var name = settings.blockName().replace("{player}", requesterName);
-    var lore = replacePlayer(settings.blockLore(), requesterName);
-
-    return MenuTemplates.simple(settings.blockIcon(), name, lore);
-  }
-
-  public ItemTemplate backTemplate(@NonNull TpaPendingActionMenuConfig settings) {
-    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
-  }
-
   private static String targetName(
       @NonNull TpaPendingActionMenuConfig settings,
       @NonNull String requesterName,
@@ -123,5 +75,53 @@ public final class TpaPendingActionRenderer {
       replaced.add(line.replace("{player}", player));
     }
     return replaced;
+  }
+
+  public ItemTemplate targetTemplate(
+      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
+    var requesterName = request.requester().name();
+    var typeLabel = typeLabel(settings, request.type());
+    var seconds = Long.toString(secondsLeft(request));
+    var name = targetName(settings, requesterName, typeLabel, seconds);
+    var lore = applyTargetPlaceholders(settings.targetLore(), requesterName, typeLabel, seconds);
+
+    var builder = ItemTemplate.builder(settings.targetIcon());
+    applyTargetHead(builder, settings, request);
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  public ItemTemplate acceptTemplate(
+      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
+    var requesterName = request.requester().name();
+    var name = settings.acceptName().replace("{player}", requesterName);
+    var lore = replacePlayer(settings.acceptLore(), requesterName);
+
+    return MenuTemplates.simple(settings.acceptIcon(), name, lore);
+  }
+
+  public ItemTemplate denyTemplate(
+      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
+    var requesterName = request.requester().name();
+    var name = settings.denyName().replace("{player}", requesterName);
+    var lore = replacePlayer(settings.denyLore(), requesterName);
+
+    return MenuTemplates.simple(settings.denyIcon(), name, lore);
+  }
+
+  public ItemTemplate blockTemplate(
+      @NonNull TpaPendingActionMenuConfig settings, @NonNull TeleportRequest request) {
+    var requesterName = request.requester().name();
+    var name = settings.blockName().replace("{player}", requesterName);
+    var lore = replacePlayer(settings.blockLore(), requesterName);
+
+    return MenuTemplates.simple(settings.blockIcon(), name, lore);
+  }
+
+  public ItemTemplate backTemplate(@NonNull TpaPendingActionMenuConfig settings) {
+    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
   }
 }

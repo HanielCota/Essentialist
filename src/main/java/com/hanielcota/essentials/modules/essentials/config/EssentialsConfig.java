@@ -29,9 +29,7 @@ public record EssentialsConfig(
     var succeededStr = String.valueOf(succeeded);
     var totalStr = String.valueOf(total);
 
-    var withSucceeded = reloadFailure.replace("{succeeded}", succeededStr);
-    var withTotal = withSucceeded.replace("{total}", totalStr);
-
-    return withTotal.replace("{failed}", failed);
+    return com.hanielcota.essentials.shared.Placeholders.format(
+        reloadFailure, "succeeded", succeededStr, "total", totalStr, "failed", failed);
   }
 }

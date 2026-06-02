@@ -38,20 +38,6 @@ public final class PlayerMessageStyler {
   private static final MiniMessage DECORATIONS_ONLY = buildMiniMessage(false, true);
   private static final MiniMessage FULL = buildMiniMessage(true, true);
 
-  public Component style(@NonNull Player sender, @NonNull String plainMessage) {
-    var hasColor = sender.hasPermission(ChatPermissions.CHAT_COLOR);
-    var hasFormat = sender.hasPermission(ChatPermissions.CHAT_FORMAT);
-
-    if (!hasColor && !hasFormat) {
-      return Component.text(plainMessage);
-    }
-
-    var converted = LegacyTagDictionary.convertLegacy(plainMessage, hasColor, hasFormat);
-    var mini = pickMini(hasColor, hasFormat);
-
-    return mini.deserialize(converted);
-  }
-
   private static MiniMessage pickMini(boolean color, boolean decorations) {
     if (color && decorations) {
       return FULL;
@@ -75,5 +61,19 @@ public final class PlayerMessageStyler {
     var tagResolver = resolver.build();
 
     return MiniMessage.builder().tags(tagResolver).build();
+  }
+
+  public Component style(@NonNull Player sender, @NonNull String plainMessage) {
+    var hasColor = sender.hasPermission(ChatPermissions.CHAT_COLOR);
+    var hasFormat = sender.hasPermission(ChatPermissions.CHAT_FORMAT);
+
+    if (!hasColor && !hasFormat) {
+      return Component.text(plainMessage);
+    }
+
+    var converted = LegacyTagDictionary.convertLegacy(plainMessage, hasColor, hasFormat);
+    var mini = pickMini(hasColor, hasFormat);
+
+    return mini.deserialize(converted);
   }
 }

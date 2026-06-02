@@ -39,6 +39,31 @@ public final class HomeOptionsMenu implements EssentialsMenu {
   private final HomesActionTarget target;
   private final HomeOptionsClickHandler clicks;
 
+  private static ItemTemplate buttonTemplate(
+      @NonNull org.bukkit.Material material,
+      @NonNull String nameTemplate,
+      @NonNull List<String> loreTemplate,
+      String homeName) {
+    var safeName = homeName != null ? homeName : "?";
+    var name = nameTemplate.replace("{name}", safeName);
+    var lore = Placeholders.replaceInAll(loreTemplate, "{name}", safeName);
+
+    return MenuTemplates.simple(material, name, lore);
+  }
+
+  private static ItemTemplate missingTemplate(@NonNull HomesOptionsMenuConfig options) {
+    var name = options.unavailableName();
+
+    return MenuTemplates.simple(options.backMaterial(), name, List.of());
+  }
+
+  // The inventory title is fixed at menu registration, so the {name} placeholder cannot be
+  // resolved per-viewer. The home name is shown in the info slot instead — strip the unresolved
+  // token so existing user configs don't render it literally.
+  private static String stripNamePlaceholder(@NonNull String raw) {
+    return raw.replace("{name}", "").strip();
+  }
+
   @Override
   public @NonNull String id() {
     return ID;
@@ -62,6 +87,7 @@ public final class HomeOptionsMenu implements EssentialsMenu {
             MenuLayouts.sanitizeSlot(options.pinSlot(), rows, 13),
             MenuLayouts.sanitizeSlot(options.iconSlot(), rows, 14),
             MenuLayouts.sanitizeSlot(options.deleteSlot(), rows, 15),
+            MenuLayouts.sanitizeSlot(options.shareSlot(), rows, 16),
             MenuLayouts.sanitizeSlot(options.backSlot(), rows, 22));
     var pagination = PaginationConfig.builder().contentSlots(contentSlots).build();
 
@@ -81,7 +107,9 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     var uuid = player.getUniqueId();
     var homeName = this.target.peek(uuid);
 
-    var pinned = isPinned(uuid, homeName);
+    var home = homeName != null ? this.service.findHome(uuid, homeName).orElse(null) : null;
+    var pinned = home != null && home.pinned();
+    var shared = home != null && home.shared();
 
     var slots = new ArrayList<SlotDefinition>();
     slots.add(homeSlot(options, rows, uuid, homeName));
@@ -90,15 +118,9 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     slots.add(pinSlot(options, rows, homeName, pinned));
     slots.add(iconSlot(options, rows, homeName));
     slots.add(deleteSlot(options, rows, homeName));
+    slots.add(shareSlot(options, rows, homeName, shared));
     slots.add(backSlot(options, rows));
     return slots;
-  }
-
-  private boolean isPinned(@NonNull java.util.UUID uuid, String homeName) {
-    if (homeName == null) {
-      return false;
-    }
-    return this.service.findHome(uuid, homeName).map(home -> home.pinned()).orElse(false);
   }
 
   private SlotDefinition homeSlot(
@@ -152,6 +174,18 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     return SlotDefinition.of(safeSlot, template, this.clicks::togglePin);
   }
 
+  private SlotDefinition shareSlot(
+      @NonNull HomesOptionsMenuConfig options, int rows, String homeName, boolean shared) {
+    var material = shared ? options.unshareMaterial() : options.shareMaterial();
+    var nameTemplate = shared ? options.unshareName() : options.shareName();
+    var loreTemplate = shared ? options.unshareLore() : options.shareLore();
+
+    var template = buttonTemplate(material, nameTemplate, loreTemplate, homeName);
+    var safeSlot = MenuLayouts.sanitizeSlot(options.shareSlot(), rows, 16);
+
+    return SlotDefinition.of(safeSlot, template, this.clicks::toggleShare);
+  }
+
   private SlotDefinition iconSlot(
       @NonNull HomesOptionsMenuConfig options, int rows, String homeName) {
     var template =
@@ -177,30 +211,5 @@ public final class HomeOptionsMenu implements EssentialsMenu {
     var safeSlot = MenuLayouts.sanitizeSlot(options.backSlot(), rows, 22);
 
     return SlotDefinition.of(safeSlot, template, this.clicks::back);
-  }
-
-  private static ItemTemplate buttonTemplate(
-      @NonNull org.bukkit.Material material,
-      @NonNull String nameTemplate,
-      @NonNull List<String> loreTemplate,
-      String homeName) {
-    var safeName = homeName != null ? homeName : "?";
-    var name = nameTemplate.replace("{name}", safeName);
-    var lore = Placeholders.replaceInAll(loreTemplate, "{name}", safeName);
-
-    return MenuTemplates.simple(material, name, lore);
-  }
-
-  private static ItemTemplate missingTemplate(@NonNull HomesOptionsMenuConfig options) {
-    var name = options.unavailableName();
-
-    return MenuTemplates.simple(options.backMaterial(), name, List.of());
-  }
-
-  // The inventory title is fixed at menu registration, so the {name} placeholder cannot be
-  // resolved per-viewer. The home name is shown in the info slot instead — strip the unresolved
-  // token so existing user configs don't render it literally.
-  private static String stripNamePlaceholder(@NonNull String raw) {
-    return raw.replace("{name}", "").strip();
   }
 }

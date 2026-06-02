@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.warps.service;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import lombok.NonNull;
 
@@ -10,11 +11,18 @@ import lombok.NonNull;
  */
 public final class WarpNameValidator {
 
+  // The pattern string comes from config and is stable across calls; compiling it per call would
+  // re-parse the regex every /setwarp. Cache by source so a config reload still picks up changes.
+  private final ConcurrentHashMap<String, Pattern> compiled = new ConcurrentHashMap<>();
+
   public boolean isValid(@NonNull String name, int maxLength, @NonNull String pattern) {
     if (name.isBlank() || name.length() > maxLength) {
       return false;
     }
 
-    return Pattern.matches(pattern, name);
+    var regex = this.compiled.computeIfAbsent(pattern, Pattern::compile);
+    var matcher = regex.matcher(name);
+
+    return matcher.matches();
   }
 }

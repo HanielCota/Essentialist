@@ -20,91 +20,6 @@ public final class TpaFavoriteMenuRenderer {
 
   private final @NonNull PlayerProvider players;
 
-  public int addSlot(@NonNull TpaFavoritesMenuConfig settings, int rows) {
-    return MenuLayouts.sanitizeSlot(settings.addSlot(), rows, 0);
-  }
-
-  public ItemTemplate addTemplate(@NonNull TpaFavoritesMenuConfig settings) {
-    var builder = ItemTemplate.builder(settings.addIcon());
-    if (settings.addIcon() == Material.PLAYER_HEAD && !settings.addHeadTexture().isBlank()) {
-      builder.head(settings.addHeadTexture());
-    }
-    builder.name(settings.addName());
-    builder.lore(settings.addLore().toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  public int backSlot(@NonNull TpaFavoritesMenuConfig settings, int rows) {
-    return MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
-  }
-
-  public ItemTemplate backTemplate(@NonNull TpaFavoritesMenuConfig settings) {
-    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
-  }
-
-  public ItemTemplate emptyTemplate(@NonNull TpaFavoritesMenuConfig settings) {
-    return MenuTemplates.simple(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
-  }
-
-  public ItemTemplate orderingTemplate(
-      @NonNull TpaFavoritesMenuConfig settings, @NonNull FavoriteOrdering ordering) {
-    var stateLabel = orderingStateLabel(settings, ordering);
-    var name = settings.orderingName().replace("{state}", stateLabel);
-    var lore = renderOrderingLore(settings, stateLabel, ordering);
-
-    return MenuTemplates.simple(settings.orderingIcon(), name, lore);
-  }
-
-  public ItemTemplate favoriteTemplate(
-      @NonNull TpaFavoritesMenuConfig settings, @NonNull TpaFavorite entry) {
-    var statusLabel = statusLabel(entry.favoriteId(), settings);
-    var name =
-        settings
-            .favoriteName()
-            .replace("{player}", entry.favoriteName())
-            .replace("{status}", statusLabel);
-    var lore =
-        applyFavoritePlaceholders(settings.favoriteLore(), entry.favoriteName(), statusLabel);
-
-    var builder = ItemTemplate.builder(settings.favoriteIcon());
-    applyFavoriteHead(builder, settings, entry);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  public ItemTemplate suggestionTemplate(
-      @NonNull TpaFavoritesMenuConfig settings, @NonNull TpaContact contact) {
-    var statusLabel = statusLabel(contact.targetId(), settings);
-    var count = Long.toString(contact.count());
-    var name =
-        settings
-            .suggestionName()
-            .replace("{player}", contact.targetName())
-            .replace("{status}", statusLabel)
-            .replace("{count}", count);
-    var lore =
-        applySuggestionPlaceholders(
-            settings.suggestionLore(), contact.targetName(), statusLabel, count);
-
-    var builder = ItemTemplate.builder(settings.suggestionIcon());
-    applySuggestionHead(builder, settings, contact);
-    builder.name(name);
-    builder.lore(lore.toArray(String[]::new));
-    builder.italic(false);
-
-    return builder.build();
-  }
-
-  private String statusLabel(@NonNull UUID targetId, @NonNull TpaFavoritesMenuConfig settings) {
-    var online = this.players.online(targetId).isPresent();
-    return online ? settings.statusOnline() : settings.statusOffline();
-  }
-
   private static String orderingStateLabel(
       @NonNull TpaFavoritesMenuConfig settings, @NonNull FavoriteOrdering ordering) {
     return switch (ordering) {
@@ -199,5 +114,90 @@ public final class TpaFavoriteMenuRenderer {
       replaced.add(withCount);
     }
     return replaced;
+  }
+
+  public int addSlot(@NonNull TpaFavoritesMenuConfig settings, int rows) {
+    return MenuLayouts.sanitizeSlot(settings.addSlot(), rows, 0);
+  }
+
+  public ItemTemplate addTemplate(@NonNull TpaFavoritesMenuConfig settings) {
+    var builder = ItemTemplate.builder(settings.addIcon());
+    if (settings.addIcon() == Material.PLAYER_HEAD && !settings.addHeadTexture().isBlank()) {
+      builder.head(settings.addHeadTexture());
+    }
+    builder.name(settings.addName());
+    builder.lore(settings.addLore().toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  public int backSlot(@NonNull TpaFavoritesMenuConfig settings, int rows) {
+    return MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
+  }
+
+  public ItemTemplate backTemplate(@NonNull TpaFavoritesMenuConfig settings) {
+    return MenuTemplates.simple(settings.backIcon(), settings.backName(), settings.backLore());
+  }
+
+  public ItemTemplate emptyTemplate(@NonNull TpaFavoritesMenuConfig settings) {
+    return MenuTemplates.simple(settings.emptyIcon(), settings.emptyName(), settings.emptyLore());
+  }
+
+  public ItemTemplate orderingTemplate(
+      @NonNull TpaFavoritesMenuConfig settings, @NonNull FavoriteOrdering ordering) {
+    var stateLabel = orderingStateLabel(settings, ordering);
+    var name = settings.orderingName().replace("{state}", stateLabel);
+    var lore = renderOrderingLore(settings, stateLabel, ordering);
+
+    return MenuTemplates.simple(settings.orderingIcon(), name, lore);
+  }
+
+  public ItemTemplate favoriteTemplate(
+      @NonNull TpaFavoritesMenuConfig settings, @NonNull TpaFavorite entry) {
+    var statusLabel = statusLabel(entry.favoriteId(), settings);
+    var name =
+        settings
+            .favoriteName()
+            .replace("{player}", entry.favoriteName())
+            .replace("{status}", statusLabel);
+    var lore =
+        applyFavoritePlaceholders(settings.favoriteLore(), entry.favoriteName(), statusLabel);
+
+    var builder = ItemTemplate.builder(settings.favoriteIcon());
+    applyFavoriteHead(builder, settings, entry);
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  public ItemTemplate suggestionTemplate(
+      @NonNull TpaFavoritesMenuConfig settings, @NonNull TpaContact contact) {
+    var statusLabel = statusLabel(contact.targetId(), settings);
+    var count = Long.toString(contact.count());
+    var name =
+        settings
+            .suggestionName()
+            .replace("{player}", contact.targetName())
+            .replace("{status}", statusLabel)
+            .replace("{count}", count);
+    var lore =
+        applySuggestionPlaceholders(
+            settings.suggestionLore(), contact.targetName(), statusLabel, count);
+
+    var builder = ItemTemplate.builder(settings.suggestionIcon());
+    applySuggestionHead(builder, settings, contact);
+    builder.name(name);
+    builder.lore(lore.toArray(String[]::new));
+    builder.italic(false);
+
+    return builder.build();
+  }
+
+  private String statusLabel(@NonNull UUID targetId, @NonNull TpaFavoritesMenuConfig settings) {
+    var online = this.players.online(targetId).isPresent();
+    return online ? settings.statusOnline() : settings.statusOffline();
   }
 }

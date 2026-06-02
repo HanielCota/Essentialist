@@ -14,7 +14,7 @@ import org.bukkit.entity.Player;
  * chat viewers list) and {@link StaffChatNotifier} (to fan a {@code /staffchat} broadcast out
  * directly).
  *
- * <p>Centralising the predicate means a permission change happens in exactly one place.
+ * <p>Centralizing the predicate means a permission change happens in exactly one place.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StaffAudience {

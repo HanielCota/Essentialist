@@ -24,7 +24,8 @@ public final class HomeCreateNotifier {
   }
 
   public void sendPrompt(@NonNull Player player, long seconds) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var template = messages.createPrompt();
     var secondsStr = Long.toString(seconds);
     var promptMsg = template.replace("{seconds}", secondsStr);
@@ -33,21 +34,24 @@ public final class HomeCreateNotifier {
   }
 
   public void sendCancelled(@NonNull Player player) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var cancelledText = messages.createCancelled();
 
     sendMini(player, cancelledText);
   }
 
   public void sendInvalid(@NonNull Player player) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var invalidText = messages.invalidName();
 
     sendMini(player, invalidText);
   }
 
   public void sendCreated(@NonNull Player player, @NonNull String name) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var template = messages.homeSet();
     var msg = template.replace("{name}", name);
 
@@ -55,7 +59,8 @@ public final class HomeCreateNotifier {
   }
 
   public void sendAlreadyExists(@NonNull Player player, @NonNull String name) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var template = messages.createAlreadyExists();
     var msg = template.replace("{name}", name);
 
@@ -66,8 +71,17 @@ public final class HomeCreateNotifier {
     sendMini(player, message);
   }
 
+  public void sendWorldBlocked(@NonNull Player player) {
+    var snap = this.config.value();
+    var messages = snap.messages();
+    var worldBlockedText = messages.worldBlocked();
+
+    sendMini(player, worldBlockedText);
+  }
+
   public void sendTimeout(@NonNull Player player, long seconds) {
-    var messages = this.config.value().messages();
+    var snap = this.config.value();
+    var messages = snap.messages();
     var template = messages.createTimeout();
     var secondsStr = Long.toString(seconds);
     var msg = template.replace("{seconds}", secondsStr);

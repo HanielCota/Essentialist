@@ -14,7 +14,6 @@ import io.github.hanielcota.commandframework.annotation.Permission;
 import io.github.hanielcota.commandframework.annotation.Syntax;
 import io.github.hanielcota.commandframework.core.CommandActor;
 import io.github.hanielcota.commandframework.core.CommandResult;
-import java.time.Duration;
 import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
@@ -45,16 +44,23 @@ public record MuteCommand(MuteService service, MuteNotifier notifier) {
     var rawDuration = duracao.orElse("");
     var trimmed = rawDuration.strip();
 
-    Duration duration = null;
-    if (!trimmed.isEmpty()) {
-      duration = MuteDurationParser.tryParse(trimmed);
-      if (duration == null) {
-        this.notifier.sendInvalidDuration(sender, trimmed);
-        return CommandResult.invalidUsage();
-      }
+    if (trimmed.isEmpty()) {
+      var permanentOutcome = this.service.mute(target, null);
+      return handleOutcome(sender, target, permanentOutcome);
+    }
+
+    var duration = MuteDurationParser.tryParse(trimmed);
+    if (duration == null) {
+      this.notifier.sendInvalidDuration(sender, trimmed);
+      return CommandResult.invalidUsage();
     }
 
     var outcome = this.service.mute(target, duration);
+    return handleOutcome(sender, target, outcome);
+  }
+
+  private CommandResult handleOutcome(
+      @NonNull CommandActor sender, @NonNull Player target, @NonNull MuteOutcome outcome) {
     return switch (outcome) {
       case MuteOutcome.Muted muted -> {
         this.notifier.sendMuted(sender, target, muted.mute());

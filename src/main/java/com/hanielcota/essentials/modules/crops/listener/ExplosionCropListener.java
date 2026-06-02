@@ -19,6 +19,14 @@ public final class ExplosionCropListener implements Listener {
 
   private final ConfigHandle<CropsConfig> config;
 
+  private static boolean isProtected(@NonNull CropsConfig snap, @NonNull Material type) {
+    if (snap.preventExplosion() && Tag.CROPS.isTagged(type) && snap.isCropAllowed(type)) {
+      return true;
+    }
+
+    return snap.preventExplosionFarmland() && type == Material.FARMLAND;
+  }
+
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onEntityExplode(@NonNull EntityExplodeEvent event) {
     var worldName = event.getLocation().getWorld().getName();
@@ -43,13 +51,5 @@ public final class ExplosionCropListener implements Listener {
     }
 
     blocks.removeIf(block -> isProtected(snap, block.getType()));
-  }
-
-  private static boolean isProtected(@NonNull CropsConfig snap, @NonNull Material type) {
-    if (snap.preventExplosion() && Tag.CROPS.isTagged(type) && snap.isCropAllowed(type)) {
-      return true;
-    }
-
-    return snap.preventExplosionFarmland() && type == Material.FARMLAND;
   }
 }

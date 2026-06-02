@@ -31,6 +31,21 @@ public final class WarpService implements WarpsApi {
 
   private final WarpPermissions permissions = new WarpPermissions();
 
+  private static Warp build(
+      @NonNull String name,
+      @NonNull Location location,
+      @NonNull Player creator,
+      @NonNull Material icon,
+      @NonNull Optional<Warp> existing) {
+    if (existing.isEmpty()) {
+      var uniqueId = creator.getUniqueId();
+      return Warp.of(name, location, uniqueId, icon);
+    }
+
+    var previous = existing.get();
+    return previous.movedTo(location, icon);
+  }
+
   public Optional<Warp> findWarp(@NonNull String name) {
     return this.cache.find(name);
   }
@@ -63,21 +78,6 @@ public final class WarpService implements WarpsApi {
 
     Runnable persist = () -> this.repository.save(warp);
     this.writer.submit("save warp", persist);
-  }
-
-  private static Warp build(
-      @NonNull String name,
-      @NonNull Location location,
-      @NonNull Player creator,
-      @NonNull Material icon,
-      @NonNull Optional<Warp> existing) {
-    if (existing.isEmpty()) {
-      var uniqueId = creator.getUniqueId();
-      return Warp.of(name, location, uniqueId, icon);
-    }
-
-    var previous = existing.get();
-    return previous.movedTo(location, icon);
   }
 
   public boolean delete(@NonNull String name) {

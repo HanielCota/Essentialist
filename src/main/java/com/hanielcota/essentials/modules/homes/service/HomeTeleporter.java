@@ -56,6 +56,31 @@ public final class HomeTeleporter {
   }
 
   public void teleport(@NonNull Player player, @NonNull Home home, @NonNull CommandActor actor) {
+    var ownerId = home.owner();
+    var homeName = home.name();
+
+    Runnable onSuccess =
+        () -> this.service.recordUsage(ownerId, homeName, System.currentTimeMillis());
+
+    schedule(player, home, actor, onSuccess);
+  }
+
+  /**
+   * Same warm-up flow as {@link #teleport} but without recording usage: a visitor must not load or
+   * mutate the offline owner's cache bucket.
+   */
+  public void teleportVisit(
+      @NonNull Player player, @NonNull Home home, @NonNull CommandActor actor) {
+    Runnable onSuccess = () -> {};
+
+    schedule(player, home, actor, onSuccess);
+  }
+
+  private void schedule(
+      @NonNull Player player,
+      @NonNull Home home,
+      @NonNull CommandActor actor,
+      @NonNull Runnable onSuccess) {
     var snap = this.config.value();
     var messages = snap.messages();
     var resolved = home.resolve().orElse(null);
@@ -66,10 +91,6 @@ public final class HomeTeleporter {
     }
 
     var delay = snap.teleportDelay();
-    var ownerId = home.owner();
-    var homeName = home.name();
-    Runnable onSuccess =
-        () -> this.service.recordUsage(ownerId, homeName, System.currentTimeMillis());
     var prompt = buildPrompt(player, actor, messages, home, onSuccess);
 
     this.delayed.schedule(player, resolved, delay, prompt);

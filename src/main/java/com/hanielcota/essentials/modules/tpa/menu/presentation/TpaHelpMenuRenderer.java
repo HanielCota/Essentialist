@@ -19,6 +19,55 @@ import org.jspecify.annotations.Nullable;
 
 public final class TpaHelpMenuRenderer {
 
+  private static String outgoingTypeLabel(
+      @NonNull TpaHelpMenuConfig helpMenu, @NonNull TeleportRequest request) {
+    return request.type() == TeleportRequestType.TPA
+        ? helpMenu.outgoingTypeTpa()
+        : helpMenu.outgoingTypeTpaHere();
+  }
+
+  private static String outgoingName(
+      @NonNull TpaHelpMenuConfig helpMenu,
+      @NonNull String targetName,
+      @NonNull String typeLabel,
+      @NonNull String seconds) {
+    return Placeholders.format(
+        helpMenu.outgoingName(), "target", targetName, "type", typeLabel, "seconds", seconds);
+  }
+
+  private static List<String> outgoingLore(
+      @NonNull TpaHelpMenuConfig helpMenu,
+      @NonNull String targetName,
+      @NonNull String typeLabel,
+      @NonNull String seconds) {
+    var values = Map.of("target", targetName, "type", typeLabel, "seconds", seconds);
+    return helpMenu.outgoingLore().stream().map(line -> Placeholders.format(line, values)).toList();
+  }
+
+  private static void applyOutgoingHead(
+      @NonNull ItemTemplate.Builder builder,
+      @NonNull TpaHelpMenuConfig helpMenu,
+      @NonNull TeleportRequest request) {
+    if (helpMenu.outgoingIcon() != Material.PLAYER_HEAD) {
+      return;
+    }
+    if (helpMenu.outgoingUsePlayerHead()) {
+      var targetId = request.target().id();
+      PlayerHeadTextures.applyTo(builder, targetId);
+      return;
+    }
+    if (!helpMenu.outgoingHeadTexture().isBlank()) {
+      builder.head(helpMenu.outgoingHeadTexture());
+    }
+  }
+
+  private static long secondsLeft(@NonNull TeleportRequest request) {
+    var now = Instant.now();
+    var remaining = Duration.between(now, request.window().expiresAt()).toSeconds();
+
+    return Math.max(0, remaining);
+  }
+
   public ItemTemplate template(
       @NonNull Material icon,
       @NonNull String headTexture,
@@ -135,54 +184,5 @@ public final class TpaHelpMenuRenderer {
     builder.italic(false);
 
     return builder.build();
-  }
-
-  private static String outgoingTypeLabel(
-      @NonNull TpaHelpMenuConfig helpMenu, @NonNull TeleportRequest request) {
-    return request.type() == TeleportRequestType.TPA
-        ? helpMenu.outgoingTypeTpa()
-        : helpMenu.outgoingTypeTpaHere();
-  }
-
-  private static String outgoingName(
-      @NonNull TpaHelpMenuConfig helpMenu,
-      @NonNull String targetName,
-      @NonNull String typeLabel,
-      @NonNull String seconds) {
-    return Placeholders.format(
-        helpMenu.outgoingName(), "target", targetName, "type", typeLabel, "seconds", seconds);
-  }
-
-  private static List<String> outgoingLore(
-      @NonNull TpaHelpMenuConfig helpMenu,
-      @NonNull String targetName,
-      @NonNull String typeLabel,
-      @NonNull String seconds) {
-    var values = Map.of("target", targetName, "type", typeLabel, "seconds", seconds);
-    return helpMenu.outgoingLore().stream().map(line -> Placeholders.format(line, values)).toList();
-  }
-
-  private static void applyOutgoingHead(
-      @NonNull ItemTemplate.Builder builder,
-      @NonNull TpaHelpMenuConfig helpMenu,
-      @NonNull TeleportRequest request) {
-    if (helpMenu.outgoingIcon() != Material.PLAYER_HEAD) {
-      return;
-    }
-    if (helpMenu.outgoingUsePlayerHead()) {
-      var targetId = request.target().id();
-      PlayerHeadTextures.applyTo(builder, targetId);
-      return;
-    }
-    if (!helpMenu.outgoingHeadTexture().isBlank()) {
-      builder.head(helpMenu.outgoingHeadTexture());
-    }
-  }
-
-  private static long secondsLeft(@NonNull TeleportRequest request) {
-    var now = Instant.now();
-    var remaining = Duration.between(now, request.window().expiresAt()).toSeconds();
-
-    return Math.max(0, remaining);
   }
 }

@@ -52,7 +52,7 @@ public final class SqlMuteRepository implements MuteRepository {
     if (rows.isEmpty()) {
       return Optional.empty();
     }
-    return Optional.of(rows.get(0).getValue());
+    return Optional.of(rows.getFirst().getValue());
   }
 
   @Override

@@ -52,11 +52,26 @@ public final class SqliteTeleportHistory implements TeleportHistory {
 
     var createdAt = rs.getLong("created_at");
 
-    return new HistoryEntry(id, location, createdAt);
+    var causeName = rs.getString("cause");
+    var cause = parseCause(causeName);
+
+    return new HistoryEntry(id, location, createdAt, cause);
+  }
+
+  /** Tolerates rows written before {@code cause} existed (NULL) or an unknown enum name. */
+  private static Cause parseCause(String raw) {
+    if (raw == null) {
+      return Cause.TELEPORT;
+    }
+    try {
+      return Cause.valueOf(raw);
+    } catch (IllegalArgumentException e) {
+      return Cause.TELEPORT;
+    }
   }
 
   @Override
-  public void push(@NonNull UUID player, @NonNull Location location) {
+  public void push(@NonNull UUID player, @NonNull Location location, @NonNull Cause cause) {
     var world = location.getWorld();
     if (world == null) {
       return;
@@ -71,8 +86,10 @@ public final class SqliteTeleportHistory implements TeleportHistory {
     var yaw = location.getYaw();
     var pitch = location.getPitch();
     var createdAt = System.currentTimeMillis();
+    var causeName = cause.name();
 
-    Runnable pushTask = () -> writeEntry(playerId, worldName, x, y, z, yaw, pitch, createdAt);
+    Runnable pushTask =
+        () -> writeEntry(playerId, worldName, x, y, z, yaw, pitch, createdAt, causeName);
     this.writer.submit("push", pushTask);
   }
 
@@ -84,9 +101,11 @@ public final class SqliteTeleportHistory implements TeleportHistory {
       double z,
       float yaw,
       float pitch,
-      long createdAt) {
+      long createdAt,
+      String causeName) {
     this.sqlExecutor.tx(
-        conn -> insertAndTrim(conn, playerId, worldName, x, y, z, yaw, pitch, createdAt));
+        conn ->
+            insertAndTrim(conn, playerId, worldName, x, y, z, yaw, pitch, createdAt, causeName));
   }
 
   private void insertAndTrim(
@@ -98,10 +117,21 @@ public final class SqliteTeleportHistory implements TeleportHistory {
       double z,
       float yaw,
       float pitch,
-      long createdAt)
+      long createdAt,
+      String causeName)
       throws SQLException {
     this.sqlExecutor.execute(
-        conn, TeleportHistoryTable.INSERT, playerId, worldName, x, y, z, yaw, pitch, createdAt);
+        conn,
+        TeleportHistoryTable.INSERT,
+        playerId,
+        worldName,
+        x,
+        y,
+        z,
+        yaw,
+        pitch,
+        createdAt,
+        causeName);
     this.sqlExecutor.execute(conn, TeleportHistoryTable.TRIM, playerId, playerId, this.capacity);
   }
 

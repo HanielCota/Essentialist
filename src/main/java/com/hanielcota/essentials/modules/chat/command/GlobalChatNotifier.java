@@ -32,6 +32,13 @@ public final class GlobalChatNotifier {
   private final GlobalChannel channel;
   private final AudienceProvider audiences;
 
+  private static Component renderOrEmpty(@NonNull String mini) {
+    if (mini.isEmpty()) {
+      return Component.empty();
+    }
+    return ComponentUtils.mini(mini);
+  }
+
   public void sendOneShot(@NonNull Player sender, @NonNull String body) {
     if (this.guards.shouldBlock(sender, this.channel, body)) {
       return;
@@ -57,12 +64,5 @@ public final class GlobalChatNotifier {
     var component = renderOrEmpty(usage);
 
     actor.sendMessage(component);
-  }
-
-  private static Component renderOrEmpty(@NonNull String mini) {
-    if (mini.isEmpty()) {
-      return Component.empty();
-    }
-    return ComponentUtils.mini(mini);
   }
 }

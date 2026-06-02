@@ -32,6 +32,15 @@ public final class TpaProfileMenuRenderer {
   private final @NonNull TeleportRequestService requests;
   private final @NonNull TpaContactService contacts;
 
+  private static List<String> replaceAll(
+      @NonNull List<String> lines, @NonNull String token, @NonNull String value) {
+    var replaced = new ArrayList<String>(lines.size());
+    for (var line : lines) {
+      replaced.add(line.replace(token, value));
+    }
+    return replaced;
+  }
+
   public List<SlotDefinition> buildSlots(@NonNull Player player, int rows) {
     var settings = this.config.value().profileMenu();
 
@@ -151,14 +160,5 @@ public final class TpaProfileMenuRenderer {
     var safeSlot = MenuLayouts.sanitizeSlot(settings.backSlot(), rows, 0);
 
     return SlotDefinition.of(safeSlot, template, click -> click.switchTo(TpaHelpMenu.ID));
-  }
-
-  private static List<String> replaceAll(
-      @NonNull List<String> lines, @NonNull String token, @NonNull String value) {
-    var replaced = new ArrayList<String>(lines.size());
-    for (var line : lines) {
-      replaced.add(line.replace(token, value));
-    }
-    return replaced;
   }
 }

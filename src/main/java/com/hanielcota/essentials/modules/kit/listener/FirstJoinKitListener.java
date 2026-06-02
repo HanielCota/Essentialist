@@ -1,6 +1,5 @@
 package com.hanielcota.essentials.modules.kit.listener;
 
-import com.hanielcota.essentials.modules.kit.domain.KitClaimResult;
 import com.hanielcota.essentials.modules.kit.service.KitCatalog;
 import com.hanielcota.essentials.modules.kit.service.KitClaimService;
 import lombok.NonNull;
@@ -23,16 +22,8 @@ public final class FirstJoinKitListener implements Listener {
       return;
     }
 
-    var given = 0;
-    for (var kit : this.catalog.firstJoinKits()) {
-      var outcome = this.claim.claim(player, kit, false);
-      if (outcome.result() == KitClaimResult.CLAIMED) {
-        given++;
-      }
-    }
+    var kits = this.catalog.firstJoinKits();
 
-    if (given > 0) {
-      this.claim.playClaimSound(player);
-    }
+    this.claim.claimAll(player, kits);
   }
 }

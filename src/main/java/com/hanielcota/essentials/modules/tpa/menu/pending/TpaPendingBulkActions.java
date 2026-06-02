@@ -33,6 +33,15 @@ public final class TpaPendingBulkActions {
   private final MainThreadCallbacks callbacks;
   private final ActorFactory actors;
 
+  private static List<TeleportRequest> requestsToAccept(@NonNull List<TeleportRequest> pending) {
+    for (var request : pending) {
+      if (request.type() == TeleportRequestType.TPAHERE) {
+        return List.of(request);
+      }
+    }
+    return pending;
+  }
+
   public void acceptAll(@NonNull ClickContext click) {
     var viewer = click.player();
     var viewerId = viewer.getUniqueId();
@@ -132,14 +141,5 @@ public final class TpaPendingBulkActions {
       actor.sendError(processedMsg);
     }
     return accepted;
-  }
-
-  private static List<TeleportRequest> requestsToAccept(@NonNull List<TeleportRequest> pending) {
-    for (var request : pending) {
-      if (request.type() == TeleportRequestType.TPAHERE) {
-        return List.of(request);
-      }
-    }
-    return pending;
   }
 }

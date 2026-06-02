@@ -36,11 +36,6 @@ public record EntityConfig(
                 + " Examples: ZOMBIE, CREEPER, PHANTOM.")
         List<String> blockedSpawnTypes) {
 
-  public enum WorldMode {
-    WHITELIST,
-    BLACKLIST
-  }
-
   public static EntityConfig defaults() {
     return new EntityConfig(
         true,
@@ -58,7 +53,7 @@ public record EntityConfig(
 
   public boolean appliesTo(String worldName) {
     var listed = worlds.contains(worldName);
-    return worldMode == WorldMode.WHITELIST ? listed : !listed;
+    return (worldMode == WorldMode.WHITELIST) == listed;
   }
 
   public boolean hasBypassPermission() {
@@ -71,5 +66,10 @@ public record EntityConfig(
 
   public boolean isSpawnTypeBlocked(String entityTypeName) {
     return blockedSpawnTypes.isEmpty() || blockedSpawnTypes.contains(entityTypeName);
+  }
+
+  public enum WorldMode {
+    WHITELIST,
+    BLACKLIST
   }
 }

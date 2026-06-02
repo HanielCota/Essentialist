@@ -15,9 +15,31 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public final class KitCatalog {
 
+  private static final int ARMOR_SLOTS = 4;
   private final ConfigHandle<KitConfig> config;
-
   private volatile Map<String, Kit> kits = Map.of();
+
+  private static Kit toKit(@NonNull String id, @NonNull KitDefinitionConfig definition) {
+    var storage = KitItemCodec.decode(definition.items());
+    var armor = KitItemCodec.decodePositional(definition.armor(), ARMOR_SLOTS);
+
+    var offhandItems = KitItemCodec.decode(definition.offhand());
+    var offhand = offhandItems.isEmpty() ? null : offhandItems.getFirst();
+
+    return new Kit(
+        id,
+        definition.displayName(),
+        definition.icon(),
+        definition.category(),
+        definition.cooldownSeconds(),
+        definition.oneTime(),
+        definition.permission(),
+        definition.firstJoin(),
+        storage,
+        armor,
+        offhand,
+        definition.dailyReset());
+  }
 
   public void rebuild() {
     var definitions = this.config.value().kits();
@@ -49,29 +71,5 @@ public final class KitCatalog {
 
   public int size() {
     return this.kits.size();
-  }
-
-  private static final int ARMOR_SLOTS = 4;
-
-  private static Kit toKit(@NonNull String id, @NonNull KitDefinitionConfig definition) {
-    var storage = KitItemCodec.decode(definition.items());
-    var armor = KitItemCodec.decodePositional(definition.armor(), ARMOR_SLOTS);
-
-    var offhandItems = KitItemCodec.decode(definition.offhand());
-    var offhand = offhandItems.isEmpty() ? null : offhandItems.getFirst();
-
-    return new Kit(
-        id,
-        definition.displayName(),
-        definition.icon(),
-        definition.category(),
-        definition.cooldownSeconds(),
-        definition.oneTime(),
-        definition.permission(),
-        definition.firstJoin(),
-        storage,
-        armor,
-        offhand,
-        definition.dailyReset());
   }
 }

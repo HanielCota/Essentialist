@@ -31,21 +31,6 @@ public final class TpaRequestRecorder {
     this.history.push(entry);
   }
 
-  public boolean recordExecution(
-      @NonNull TeleportRequest request, @NonNull TeleportExecution execution) {
-    if (!execution.succeeded()) {
-      recordTerminal(request, TeleportRequestStatus.CANCELLED);
-      return false;
-    }
-
-    var destination = execution.optionalDestination().orElseThrow();
-    var entry = TpaHistoryEntry.of(request, TeleportRequestStatus.ACCEPTED, destination);
-
-    this.history.push(entry);
-    recordAcceptedOutgoingStats(request, entry);
-    return true;
-  }
-
   public void recordTeleportFailure(@NonNull TeleportRequest request) {
     recordTerminal(request, TeleportRequestStatus.CANCELLED);
   }

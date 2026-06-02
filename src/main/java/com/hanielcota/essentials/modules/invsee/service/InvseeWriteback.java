@@ -1,12 +1,12 @@
 package com.hanielcota.essentials.modules.invsee.service;
 
-import com.hanielcota.essentials.modules.invsee.domain.InvseeLayout;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeHolder;
+import com.hanielcota.essentials.modules.invsee.domain.InvseeSnapshot;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Writes the editable slots of an /invsee view back into the target's real inventory (storage,
@@ -15,25 +15,17 @@ import org.bukkit.inventory.ItemStack;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class InvseeWriteback {
 
-  public static void apply(@NonNull Player target, @NonNull Inventory view) {
-    var inv = target.getInventory();
-
-    var storage = new ItemStack[InvseeLayout.STORAGE_SLOTS];
-    for (var slot = 0; slot < InvseeLayout.STORAGE_SLOTS; slot++) {
-      storage[slot] = view.getItem(slot);
+  public static boolean apply(
+      @NonNull Player target, @NonNull InvseeHolder holder, @NonNull Inventory view) {
+    var baseline = holder.snapshot();
+    if (baseline == null || !baseline.matches(target)) {
+      return false;
     }
-    inv.setStorageContents(storage);
 
-    var helmet = view.getItem(InvseeLayout.HELMET_SLOT);
-    var chestplate = view.getItem(InvseeLayout.CHESTPLATE_SLOT);
-    var leggings = view.getItem(InvseeLayout.LEGGINGS_SLOT);
-    var boots = view.getItem(InvseeLayout.BOOTS_SLOT);
-    var offhand = view.getItem(InvseeLayout.OFFHAND_SLOT);
+    var next = InvseeSnapshot.fromView(view);
+    next.writeTo(target);
+    holder.snapshot(next);
 
-    inv.setHelmet(helmet);
-    inv.setChestplate(chestplate);
-    inv.setLeggings(leggings);
-    inv.setBoots(boots);
-    inv.setItemInOffHand(offhand);
+    return true;
   }
 }

@@ -20,11 +20,11 @@ public final class ChatTemplateCompiler {
 
   private final ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
 
-  public String compile(@NonNull String templateSource) {
-    return this.cache.computeIfAbsent(templateSource, ChatTemplateCompiler::normalize);
-  }
-
   private static String normalize(@NonNull String source) {
     return LegacyTagDictionary.convertLegacy(source, true, true);
+  }
+
+  public String compile(@NonNull String templateSource) {
+    return this.cache.computeIfAbsent(templateSource, ChatTemplateCompiler::normalize);
   }
 }

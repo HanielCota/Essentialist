@@ -9,11 +9,17 @@ public interface TeleportHistory {
 
   int CAPACITY = 5;
 
-  void push(@NonNull UUID player, @NonNull Location location);
+  void push(@NonNull UUID player, @NonNull Location location, @NonNull Cause cause);
 
   List<HistoryEntry> list(@NonNull UUID player);
 
   void remove(@NonNull UUID player, long entryId);
 
-  record HistoryEntry(long id, Location location, long createdAt) {}
+  /** Why a location was captured into history — drives the {@code /back} menu filter. */
+  enum Cause {
+    DEATH,
+    TELEPORT
+  }
+
+  record HistoryEntry(long id, Location location, long createdAt, Cause cause) {}
 }

@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 class CachedHomeRepositoryTest {
 
   private static Home home(UUID owner, String name) {
-    return new Home(owner, name, "world", 1, 2, 3, 0, 0, Material.RED_BED, 1, false, 0L, 0L);
+    return new Home(owner, name, "world", 1, 2, 3, 0, 0, Material.RED_BED, 1, false, 0L, 0L, false);
   }
 
   private static List<String> names(List<Home> homes) {
@@ -126,6 +126,21 @@ class CachedHomeRepositoryTest {
     assertEquals(1, repository.count(owner));
   }
 
+  @Test
+  void listSharedUsesLoadedCacheBeforeQueuedWriteRuns() {
+    var owner = UUID.randomUUID();
+    var delegate = new RecordingHomeRepository();
+    var writer = new RecordingWriter();
+    var cache = new HomeCache();
+    cache.loadFor(owner, List.of(home(owner, "base")));
+    var repository = new CachedHomeRepository(delegate, writer, cache);
+
+    assertTrue(repository.updateShared(owner, "base", true));
+
+    assertEquals(List.of("base"), names(repository.listShared()));
+    assertEquals(1, writer.pending());
+  }
+
   private static final class RecordingWriter implements AsyncDatabaseWriter {
 
     private final Queue<Runnable> tasks = new ArrayDeque<>();
@@ -208,6 +223,21 @@ class CachedHomeRepositoryTest {
     @Override
     public boolean updatePinned(@NonNull UUID owner, @NonNull String name, boolean pinned) {
       return true;
+    }
+
+    @Override
+    public boolean updateShared(@NonNull UUID owner, @NonNull String name, boolean shared) {
+      this.homes.replaceAll(
+          home ->
+              home.owner().equals(owner) && home.name().equals(name)
+                  ? home.withShared(shared)
+                  : home);
+      return true;
+    }
+
+    @Override
+    public List<Home> listShared() {
+      return this.homes.stream().filter(Home::shared).toList();
     }
 
     @Override

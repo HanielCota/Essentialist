@@ -1,5 +1,6 @@
 package com.hanielcota.essentials.modules.enchant.config;
 
+import com.hanielcota.essentials.shared.Placeholders;
 import java.util.List;
 import lombok.NonNull;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
@@ -57,8 +58,7 @@ public record EnchantConfig(
 
   public String formatApplied(@NonNull String enchantment, int level) {
     var levelText = Integer.toString(level);
-    var withEnchant = applied.replace("{enchantment}", enchantment);
-    return withEnchant.replace("{level}", levelText);
+    return Placeholders.format(applied, "enchantment", enchantment, "level", levelText);
   }
 
   public String formatRemoved(@NonNull String enchantment) {

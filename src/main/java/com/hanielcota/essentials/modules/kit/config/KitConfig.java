@@ -76,6 +76,10 @@ public record KitConfig(
         kits);
   }
 
+  private static KitCategory toCategory(@NonNull String id, @NonNull KitCategoryConfig config) {
+    return new KitCategory(id, config.displayName(), config.icon(), config.order());
+  }
+
   public KitConfig withKits(@NonNull Map<String, KitDefinitionConfig> newKits) {
     return new KitConfig(
         dropWhenInventoryFull,
@@ -114,9 +118,5 @@ public record KitConfig(
     }
 
     return toCategory(id, configured);
-  }
-
-  private static KitCategory toCategory(@NonNull String id, @NonNull KitCategoryConfig config) {
-    return new KitCategory(id, config.displayName(), config.icon(), config.order());
   }
 }

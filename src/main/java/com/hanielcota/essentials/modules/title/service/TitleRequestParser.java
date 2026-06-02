@@ -17,6 +17,13 @@ public final class TitleRequestParser {
 
   private final @NonNull PlayerProvider players;
 
+  private static TitleRequest forSelf(@Nullable Player self, @NonNull String message) {
+    if (self == null) {
+      return new TitleRequest(null, null, message);
+    }
+    return new TitleRequest(self.getUniqueId(), self.getName(), message);
+  }
+
   public TitleRequest parse(@Nullable Player self, @NonNull String input) {
     var trimmedInput = input.strip();
 
@@ -43,12 +50,5 @@ public final class TitleRequestParser {
     }
 
     return new TitleRequest(namedTarget.getUniqueId(), namedTarget.getName(), rest);
-  }
-
-  private static TitleRequest forSelf(@Nullable Player self, @NonNull String message) {
-    if (self == null) {
-      return new TitleRequest(null, null, message);
-    }
-    return new TitleRequest(self.getUniqueId(), self.getName(), message);
   }
 }

@@ -9,8 +9,9 @@ import lombok.NonNull;
 
 /**
  * Stores the history snapshot that {@code /back} read on the main thread so the menu can render it
- * without a second SQL hit on the click thread. Used by the menu via {@link BackEntryProvider},
- * cleared on inventory close / quit.
+ * without a second SQL hit on re-render (e.g. cycling the cause filter). The snapshot is kept — not
+ * consumed — so every re-render reuses it; {@code /back} overwrites it with a fresh read on each
+ * open, and {@link #clear} drops it on quit. Used by the menu via {@link BackEntryProvider}.
  */
 public final class BackPrefetch {
 
@@ -20,8 +21,8 @@ public final class BackPrefetch {
     this.prefetched.put(viewer, List.copyOf(entries));
   }
 
-  public List<HistoryEntry> consume(@NonNull UUID viewer) {
-    return this.prefetched.remove(viewer);
+  public List<HistoryEntry> peek(@NonNull UUID viewer) {
+    return this.prefetched.get(viewer);
   }
 
   public void clear(@NonNull UUID viewer) {

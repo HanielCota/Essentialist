@@ -10,15 +10,6 @@ import lombok.NonNull;
 
 public final class TpaPickPlayerMenuRenderer {
 
-  public ItemTemplate filterTemplate(
-      @NonNull TpaPickPlayerMenuConfig settings, @NonNull TpaPickPlayerFilter filter) {
-    var stateLabel = filterLabel(settings, filter);
-    var name = settings.filterName().replace("{filter}", stateLabel);
-    var lore = renderLore(settings, stateLabel, filter);
-
-    return MenuTemplates.simple(settings.filterIcon(), name, lore);
-  }
-
   private static String filterLabel(
       @NonNull TpaPickPlayerMenuConfig settings, @NonNull TpaPickPlayerFilter filter) {
     return switch (filter) {
@@ -58,5 +49,14 @@ public final class TpaPickPlayerMenuRenderer {
 
   private static String markActive(@NonNull String label, @NonNull String marker, boolean active) {
     return active ? label + marker : label;
+  }
+
+  public ItemTemplate filterTemplate(
+      @NonNull TpaPickPlayerMenuConfig settings, @NonNull TpaPickPlayerFilter filter) {
+    var stateLabel = filterLabel(settings, filter);
+    var name = settings.filterName().replace("{filter}", stateLabel);
+    var lore = renderLore(settings, stateLabel, filter);
+
+    return MenuTemplates.simple(settings.filterIcon(), name, lore);
   }
 }

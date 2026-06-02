@@ -57,7 +57,9 @@ public record HomesMessages(
         String createTimeout,
     @Comment(
             "Shown when the chosen name is already used by an existing home. Placeholders: {name}.")
-        String createAlreadyExists) {
+        String createAlreadyExists,
+    @Comment("Shown when the player tries to create a home in a world where homes are disabled.")
+        String worldBlocked) {
 
   public static HomesMessages defaults() {
     return new HomesMessages(
@@ -92,7 +94,8 @@ public record HomesMessages(
             + "(or <gold>cancel</gold>). You have <gold>{seconds}s</gold>.",
         "<yellow>Create cancelled.",
         "<red>The create window (<gold>{seconds}s</gold>) expired.",
-        "<red>You already have a home named <gold>{name}</gold>. Pick a different name.");
+        "<red>You already have a home named <gold>{name}</gold>. Pick a different name.",
+        "<red>You can't create a home in this world.");
   }
 
   public String invalidName() {

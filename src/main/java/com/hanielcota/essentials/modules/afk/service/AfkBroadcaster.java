@@ -21,14 +21,21 @@ public final class AfkBroadcaster {
 
   public void broadcastEnter(@NonNull String playerName, @Nullable String reason) {
     var snap = this.config.value();
-    var line =
-        reason == null
-            ? snap.formatEnter(playerName)
-            : snap.formatEnterWithReason(playerName, reason);
+    var line = enterLine(snap, playerName, reason);
+
     var component = ComponentUtils.mini(line);
     var audience = this.audiences.broadcast();
 
     audience.sendMessage(component);
+  }
+
+  private static String enterLine(
+      @NonNull AfkConfig snap, @NonNull String playerName, @Nullable String reason) {
+    if (reason == null) {
+      return snap.formatEnter(playerName);
+    }
+
+    return snap.formatEnterWithReason(playerName, reason);
   }
 
   public void broadcastExit(@NonNull String playerName) {

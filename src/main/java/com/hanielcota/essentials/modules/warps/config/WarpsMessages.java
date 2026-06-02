@@ -17,14 +17,6 @@ public record WarpsMessages(
                 + "Placeholders: {name}.")
         String noPermission,
     @Comment("Shown by /warp when the target world is no longer loaded.") String worldGone,
-    @Comment("/warps when the player has no usable warps.") String noWarps,
-    @Comment("/warps header. Placeholders: {count}.") String listHeader,
-    @Comment(
-            "Clickable list item shown by /warps — one per warp. Placeholders: {name}, "
-                + "{world}, {x}, {y}, {z}.")
-        String listEntry,
-    @Comment("Tooltip shown when hovering a /warps entry. Placeholders: {name}.")
-        String listEntryHover,
     @Comment("Shown on /warp start when a delay is configured. Placeholders: {name}, {seconds}.")
         String teleporting,
     @Comment("Shown after /warp completes successfully. Placeholders: {name}.") String teleported,
@@ -41,10 +33,6 @@ public record WarpsMessages(
         "<yellow>Warp <gold>{name}</gold> removed.",
         "<red>You do not have permission to use the warp <gold>{name}</gold>.",
         "<red>This warp's world is not loaded.",
-        "<red>You do not have access to any warp.",
-        "<gray>Available warps (<gold>{count}</gold><gray>):",
-        "<gold>{name}</gold> <gray>— <white>{world} {x}, {y}, {z}",
-        "<gray>Click to go to <gold>{name}</gold>.",
         "<yellow>Teleporting to <gold>{name}</gold> in <gold>{seconds}s</gold>. "
             + "Do not take damage.",
         "<green>You were teleported to <gold>{name}</gold>.",

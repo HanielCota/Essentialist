@@ -19,6 +19,12 @@ public final class KitClaimNotifier {
   private final ConfigHandle<KitConfig> config;
   private final KitCooldownService cooldowns;
 
+  private static void send(@NonNull Player player, @NonNull String mini) {
+    var component = ComponentUtils.mini(mini);
+
+    player.sendMessage(component);
+  }
+
   public void notify(@NonNull Player player, @NonNull Kit kit, @NonNull ClaimOutcome outcome) {
     var messages = this.config.value().messages();
     var name = kit.displayName();
@@ -45,11 +51,5 @@ public final class KitClaimNotifier {
     var seconds = this.cooldowns.remainingSeconds(player.getUniqueId(), kit);
 
     return KitDurations.format(seconds);
-  }
-
-  private static void send(@NonNull Player player, @NonNull String mini) {
-    var component = ComponentUtils.mini(mini);
-
-    player.sendMessage(component);
   }
 }

@@ -19,17 +19,17 @@ public record LeavesConfig(
     @Comment("Worlds the worldMode applies to. Use the exact world folder name.")
         List<String> worlds) {
 
-  public enum WorldMode {
-    WHITELIST,
-    BLACKLIST
-  }
-
   public static LeavesConfig defaults() {
     return new LeavesConfig(true, WorldMode.BLACKLIST, List.of());
   }
 
   public boolean appliesTo(String worldName) {
     var listed = worlds.contains(worldName);
-    return worldMode == WorldMode.WHITELIST ? listed : !listed;
+    return (worldMode == WorldMode.WHITELIST) == listed;
+  }
+
+  public enum WorldMode {
+    WHITELIST,
+    BLACKLIST
   }
 }

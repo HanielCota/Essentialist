@@ -20,16 +20,6 @@ public record InfoEntry(Material icon, String name, List<String> lore, @Nullable
     lore = List.copyOf(lore);
   }
 
-  public static InfoEntry of(
-      @NonNull Material icon, @NonNull String name, @NonNull String... lore) {
-    return new InfoEntry(icon, name, List.of(lore), null);
-  }
-
-  /** An entry rendered as the player head of {@code owner}. */
-  public static InfoEntry head(@NonNull UUID owner, @NonNull String name, @NonNull String... lore) {
-    return new InfoEntry(Material.PLAYER_HEAD, name, List.of(lore), owner);
-  }
-
   /** Expands {@code template}'s name/lore against {@code values}; uses the template's icon. */
   public static InfoEntry from(@NonNull InfoEntryConfig template, @NonNull Map<String, ?> values) {
     var name = Placeholders.format(template.name(), values);
