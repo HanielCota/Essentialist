@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("com.gradleup.shadow") version "9.4.2"
+    id("com.gradleup.shadow") version "9.4.3"
     id("com.diffplug.spotless") version "8.6.0"
 }
 
