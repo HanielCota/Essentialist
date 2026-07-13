@@ -34,7 +34,7 @@ dependencies {
     implementation("org.spongepowered:configurate-yaml:${configurate.get()}")
     implementation("com.zaxxer:HikariCP:${hikari.get()}")
     implementation("org.xerial:sqlite-jdbc:${sqlite.get()}")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.1.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
